@@ -1,10 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portal AR – Galeria Imersiva com Modal Externo</title>
+    
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    
+    <style>
+      html, body {
+        margin: 0; padding: 0; width: 100%; height: 100%;
+        overflow: hidden; background-color: transparent !important;
+      }
+      
+      /* Elementos de Fundo (Câmara Web) */
+      #container-video {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        z-index: 1; pointer-events: none; background-color: #000;
+      }
+      #webcam-video { width: 100% !important; height: 100% !important; object-fit: cover; }
+      
+      /* Elementos AR 3D */
+      #container-3d {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        z-index: 10; pointer-events: auto; background: transparent !important;
+      }
+      a-scene { width: 100% !important; height: 100% !important; background: transparent !important; }
+      
+      /* Botão Inicial */
+      #btn-iniciar {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        z-index: 9999; padding: 15px 30px; background-color: #FF0000; color: white;
+        border: none; font-family: sans-serif; font-size: 16px; font-weight: bold;
+        cursor: pointer; border-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      }
 
-<html>
-    <head>
-        <title>Template VR Corrigido</title>
-       
-    </head>
-    <body>
-       <p> fernanda<p>
-    </body>
+      /* Modal (Janela Sobreposta) */
+      #modal-obra {
+        display: none; 
+        position: absolute; top: 0; left: 0; z-index: 99999; 
+        width: 100%; height: 100%; background-color: #0c0000; 
+        flex-direction: column; align-items: center; justify-content: center; 
+        font-family: sans-serif;
+      }
+      
+      #modal-obra button {
+        margin-bottom: 20px; padding: 10px 20px; 
+        background-color: transparent; color: white; 
+        border: 1px solid white; cursor: pointer; font-size: 16px;
+        transition: background-color 0.3s, color 0.3s;
+      }
+      #modal-obra button:hover {
+        background-color: white; color: #0c0000;
+      }
+
+      #iframe-obra {
+        width: 100%; max-width: 560px; height: 315px; 
+        border: none; background-color: #0c0000;
+      }
+    </style>
+    
+    <script>
+      // --- LÓGICA DO MODAL (JANELA SOBREPOSTA) ---
+      function fecharObra() {
+        document.getElementById('modal-obra').style.display = 'none';
+        document.getElementById('iframe-obra').src = ""; // Limpa o src para pausar áudios/vídeos
+      }
+
+      AFRAME.registerComponent('abrir-modal', {
+        schema: { url: { type: 'string' } },
+        init: function () {
+          this.el.addEventListener('click', () => {
+            document.getElementById('iframe-obra').src = this.data.url;
+            document.getElementById('modal-obra').style.display = 'flex';
+          });
+        }
+      });
+
+      // --- CONFIGURAÇÃO GLOBAL ---
+      window.materiaisVirtuais = [];
+
+      AFRAME.registerComponent('config-ar', {
+        init: function () {
+          this.el.setAttribute('embedded', '');
+          this.el.addEventListener('render-target-loaded', () => {
+            let renderer = this.el.renderer;
+            renderer.setClearColor(0x000000, 0); 
+            renderer.alpha = true;
+            renderer.stencil = true;
+          });
+        }
+      });
+      
+      // --- OBRAS SUJEITAS AO ESTÊNCIL ---
+      AFRAME.registerComponent('material-virtual', {
+        init: function () {
+          this.el.addEventListener('loaded', () => this.applyStencil());
+          if (this.el.getObject3D('mesh')) this.applyStencil();
+        },
+        applyStencil: function() {
+          let mesh = this.el.getObject3D('mesh');
+          if (!mesh) return;
+          mesh.traverse((node) => {
+            if (node.isMesh && node.material) {
+              let mat = node.material;
+              mat.stencilWrite = true;
+              mat.stencilRef = 1;
+              mat.stencilWriteMask = 0xFF;
+              mat.stencilReadMask = 0xFF;
+              mat.stencilFail = THREE.KeepStencilOp;
+              mat.stencilZFail = THREE.KeepStencilOp;
+              mat.stencilZPass = THREE.KeepStencilOp;
+              
+              if (!window.materiaisVirtuais.includes(mat)) {
+                window.materiaisVirtuais.push(mat);
+              }
+            }
+          });
+        }
+      });
+
+      // --- MÁQUINA DE ESTADOS (TRAVA 10s) ---
+      AFRAME.registerComponent('limite-movimento', {
+        schema: {
+          portalZ: { default: -5 },
+          minX: { default: -20 },
+          maxX: { default: 20 },
+          minZ: { default: -80 },
+          tempoTrava: { default: 10000 }
+        },
+        init: function () { this.estado = 'inicio'; },
+        tick: function () {
+          let pos = this.el.object3D.position;
+          
+          if (this.estado === 'inicio' && pos.z < (this.data.portalZ - 1)) {
+            this.estado = 'dentro';
+          }
+          if (this.estado === 'dentro' && pos.z > (this.data.portalZ + 1.5)) {
+            this.estado = 'saiu';
+            setTimeout(() => { if (this.estado === 'saiu') this.estado = 'inicio'; }, this.data.tempoTrava);
+          }
+
+          if (pos.x < this.data.minX) pos.x = this.data.minX;
+          if (pos.x > this.data.maxX) pos.x = this.data.maxX;
+          
+          if (this.estado === 'saiu') {
+             let barreiraSegura = this.data.portalZ + 0.5;
+             if (pos.z < barreiraSegura) pos.z = barreiraSegura;
+          } else {
+             if (pos.z < this.data.minZ) pos.z = this.data.minZ;
+          }
+        }
+      });
+
+      // --- PORTAL ESTÊNCIL PERFEITO ---
+      AFRAME.registerComponent('portal-estencil-dinamico', {
+        schema: {
+          src: { type: 'selector' },
+          width: { default: 12.0 },
+          height: { default: 16.0 }
+        },
+        init: function () {
+          let el = this.el;
+          let w = this.data.width;
+          let h = this.data.height;
+          let portalGroup = new THREE.Group();
+
+          let maskGeo = new THREE.PlaneGeometry(w, h, 32, 32);
+          let maskMat = new THREE.MeshBasicMaterial({
+            colorWrite: false, depthWrite: false, side: THREE.DoubleSide,
+            stencilWrite: true, stencilFunc: THREE.AlwaysStencilFunc, stencilRef: 1,
+            stencilWriteMask: 0xFF, stencilReadMask: 0xFF,
+            stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.ReplaceStencilOp
+          });
+
+          let maskMesh = new THREE.Mesh(maskGeo, maskMat);
+          maskMesh.position.set(0, h/2, 0);
+          maskMesh.renderOrder = 1;
+          portalGroup.add(maskMesh);
+
+          let imgEl = this.data.src;
+          if (!imgEl) imgEl = document.querySelector('#cidade-360'); 
+          let texture = new THREE.Texture(imgEl);
+          texture.minFilter = THREE.LinearFilter;
+          texture.generateMipmaps = false;
+          
+          if (imgEl && imgEl.complete) { texture.needsUpdate = true; } 
+          else if (imgEl) { imgEl.onload = () => { texture.needsUpdate = true; }; }
+
+          let sphereGeo = new THREE.SphereGeometry(100, 64, 64);
+          this.sphereMat = new THREE.MeshBasicMaterial({ 
+            map: texture, side: THREE.BackSide, depthWrite: false,
+            stencilWrite: true, stencilRef: 1, stencilWriteMask: 0xFF, stencilReadMask: 0xFF,
+            stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.KeepStencilOp
+          });
+          
+          let sphere = new THREE.Mesh(sphereGeo, this.sphereMat);
+          sphere.position.set(0, h/2, 0); 
+          sphere.renderOrder = 2; 
+          sphere.frustumCulled = false;
+          portalGroup.add(sphere);
+
+          let molduraMat = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
+          let esp = 0.3; let halfW = w / 2; let halfH = h / 2;
+          
+          let leftF  = new THREE.Mesh(new THREE.BoxGeometry(esp, h, 0.2), molduraMat); leftF.position.set(-halfW - esp/2, halfH, 0);
+          let rightF = new THREE.Mesh(new THREE.BoxGeometry(esp, h, 0.2), molduraMat); rightF.position.set( halfW + esp/2, halfH, 0);
+          let topF   = new THREE.Mesh(new THREE.BoxGeometry(w + 2*esp, esp, 0.2), molduraMat); topF.position.set(0, h + esp/2, 0);
+          let bottomF= new THREE.Mesh(new THREE.BoxGeometry(w + 2*esp, esp, 0.2), molduraMat); bottomF.position.set(0, -esp/2, 0);
+
+          let frameGroup = new THREE.Group();
+          frameGroup.add(leftF, rightF, topF, bottomF);
+          frameGroup.children.forEach(c => { c.renderOrder = 3; });
+          portalGroup.add(frameGroup);
+
+          el.setObject3D('portal-mesh', portalGroup);
+        },
+        tick: function() {
+            let cam = document.querySelector('a-camera');
+            if (!cam || !this.sphereMat) return;
+            let camZ = cam.object3D.position.z;
+            let portalZ = this.el.object3D.position.z; 
+            
+            let func = (camZ > portalZ) ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
+            this.sphereMat.stencilFunc = func;
+            
+            if (window.materiaisVirtuais) {
+                window.materiaisVirtuais.forEach(mat => mat.stencilFunc = func);
+            }
+        }
+      });
+    </script>
+  </head>
+  
+  <body>
+
+    <!-- OVERLAY: Janela Modal -->
+    <div id="modal-obra">
+      <button onclick="fecharObra()">Voltar para a Galeria</button>
+      <iframe 
+        id="iframe-obra"
+        src=""
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <!-- Interface Inicial -->
+    <button id="btn-iniciar" onclick="iniciarCena()">ATIVAR EXPOSIÇÃO</button>
+
+    <!-- Fundo de Câmera -->
+    <div id="container-video">
+      <video id="webcam-video" autoplay playsinline muted></video>
+    </div>
+
+    <!-- Cena A-Frame -->
+    <div id="container-3d">
+      <a-scene config-ar renderer="alpha: true; antialias: true;" cursor="rayOrigin: mouse">
+        
+        <a-assets>
+          <img id="cidade-360" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg" crossorigin="anonymous">
+          <img id="img1" src="img/sky.jpg" crossorigin="anonymous">
+          <img id="img2" src="https://aframe.io/a-saturday-night/assets/images/sky-2.jpg" crossorigin="anonymous">
+          <img id="galeriaFoto1" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1024" crossorigin="anonymous">
+          <img id="galeriaFoto2" src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1024" crossorigin="anonymous">
+          <video id="video" src="img/compequi.mp4" crossorigin="anonymous" autoplay loop="true" muted></video>
+        </a-assets>
+
+        <!-- Câmera e Cursor -->
+        <a-camera position="0 1.6 0" limite-movimento="portalZ: -5; tempoTrava: 10000" look-controls="pointerLockEnabled: false" wasd-controls="acceleration: 45; easing: 15;">
+          <a-cursor color="#ffffff" opacity="0.8"></a-cursor>
+        </a-camera>
+
+        <!-- Portal -->
+        <a-entity position="0 0 -5" portal-estencil-dinamico="src: #cidade-360; width: 12.0; height: 16.0;"></a-entity>
+
+        <!-- Obras da Galeria (Em Z = -60, bem dentro da cidade) -->
+        <a-entity position="0 0 -60">
+          
+          <!-- Obra Esquerda -->
+          <a-box 
+            material-virtual
+            src="#galeriaFoto1" 
+            position="-44 1.5 5" 
+            rotation="0 15 0" 
+            width="4" height="3" depth="0.1"
+            abrir-modal="url: https://lecliche.bandcamp.com/album/vicarious-life">
+          </a-box>
+
+          <!-- Obra Centro -->
+          <a-box 
+            material-virtual
+            src="#galeriaFoto2" 
+            position="-24 1.5 5" 
+            width="4" height="3" depth="0.1"
+            abrir-modal="url: https://www.youtube.com/embed/f7fXAjDwZco?si=N8PmuCHll1INQQdA">
+        </a-box>
+
+          <!-- Obra Direita (Vídeo AR) -->
+          <a-box 
+            material-virtual
+            src="#video" 
+            position="4 1.5 5" 
+            rotation="0 -15 0" 
+            width="4" height="3" depth="0.1"
+            abrir-modal="url: https://vimeo.com/184724252?fl=pl&fe=vl">
+          </a-box>
+
+          <!-- Obra Mais à Direita (Antigo carrossel agora abrindo o Modal) -->
+          <!-- Dica: Coloque a URL da página HTML do seu carrossel/texto na propriedade 'url' abaixo -->
+          <a-box 
+            material-virtual
+            src="#galeriaFoto1" 
+            position="24 1.5 5" 
+            width="4" height="3" depth="0.1"
+            abrir-modal="url: http://www.librodeartista2016bcn.blogspot.com.es">
+          </a-box>
+
+        </a-entity>
+
+      </a-scene>
+    </div>
+
+    <script>
+      function iniciarCena() {
+        document.getElementById('btn-iniciar').style.display = 'none';
+        var video = document.getElementById('webcam-video');
+        if (navigator.mediaDevices?.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720, facingMode: 'environment' } })
+            .then(stream => {
+              video.srcObject = stream;
+              video.play();
+              setTimeout(() => {
+                let scene = document.querySelector('a-scene');
+                if (scene?.resize) scene.resize();
+              }, 300);
+            });
+        }
+      }
+    </script>
+  </body>
 </html>
