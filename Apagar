@@ -1,1 +1,35 @@
 Zonas 12 galeria teste
+<html>
+    <head>
+        <title>Template VR Corrigido</title>
+        <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+        <script src="https://unpkg.com/aframe-environment-component@1.5.x/dist/aframe-environment-component.min.js"></script>
+        <script src="https://unpkg.com/aframe-youtube-component@2.1.x/dist/aframe-youtube-component.min.js"></script>
+    </head>
+    <body>
+        <a-scene>
+            <a-assets>
+                <img id="imagem" src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1024" crossorigin="anonymous">
+                <img id="imagem2" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1024" crossorigin="anonymous">
+                
+                <video id="video" src="video/compequicolor1024vr.mp4" autoplay loop="true" playsinline webkit-playsinline muted crossorigin="anonymous"></video>
+            </a-assets>
+            
+            <a-camera position="0 1.6 0">
+                <a-cursor color="red"></a-cursor>
+            </a-camera>
+            
+            <a-video src="#video" position="-2.5 1.6 -4" height="1.5" width="2.5"></a-video>
+            <a-image src="#imagem" position="0 1.6 -3" height="1" width="2" material="npot: true; minFilter: linear; magFilter: linear; shader: flat"></a-image>
+            <a-image src="#imagem2" position="2.5 1.6 -3" height="1" width="2" material="npot: true; minFilter: linear; magFilter: linear; shader: flat"></a-image>
+            <a-plane position="5 1.8 -1" rotation="0 -70 0" width="3" height="2" color="red" exhibit-screen="src: #imagem2"></a-plane>
+            
+            <a-entity youtube="id: USG8Z6UJu; autoplay: true; loop: true"
+                      position="0 3.5 -4" 
+                      scale="2.5 1.5 1" material="npot: true; minFilter: linear; magFilter: linear; shader: flat">
+            </a-entity>
+            
+            <a-entity environment="preset: default; groundColor: #445; grid: cross"></a-entity>
+        </a-scene>
+    </body>
+</html>
