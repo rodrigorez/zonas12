@@ -2,8 +2,8 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Portal AR – Galeria Imersiva com Modal Externo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Portal AR – Galeria Imersiva com Controlos Mobile</title>
     
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     
@@ -11,6 +11,7 @@
       html, body {
         margin: 0; padding: 0; width: 100%; height: 100%;
         overflow: hidden; background-color: transparent !important;
+        touch-action: none; /* Previne zoom e scroll acidental no telemóvel */
       }
       
       /* Elementos de Fundo (Câmara Web) */
@@ -37,8 +38,7 @@
 
       /* Modal (Janela Sobreposta) */
       #modal-obra {
-        display: none; 
-        position: absolute; top: 0; left: 0; z-index: 99999; 
+        display: none; position: absolute; top: 0; left: 0; z-index: 99999; 
         width: 100%; height: 100%; background-color: #0c0000; 
         flex-direction: column; align-items: center; justify-content: center; 
         font-family: sans-serif;
@@ -58,13 +58,35 @@
         width: 100%; max-width: 560px; height: 315px; 
         border: none; background-color: #0c0000;
       }
+
+      /* --- CONTROLOS MOBILE (D-PAD) --- */
+      #controles-mobile {
+        display: none; /* Escondido por defeito, ativado via JS no telemóvel */
+        position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+        z-index: 9999; width: 200px; height: 200px;
+        pointer-events: auto; user-select: none;
+      }
+      
+      .dpad-btn {
+        position: absolute; width: 60px; height: 60px;
+        background-color: rgba(255, 255, 255, 0.3); border: 2px solid white;
+        border-radius: 50%; color: white; font-size: 24px; font-weight: bold;
+        display: flex; align-items: center; justify-content: center;
+        user-select: none; touch-action: manipulation;
+      }
+      .dpad-btn:active { background-color: rgba(255, 0, 0, 0.6); }
+
+      #btn-frente { top: 0; left: 70px; }
+      #btn-tras { bottom: 0; left: 70px; }
+      #btn-esq { top: 70px; left: 0; }
+      #btn-dir { top: 70px; right: 0; }
     </style>
     
     <script>
       // --- LÓGICA DO MODAL (JANELA SOBREPOSTA) ---
       function fecharObra() {
         document.getElementById('modal-obra').style.display = 'none';
-        document.getElementById('iframe-obra').src = ""; // Limpa o src para pausar áudios/vídeos
+        document.getElementById('iframe-obra').src = "";
       }
 
       AFRAME.registerComponent('abrir-modal', {
@@ -111,10 +133,7 @@
               mat.stencilFail = THREE.KeepStencilOp;
               mat.stencilZFail = THREE.KeepStencilOp;
               mat.stencilZPass = THREE.KeepStencilOp;
-              
-              if (!window.materiaisVirtuais.includes(mat)) {
-                window.materiaisVirtuais.push(mat);
-              }
+              if (!window.materiaisVirtuais.includes(mat)) window.materiaisVirtuais.push(mat);
             }
           });
         }
@@ -155,15 +174,9 @@
 
       // --- PORTAL ESTÊNCIL PERFEITO ---
       AFRAME.registerComponent('portal-estencil-dinamico', {
-        schema: {
-          src: { type: 'selector' },
-          width: { default: 12.0 },
-          height: { default: 16.0 }
-        },
+        schema: { src: { type: 'selector' }, width: { default: 12.0 }, height: { default: 16.0 } },
         init: function () {
-          let el = this.el;
-          let w = this.data.width;
-          let h = this.data.height;
+          let el = this.el; let w = this.data.width; let h = this.data.height;
           let portalGroup = new THREE.Group();
 
           let maskGeo = new THREE.PlaneGeometry(w, h, 32, 32);
@@ -175,16 +188,12 @@
           });
 
           let maskMesh = new THREE.Mesh(maskGeo, maskMat);
-          maskMesh.position.set(0, h/2, 0);
-          maskMesh.renderOrder = 1;
-          portalGroup.add(maskMesh);
+          maskMesh.position.set(0, h/2, 0); maskMesh.renderOrder = 1; portalGroup.add(maskMesh);
 
           let imgEl = this.data.src;
           if (!imgEl) imgEl = document.querySelector('#cidade-360'); 
           let texture = new THREE.Texture(imgEl);
-          texture.minFilter = THREE.LinearFilter;
-          texture.generateMipmaps = false;
-          
+          texture.minFilter = THREE.LinearFilter; texture.generateMipmaps = false;
           if (imgEl && imgEl.complete) { texture.needsUpdate = true; } 
           else if (imgEl) { imgEl.onload = () => { texture.needsUpdate = true; }; }
 
@@ -196,10 +205,8 @@
           });
           
           let sphere = new THREE.Mesh(sphereGeo, this.sphereMat);
-          sphere.position.set(0, h/2, 0); 
-          sphere.renderOrder = 2; 
-          sphere.frustumCulled = false;
-          portalGroup.add(sphere);
+          sphere.position.set(0, h/2, 0); sphere.renderOrder = 2; 
+          sphere.frustumCulled = false; portalGroup.add(sphere);
 
           let molduraMat = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
           let esp = 0.3; let halfW = w / 2; let halfH = h / 2;
@@ -213,7 +220,6 @@
           frameGroup.add(leftF, rightF, topF, bottomF);
           frameGroup.children.forEach(c => { c.renderOrder = 3; });
           portalGroup.add(frameGroup);
-
           el.setObject3D('portal-mesh', portalGroup);
         },
         tick: function() {
@@ -230,6 +236,55 @@
             }
         }
       });
+      
+      // --- LÓGICA DE MOVIMENTAÇÃO MOBILE ---
+      let estadosMovimento = { frente: false, tras: false, esq: false, dir: false };
+      const VELOCIDADE = 0.1;
+
+      function atualizarMovimentoMobile() {
+        let cam = document.querySelector('a-camera');
+        if (cam) {
+          // Obtém o ângulo atual para o qual o utilizador está a olhar
+          let angle = cam.object3D.rotation.y;
+          
+          if (estadosMovimento.frente) {
+            cam.object3D.position.x -= Math.sin(angle) * VELOCIDADE;
+            cam.object3D.position.z -= Math.cos(angle) * VELOCIDADE;
+          }
+          if (estadosMovimento.tras) {
+            cam.object3D.position.x += Math.sin(angle) * VELOCIDADE;
+            cam.object3D.position.z += Math.cos(angle) * VELOCIDADE;
+          }
+          if (estadosMovimento.esq) {
+            cam.object3D.position.x -= Math.cos(angle) * VELOCIDADE;
+            cam.object3D.position.z += Math.sin(angle) * VELOCIDADE;
+          }
+          if (estadosMovimento.dir) {
+            cam.object3D.position.x += Math.cos(angle) * VELOCIDADE;
+            cam.object3D.position.z -= Math.sin(angle) * VELOCIDADE;
+          }
+        }
+        requestAnimationFrame(atualizarMovimentoMobile);
+      }
+      
+      // Regista os eventos táteis nos botões
+      function configurarBotoesMobile() {
+        const associarBotao = (id, direcao) => {
+          let btn = document.getElementById(id);
+          btn.addEventListener('touchstart', (e) => { e.preventDefault(); estadosMovimento[direcao] = true; });
+          btn.addEventListener('touchend', (e) => { e.preventDefault(); estadosMovimento[direcao] = false; });
+          btn.addEventListener('mousedown', (e) => { estadosMovimento[direcao] = true; });
+          btn.addEventListener('mouseup', (e) => { estadosMovimento[direcao] = false; });
+          btn.addEventListener('mouseleave', (e) => { estadosMovimento[direcao] = false; });
+        };
+
+        associarBotao('btn-frente', 'frente');
+        associarBotao('btn-tras', 'tras');
+        associarBotao('btn-esq', 'esq');
+        associarBotao('btn-dir', 'dir');
+        
+        atualizarMovimentoMobile();
+      }
     </script>
   </head>
   
@@ -238,16 +293,19 @@
     <!-- OVERLAY: Janela Modal -->
     <div id="modal-obra">
       <button onclick="fecharObra()">Voltar para a Galeria</button>
-      <iframe 
-        id="iframe-obra"
-        src=""
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-        allowfullscreen>
-      </iframe>
+      <iframe id="iframe-obra" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 
     <!-- Interface Inicial -->
     <button id="btn-iniciar" onclick="iniciarCena()">ATIVAR EXPOSIÇÃO</button>
+
+    <!-- CONTROLOS MOBILE (Só aparecem se for smartphone/tablet) -->
+    <div id="controles-mobile">
+      <div id="btn-frente" class="dpad-btn">▲</div>
+      <div id="btn-tras" class="dpad-btn">▼</div>
+      <div id="btn-esq" class="dpad-btn">◄</div>
+      <div id="btn-dir" class="dpad-btn">►</div>
+    </div>
 
     <!-- Fundo de Câmera -->
     <div id="container-video">
@@ -256,12 +314,10 @@
 
     <!-- Cena A-Frame -->
     <div id="container-3d">
-      <a-scene config-ar renderer="alpha: true; antialias: true;" cursor="rayOrigin: mouse">
+      <a-scene config-ar renderer="alpha: true; antialias: true;" cursor="rayOrigin: mouse" raycaster="objects: [abrir-modal]">
         
         <a-assets>
           <img id="cidade-360" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg" crossorigin="anonymous">
-          <img id="img1" src="img/sky.jpg" crossorigin="anonymous">
-          <img id="img2" src="https://aframe.io/a-saturday-night/assets/images/sky-2.jpg" crossorigin="anonymous">
           <img id="galeriaFoto1" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1024" crossorigin="anonymous">
           <img id="galeriaFoto2" src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1024" crossorigin="anonymous">
           <video id="video" src="img/compequi.mp4" crossorigin="anonymous" autoplay loop="true" muted></video>
@@ -278,47 +334,26 @@
         <!-- Obras da Galeria (Em Z = -60, bem dentro da cidade) -->
         <a-entity position="0 0 -60">
           
-          <!-- Obra Esquerda -->
           <a-box 
-            material-virtual
-            src="#galeriaFoto1" 
-            position="-44 1.5 5" 
-            rotation="0 15 0" 
-            width="4" height="3" depth="0.1"
+            material-virtual src="#galeriaFoto1" position="-44 1.5 5" rotation="0 15 0" width="4" height="3" depth="0.1"
             abrir-modal="url: https://lecliche.bandcamp.com/album/vicarious-life">
           </a-box>
 
-          <!-- Obra Centro -->
           <a-box 
-            material-virtual
-            src="#galeriaFoto2" 
-            position="-24 1.5 5" 
-            width="4" height="3" depth="0.1"
+            material-virtual src="#galeriaFoto2" position="-24 1.5 5" width="4" height="3" depth="0.1"
             abrir-modal="url: https://www.youtube.com/embed/f7fXAjDwZco?si=N8PmuCHll1INQQdA">
-        </a-box>
-
-          <!-- Obra Direita (Vídeo AR) -->
-          <a-box 
-            material-virtual
-            src="#video" 
-            position="4 1.5 5" 
-            rotation="0 -15 0" 
-            width="4" height="3" depth="0.1"
-            abrir-modal="url: https://vimeo.com/184724252?fl=pl&fe=vl">
           </a-box>
 
-          <!-- Obra Mais à Direita (Antigo carrossel agora abrindo o Modal) -->
-          <!-- Dica: Coloque a URL da página HTML do seu carrossel/texto na propriedade 'url' abaixo -->
           <a-box 
-            material-virtual
-            src="#galeriaFoto1" 
-            position="24 1.5 5" 
-            width="4" height="3" depth="0.1"
-            abrir-modal="url: http://www.librodeartista2016bcn.blogspot.com.es">
+            material-virtual src="#video" position="4 1.5 5" rotation="0 -15 0" width="4" height="3" depth="0.1">
+          </a-box>
+
+          <a-box 
+            material-virtual src="#galeriaFoto1" position="24 1.5 5" width="4" height="3" depth="0.1"
+            abrir-modal="url: https://pt.wikipedia.org/wiki/Arte_digital">
           </a-box>
 
         </a-entity>
-
       </a-scene>
     </div>
 
@@ -326,6 +361,13 @@
       function iniciarCena() {
         document.getElementById('btn-iniciar').style.display = 'none';
         var video = document.getElementById('webcam-video');
+        
+        // Verifica se é dispositivo móvel para ativar a UI de botões
+        if (AFRAME.utils.device.isMobile()) {
+          document.getElementById('controles-mobile').style.display = 'block';
+          configurarBotoesMobile(); // Inicia os ouvintes de toque
+        }
+
         if (navigator.mediaDevices?.getUserMedia) {
           navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720, facingMode: 'environment' } })
             .then(stream => {
