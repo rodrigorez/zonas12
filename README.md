@@ -85,7 +85,7 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 
 ## Tecnologias Utilizadas
 
-- **A-Frame 1.5.0**: Framework de realidade aumentada/virtual
+- **A-Frame 1.8.0**: Framework de realidade aumentada/virtual
 - **HTML5/CSS3**: Estrutura e estilo da aplicação
 - **JavaScript ES6+**: Lógica da aplicação e componentes personalizados
 - **Three.js**: Biblioteca 3D integrada ao A-Frame

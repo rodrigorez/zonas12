@@ -6,108 +6,9 @@
     <title>Portal AR – Galeria Imersiva com Controlos Mobile</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
-
-      // --- MÁQUINA DE ESTADOS (TRAVA 10s) ---
-      AFRAME.registerComponent('limite-movimento', {
-        schema: {
-          portalZ: { default: -5 },
-          minX: { default: -20 },
-          maxX: { default: 20 },
-          minZ: { default: -80 },
-          tempoTrava: { default: 10000 }
-        },
-        init: function () { this.estado = 'inicio'; },
-        tick: function () {
-          let pos = this.el.object3D.position;
-          
-          if (this.estado === 'inicio' && pos.z < (this.data.portalZ - 1)) {
-            this.estado = 'dentro';
-          }
-          if (this.estado === 'dentro' && pos.z > (this.data.portalZ + 1.5)) {
-            this.estado = 'saiu';
-            setTimeout(() => { if (this.estado === 'saiu') this.estado = 'inicio'; }, this.data.tempoTrava);
-          }
-
-          if (pos.x < this.data.minX) pos.x = this.data.minX;
-          if (pos.x > this.data.maxX) pos.x = this.data.maxX;
-          
-          if (this.estado === 'saiu') {
-             let barreiraSegura = this.data.portalZ + 0.5;
-             if (pos.z < barreiraSegura) pos.z = barreiraSegura;
-          } else {
-             if (pos.z < this.data.minZ) pos.z = this.data.minZ;
-          }
-        }
-      });
-
-      // --- PORTAL ESTÊNCIL PERFEITO ---
-      AFRAME.registerComponent('portal-estencil-dinamico', {
-        schema: { src: { type: 'selector' }, width: { default: 12.0 }, height: { default: 16.0 } },
-        init: function () {
-          let el = this.el; let w = this.data.width; let h = this.data.height;
-          let portalGroup = new THREE.Group();
-
-          let maskGeo = new THREE.PlaneGeometry(w, h, 32, 32);
-          let maskMat = new THREE.MeshBasicMaterial({
-            colorWrite: false, depthWrite: false, side: THREE.DoubleSide,
-            stencilWrite: true, stencilFunc: THREE.AlwaysStencilFunc, stencilRef: 1,
-            stencilWriteMask: 0xFF, stencilReadMask: 0xFF,
-            stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.ReplaceStencilOp
-          });
-
-          let maskMesh = new THREE.Mesh(maskGeo, maskMat);
-          maskMesh.position.set(0, h/2, 0); maskMesh.renderOrder = 1; portalGroup.add(maskMesh);
-
-          let imgEl = this.data.src;
-          if (!imgEl) imgEl = document.querySelector('#cidade-360'); 
-          let texture = new THREE.Texture(imgEl);
-          texture.minFilter = THREE.LinearFilter; texture.generateMipmaps = false;
-          if (imgEl && imgEl.complete) { texture.needsUpdate = true; } 
-          else if (imgEl) { imgEl.onload = () => { texture.needsUpdate = true; }; }
-
-          let sphereGeo = new THREE.SphereGeometry(100, 64, 64);
-          this.sphereMat = new THREE.MeshBasicMaterial({ 
-            map: texture, side: THREE.BackSide, depthWrite: false,
-            stencilWrite: true, stencilRef: 1, stencilWriteMask: 0xFF, stencilReadMask: 0xFF,
-            stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.KeepStencilOp
-          });
-          
-          let sphere = new THREE.Mesh(sphereGeo, this.sphereMat);
-          sphere.position.set(0, h/2, 0); sphere.renderOrder = 2; 
-          sphere.frustumCulled = false; portalGroup.add(sphere);
-
-          let molduraMat = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
-          let esp = 0.3; let halfW = w / 2; let halfH = h / 2;
-          
-          let leftF  = new THREE.Mesh(new THREE.BoxGeometry(esp, h, 0.2), molduraMat); leftF.position.set(-halfW - esp/2, halfH, 0);
-          let rightF = new THREE.Mesh(new THREE.BoxGeometry(esp, h, 0.2), molduraMat); rightF.position.set( halfW + esp/2, halfH, 0);
-          let topF   = new THREE.Mesh(new THREE.BoxGeometry(w + 2*esp, esp, 0.2), molduraMat); topF.position.set(0, h + esp/2, 0);
-          let bottomF= new THREE.Mesh(new THREE.BoxGeometry(w + 2*esp, esp, 0.2), molduraMat); bottomF.position.set(0, -esp/2, 0);
-
-          let frameGroup = new THREE.Group();
-          frameGroup.add(leftF, rightF, topF, bottomF);
-          frameGroup.children.forEach(c => { c.renderOrder = 3; });
-          portalGroup.add(frameGroup);
-          el.setObject3D('portal-mesh', portalGroup);
-        },
-        tick: function() {
-            let cam = document.querySelector('a-camera');
-            if (!cam || !this.sphereMat) return;
-            let camZ = cam.object3D.position.z;
-            let portalZ = this.el.object3D.position.z; 
-            
-            let func = (camZ > portalZ) ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
-            this.sphereMat.stencilFunc = func;
-            
-            if (window.materiaisVirtuais) {
-                window.materiaisVirtuais.forEach(mat => mat.stencilFunc = func);
-            }
-        }
-      });
-      
-    </script>
+    <script src="js/main.js"></script>
   </head>
   
   <body>
@@ -153,7 +54,7 @@
 
         <!-- Câmera e Cursor -->
         <a-camera position="0 1.6 0" limite-movimento="portalZ: -5; tempoTrava: 10000" look-controls="pointerLockEnabled: false" wasd-controls="acceleration: 45;">
-          <a-cursor color="#ffffff" opacity="0.8"></a-cursor>
+          <a-cursor color="#ffffff" opacity="0.8" objects=".interactable"></a-cursor>
         </a-camera>
 
         <!-- Portal -->

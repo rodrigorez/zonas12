@@ -25,10 +25,6 @@ AFRAME.registerComponent('config-ar', {
       renderer.setClearColor(0x000000, 0); 
       renderer.alpha = true;
       renderer.stencil = true;
-      // Correção para evitar o aviso de useLegacyLights
-      if (renderer.useLegacyLights !== undefined) {
-        renderer.useLegacyLights = false;
-      }
     });
   }
 });
@@ -55,7 +51,7 @@ AFRAME.registerComponent('material-virtual', {
         mat.stencilWrite = true;
         mat.stencilRef = 1;
         mat.stencilWriteMask = 0xFF;
-        mat.stencilReadMask = 0xFF;
+        mat.stencilFuncMask = 0xFF;
         mat.stencilFail = THREE.KeepStencilOp;
         mat.stencilZFail = THREE.KeepStencilOp;
         mat.stencilZPass = THREE.KeepStencilOp;
@@ -109,7 +105,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     let maskMat = new THREE.MeshBasicMaterial({
       colorWrite: false, depthWrite: false, side: THREE.DoubleSide,
       stencilWrite: true, stencilFunc: THREE.AlwaysStencilFunc, stencilRef: 1,
-      stencilWriteMask: 0xFF, stencilReadMask: 0xFF,
+      stencilWriteMask: 0xFF, stencilFuncMask: 0xFF,
       stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.ReplaceStencilOp
     });
 
@@ -126,7 +122,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     let sphereGeo = new THREE.SphereGeometry(100, 64, 64);
     this.sphereMat = new THREE.MeshBasicMaterial({ 
       map: texture, side: THREE.BackSide, depthWrite: false,
-      stencilWrite: true, stencilRef: 1, stencilWriteMask: 0xFF, stencilReadMask: 0xFF,
+      stencilWrite: true, stencilRef: 1, stencilWriteMask: 0xFF, stencilFuncMask: 0xFF,
       stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.KeepStencilOp
     });
     
@@ -218,6 +214,7 @@ function mostrarLoading() {
   loadingOverlay.className = 'loading-overlay';
   loadingOverlay.id = 'loading-overlay';
   loadingOverlay.innerHTML = 'Carregando...';
+  loadingOverlay.style.display = 'flex';
   document.body.appendChild(loadingOverlay);
 }
 
@@ -238,6 +235,7 @@ function tratarErroCamera(error) {
   const errorMsg = document.createElement('div');
   errorMsg.className = 'loading-overlay';
   errorMsg.innerHTML = 'Não foi possível acessar a câmera. Por favor, verifique as permissões.';
+  errorMsg.style.display = 'flex';
   document.body.appendChild(errorMsg);
   
   // Esconder botão de início
