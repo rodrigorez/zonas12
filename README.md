@@ -84,6 +84,11 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 - Impede que o usuário saia do ambiente virtual
 - Limites e tempos ficam em `CONFIG_NAVEGACAO` (`js/main.js`), num único sítio, e podem ser sobrepostos por atributo: `limite-movimento="maxX: 60; minX: -60"`
 
+### 5. Feedback de Carregamento / Erro de Câmera
+
+- Aviso em faixa no topo do ecrã, que **não cobre** a cena 3D (o portal mantém-se sempre visível)
+- Mostra "Carregando..." ao iniciar e, se a câmera não estiver acessível, a mensagem de permissões
+
 ## Tecnologias Utilizadas
 
 - **A-Frame 1.8.0**: Framework de realidade aumentada/virtual
