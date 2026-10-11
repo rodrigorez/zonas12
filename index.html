@@ -41,7 +41,8 @@
 
     <!-- Cena A-Frame -->
     <div id="container-3d">
-      <a-scene config-ar renderer="alpha: true; antialias: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable">
+      <!-- renderer: o stencil é obrigatório para o portal (buffer de stencil) -->
+      <a-scene config-ar renderer="alpha: true; antialias: true; stencil: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable">
         
         <a-assets>
           <img id="cidade-360" src="assets/images/forest.jpg" crossorigin="anonymous">

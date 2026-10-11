@@ -64,9 +64,20 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 
 ### 1. Portal Estêncil Dinâmico
 
-- Renderiza cenas 360º atrás de um quadro virtual
-- Utiliza operações de stencil buffer para criar efeito de portal
-- Permite visualização de conteúdo virtual sobreposto à câmera do dispositivo
+O portal é uma "janela entre duas dimensões": o quadro vermelho troca o que se vê dentro e fora dele, conforme a posição da câmera em relação ao portal (z = -5).
+
+| Posição | Fundo do ecrã | Dentro do quadro vermelho |
+|---|---|---|
+| **Fora** do portal | Câmera (realidade) | Dimensão do portal (imagem 360º) + obras |
+| **Dentro** do portal | Dimensão do portal (imagem 360º) | Câmera (realidade) |
+
+Atravessar o portal é mudar de dimensão; as obras ficam acessíveis na dimensão interior.
+
+Requisitos técnicos (não remover, o portal deixa de funcionar):
+
+- `renderer="...; stencil: true"` no `<a-scene>`: a partir do three r184 o buffer de stencil **não é criado por omissão**, e sem ele o portal desenha tudo em todo o lado (perde-se a troca de dimensões)
+- `renderer.sortObjects = false` em `config-ar` (`js/main.js`): o A-Frame 1.4.2 forçava este valor; no 1.8.x fica `true`, o que desenha as obras antes da máscara do portal e as faz falhar o teste de stencil
+- A ordem de desenho depende dos `renderOrder`: máscara (1) → esfera 360º (2) → moldura (3)
 
 ### 2. Controles Mobile
 

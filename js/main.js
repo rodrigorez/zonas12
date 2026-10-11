@@ -20,12 +20,20 @@ window.materiaisVirtuais = [];
 AFRAME.registerComponent('config-ar', {
   init: function () {
     this.el.setAttribute('embedded', '');
-    this.el.addEventListener('render-target-loaded', () => {
-      let renderer = this.el.renderer;
-      renderer.setClearColor(0x000000, 0); 
-      renderer.alpha = true;
-      renderer.stencil = true;
-    });
+    // O renderer já existe neste ponto (a-scene cria-o em connectedCallback).
+    this.aplicarConfigRenderer();
+    this.el.addEventListener('render-target-loaded', () => this.aplicarConfigRenderer());
+  },
+  aplicarConfigRenderer: function () {
+    let renderer = this.el.renderer;
+    if (!renderer) return;
+    renderer.setClearColor(0x000000, 0);
+    // O A-Frame 1.4.2 forçava sortObjects = false. No 1.8.x fica o default do
+    // three (true), o que reordena o desenho e faz as obras serem desenhadas
+    // antes da máscara do portal, falhando o teste de stencil. Repomos o
+    // comportamento original. O buffer de stencil é pedido no atributo
+    // renderer="stencil: true" do index.html.
+    renderer.sortObjects = false;
   }
 });
 
