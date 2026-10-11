@@ -2,6 +2,7 @@
 
 ## Descrição
 
+
 Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A-Frame. Ele permite criar experiências interativas onde os usuários podem explorar ambientes 360º e interagir com obras de arte virtuais através de portais estêncil.
 
 ## Estrutura do Projeto
