@@ -1,0 +1,82 @@
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%;
+  overflow: hidden; background-color: transparent !important;
+  touch-action: none; /* Previne zoom e scroll acidental no telemóvel */
+}
+
+/* Elementos de Fundo (Câmara Web) */
+#container-video {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 1; pointer-events: none; background-color: #000;
+}
+#webcam-video { width: 100% !important; height: 100% !important; object-fit: cover; }
+
+/* Elementos AR 3D */
+#container-3d {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 10; pointer-events: auto; background: transparent !important;
+}
+a-scene { width: 100% !important; height: 100% !important; background: transparent !important; }
+
+/* Botão Inicial */
+#btn-iniciar {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 9999; padding: 15px 30px; background-color: #FF0000; color: white;
+  border: none; font-family: sans-serif; font-size: 16px; font-weight: bold;
+  cursor: pointer; border-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+/* Modal (Janela Sobreposta) */
+#modal-obra {
+  display: none; position: absolute; top: 0; left: 0; z-index: 99999; 
+  width: 100%; height: 100%; background-color: #0c0000; 
+  flex-direction: column; align-items: center; justify-content: center; 
+  font-family: sans-serif;
+}
+
+#modal-obra button {
+  margin-bottom: 20px; padding: 10px 20px; 
+  background-color: transparent; color: white; 
+  border: 1px solid white; cursor: pointer; font-size: 16px;
+  transition: background-color 0.3s, color 0.3s;
+}
+#modal-obra button:hover {
+  background-color: white; color: #0c0000;
+}
+
+#iframe-obra {
+  width: 100%; max-width: 560px; height: 315px; 
+  border: none; background-color: #0c0000;
+}
+
+/* --- CONTROLOS MOBILE (D-PAD) --- */
+#controles-mobile {
+  display: none; /* Escondido por defeito, ativado via JS no telemóvel */
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  z-index: 9999; width: 200px; height: 200px;
+  pointer-events: auto; user-select: none;
+}
+
+.dpad-btn {
+  position: absolute; width: 60px; height: 60px;
+  background-color: rgba(255, 255, 255, 0.3); border: 2px solid white;
+  border-radius: 50%; color: white; font-size: 24px; font-weight: bold;
+  display: flex; align-items: center; justify-content: center;
+  user-select: none; touch-action: manipulation;
+}
+.dpad-btn:active { background-color: rgba(255, 0, 0, 0.6); }
+
+#btn-frente { top: 0; left: 70px; }
+#btn-tras { bottom: 0; left: 70px; }
+#btn-esq { top: 70px; left: 0; }
+#btn-dir { top: 70px; right: 0; }
+
+/* Loading indicator */
+.loading-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10000;
+  color: white; font-family: sans-serif;
+  font-size: 20px;
+}
