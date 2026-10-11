@@ -61,23 +61,42 @@ AFRAME.registerComponent('material-virtual', {
   }
 });
 
+// --- CONFIGURAÇÃO DE NAVEGAÇÃO ---
+// Fonte única destes valores: para alterar os limites, muda aqui.
+// Cada valor pode também ser sobreposto por atributo no HTML, por exemplo:
+// <a-camera limite-movimento="maxX: 60; minX: -60">
+const CONFIG_NAVEGACAO = {
+  portalZ: -5,          // posição Z do portal
+  minX: -20,            // limite lateral esquerdo
+  maxX: 20,             // limite lateral direito
+  minZ: -80,            // profundidade máxima permitida
+  tempoTrava: 10000,    // bloqueio após sair do portal (ms)
+  entradaOffset: -1,    // portalZ + isto = z a partir do qual passa a "dentro"
+  saidaOffset: 1.5,     // portalZ + isto = z a partir do qual passa a "saiu"
+  barreiraOffset: 0.5   // portalZ + isto = z da barreira enquanto está "saiu"
+};
+
 // --- MÁQUINA DE ESTADOS (TRAVA 10s) ---
 AFRAME.registerComponent('limite-movimento', {
   schema: {
-    portalZ: { default: -5 },
-    minX: { default: -20 },
-    maxX: { default: 20 },
-    minZ: { default: -80 },
-    tempoTrava: { default: 10000 }
+    portalZ: { default: CONFIG_NAVEGACAO.portalZ },
+    minX: { default: CONFIG_NAVEGACAO.minX },
+    maxX: { default: CONFIG_NAVEGACAO.maxX },
+    minZ: { default: CONFIG_NAVEGACAO.minZ },
+    tempoTrava: { default: CONFIG_NAVEGACAO.tempoTrava },
+    entradaOffset: { default: CONFIG_NAVEGACAO.entradaOffset },
+    saidaOffset: { default: CONFIG_NAVEGACAO.saidaOffset },
+    barreiraOffset: { default: CONFIG_NAVEGACAO.barreiraOffset }
   },
   init: function () { this.estado = 'inicio'; },
   tick: function () {
     let pos = this.el.object3D.position;
+    let zPortal = this.data.portalZ;
     
-    if (this.estado === 'inicio' && pos.z < (this.data.portalZ - 1)) {
+    if (this.estado === 'inicio' && pos.z < (zPortal + this.data.entradaOffset)) {
       this.estado = 'dentro';
     }
-    if (this.estado === 'dentro' && pos.z > (this.data.portalZ + 1.5)) {
+    if (this.estado === 'dentro' && pos.z > (zPortal + this.data.saidaOffset)) {
       this.estado = 'saiu';
       setTimeout(() => { if (this.estado === 'saiu') this.estado = 'inicio'; }, this.data.tempoTrava);
     }
@@ -86,7 +105,7 @@ AFRAME.registerComponent('limite-movimento', {
     if (pos.x > this.data.maxX) pos.x = this.data.maxX;
     
     if (this.estado === 'saiu') {
-       let barreiraSegura = this.data.portalZ + 0.5;
+       let barreiraSegura = zPortal + this.data.barreiraOffset;
        if (pos.z < barreiraSegura) pos.z = barreiraSegura;
     } else {
        if (pos.z < this.data.minZ) pos.z = this.data.minZ;

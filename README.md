@@ -82,6 +82,7 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 
 - Sistema de estados para controlar movimentação do usuário
 - Impede que o usuário saia do ambiente virtual
+- Limites e tempos ficam em `CONFIG_NAVEGACAO` (`js/main.js`), num único sítio, e podem ser sobrepostos por atributo: `limite-movimento="maxX: 60; minX: -60"`
 
 ## Tecnologias Utilizadas
 
