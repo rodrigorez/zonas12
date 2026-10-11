@@ -1,1 +1,6 @@
-.harness/\nnode_modules/\n
+.harness/
+node_modules/
+
+# Artefactos de teste/sessao (capturas de ecra, logs do browser)
+.playwright-mcp/
+/*.png
