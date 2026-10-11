@@ -8,46 +8,6 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
 
-      // --- CONFIGURAÇÃO GLOBAL ---
-      window.materiaisVirtuais = [];
-
-      AFRAME.registerComponent('config-ar', {
-        init: function () {
-          this.el.setAttribute('embedded', '');
-          this.el.addEventListener('render-target-loaded', () => {
-            let renderer = this.el.renderer;
-            renderer.setClearColor(0x000000, 0); 
-            renderer.alpha = true;
-            renderer.stencil = true;
-          });
-        }
-      });
-      
-      // --- OBRAS SUJEITAS AO ESTÊNCIL ---
-      AFRAME.registerComponent('material-virtual', {
-        init: function () {
-          this.el.addEventListener('loaded', () => this.applyStencil());
-          if (this.el.getObject3D('mesh')) this.applyStencil();
-        },
-        applyStencil: function() {
-          let mesh = this.el.getObject3D('mesh');
-          if (!mesh) return;
-          mesh.traverse((node) => {
-            if (node.isMesh && node.material) {
-              let mat = node.material;
-              mat.stencilWrite = true;
-              mat.stencilRef = 1;
-              mat.stencilWriteMask = 0xFF;
-              mat.stencilReadMask = 0xFF;
-              mat.stencilFail = THREE.KeepStencilOp;
-              mat.stencilZFail = THREE.KeepStencilOp;
-              mat.stencilZPass = THREE.KeepStencilOp;
-              if (!window.materiaisVirtuais.includes(mat)) window.materiaisVirtuais.push(mat);
-            }
-          });
-        }
-      });
-
       // --- MÁQUINA DE ESTADOS (TRAVA 10s) ---
       AFRAME.registerComponent('limite-movimento', {
         schema: {
@@ -182,9 +142,11 @@
       <a-scene config-ar renderer="alpha: true; antialias: true;" cursor="rayOrigin: mouse" raycaster="objects: [abrir-modal]">
         
         <a-assets>
-          <img id="cidade-360" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg" crossorigin="anonymous">
-          <img id="galeriaFoto1" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1024" crossorigin="anonymous">
-          <img id="galeriaFoto2" src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1024" crossorigin="anonymous">
+          <img id="cidade-360" src="assets/images/forest.jpg" crossorigin="anonymous">
+          <img id="galeriaFoto1" src="assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg" crossorigin="anonymous">
+          <img id="galeriaFoto2" src="assets/images/eiffel.jpg" crossorigin="anonymous">
+          <img id="praia" src="assets/images/praia.jpg" crossorigin="anonymous">
+          <img id="skycloud" src="assets/images/skycloud.jpg" crossorigin="anonymous">
           <video id="video" src="assets/images/compequicolor1024vr.mp4" crossorigin="anonymous" autoplay loop="true" muted></video>
         </a-assets>
 
@@ -201,21 +163,27 @@
           
           <a-box 
             material-virtual src="#galeriaFoto1" position="-44 1.5 5" rotation="0 15 0" width="4" height="3" depth="0.1"
-            abrir-modal="url: https://lecliche.bandcamp.com/album/vicarious-life">
+            abrir-modal="url: assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg">
           </a-box>
 
           <a-box 
             material-virtual src="#galeriaFoto2" position="-24 1.5 5" width="4" height="3" depth="0.1"
-            abrir-modal="url: https://www.youtube.com/embed/f7fXAjDwZco?si=N8PmuCHll1INQQdA">
+            abrir-modal="url: assets/images/eiffel.jpg">
           </a-box>
 
           <a-box 
-            material-virtual src="#video" position="4 1.5 5" rotation="0 -15 0" width="4" height="3" depth="0.1">
+            material-virtual src="#video" position="4 1.5 5" rotation="0 -15 0" width="4" height="3" depth="0.1"
+            abrir-modal="url: assets/images/compequicolor1024vr.mp4">
           </a-box>
 
           <a-box 
-            material-virtual src="#galeriaFoto1" position="24 1.5 5" width="4" height="3" depth="0.1"
-            abrir-modal="url: https://pt.wikipedia.org/wiki/Arte_digital">
+            material-virtual src="#praia" position="24 1.5 5" width="4" height="3" depth="0.1"
+            abrir-modal="url: assets/images/praia.jpg">
+          </a-box>
+
+          <a-box 
+            material-virtual src="#skycloud" position="44 1.5 5" width="4" height="3" depth="0.1"
+            abrir-modal="url: assets/images/skycloud.jpg">
           </a-box>
 
         </a-entity>
