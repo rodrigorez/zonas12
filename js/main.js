@@ -33,6 +33,13 @@ AFRAME.registerComponent('config-ar', {
   }
 });
 
+AFRAME.registerComponent('cursor-listener', {
+  init: function () {
+    // Adiciona classe para raycaster funcionar corretamente
+    this.el.setAttribute('class', 'interactable');
+  }
+});
+
 // --- OBRAS SUJEITAS AO ESTÊNCIL ---
 AFRAME.registerComponent('material-virtual', {
   init: function () {
