@@ -25,6 +25,10 @@ AFRAME.registerComponent('config-ar', {
       renderer.setClearColor(0x000000, 0); 
       renderer.alpha = true;
       renderer.stencil = true;
+      // Correção para evitar o aviso de useLegacyLights
+      if (renderer.useLegacyLights !== undefined) {
+        renderer.useLegacyLights = false;
+      }
     });
   }
 });
