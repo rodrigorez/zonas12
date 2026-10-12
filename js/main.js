@@ -130,6 +130,11 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.portalGroup = new THREE.Group();
     el.setObject3D('portal-mesh', this.portalGroup);
 
+    // Estados para controle de detecção
+    this.isInsidePortal = false; // Estado atual da câmera em relação ao portal
+    this.lastDetectionTime = 0; // Tempo da última detecção válida
+    this.detectionCooldown = 500; // Tempo mínimo entre detecções (ms)
+    
     // Criar o lado frontal do portal (dimensão)
     let frontGroup = new THREE.Group();
     
@@ -206,24 +211,6 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     backGroup.rotation.y = Math.PI; // Rotacionar 180 graus para ficar na parte de trás
     this.portalGroup.add(backGroup);
     
-    // Criar caixa de debug (wireframe) para visualizar a bounding box de colisão
-    // Visível apenas durante desenvolvimento/debug
-    let debugMode = false; // Mudar para true para ativar debug
-    if (debugMode) {
-      let portalDepth = 0.1;
-      let debugBoxGeo = new THREE.BoxGeometry(w, h, portalDepth);
-      let debugBoxMat = new THREE.MeshBasicMaterial({ 
-        color: 0x00FF00, 
-        wireframe: true,
-        transparent: true,
-        opacity: 0.5
-      });
-      let debugBox = new THREE.Mesh(debugBoxGeo, debugBoxMat);
-      debugBox.position.set(0, h/2, 0);
-      debugBox.renderOrder = 10; // Renderizar por cima de outros elementos
-      this.portalGroup.add(debugBox);
-    }
-    
     // Inicializar o ângulo de rotação
     this.portalGroup.rotation.y = 0; // Começa com o lado frontal visível
     
@@ -268,7 +255,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.debugBox.renderOrder = 10; // Renderizar por cima de outros elementos
     this.portalGroup.add(this.debugBox);
   },
-  tick: function() {
+  tick: function(time) {
       let cam = document.querySelector('a-camera');
       if (!cam || !this.sphereMat) return;
       
@@ -302,15 +289,36 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
           console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
           console.log(`Portal bounds: X[${portalLeft.toFixed(2)}, ${portalRight.toFixed(2)}], Y[${portalBottom.toFixed(2)}, ${portalTop.toFixed(2)}], Z[${portalFront.toFixed(2)}, ${portalBack.toFixed(2)}]`);
           console.log(`Inside portal: ${isCameraInPortalBounds}`);
+          console.log(`Current state: ${this.isInsidePortal ? 'INSIDE' : 'OUTSIDE'}`);
       }
       
-      // Determinar a função stencil com base na colisão 3D
+      // Sistema de estados com cooldown para evitar oscilações
+      let currentTime = time || Date.now();
+      
+      // Se a câmera entrou no portal e não está em cooldown
+      if (isCameraInPortalBounds && !this.isInsidePortal && (currentTime - this.lastDetectionTime > this.detectionCooldown)) {
+          this.isInsidePortal = true;
+          this.lastDetectionTime = currentTime;
+          if (this.debugBox) {
+              console.log('>>> ENTERED PORTAL <<<');
+          }
+      }
+      // Se a câmera saiu do portal e não está em cooldown
+      else if (!isCameraInPortalBounds && this.isInsidePortal && (currentTime - this.lastDetectionTime > this.detectionCooldown)) {
+          this.isInsidePortal = false;
+          this.lastDetectionTime = currentTime;
+          if (this.debugBox) {
+              console.log('>>> EXITED PORTAL <<<');
+          }
+      }
+      
+      // Determinar a função stencil com base no estado atual
       let func;
-      if (isCameraInPortalBounds) {
-          // Se a câmera está dentro da bounding box do portal, mostrar a dimensão do portal
+      if (this.isInsidePortal) {
+          // Se a câmera está dentro do portal, mostrar a dimensão do portal
           func = THREE.EqualStencilFunc;
       } else {
-          // Se a câmera não está dentro da bounding box do portal, mostrar a câmera real
+          // Se a câmera não está dentro do portal, mostrar a câmera real
           func = THREE.NotEqualStencilFunc;
       }
       
