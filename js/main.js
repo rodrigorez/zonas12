@@ -100,7 +100,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.portalTransitionCooldown = 0; // Cooldown para evitar transições rápidas
     this.isCompletingTraversal = false; // Flag para indicar se está completando uma travessia
     this.lastTraversalTime = 0; // Tempo da última travessia completa
-    this.traversalDebounceTime = 2000; // Tempo mínimo entre travessias (ms) - aumentado para 2 segundos
+    this.traversalDebounceTime = 5000; // Tempo mínimo entre travessias (ms) - aumentado para 5 segundos
     
     // Criar o lado frontal do portal (dimensão)
     let frontGroup = new THREE.Group();
