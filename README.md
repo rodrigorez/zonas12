@@ -110,8 +110,10 @@ dimensão.
 | Dimensão central que dá acesso a todas | Um portal por destino: `dimensaoA: 0; dimensaoB: N`, todos na dimensão central |
 | 7 portais da dimensão 1 para a 2 | 7 portais `dimensaoA: 1; dimensaoB: 2; pertenceA: 1` |
 | 7 portais da dimensão 2 para a 1 | 7 portais `dimensaoA: 1; dimensaoB: 2; pertenceA: 2` |
+| **Vários portais no mesmo sítio para o mesmo destino** | N portais iguais com `pertenceA` da dimensão deles (ex.: 2 portais de 2 → 1) |
+| **Uma dimensão com portais para destinos diferentes** | Ex.: `pertenceA: 2` com 2 portais `dimensaoB: 1` e 1 portal `dimensaoB: 3` |
 | Atravessar para "qualquer" outra dimensão | Um portal entre as duas; atravessar em qualquer sentido |
-| Vários portais a mostrar dimensões diferentes no mesmo ecrã | Cada janela recebe um valor de stencil próprio |
+| Vários portais a mostrar dimensões diferentes no mesmo ecrã | Cada **dimensão mostrada** recebe um valor de stencil próprio |
 
 Exemplo — uma central (0) com dois destinos, e conteúdo nas dimensões:
 
@@ -127,24 +129,35 @@ Exemplo — uma central (0) com dois destinos, e conteúdo nas dimensões:
 
 #### Cena atual (`index.html`)
 
-O `index.html` monta um **grafo completo de 3 dimensões**: cada dimensão tem 2 portais, um
-para cada uma das outras duas.
+O `index.html` monta **4 dimensões**. As dimensões 0, 1 e 2 formam um grafo completo (2
+portais cada uma, um para cada uma das outras); a **dimensão 2 tem 3 portais** — dois para
+a dimensão 1 e um para a dimensão 3 — e a dimensão 3 volta à 2.
 
 | Dimensão | Conteúdo | Portais (id: liga para onde) |
 | --- | --- | --- |
 | **0** (realidade / hub) | Vê-se a câmara | `0 → 1`, `1 → 2` — em `x = ∓6`, `z = -8` |
 | **1** (cidade 360º) | `#cidade-360` + 5 obras | `2 → 0`, `3 → 2` — em `x = ∓25`, `z = -45` |
-| **2** (praia) | `#praia` + 3 obras | `4 → 0`, `5 → 1` — em `x = ∓25`, `z = -80` |
+| **2** (praia) | `#praia` + 3 obras | `4 → 1`, `5 → 1` e `6 → 3` — em `x = -25`, `x = 25` e `x = 0`, `z = -80` |
+| **3** (céu 360º) | `#skycloud` + 2 obras | `7 → 2` — em `x = 0`, `z = -120` |
 
 Cada portal tem `pertenceA` igual à sua dimensão, por isso dentro de uma dimensão só se
-vêem os 2 portais dela. As travessias são todas bidirecionais (o mesmo portal serve de ida
+vêem os portais dela. As travessias são todas bidirecionais (o mesmo portal serve de ida
 e de volta):
 
 ```
 0 ⇄ 1 (portal 0)      0 ⇄ 2 (portal 1)
 1 ⇄ 0 (portal 2)      1 ⇄ 2 (portal 3)
-2 ⇄ 0 (portal 4)      2 ⇄ 1 (portal 5)
+2 ⇄ 1 (portal 4)      2 ⇄ 1 (portal 5)      2 ⇄ 3 (portal 6)
+3 ⇄ 2 (portal 7)
 ```
+
+Os portais 4 e 5 (os dois que vão da dimensão 2 para a 1) são a prova de que **o valor de
+stencil pertence à dimensão mostrada, não ao portal**: ambos escrevem o mesmo valor e
+ambas as janelas mostram a dimensão 1 ao mesmo tempo, junto com a janela do portal 6 (que
+mostra a dimensão 3). Na dimensão 2 há então 3 janelas no ecrã com 2 valores de stencil.
+
+Como a dimensão 2 não tem portal direto para a 0 (é o que esta cena pede), o regresso ao
+hub faz-se por `2 → 1 → 0` (portais 4 ou 5 e depois o portal 2).
 
 As posições foram escolhidas para que o ponto onde se chega (o portal atravessado) nunca
 caia dentro da caixa de outro portal — sem isso haveria trocas em cadeia ao chegar.
@@ -183,9 +196,13 @@ panorama, mesmas obras).
 #### Limites
 
 - **512 dimensões** e **512 portais** (IDs de organização).
-- **255 janelas ao mesmo tempo**: o stencil tem 8 bits e cada janela que mostra uma
-  dimensão diferente precisa de um valor. Se houver mais, a consola avisa e as restantes
-  ficam sem janela (sem estragar as outras).
+- **Portais por dimensão: os que quiser.** O valor de stencil é da **dimensão mostrada**,
+  não do portal: dois portais da dimensão 2 que mostrem a dimensão 1 escrevem o mesmo
+  valor e as duas janelas funcionam ao mesmo tempo (é o caso dos portais 4 e 5).
+- **255 janelas ao mesmo tempo**: o stencil tem 8 bits e cada **dimensão diferente**
+  visível ao mesmo tempo precisa de um valor. Se houver mais, a consola avisa e as
+  restantes ficam sem janela (sem estragar as outras). O que conta para este limite é o
+  número de dimensões mostradas em simultâneo, não o número de portais.
 - Uma dimensão sem conteúdo 3D mostra a câmara (o canvas é transparente). É o caso da
   dimensão 0.
 
