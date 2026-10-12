@@ -246,6 +246,13 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
           camPos.z >= portalFront && camPos.z <= portalBack
       );
       
+      // Debug logs detalhados (mesmo sem debugBox ativo para diagnóstico)
+      if (this.debugBox || (isCurrentlyInsidePortal !== this.wasInsidePortal)) {
+          console.log(`Portal Detection - Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
+          console.log(`Portal Bounds: X[${portalLeft.toFixed(2)}, ${portalRight.toFixed(2)}], Y[${portalBottom.toFixed(2)}, ${portalTop.toFixed(2)}], Z[${portalFront.toFixed(2)}, ${portalBack.toFixed(2)}]`);
+          console.log(`Inside Portal: ${isCurrentlyInsidePortal} | Was Inside: ${this.wasInsidePortal} | Cooldown: ${this.portalTransitionCooldown.toFixed(0)}`);
+      }
+      
       // Detectar transição de entrada no portal (apenas quando entra)
       if (isCurrentlyInsidePortal && !this.wasInsidePortal && this.portalTransitionCooldown <= 0) {
           // Alternar estado da dimensão (interruptor)
@@ -257,6 +264,11 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
               console.log(`>>> PORTAL TRANSITION: ${this.showingPortalDimension ? 'SHOWING PORTAL DIMENSION' : 'SHOWING CAMERA DIMENSION'} <<<`);
               console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
           }
+      }
+      
+      // Mostrar flickering suspeito
+      if (!isCurrentlyInsidePortal && this.wasInsidePortal && this.portalTransitionCooldown > 0) {
+          console.log(`!!! FLICKERING DETECTED: Camera briefly outside portal during cooldown !!!`);
       }
       
       // Atualizar estado anterior
