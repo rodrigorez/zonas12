@@ -266,18 +266,19 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
           }
       }
       
-      // Ignorar saídas breves durante o cooldown (previne flickering)
-      if (!isCurrentlyInsidePortal && this.wasInsidePortal && this.portalTransitionCooldown > 0) {
-          // Durante o cooldown, manter o estado anterior se a saída for breve
-          // Isso previne o flickering quando a câmera sai momentaneamente do portal
-          console.log(`!!! Brief exit during cooldown ignored - maintaining previous state !!!`);
-          isCurrentlyInsidePortal = true; // Forçar a permanecer "dentro" durante o cooldown
+      // Durante o cooldown, manter o estado de "dentro do portal" mesmo que a detecção mude
+      // Isso previne flickering quando a câmera oscila na borda do portal
+      let effectiveInsidePortal = isCurrentlyInsidePortal;
+      if (this.portalTransitionCooldown > 0 && this.wasInsidePortal) {
+          effectiveInsidePortal = true;
+          // Mostrar apenas quando há mudança real para evitar spam
+          if (isCurrentlyInsidePortal !== this.wasInsidePortal) {
+              console.log(`!!! Maintaining inside state during cooldown !!!`);
+          }
       }
       
-      // Atualizar estado anterior apenas quando não estiver em cooldown
-      if (this.portalTransitionCooldown <= 0) {
-          this.wasInsidePortal = isCurrentlyInsidePortal;
-      }
+      // Atualizar estado anterior
+      this.wasInsidePortal = isCurrentlyInsidePortal;
       
       // Determinar a função stencil com base no estado do interruptor
       let func = this.showingPortalDimension ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
