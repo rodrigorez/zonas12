@@ -125,6 +125,22 @@ Exemplo — uma central (0) com dois destinos, e conteúdo nas dimensões:
 <a-box position="0 1.5 -30" material-virtual="dimensao: 1" abrir-modal="url: assets/images/praia.jpg"></a-box>
 ```
 
+#### Cena atual (`index.html`)
+
+O `index.html` já tem um hub com dois destinos, para servir de referência:
+
+| O que | Onde |
+| --- | --- |
+| Dimensão 0 (realidade) | O hub: vê-se a câmara e os dois portais |
+| Dimensão 1 (cidade 360º) | `panorama-dimensao="dimensao: 1; src: #cidade-360"` + 5 obras |
+| Dimensão 2 (praia) | `panorama-dimensao="dimensao: 2; src: #praia"` + 3 obras |
+| Portais do hub | `portalId: 0` (0↔1) e `portalId: 1` (0↔2), ambos `pertenceA: 0`, em `x = -6` e `x = +6` |
+| Portais de volta | `portalId: 2` (1↔0) e `portalId: 3` (2↔0), `pertenceA: 1` e `pertenceA: 2`, em `z = -45` |
+
+No hub vês os dois quadros ao mesmo tempo (um para cada dimensão). Dentro de cada
+dimensão só aparece o portal de volta dessa dimensão, porque os portais do hub têm
+`pertenceA: 0`.
+
 #### Atributos do portal
 
 | Atributo | Significado | Omissão |

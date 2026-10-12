@@ -61,11 +61,17 @@
         <!-- Dimensões (uma entidade por dimensão, com o seu ID) -->
         <!-- O panorama de uma dimensão é o fundo 360º dela. O portal é só a porta. -->
         <a-entity panorama-dimensao="dimensao: 1; src: #cidade-360; raio: 100;"></a-entity>
+        <a-entity panorama-dimensao="dimensao: 2; src: #praia; raio: 100;"></a-entity>
 
-        <!-- Portal: portal-id proprio, liga duas dimensoes (bidirecional) -->
-        <a-entity position="0 0 -5" portal-estencil-dinamico="portalId: 0; dimensaoA: 0; dimensaoB: 1; width: 12.0; height: 16.0;"></a-entity>
+        <!-- Portais do hub: ficam na realidade (pertenceA: 0) e levam às dimensões -->
+        <a-entity position="-6 0 -8" portal-estencil-dinamico="portalId: 0; dimensaoA: 0; dimensaoB: 1; pertenceA: 0; width: 8; height: 10;"></a-entity>
+        <a-entity position=" 6 0 -8" portal-estencil-dinamico="portalId: 1; dimensaoA: 0; dimensaoB: 2; pertenceA: 0; width: 8; height: 10;"></a-entity>
 
-        <!-- Obras da Galeria (Em Z = -60, bem dentro da cidade) -->
+        <!-- Portais de volta: um dentro de cada dimensão (pertenceA: 1 e 2) -->
+        <a-entity position="0 0 -45" portal-estencil-dinamico="portalId: 2; dimensaoA: 1; dimensaoB: 0; pertenceA: 1; width: 12; height: 16;"></a-entity>
+        <a-entity position="0 0 -45" portal-estencil-dinamico="portalId: 3; dimensaoA: 2; dimensaoB: 0; pertenceA: 2; width: 12; height: 16;"></a-entity>
+
+        <!-- Obras da dimensão 1 (cidade 360º), em Z = -60 -->
         <a-entity position="0 0 -60">
           
           <a-box 
@@ -96,6 +102,29 @@
             class="interactable"
             material-virtual="dimensao: 1" src="#skycloud" position="44 1.5 5" width="4" height="3" depth="0.1"
             abrir-modal="url: assets/images/skycloud.jpg">
+          </a-box>
+
+        </a-entity>
+
+        <!-- Obras da dimensão 2 (praia), no mesmo sítio: cada dimensão tem o seu conteúdo -->
+        <a-entity position="0 0 -60">
+
+          <a-box 
+            class="interactable"
+            material-virtual="dimensao: 2" src="#skycloud" position="-20 1.5 5" width="4" height="3" depth="0.1"
+            abrir-modal="url: assets/images/skycloud.jpg">
+          </a-box>
+
+          <a-box 
+            class="interactable"
+            material-virtual="dimensao: 2" src="#galeriaFoto2" position="0 1.5 5" width="4" height="3" depth="0.1"
+            abrir-modal="url: assets/images/eiffel.jpg">
+          </a-box>
+
+          <a-box 
+            class="interactable"
+            material-virtual="dimensao: 2" src="#galeriaFoto1" position="20 1.5 5" width="4" height="3" depth="0.1"
+            abrir-modal="url: assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg">
           </a-box>
 
         </a-entity>
