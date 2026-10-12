@@ -14,6 +14,8 @@ zonas12/
 │   └── style.css       estilos da página, HUD, modal e D-pad
 ├── js/
 │   └── main.js         toda a lógica (dimensões, portais, stencil, obras)
+├── docs/
+│   └── ROADMAP.md      plano de desenvolvimento (módulos + página de edição)
 ├── assets/
 │   └── images/         panoramas 360º, fotos e vídeo usados na cena
 ├── .harness/           fora do repositório (está no .gitignore)
@@ -33,6 +35,8 @@ zonas12/
 
 - A raiz tem só o que é preciso para o projeto funcionar: `index.html`, `css/`, `js/`,
   `assets/`, `README.md` e `.gitignore`.
+- Documentação de planeamento (roadmap, decisões) fica em `docs/`; ferramentas de
+  construção (ex.: processamento de assets) em `tools/`.
 - Todos os assets (imagens, vídeos) ficam em `assets/images/`.
 - Código JavaScript em arquivos separados dentro de `js/`.
 - Código CSS em arquivos separados dentro de `css/`.
@@ -50,6 +54,7 @@ zonas12/
 
 - `README.md`, na raiz, contém a documentação principal: arquitetura, atributos, limites,
   requisitos técnicos e o estado atual do código.
+- O plano de desenvolvimento (roadmap, decisões em curso) fica em `docs/ROADMAP.md`.
 - Documentação de componentes novos deve ser acrescentada ao `README.md`.
 
 ### 4. Regras para Humanos e IA
