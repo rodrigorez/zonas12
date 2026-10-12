@@ -228,30 +228,32 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       // Dimensões do portal
       let portalWidth = this.data.width || 12.0;
       let portalHeight = this.data.height || 16.0;
+      let portalDepth = 0.1; // Profundidade fina para detecção precisa
       
-      // Calcular limites do portal
+      // Calcular limites da bounding box do portal
       let portalLeft = portalPos.x - (portalWidth / 2);
       let portalRight = portalPos.x + (portalWidth / 2);
-      let portalTop = portalPos.y + portalHeight;
       let portalBottom = portalPos.y;
+      let portalTop = portalPos.y + portalHeight;
+      let portalFront = portalPos.z - (portalDepth / 2);
+      let portalBack = portalPos.z + (portalDepth / 2);
       
-      // Verificar se a câmera está horizontalmente alinhada com o portal
-      let isHorizontallyAligned = (camPos.x >= portalLeft) && (camPos.x <= portalRight);
+      // Verificar colisão 3D entre câmera e bounding box do portal
+      // A câmera é tratada como um ponto para simplificação
+      let isCameraInPortalBounds = (
+          camPos.x >= portalLeft && camPos.x <= portalRight &&
+          camPos.y >= portalBottom && camPos.y <= portalTop &&
+          camPos.z >= portalFront && camPos.z <= portalBack
+      );
       
-      // Verificar se a câmera está verticalmente alinhada com o portal
-      let isVerticallyAligned = (camPos.y >= portalBottom) && (camPos.y <= portalTop);
-      
-      // Verificar se a câmera está alinhada com o portal (dentro dos limites horizontais e verticais)
-      let isAlignedWithPortal = isHorizontallyAligned && isVerticallyAligned;
-      
-      // Determinar a função stencil com base na posição relativa da câmera
+      // Determinar a função stencil com base na colisão 3D
       let func;
-      if (isAlignedWithPortal) {
-          // Se a câmera está alinhada com o portal, usar a lógica original de troca de dimensão
+      if (isCameraInPortalBounds) {
+          // Se a câmera está dentro da bounding box do portal, usar a lógica de troca de dimensão
           func = (camPos.z > portalPos.z) ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
       } else {
-          // Se a câmera não está alinhada com o portal, manter a dimensão atual
-          // Com base na posição Z relativa ao portal
+          // Se a câmera não está dentro da bounding box do portal, manter a lógica baseada apenas na posição Z
+          // Isso permite que a dimensão seja determinada pela posição relativa à face do portal
           func = (camPos.z > portalPos.z) ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
       }
       
