@@ -243,24 +243,25 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
   // Função para alternar modo debug
   toggleDebugMode: function() {
     // Remover caixa de debug existente se houver
-    let existingDebugBox = this.debugBox;
-    if (existingDebugBox) {
-      this.portalGroup.remove(existingDebugBox);
+    if (this.debugBox) {
+      this.portalGroup.remove(this.debugBox);
       this.debugBox = null;
       return;
     }
     
-    // Criar nova caixa de debug
+    // Criar nova caixa de debug mais visível
     let w = this.data.width || 12.0;
     let h = this.data.height || 16.0;
     let portalDepth = 0.1;
     
+    // Criar wireframe azul mais proeminente
     let debugBoxGeo = new THREE.BoxGeometry(w, h, portalDepth);
     let debugBoxMat = new THREE.MeshBasicMaterial({ 
-      color: 0x00FF00, 
+      color: 0x0000FF, // Azul
       wireframe: true,
       transparent: true,
-      opacity: 0.7
+      opacity: 0.7,
+      side: THREE.DoubleSide
     });
     this.debugBox = new THREE.Mesh(debugBoxGeo, debugBoxMat);
     this.debugBox.position.set(0, h/2, 0);
