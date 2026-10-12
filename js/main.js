@@ -94,8 +94,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.portalGroup = new THREE.Group();
     el.setObject3D('portal-mesh', this.portalGroup);
 
-    // Estados para controle de detecção limpo
-    this.isInsidePortal = false; // Estado atual da câmera em relação ao portal
+    // Sistema de estados como interruptor (true = dimensão do portal, false = câmera)
+    this.showingPortalDimension = false; // Estado atual da dimensão sendo mostrada
+    this.wasInsidePortal = false; // Para detectar transições de entrada/saída
+    this.portalTransitionCooldown = 0; // Cooldown para evitar transições rápidas
     
     // Criar o lado frontal do portal (dimensão)
     let frontGroup = new THREE.Group();
@@ -217,9 +219,15 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.debugBox.renderOrder = 10; // Renderizar por cima de outros elementos
     this.portalGroup.add(this.debugBox);
   },
-  tick: function() {
+  tick: function(time) {
       let cam = document.querySelector('a-camera');
       if (!cam || !this.sphereMat) return;
+      
+      // Cooldown para evitar transições rápidas
+      if (this.portalTransitionCooldown > 0) {
+          this.portalTransitionCooldown -= Math.min(100, time - (this.lastTime || time));
+          this.lastTime = time;
+      }
       
       // Obter posições da câmera e do portal
       let camPos = cam.object3D.position;
@@ -239,25 +247,31 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       let portalBack = portalPos.z + (portalDepth / 2);
       
       // Verificar colisão 3D entre câmera e bounding box do portal
-      let isInsidePortal = (
+      let isCurrentlyInsidePortal = (
           camPos.x >= portalLeft && camPos.x <= portalRight &&
           camPos.y >= portalBottom && camPos.y <= portalTop &&
           camPos.z >= portalFront && camPos.z <= portalBack
       );
       
-      // Atualizar estado apenas se mudou
-      if (isInsidePortal !== this.isInsidePortal) {
-          this.isInsidePortal = isInsidePortal;
+      // Detectar transição de entrada no portal (apenas quando entra)
+      if (isCurrentlyInsidePortal && !this.wasInsidePortal && this.portalTransitionCooldown <= 0) {
+          // Alternar estado da dimensão (interruptor)
+          this.showingPortalDimension = !this.showingPortalDimension;
+          this.portalTransitionCooldown = 500; // 500ms cooldown
           
-          // Debug logs apenas quando o estado muda
+          // Debug logs
           if (this.debugBox) {
-              console.log(`>>> ${this.isInsidePortal ? 'ENTERED' : 'EXITED'} PORTAL <<<`);
+              console.log(`>>> PORTAL TRANSITION: ${this.showingPortalDimension ? 'SHOWING PORTAL DIMENSION' : 'SHOWING CAMERA DIMENSION'} <<<`);
               console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
           }
       }
       
-      // Determinar a função stencil com base no estado atual
-      let func = this.isInsidePortal ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
+      // Atualizar estado anterior
+      this.wasInsidePortal = isCurrentlyInsidePortal;
+      this.lastTime = time;
+      
+      // Determinar a função stencil com base no estado do interruptor
+      let func = this.showingPortalDimension ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
       
       this.sphereMat.stencilFunc = func;
       
