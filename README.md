@@ -64,29 +64,32 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 
 ### 1. Portal Estêncil Dinâmico
 
-O portal é um "interruptor entre dimensões": atravessá-lo troca a dimensão mostrada. Quem dispara a troca é uma **caixa de colisão** — quando a câmara **entra** na caixa, o estado avança uma dimensão.
+O portal é uma **janela entre dimensões**: o quadro vermelho mostra a dimensão do outro lado e, ao atravessá-lo, troca-se de dimensão. Quem deteta a travessia é uma **caixa de colisão**, calculada no espaço do portal — não há nenhuma posição nem distância fixa no mundo.
 
-| Dimensão | Desenhado no ecrã |
-| --- | --- |
-| **1 — Mundo real** | Nada da dimensão (o canvas fica transparente e vê-se a câmara) + moldura vermelha |
-| **2 — Portal** | Esfera 360º (imagem panorâmica) + obras |
+| Estado | Fora do quadro vermelho | Dentro do quadro vermelho |
+| --- | --- | --- |
+| **1 — Mundo real** | Câmera (realidade) | Dimensão do portal (esfera 360º + obras) |
+| **2 — Portal** | Dimensão do portal (esfera 360º + obras) | Câmera (realidade) |
 
-O interruptor dispara na **entrada** da caixa (de fora para dentro), não em cada frame:
+O quadro é a janela: perto do portal a janela cresce até preencher o ecrã, por isso ao atravessar a dimensão seguinte passa a ocupar tudo.
 
-- **Entrar** na caixa: passa para a dimensão seguinte
-- **Ficar** dentro da caixa: não muda nada
-- **Entrar outra vez** (depois de sair): volta à dimensão anterior
+A travessia é detetada pela colisão com a caixa, sempre dentro dela:
 
-Com 2 dimensões isto é uma alternância: entrar → dimensão 2; entrar de novo → dimensão 1.
+- **Atravessar** o plano do quadro: passa para a dimensão seguinte
+- **Estar** dentro da caixa sem atravessar: não muda nada
+- **Atravessar outra vez** (ao voltar): volta à dimensão anterior
 
-"Entrar" depende de todas as dimensões da caixa (X, Y e Z), não de uma distância num só eixo. Com a caixa centrada no quadro (`caixaPosicao: 0 8 0`), a troca acontece na face da caixa por onde se entra.
+Com 2 dimensões isto é uma alternância: atravessar → dimensão 2; atravessar de novo → dimensão 1.
+
+Como tudo é calculado no espaço do portal (`worldToLocal` + a rotação da caixa), o portal pode estar **deslocado, rodado ou em movimento** — a travessia acompanha-o sempre (`js/main.js`, `tick`).
 
 Requisitos técnicos (não remover, o portal deixa de funcionar):
 
 - `renderer="...; stencil: true"` no `<a-scene>`: a partir do three r184 o buffer de stencil **não é criado por omissão**, e sem ele o portal desenha tudo em todo o lado (perde-se a troca de dimensões)
 - `renderer.sortObjects = false` em `config-ar` (`js/main.js`): o A-Frame 1.4.2 forçava este valor; no 1.8.x fica `true`, o que desenha as obras antes da máscara do portal e as faz falhar o teste de stencil
 - A ordem de desenho depende dos `renderOrder`: máscara (1) → esfera 360º (2) → moldura (3)
-- A dimensão ativa é desenhada com `THREE.AlwaysStencilFunc` e as restantes com `THREE.NeverStencilFunc` (`aplicarEstado`)
+- A dimensão atual usa `THREE.NotEqualStencilFunc`, a seguinte `THREE.EqualStencilFunc` e as restantes `THREE.NeverStencilFunc` (`aplicarEstado`)
+- A máscara do quadro (`stencilFunc: Always`, `stencilZPass: Replace`) é quem escreve o stencil; é ela que faz a janela funcionar
 
 #### Caixa de colisão e caixa de debug
 
@@ -97,8 +100,11 @@ A caixa é declarada no atributo do portal (`js/main.js`, schema do componente) 
 | `caixa` | Tamanho X, Y, Z | `12 16 1` |
 | `caixaPosicao` | Centro da caixa (espaço do portal) | `0 8 0` |
 | `caixaRotacao` | Rotação da caixa, em graus | `0 0 0` |
+| `gatilho` | Onde a travessia dispara: `plano` (plano central da caixa) ou `caixa` (face de entrada) | `plano` |
 
 Exemplo: `portal-estencil-dinamico="src: #cidade-360; caixa: 12 16 1; caixaPosicao: 0 8 0;"`
+
+**Porquê `plano` por omissão:** a máscara do quadro só escreve o stencil quando está à frente da câmara, ou seja, o quadro só é uma janela de um dos lados. A troca de dimensão tem de acontecer no plano do quadro, que é o plano central da caixa — é o único ponto em que a troca não se nota. Com `gatilho: caixa` (face de entrada, meia espessura antes do quadro) fica-se ~0,55 m com a dimensão errada durante a travessia, com a caixa por omissão.
 
 #### Escalar para outras dimensões
 
@@ -108,11 +114,16 @@ As dimensões vivem em `window.dimensoes` (`js/main.js`): cada índice é uma di
 - `dimensoes[1]` é a dimensão do portal (esfera 360º + obras)
 - Cada obra declara a sua dimensão com `material-virtual="dimensao: 1"` (omissão `1`)
 
-Registar materiais num índice novo cria uma dimensão nova e o interruptor passa a percorrer todas (entrar na caixa cicla 1 → 2 → 3 → 1).
+Registar materiais num índice novo cria uma dimensão nova e o interruptor passa a percorrer todas (atravessar cicla 1 → 2 → 3 → 1), com o quadro a mostrar sempre a dimensão seguinte.
+
+#### Vários portais (limitação atual)
+
+`window.dimensoes` e os seus materiais são **globais**: cada portal aplica o seu estado a todos os materiais da dimensão. Com dois portais em estados diferentes, o último a correr (`aplicarEstado`) sobrescreve o teste de stencil do outro — um deles fica a mostrar a dimensão errada. Antes de usar vários portais ao mesmo tempo é preciso decidir a arquitetura (por exemplo, um bit de stencil por portal, ou os materiais da dimensão pertencerem a um portal).
 
 ### Recursos Recentes
 
-- **Interruptor por Caixa de Colisão**: a dimensão só muda quando a câmara entra na caixa (X, Y e Z), uma vez por travessia — sem debounce, sem cooldown e sem distância de z
+- **Janela entre Dimensões**: o quadro vermelho mostra a dimensão atual por fora e a seguinte por dentro, nos dois sentidos
+- **Travessia por Colisão com a Caixa**: sem debounce, sem cooldown e sem distância; calculada no espaço do portal, por isso funciona com portais deslocados, rodados e em movimento
 - **Caixa de Debug Igual à Real**: a caixa de debug é desenhada com a mesma dimensão, posição e rotação da caixa de colisão
 - **Sem Barreiras Invisíveis**: Removido sistema antigo de limites que causava colisões fantasmas
 
@@ -148,11 +159,11 @@ Registar materiais num índice novo cria uma dimensão nova e o interruptor pass
 
 ### Funcionamento do Portal
 
-A dimensão mostrada é o **estado** do portal, que só muda ao entrar na caixa de colisão (`js/main.js`):
+A travessia é detetada pela colisão com a caixa, sempre dentro dela (`js/main.js`, `tick`):
 
-- **Estado 1 (mundo real)**: a esfera 360º e as obras não são desenhadas; fica só o mundo real da câmara e a moldura vermelha
-- **Estado 2 (portal)**: a esfera 360º e as obras são desenhadas; o quadro vermelho continua a marcar o portal
-- **Sem piscas**: a dimensão só muda ao entrar na caixa (fora → dentro), uma vez por travessia, e não depende de estar à frente ou atrás do quadro — por isso não há frames com a dimensão errada
+- **Estado 1 (mundo real)**: fora do quadro vê-se a câmara; dentro do quadro vê-se a dimensão do portal (`Equal`)
+- **Estado 2 (portal)**: fora do quadro vê-se a dimensão do portal; dentro do quadro vê-se a câmara (`NotEqual`)
+- **Sem piscas**: a troca de estado acontece no plano central da caixa, exatamente onde a máscara do quadro muda de lado, por isso não há frames com a dimensão errada (com `gatilho: caixa` há, ver acima)
 
 ### 7. Modo Debug
 

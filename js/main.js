@@ -101,7 +101,13 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     // valores, pelo que as duas têm sempre a mesma dimensão, posição e rotação.
     caixa: { type: 'vec3', default: { x: 12.0, y: 16.0, z: 1.0 } },
     caixaPosicao: { type: 'vec3', default: { x: 0.0, y: 8.0, z: 0.0 } },
-    caixaRotacao: { type: 'vec3', default: { x: 0.0, y: 0.0, z: 0.0 } }
+    caixaRotacao: { type: 'vec3', default: { x: 0.0, y: 0.0, z: 0.0 } },
+    // Onde a travessia é detetada, sempre dentro da caixa:
+    //  - 'plano': no plano central da caixa, que é onde a máscara do quadro muda
+    //    de lado — a troca de dimensão não se nota;
+    //  - 'caixa': na face de entrada da caixa, que fica antes do quadro — a troca
+    //    acontece antes do quadro e vê-se a dimensão errada até o atravessar.
+    gatilho: { type: 'string', default: 'plano', oneOf: ['plano', 'caixa'] }
   },
   init: function () {
     let el = this.el; let w = this.data.width; let h = this.data.height;
@@ -109,13 +115,14 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.portalGroup = new THREE.Group();
     el.setObject3D('portal-mesh', this.portalGroup);
 
-    // Interruptor de dimensões: o estado avança quando a câmara atravessa o plano
-    // do quadro (o plano central da caixa de colisão) estando dentro da caixa.
-    // sinalZ guarda de que lado do plano a câmara estava no frame anterior
-    // (null = ainda não houve primeiro tick).
+    // Interruptor de dimensões: o estado avança quando a câmara atravessa a caixa
+    // de colisão (ver o tick). Tudo é calculado no espaço do portal, por isso
+    // segue o portal mesmo que este se mova ou rode.
     this.estadoAtual = 0;
-    this.sinalZ = null;
     this.dimensoes = window.dimensoes;
+    this.dentroDaCaixa = false;   // colisão no frame anterior
+    this.sinalZ = 1;              // de que lado do plano central a câmara estava
+    this.travessiaIniciada = false;
 
     // Caixa de colisão, no espaço do portal. Os mesmos valores alimentam a caixa
     // de debug (ver configurarCaixa/criarCaixaDebug).
@@ -307,23 +314,36 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
           Math.abs(_pontoCaixa.z) <= this.caixaMeio.z
       );
 
-      // O interruptor dispara ao atravessar o plano do quadro — e só dentro da
-      // caixa. É o único ponto em que a troca não se nota: é aí que a máscara muda
-      // de lado e a janela entre as duas dimensões roda.
-      let sinalZ = _pontoCaixa.z < 0 ? -1 : 1;
-      if (this.sinalZ === null) {
+      // Travessia detetada pela colisão com a caixa, no espaço do portal: não há
+      // nenhuma distância global nem posição fixa, por isso funciona com o portal
+      // em movimento e com vários portais.
+      if (!this.travessiaIniciada) {
           // Primeiro tick: alinha o estado com o lado onde a câmara está, sem
           // contar como travessia.
-          this.sinalZ = sinalZ;
-          this.estadoAtual = sinalZ < 0 ? 1 : 0;
+          this.travessiaIniciada = true;
+          this.dentroDaCaixa = dentroDaCaixa;
+          this.sinalZ = _pontoCaixa.z < 0 ? -1 : 1;
+          this.estadoAtual = this.sinalZ < 0 ? 1 : 0;
           this.aplicarEstado();
-      } else if (sinalZ !== this.sinalZ) {
-          if (dentroDaCaixa) {
-              this.estadoAtual = (this.estadoAtual + 1) % this.dimensoes.length;
-              this.aplicarEstado();
-              console.log(`>>> PORTAL: DIMENSÃO ${this.estadoAtual + 1} DE ${this.dimensoes.length} <<<`);
-          }
-          this.sinalZ = sinalZ;
+          return;
+      }
+
+      let sinalZ = _pontoCaixa.z < 0 ? -1 : 1;
+      let atravessou;
+      if (this.data.gatilho === 'caixa') {
+          // Entrada na caixa (fora -> dentro).
+          atravessou = dentroDaCaixa && !this.dentroDaCaixa;
+      } else {
+          // Travessia do plano central da caixa, contando só dentro dela.
+          atravessou = dentroDaCaixa && sinalZ !== this.sinalZ;
+      }
+      this.dentroDaCaixa = dentroDaCaixa;
+      this.sinalZ = sinalZ;
+
+      if (atravessou) {
+          this.estadoAtual = (this.estadoAtual + 1) % this.dimensoes.length;
+          this.aplicarEstado();
+          console.log(`>>> PORTAL: DIMENSÃO ${this.estadoAtual + 1} DE ${this.dimensoes.length} <<<`);
       }
   }
 });
