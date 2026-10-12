@@ -100,7 +100,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.portalTransitionCooldown = 0; // Cooldown para evitar transições rápidas
     this.isCompletingTraversal = false; // Flag para indicar se está completando uma travessia
     this.lastTraversalTime = 0; // Tempo da última travessia completa
-    this.traversalDebounceTime = 1000; // Tempo mínimo entre travessias (ms)
+    this.traversalDebounceTime = 2000; // Tempo mínimo entre travessias (ms) - aumentado para 2 segundos
     
     // Criar o lado frontal do portal (dimensão)
     let frontGroup = new THREE.Group();
@@ -280,9 +280,20 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
                   console.log(`>>> PORTAL DIMENSION TOGGLED: ${this.showingPortalDimension ? 'SHOWING PORTAL DIMENSION' : 'SHOWING CAMERA DIMENSION'} <<<`);
               }
           } else {
-              console.log(`>>> TRAVERSAL IGNORED - TOO FAST <<<`);
+              console.log(`>>> TRAVERSAL IGNORED - TOO FAST (elapsed: ${currentTime - this.lastTraversalTime}ms) <<<`);
               // Ignorar travessia muito rápida
               this.isCompletingTraversal = false;
+          }
+      }
+      
+      // Também verificar debounce para início de travessia
+      if (isCurrentlyInsidePortal && !this.wasInsidePortal && this.isCompletingTraversal) {
+          // Se já está em travessia mas detectou entrada novamente, pode ser flickering
+          let currentTime = time || Date.now();
+          if (currentTime - this.lastTraversalTime < this.traversalDebounceTime) {
+              console.log(`>>> RE-ENTRY IGNORED - STILL IN DEBOUNCE (elapsed: ${currentTime - this.lastTraversalTime}ms) <<<`);
+              // Ignorar re-entrada durante debounce
+              isCurrentlyInsidePortal = false; // Forçar a permanecer "fora" temporariamente
           }
       }
       
