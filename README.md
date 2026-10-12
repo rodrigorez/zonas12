@@ -7,58 +7,122 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 ## Estrutura do Projeto
 
 ````markdown
-├── assets/
-│   ├── images/
-│   └── videos/
+zonas12/
+├── index.html          ponto de entrada: a cena A-Frame
+├── README.md           documentação principal (fica sempre na raiz)
 ├── css/
-│   └── style.css
+│   └── style.css       estilos da página, HUD, modal e D-pad
 ├── js/
-│   └── main.js
-├── .harness/
-│   ├── exclude/ (arquivos excluídos do projeto principal)
-│   └── PLANO_ACOES.md (plano de ações do projeto)
-├── index.html (versão atual do projeto)
-├── portaljerome.html (versão antiga, movida para .harness/exclude)
-└── README.md
+│   └── main.js         toda a lógica (dimensões, portais, stencil, obras)
+├── assets/
+│   └── images/         panoramas 360º, fotos e vídeo usados na cena
+├── .harness/           fora do repositório (está no .gitignore)
+│   ├── dev/            ferramentas retiradas da raiz (não são precisas para o app)
+│   │   ├── package.json, package-lock.json   dependências npm (A-Frame vem do CDN)
+│   │   ├── node_modules/
+│   │   ├── favicon.ico                       vazio, sem uso
+│   │   └── vscode-config/settings.json       configuração do editor
+│   ├── imagenTeste/    capturas de ecrã usadas para diagnosticar problemas
+│   └── skills/         material auxiliar de trabalho
+└── .gitignore
 ````
 
 ## Regras de Organização do Projeto
 
 ### 1. Estrutura de Pastas
 
-- Todos os novos assets (imagens, vídeos, modelos 3D) devem ser colocados em `assets/images/` ou `assets/videos/`
-- A pasta `img/` foi removida do projeto. Todos os assets foram migrados para `assets/images/`
-- Código JavaScript deve ser colocado em arquivos separados dentro da pasta `js/`
-- Código CSS deve ser colocado em arquivos separados dentro da pasta `css/`
+- A raiz tem só o que é preciso para o projeto funcionar: `index.html`, `css/`, `js/`,
+  `assets/`, `README.md` e `.gitignore`.
+- Todos os assets (imagens, vídeos) ficam em `assets/images/`.
+- Código JavaScript em arquivos separados dentro de `js/`.
+- Código CSS em arquivos separados dentro de `css/`.
+- Tudo o que **não** é essencial para o projeto funcionar (ferramentas de
+  desenvolvimento, versões antigas, capturas de ecrã, planos) vai para `.harness/`, que
+  está no `.gitignore` e por isso não entra no repositório.
 
 ### 2. Arquivos HTML
 
-- `index.html` é o arquivo principal do projeto
-- Versões antigas ou alternativas devem ser movidas para `.harness/exclude/`
-- Arquivos em `.harness/exclude/` são mantidos apenas para referência histórica
+- `index.html` é o único arquivo do projeto.
+- Versões antigas ou alternativas devem ser movidas para `.harness/`.
+- Arquivos em `.harness/` são mantidos apenas para referência histórica.
 
 ### 3. Documentação
 
-- `README.md` contém a documentação principal do projeto
-- `PLANO_ACOES.md` foi movido para `.harness/PLANO_ACOES.md`
-- Documentação de componentes deve ser adicionada ao README.md
+- `README.md`, na raiz, contém a documentação principal: arquitetura, atributos, limites,
+  requisitos técnicos e o estado atual do código.
+- Documentação de componentes novos deve ser acrescentada ao `README.md`.
 
 ### 4. Regras para Humanos e IA
 
 #### Para Humanos
 
-- Mantenha todos os novos assets na estrutura padronizada `assets/`
+- Mantenha todos os novos assets na estrutura `assets/images/`
 - Utilize `index.html` como ponto de entrada principal
-- Consulte `.harness/PLANO_ACOES.md` para entender o roadmap do projeto
-- Arquivos em `.harness/exclude/` são históricos e não devem ser modificados
+- Mantenha a raiz limpa: o que não é essencial vai para `.harness/`
+- Arquivos em `.harness/` são históricos e não devem ser modificados
 
 #### Para IA
 
-- SEMPRE que adicionar novos assets, use a pasta `assets/images/` ou `assets/videos/`
-- NÃO use a pasta `img/` para novos assets
-- SEMPRE que criar novos componentes, documente-os no README.md
-- NÃO modifique arquivos em `.harness/exclude/`
-- SEMPRE que precisar de informações sobre o roadmap, consulte `.harness/PLANO_ACOES.md`
+- SEMPRE use `assets/images/` para novos assets
+- SEMPRE documente componentes novos no `README.md`
+- NUNCA ponha na raiz nada que não seja preciso para o projeto funcionar
+- NÃO modifique arquivos em `.harness/`
+- Ao mexer no render (stencil/profundidade), leia primeiro *Requisitos técnicos* e
+  *Estado atual do código* neste README
+
+## Estado atual do código (v0.0.2)
+
+Marcado pela branch `0.0.2`. Resumo do que existe hoje: `index.html` (183 linhas),
+`js/main.js` (547 linhas), `css/style.css` (74 linhas) e `assets/images/`.
+
+### O que está implementado
+
+| Área | Estado |
+| --- | --- |
+| Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID aparece nos atributos, em `data-dimensao`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
+| Grafo de dimensões | Portais bidirecionais entre duas dimensões, com uma **dimensão ativa** global; a cena tem 4 dimensões e 8 portais |
+| Travessia | Por **colisão com a caixa** do portal (`caixa`, `caixaPosicao`, `caixaRotacao`), no plano do quadro ou na face da caixa (`gatilho`) — nunca por distância |
+| Janelas | Uma por portal, com valor de stencil por **dimensão mostrada** (não por portal); portais que mostram o mesmo destino partilham o valor |
+| Fundo 360º | `panorama-dimensao` por dimensão (imagem ou vídeo), segue a câmara; a dimensão 0 é a câmara real (canvas transparente) |
+| Conteúdo | As obras pertencem à dimensão (`material-virtual="dimensao: N"`); o clique só abre na dimensão ativa |
+| Molduras | Barra vermelha à volta do quadro, pertencente à dimensão onde o portal está; o bordo mantém-se fechado mesmo quando cruza a janela de outro portal |
+| Modo debug | Tecla `D` mostra a caixa de colisão (sempre igual à usada na deteção); tecla `R` roda o portal |
+
+### Modelo de render (ler antes de mexer)
+
+1. `renderer.sortObjects = true` e `stencil: true` no `<a-scene>`.
+2. Ordem de desenho: máscaras (1) → panoramas (2; **2.5** para os das janelas) → obras (3)
+   → molduras (4) → caixa de debug (10).
+3. A **máscara** de cada portal escreve o valor do stencil (`Replace`) **e profundidade** no
+   plano da janela.
+4. Quem pertence à **dimensão ativa** não tem teste de stencil: a profundidade decide — o
+   que está atrás de uma janela fica tapado por ela, o que está à frente desenha-se por
+   cima. Vale para o panorama, as obras, a moldura e a caixa de debug.
+5. Quem pertence a uma **dimensão vista por uma janela** usa `Equal` com o valor dela e
+   `depthTest: false` (o mundo do outro lado da janela não conta com a profundidade dela).
+6. Uma dimensão **sem janela** usa `Never` e não se desenha.
+7. O raio do panorama de uma dimensão tem de ser maior do que a distância a qualquer
+   portal (`raio: 500` no `index.html`).
+
+### Verificado nesta versão (medido no browser)
+
+- **8/8** travessias da cena atual, sem trocas em cadeia ao chegar
+- **0** poses (de 236) com o bordo da moldura cortado (era 110 antes da correção)
+- Contorno da moldura fecha: 0 falhas de bordo em 8 poses (hub e dimensões 1, 2 e 3)
+- 0 px de moldura dentro da própria janela; moldura de trás escondida pela janela da frente
+- Clique na obra abre só na dimensão ativa
+- Consola sem erros nem avisos
+
+### Limitações e decisões assumidas
+
+- **255 dimensões distintas** visíveis ao mesmo tempo (8 bits de stencil); portais por
+  dimensão não têm limite.
+- Onde uma moldura cruza uma janela, a parte da espessura (0,2 m) que fica **atrás** do
+  plano da janela é tapada por ela — a moldura aparece um pouco mais fina aí.
+- Uma obra que esteja **à frente** de uma janela desenha-se por cima do conteúdo dela.
+- O cursor do A-Frame não leva teste de stencil (é elemento de interface).
+- A dimensão 0 não tem conteúdo 3D: dentro das janelas que a mostram vê-se a imagem real
+  da câmara (o canvas é transparente).
 
 ## Funcionalidades Principais
 
@@ -302,10 +366,10 @@ for a **dimensão ativa**: vê-la pela janela não conta.
 Tudo é decidido por frame em `gestor-dimensoes` (`js/main.js`), pela colisão com a caixa
 e pelo `dimensaoAtiva`:
 
-- **Onde estás**: o conteúdo da tua dimensão desenha em todo o lado onde nenhuma janela
-  escreveu (`Equal 0`).
-- **O que a janela mostra**: o conteúdo da dimensão do outro lado desenha dentro do
-  quadro (`Equal` com o valor daquela dimensão).
+- **Onde estás**: o conteúdo da tua dimensão desenha-se em todo o lado **excepto** onde uma
+  janela está *à frente* (é a profundidade que decide, não o stencil).
+- **O que a janela mostra**: o conteúdo da dimensão do outro lado desenha dentro do quadro
+  (`Equal` com o valor daquela dimensão, sem contar com a profundidade da máscara).
 - **Sem piscas**: a troca acontece no plano central da caixa, exatamente onde a máscara
   muda de lado, por isso não há frames com a dimensão errada (com `gatilho: caixa` há,
   ver acima).
@@ -334,9 +398,11 @@ Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caix
 
 ### 1. Executar o Projeto
 
-1. Abra o arquivo `index.html` ou `portaljerome.html` em um navegador moderno
+1. Sirva a pasta do projeto por HTTP (por exemplo `python -m http.server 8123`) e abra
+   `http://127.0.0.1:8123/index.html` — abrir o arquivo directamente também funciona, mas
+   algumas texturas exigem HTTP
 2. Clique no botão "ATIVAR EXPOSIÇÃO"
-3. Permita o acesso à câmera quando solicitado
+3. Permita o acesso à câmera quando solicitado (é a dimensão 0, a realidade)
 4. Explore o ambiente utilizando o mouse (desktop) ou o D-pad (mobile)
 
 ### 2. Personalizar Conteúdo
@@ -347,7 +413,11 @@ Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caix
 
 ## Melhorias Planejadas
 
-Consulte o arquivo `PLANO_ACOES.md` para detalhes sobre as melhorias planejadas para o projeto.
+- Portais com movimento e rotação animados, definidos na cena
+- Mais conteúdo por dimensão (vídeo 360º como fundo, por exemplo)
+- Um gestor de portais que crie as janelas a partir de uma descrição da cena (uma lista de
+  dimensões e portais), em vez de entidades escritas à mão no `index.html`
+- Testes automáticos das travessias e das janelas (o que hoje é medido à mão no browser)
 
 ## Requisitos do Sistema
 
@@ -367,4 +437,4 @@ Para contribuir com o projeto, siga estas etapas:
 
 ## Licença
 
-Este projeto é distribuído sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+Este projeto é distribuído sob a licença MIT.

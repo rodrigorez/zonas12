@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "aframe": "^1.8.0",
-    "three": "^0.158.0"
-  }
-}
