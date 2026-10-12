@@ -317,6 +317,7 @@ zonas12/
 │   ├── modules/             dimension.js, artwork.js, portal.js, camera.js
 │   └── scene/               scene-builder.js, schema.js, validation.js
 ├── data/                    scene.json + scene-example.json
+├── i18n/                    pt.json (+ en.json quando houver tradução)
 ├── assets/{panoramas,artworks,video}/
 ├── tools/                   conversor HTML→JSON, processamento de assets
 └── .harness/                fora do repositório (está no .gitignore)
@@ -326,6 +327,91 @@ Nota de nomenclatura: as pastas de **código** são em inglês (D10); os **dados
 nome que já existe (`data/cena.json`) porque são conteúdo. Passar a `data/scene.json` é uma
 decisão pequena a tomar na Fase 0 — depois obriga a mexer em 3 sítios (JSON, `app.js`,
 conversor).
+
+### 5.7 Idiomas: código, interface e documentação
+
+São três coisas diferentes, com três regras diferentes (decisões D10 e D12):
+
+| O quê | Regra | Onde vive |
+| --- | --- | --- |
+| **Código** — identificadores, comentários, mensagens de consola, chaves do JSON, nomes de pastas | **inglês** | `js/`, `data/`, `tools/` |
+| **Interface** — botões, rótulos, avisos, ecrãs do editor | **traduzível**, com o português como língua de origem | catálogo em `i18n/` |
+| **Documentação** — README, ROADMAP, comentários no HTML | **português** | `README.md`, `docs/` |
+
+#### Glossário de identificadores (PT → EN)
+
+Fixa-se na Fase 0. É o que impede três traduções para a mesma coisa.
+
+| Hoje (PT) | Código (EN) | Rótulo de interface (PT, no catálogo) |
+| --- | --- | --- |
+| dimensão | `dimension` | Dimensão |
+| obra | `artwork` | Obra |
+| portal | `portal` | Portal |
+| câmara | `camera` | Câmara |
+| travessia | `traversal` | — |
+| janela (do portal) | `window` | Porta / Janela |
+| máscara | `mask` | — |
+| moldura | `frame` | Moldura |
+| caixa (de colisão) | `box` | — |
+| gatilho | `trigger` | — |
+| valor de stencil | `stencilValue` | — |
+| panorâmica / fundo 360º | `panorama` / `background` | Fundo |
+| pertença (a que dimensão pertence) | `ownedBy` | — |
+| abrir obra (modal) | `openArtwork` | — |
+
+#### Nomes dos componentes A-Frame
+
+Aparecem no HTML, por isso contam como código:
+
+| Hoje | Proposto |
+| --- | --- |
+| `gestor-dimensoes` | `dimension-manager` |
+| `portal-estencil-dinamico` | `stencil-portal` |
+| `panorama-dimensao` | `dimension-panorama` |
+| `material-virtual` | `dimensional-material` |
+| `abrir-modal` | `open-artwork` |
+| `config-ar` | `ar-config` |
+| `cursor-listener` | `cursor-listener` (já em inglês) |
+
+#### Regras da interface traduzível (para não haver reescrita depois)
+
+1. **Nenhum texto de interface escrito em código.** Sempre por chave:
+   `t('editor.artwork.title')`, nunca `"Título da obra"` dentro de um `.js`.
+2. **Nada de frases montadas por concatenação.** Uma frase é **uma** chave inteira
+   (`t('portal.dimensionChanged')` com parâmetros), senão a ordem das palavras quebra noutra
+   língua — e a ordem em inglês não é a ordem em português.
+3. **Zero texto em `css/`** (nada de `content: "..."`).
+4. **No HTML, o mínimo:** só os textos que têm de existir antes de o JavaScript correr
+   ("Carregando...", "ATIVAR EXPOSIÇÃO"). Contam como **valores de origem do português**, e
+   o catálogo tem de ter a mesma chave — senão há dois textos para o mesmo sítio.
+5. **A língua de origem é o português.** Uma tradução em falta mostra o português (nunca uma
+   chave crua nem vazio).
+6. **Avisos em desenvolvimento:** se faltar uma chave, avisar na consola (em inglês, porque é
+   código) em vez de falhar em silêncio.
+
+#### D12 — onde vivem os textos traduzíveis
+
+| Variante | Como funciona | Ganhos | Perdas / consequências |
+| --- | --- | --- | --- |
+| **A. Catálogo para a interface + campos por idioma nos dados** (recomendada) | `i18n/pt.json` tem tudo o que é da aplicação; o conteúdo (títulos das obras, nomes das dimensões) tem `title: { "pt": "…", "en": "…" }` | Acrescentar uma língua = 1 ficheiro de catálogo + 1 campo nos dados; o editor continua a exportar **um** ficheiro (coerente com a D2) | O JSON da cena cresce com o número de línguas; o editor tem de mostrar os campos por idioma |
+| B. Tudo no catálogo, incluindo o conteúdo | O JSON só tem chaves (`titleKey: "artwork.0.title"`) e o texto está no catálogo | JSON pequeno e estável; quem traduz não toca nos dados | **Duas fontes de verdade** para editar uma obra; "exportar" deixa de ser suficiente (contradiz a D2); acrescentar uma obra mexe em 2 ficheiros |
+| C. Só a interface traduzível | O conteúdo fica na língua da exposição | Simples; nada a fazer nos dados | Numa exposição com duas línguas, o título da obra não acompanha |
+
+**Recomendação: A** — mantém o "um ficheiro exportado" da D2 e deixa a tradução do conteúdo
+onde ela é editada.
+
+#### Como o utilizador escolhe a língua
+
+| Variante | Ganhos | Perdas |
+| --- | --- | --- |
+| **`?lang=en` na URL** (recomendada) | Sem UI nova; dá para ter dois QR codes (um por língua) ou um quiosque por língua | Não há como trocar sem recarregar |
+| Deteção do browser + memória | Zero configuração | Imprevisível num quiosque (a língua do sistema manda) |
+| Seletor visível na página | Explícito e trocável | Ocupa espaço e é mais uma peça de interface |
+| Campo `language` nos dados | Fixo por exposição, bom para quiosques dedicados | Não serve exposições bilingues no mesmo sítio |
+
+Começar por `?lang=`, com português como omissão: resolve o caso real (duas línguas, dois
+acessos) sem construir interface nenhuma. As outras variantes podem acrescentar-se depois —
+desde que as 6 regras acima estejam cumpridas.
 
 ---
 
@@ -345,7 +431,7 @@ conversor).
   "artworks": [
     { "id": 0, "dimension": 1, "asset": "galeriaFoto1",
       "position": [-44, 1.5, 5], "rotation": [0, 15, 0], "size": [4, 3],
-      "interaction": "modal", "title": "Aurora" }
+      "interaction": "modal", "title": { "pt": "Aurora", "en": "Aurora" } }
   ],
   "portals": [
     { "id": 0, "dimensionA": 0, "dimensionB": 1, "ownedBy": 0,
@@ -363,6 +449,11 @@ dimensão deixa de ser "copiar 6 blocos de HTML e não falhar nenhum atributo".
 utilizador (títulos de obras, nomes de dimensões) ficam em português. O `"id"` do asset
 (`cidade-360`) continua em português porque é o nome que já existe no `index.html` — renomear
 assets obriga a mexer nos ficheiros e não traz ganho; fica permitido misturar.
+
+**Nota (D12):** o texto de **conteúdo** é um mapa por língua (`"title": { "pt": …, "en": … }`),
+não uma string — é a variante A da §5.7. Também aqui a **Fase 3 fecha o formato**: mudar
+depois obriga a reconverter o JSON. O texto de **interface** não entra aqui: vive no catálogo
+`i18n/`.
 
 **Consequência para a migração:** ao converter a cena atual para este JSON é preciso
 reescrever os 8 portais e as 10 obras com os nomes novos de atributos
@@ -410,11 +501,15 @@ Cada fase tem um critério de verificação **medido no browser**, como temos fe
 
 ### Fase 0 — Congelar o contrato *(sem código de produção)*
 - **Entregável:**
-  1. Este ROADMAP com as decisões fechadas (§11) e o **glossário PT→EN** fixado (§11/D10).
+  1. Este ROADMAP com as decisões fechadas (§11), o **glossário PT→EN** oficial (§5.7) e as
+     **regras da interface traduzível** aceites.
   2. A lista de testes de regressão (§10) aceite como critério de aceitação.
-  3. `data/cena-exemplo.json` — a cena atual **convertida para JSON** (feita por script que lê
-     o `index.html`, não à mão), com o esquema acordado.
-  4. Uma cópia da cena atual em `data/cena.json` (a exposição).
+  3. `i18n/pt.json` com as chaves que já existem (o "Carregando...", o "ATIVAR EXPOSIÇÃO", as
+     mensagens de erro da câmara) — o catálogo nasce aqui, não na Fase 4.
+  4. `data/cena-exemplo.json` — a cena atual **convertida para JSON** (feita por script que lê
+     o `index.html`, não à mão), com o esquema acordado, incluindo o formato do texto de
+     conteúdo por língua.
+  5. Uma cópia da cena atual em `data/cena.json` (a exposição).
 - **Verificação:** os testes de regressão passam **antes** de mexer (linha de base); e o JSON
   convertido, ao ser reaplicado, dá os mesmos valores que o HTML (comparar campo a campo).
 - **Porquê agora:** o JSON é o contrato de que tudo o resto depende (núcleo, módulos,
@@ -453,8 +548,12 @@ Cada fase tem um critério de verificação **medido no browser**, como temos fe
 ### Fase 4 — Página de edição
 - **Entregável:** `editor.html` + `css/editor.css` + `js/editor.js`: CRUD por módulo,
   validação (§8), pré-visualização, importar/exportar.
+- **D12 aplica-se desde o primeiro ecrã:** todos os rótulos do editor saem do catálogo
+  `i18n/pt.json` (`t('editor.…')`) e os campos de texto do conteúdo são **por língua**
+  (variante A da §5.7). Fazer o editor só em português "para traduzir depois" era o que a D12
+  veio evitar.
 - **Verificação:** criar uma dimensão + 2 obras + 1 portal **só pelo editor**, exportar,
-  substituir o JSON e ver a cena a funcionar; e os 8 testes de regressão na cena editada.
+  substituir o JSON e ver a cena a funcionar; e os 9 testes de regressão na cena editada.
 - **Risco:** o editor e a exposição divergirem. Mitigação: o editor usa os **mesmos** módulos.
 
 ### Fase 5 — Gravação direta *(só se a fricção de 2A incomodar)*
@@ -505,6 +604,7 @@ Estes já foram medidos manualmente; passam a ser o critério de aceitação de 
 | D9 | A cena atual é conteúdo real ou demo | **FECHADA** (2026-10-12) | **É demonstração, mas fica no repositório como cena de exemplo** (serve de teste e de montra) |
 | D10 | Idioma do código | **FECHADA** (2026-10-12) | **Inglês no código** (identificadores, comentários, mensagens de consola, chaves do JSON); **português na documentação e nos textos da interface** |
 | D11 | Arquitetura de render | **FECHADA** (2026-10-12) | **Manter o stencil partilhado e o núcleo.** Não migrar para *render-to-texture* por portal (ver §5.0) |
+| D12 | Idiomas | **FECHADA** (2026-10-12) | **Código em inglês, documentação em português, interface preparada para vários idiomas** (catálogo em `i18n/`, português como língua de origem). Variante da D12 a confirmar: recomendada a **A** (catálogo para a interface + campos por idioma nos dados), língua escolhida por `?lang=` |
 
 ### Efeitos da D7 na execução
 
@@ -576,41 +676,35 @@ usá-la. R2 fica como plano B se a ferramenta se revelar mais trabalho do que po
   **L9** — todo o `asset` do JSON existe em disco; **L10** — o nome do ficheiro segue a
   convenção (aviso, não erro).
 
+### Efeitos da D12 na execução
+
+- Surge uma pasta nova, `i18n/`, com o **português como língua de origem**:
+  `i18n/pt.json` (e `i18n/en.json` quando houver tradução). Formato plano de chaves
+  (`"editor.artwork.title": "Título da obra"`).
+- **A Fase 4 (editor) passa a incluir a tradução desde o início.** Fazer o editor em
+  português "para depois traduzir" seria reescrever todos os rótulos e os formulários — é
+  exatamente o que a D12 pretende evitar. Custo agora: mínimo (uma chamada `t()` em vez de um
+  literal). Custo depois: reescrever tudo.
+- **A Fase 2 (módulos) só tem uma obrigação:** os módulos **não** contêm texto de interface.
+  As mensagens de consola são técnica (inglês) e não passam pelo catálogo.
+- **A Fase 3 (dados)** tem de decidir já o formato do texto do conteúdo (`title: { pt, en }`),
+  porque o conversor gera o JSON: mudar depois obriga a reconverter.
+- **O A-Frame e a interface existente ficam com texto em português no HTML** (o "ATIVAR
+  EXPOSIÇÃO", o "Carregando..."). Pela regra 4 da §5.7, contam como **valores de origem do
+  português** e o catálogo tem de ter a mesma chave — não se inventa um segundo texto.
+- **Custo aceite:** um pouco mais de cerimónia (chave + catálogo em vez de texto direto) em
+  troca de não haver reescrita quando entrar a segunda língua.
+- **Não afeta o JavaScript dos módulos**: nenhum módulo faz `t('...')` — quem mostra texto é
+  a interface (`editor.js`, e o arranque da exposição). Os módulos expõem **estado**, não
+  frases.
+
 ### Efeitos da D10 na execução
 
 O código que existe hoje é todo em português. Esta decisão obriga a um **glossário** (para
 não haver três traduções para a mesma coisa) e a um **método** de renomeação.
 
-**Glossário proposto (a fixar na Fase 0):**
-
-| Hoje (PT) | Código (EN) | Texto de interface (PT) |
-| --- | --- | --- |
-| dimensão | `dimension` | Dimensão |
-| obra | `artwork` | Obra |
-| portal | `portal` | Portal |
-| câmara | `camera` | Câmara |
-| travessia | `traversal` | — |
-| janela (do portal) | `window` | Porta / Janela |
-| máscara | `mask` | — |
-| moldura | `frame` | Moldura |
-| caixa (de colisão) | `box` | — |
-| gatilho | `trigger` | — |
-| valor de stencil | `stencilValue` | — |
-| panorâmica / fundo 360º | `panorama` / `background` | Fundo |
-| pertença (a que dimensão pertence) | `ownedBy` | — |
-| abrir modal | `openArtwork` | — |
-
-**Nomes dos componentes A-Frame** (aparecem no HTML, por isso contam como código):
-
-| Hoje | Proposto |
-| --- | --- |
-| `gestor-dimensoes` | `dimension-manager` |
-| `portal-estencil-dinamico` | `stencil-portal` |
-| `panorama-dimensao` | `dimension-panorama` |
-| `material-virtual` | `dimensional-material` |
-| `abrir-modal` | `open-artwork` |
-| `config-ar` | `ar-config` |
-| `cursor-listener` | `cursor-listener` (já em inglês) |
+**O glossário de identificadores (PT→EN) e os nomes novos dos componentes A-Frame estão na
+§5.7** — fonte única —, junto com as regras da interface traduzível.
 
 **Método: renomear ao mover, não numa fase própria.** Como a Fase 1 e a Fase 2 já tocam em
 todas as linhas (mover para o núcleo e para os módulos), renomear no mesmo passo evita dois
@@ -753,6 +847,7 @@ alteram comportamento.
 | D9 | Cena atual | Demonstração, mantida como cena de exemplo |
 | D10 | Idioma | Código em inglês; documentação e interface em português |
 | D11 | Arquitetura de render | Stencil partilhado + núcleo (sem *render-to-texture*) |
+| D12 | Idiomas | Código em inglês, docs em português, interface traduzível (catálogo `i18n/`, PT como origem) |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -766,11 +861,14 @@ disco.
 
 ### Próximo passo (Fase 0, ainda sem código de produção)
 
-1. Fixar o **glossário PT→EN** (§11/D10) — é o que impede três traduções para a mesma coisa.
+1. **Glossário PT→EN** (§5.7) e as 6 regras da interface traduzível — aceitar.
 2. Aceitar a lista de **testes de regressão** (§10) como critério de aceitação de cada fase.
-3. Decidir o nome do ficheiro de dados: `data/cena.json` (como está) ou `data/scene.json`.
-4. Escrever o **conversor** `tools/html-to-scene-json/` (lê o `index.html`, escreve o JSON) e
+3. **Variante da D12**: confirmar a **A** (catálogo para a interface + campos por idioma nos
+   dados) e `?lang=` para escolher a língua.
+4. Nome do ficheiro de dados: `data/scene.json` ou `data/cena.json`.
+5. `i18n/pt.json` com as chaves que já existem na interface.
+6. Escrever o **conversor** `tools/html-to-scene-json/` (lê o `index.html`, escreve o JSON) e
    gerar a cena de exemplo.
-5. Validar o JSON convertido contra o HTML, **campo a campo**, com a cena a funcionar como hoje.
+7. Validar o JSON convertido contra o HTML, **campo a campo**, com a cena a funcionar como hoje.
 
 Só depois disto começa a Fase 1 (núcleo).
