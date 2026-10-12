@@ -15,7 +15,22 @@ AFRAME.registerComponent('abrir-modal', {
 });
 
 // --- CONFIGURAÇÃO GLOBAL ---
-window.materiaisVirtuais = [];
+// Dimensões do portal: dimensoes[m] guarda os materiais da dimensão m.
+// O índice 0 é o mundo real (nada 3D é desenhado, vê-se a câmara por baixo do
+// canvas transparente) e o índice 1 é a dimensão do portal (esfera 360º + obras).
+// Registar materiais num índice novo cria uma dimensão nova, e o interruptor do
+// portal passa a percorrer todas (ver aplicarEstado/tick).
+window.dimensoes = [];
+
+// Regista um material numa dimensão e aplica logo o estado atual do portal, para
+// uma obra registada mais tarde nunca aparecer na dimensão errada.
+function registarNaDimensao(dimensao, material) {
+  if (!window.dimensoes[dimensao]) window.dimensoes[dimensao] = [];
+  if (!window.dimensoes[dimensao].includes(material)) window.dimensoes[dimensao].push(material);
+  let portalEl = document.querySelector('[portal-estencil-dinamico]');
+  let portal = portalEl && portalEl.components['portal-estencil-dinamico'];
+  if (portal) portal.aplicarEstado();
+}
 
 AFRAME.registerComponent('config-ar', {
   init: function () {
@@ -44,8 +59,10 @@ AFRAME.registerComponent('cursor-listener', {
   }
 });
 
-// --- OBRAS SUJEITAS AO ESTÊNCIL ---
+// --- OBRAS SUJEITAS AO ESTADO DO PORTAL ---
 AFRAME.registerComponent('material-virtual', {
+  // Dimensão a que a obra pertence (0 = mundo real, 1 = dimensão do portal).
+  schema: { dimensao: { default: 1 } },
   init: function () {
     this.el.addEventListener('loaded', () => this.applyStencil());
     if (this.el.getObject3D('mesh')) this.applyStencil();
@@ -63,41 +80,45 @@ AFRAME.registerComponent('material-virtual', {
         mat.stencilFail = THREE.KeepStencilOp;
         mat.stencilZFail = THREE.KeepStencilOp;
         mat.stencilZPass = THREE.KeepStencilOp;
-        if (!window.materiaisVirtuais.includes(mat)) window.materiaisVirtuais.push(mat);
+        registarNaDimensao(this.data.dimensao, mat);
       }
     });
   }
 });
 
-// --- CONFIGURAÇÃO DE NAVEGAÇÃO ---
-// Fonte única destes valores: para alterar os limites, muda aqui.
-// Cada valor pode também ser sobreposto por atributo no HTML, por exemplo:
-// <a-camera limite-movimento="maxX: 60; minX: -60">
-const CONFIG_NAVEGACAO = {
-  portalZ: -5,          // posição Z do portal
-  minX: -20,            // limite lateral esquerdo
-  maxX: 20,             // limite lateral direito
-  minZ: -80,            // profundidade máxima permitida
-  tempoTrava: 10000,    // bloqueio após sair do portal (ms)
-  entradaOffset: -1,    // portalZ + isto = z a partir do qual passa a "dentro"
-  saidaOffset: 1.5,     // portalZ + isto = z a partir do qual passa a "saiu"
-  barreiraOffset: 0.5   // portalZ + isto = z da barreira enquanto está "saiu"
-};
+// Temporários reutilizados no tick do portal (evita alocar por frame).
+const _pontoMundo = new THREE.Vector3();
+const _pontoCaixa = new THREE.Vector3();
 
 // --- PORTAL ESTÊNCIL PERFEITO ---
 AFRAME.registerComponent('portal-estencil-dinamico', {
-  schema: { src: { type: 'selector' }, width: { default: 12.0 }, height: { default: 16.0 } },
+  schema: {
+    src: { type: 'selector' },
+    width: { default: 12.0 },
+    height: { default: 16.0 },
+    // Caixa de colisão (X, Y, Z), centro e rotação (em graus), no espaço do portal.
+    // É a única fonte da caixa: a caixa de debug é desenhada com estes mesmos
+    // valores, pelo que as duas têm sempre a mesma dimensão, posição e rotação.
+    caixa: { type: 'vec3', default: { x: 12.0, y: 16.0, z: 1.0 } },
+    caixaPosicao: { type: 'vec3', default: { x: 0.0, y: 8.0, z: 0.0 } },
+    caixaRotacao: { type: 'vec3', default: { x: 0.0, y: 0.0, z: 0.0 } }
+  },
   init: function () {
     let el = this.el; let w = this.data.width; let h = this.data.height;
     // Criar um grupo para o portal que pode ser rotacionado manualmente
     this.portalGroup = new THREE.Group();
     el.setObject3D('portal-mesh', this.portalGroup);
 
-    // Lado do plano do portal onde a câmara está. Só serve para registar a mudança
-    // no log: a dimensão desenhada é recalculada a cada tick a partir da posição da
-    // câmara (ver tick), para nunca ficar dessincronizada da máscara.
-    this.dentroDaDimensao = false;
-    
+    // Interruptor de dimensões: o estado avança quando a câmara ENTRA na caixa de
+    // colisão (fora -> dentro). Começa na dimensão 1 (mundo real).
+    this.estadoAtual = 0;
+    this.dentroDaCaixa = false;
+    this.dimensoes = window.dimensoes;
+
+    // Caixa de colisão, no espaço do portal. Os mesmos valores alimentam a caixa
+    // de debug (ver configurarCaixa/criarCaixaDebug).
+    this.configurarCaixa();
+
     // Criar o lado frontal do portal (dimensão)
     let frontGroup = new THREE.Group();
     
@@ -129,6 +150,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     let sphere = new THREE.Mesh(sphereGeo, this.sphereMat);
     sphere.position.set(0, h/2, 0); sphere.renderOrder = 2; 
     sphere.frustumCulled = false; frontGroup.add(sphere);
+
+    // A esfera 360º é o conteúdo da dimensão do portal (índice 1).
+    registarNaDimensao(1, this.sphereMat);
+    this.aplicarEstado();
 
     let molduraMat = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
     let esp = 0.3; let halfW = w / 2; let halfH = h / 2;
@@ -183,23 +208,52 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     });
   },
   
+  // O A-Frame chama isto sempre que o atributo muda (também logo após o init).
+  update: function() {
+    this.configurarCaixa();
+  },
+
+  // Lê a caixa de colisão do atributo. É o único sítio onde a caixa é montada, de
+  // modo que a colisão e a caixa de debug nunca podem divergir.
+  configurarCaixa: function() {
+    let caixa = this.data.caixa;
+    let pos = this.data.caixaPosicao;
+    let rot = this.data.caixaRotacao;
+
+    this.caixaMeio = new THREE.Vector3(caixa.x / 2, caixa.y / 2, caixa.z / 2);
+    this.caixaCentro = new THREE.Vector3(pos.x, pos.y, pos.z);
+    this.caixaRotacaoInversa = new THREE.Quaternion().setFromEuler(new THREE.Euler(
+      THREE.MathUtils.degToRad(rot.x),
+      THREE.MathUtils.degToRad(rot.y),
+      THREE.MathUtils.degToRad(rot.z)
+    )).invert();
+
+    // Se a caixa de debug estiver visível, é refeita com os novos valores.
+    if (this.debugBox) {
+      this.portalGroup.remove(this.debugBox);
+      this.debugBox = null;
+      this.criarCaixaDebug();
+    }
+  },
+
   // Função para alternar modo debug
   toggleDebugMode: function() {
-    // Remover caixa de debug existente se houver
     if (this.debugBox) {
       this.portalGroup.remove(this.debugBox);
       this.debugBox = null;
       return;
     }
-    
-    // Criar nova caixa de debug com profundidade realista
-    let w = this.data.width || 12.0;
-    let h = this.data.height || 16.0;
-    let portalDepth = 1.0; // Profundidade realista (1 metro)
-    
-    // Criar wireframe azul mais proeminente
-    let debugBoxGeo = new THREE.BoxGeometry(w, h, portalDepth);
-    let debugBoxMat = new THREE.MeshBasicMaterial({ 
+    this.criarCaixaDebug();
+  },
+
+  // Caixa de debug: mesma dimensão X, Y, Z, posição e rotação da caixa de colisão.
+  criarCaixaDebug: function() {
+    let caixa = this.data.caixa;
+    let pos = this.data.caixaPosicao;
+    let rot = this.data.caixaRotacao;
+
+    let debugBoxGeo = new THREE.BoxGeometry(caixa.x, caixa.y, caixa.z);
+    let debugBoxMat = new THREE.MeshBasicMaterial({
       color: 0x0000FF, // Azul
       wireframe: true,
       transparent: true,
@@ -207,35 +261,52 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       side: THREE.DoubleSide
     });
     this.debugBox = new THREE.Mesh(debugBoxGeo, debugBoxMat);
-    this.debugBox.position.set(0, h/2, 0);
+    this.debugBox.position.set(pos.x, pos.y, pos.z);
+    this.debugBox.rotation.set(
+      THREE.MathUtils.degToRad(rot.x),
+      THREE.MathUtils.degToRad(rot.y),
+      THREE.MathUtils.degToRad(rot.z)
+    );
     this.debugBox.renderOrder = 10; // Renderizar por cima de outros elementos
     this.portalGroup.add(this.debugBox);
   },
+
+  // Mostra a dimensão do estado atual e esconde as restantes. Escalável: qualquer
+  // dimensão registada em window.dimensoes entra na rotação do interruptor.
+  aplicarEstado: function() {
+      let ativa = this.estadoAtual;
+      window.dimensoes.forEach((materiais, dimensao) => {
+          let func = dimensao === ativa ? THREE.AlwaysStencilFunc : THREE.NeverStencilFunc;
+          materiais.forEach(mat => { mat.stencilFunc = func; });
+      });
+  },
+
   tick: function() {
       let cam = document.querySelector('a-camera');
       if (!cam || !this.sphereMat) return;
 
-      // O plano do portal (mesmo z onde a máscara muda de lado) separa as duas
-      // dimensões. O lado é recalculado a cada frame em vez de guardado em estado:
-      // a troca acontece exactamente onde a máscara troca, portanto sem piscas.
-      let dentroDaDimensao = cam.object3D.position.z < this.el.object3D.position.z;
+      // Colisão com a caixa do portal, no espaço do portal (posição e rotação da
+      // caixa incluídas). A caixa de debug é desenhada com a mesma configuração.
+      this.portalGroup.updateWorldMatrix(true, false);
+      cam.object3D.getWorldPosition(_pontoMundo);
+      _pontoCaixa.copy(_pontoMundo);
+      this.portalGroup.worldToLocal(_pontoCaixa);
+      _pontoCaixa.sub(this.caixaCentro).applyQuaternion(this.caixaRotacaoInversa);
 
-      if (dentroDaDimensao !== this.dentroDaDimensao) {
-          this.dentroDaDimensao = dentroDaDimensao;
-          console.log(`>>> ${dentroDaDimensao ? 'DENTRO DA DIMENSÃO DO PORTAL' : 'FORA DO PORTAL (MUNDO REAL)'} <<<`);
+      let dentroDaCaixa = (
+          Math.abs(_pontoCaixa.x) <= this.caixaMeio.x &&
+          Math.abs(_pontoCaixa.y) <= this.caixaMeio.y &&
+          Math.abs(_pontoCaixa.z) <= this.caixaMeio.z
+      );
+
+      // Interruptor: a dimensão avança ao ENTRAR na caixa (fora -> dentro), uma vez
+      // por travessia. Ficar dentro da caixa não volta a mudar o estado.
+      if (dentroDaCaixa && !this.dentroDaCaixa) {
+          this.estadoAtual = (this.estadoAtual + 1) % this.dimensoes.length;
+          this.aplicarEstado();
+          console.log(`>>> PORTAL: DIMENSÃO ${this.estadoAtual + 1} DE ${this.dimensoes.length} <<<`);
       }
-
-      // Fora do portal: Never -> nada da dimensão (esfera 360º e obras) é desenhado,
-      // fica só o mundo real da câmara e a moldura vermelha.
-      // Dentro do portal: NotEqual -> a esfera e as obras são desenhadas fora do
-      // quadro da máscara, e o quadro passa a ser a janela para o mundo real.
-      let func = dentroDaDimensao ? THREE.NotEqualStencilFunc : THREE.NeverStencilFunc;
-
-      this.sphereMat.stencilFunc = func;
-
-      if (window.materiaisVirtuais) {
-          window.materiaisVirtuais.forEach(mat => mat.stencilFunc = func);
-      }
+      this.dentroDaCaixa = dentroDaCaixa;
   }
 });
 
