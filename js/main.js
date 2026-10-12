@@ -126,8 +126,13 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
   schema: { src: { type: 'selector' }, width: { default: 12.0 }, height: { default: 16.0 } },
   init: function () {
     let el = this.el; let w = this.data.width; let h = this.data.height;
-    let portalGroup = new THREE.Group();
+    // Criar um grupo para o portal que irá rotacionar
+    this.portalGroup = new THREE.Group();
+    el.setObject3D('portal-mesh', this.portalGroup);
 
+    // Criar o lado frontal do portal (dimensão)
+    let frontGroup = new THREE.Group();
+    
     let maskGeo = new THREE.PlaneGeometry(w, h, 32, 32);
     let maskMat = new THREE.MeshBasicMaterial({
       colorWrite: false, depthWrite: false, side: THREE.DoubleSide,
@@ -137,7 +142,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     });
 
     let maskMesh = new THREE.Mesh(maskGeo, maskMat);
-    maskMesh.position.set(0, h/2, 0); maskMesh.renderOrder = 1; portalGroup.add(maskMesh);
+    maskMesh.position.set(0, h/2, 0); maskMesh.renderOrder = 1; frontGroup.add(maskMesh);
 
     let imgEl = this.data.src;
     if (!imgEl) imgEl = document.querySelector('#cidade-360'); 
@@ -155,7 +160,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     
     let sphere = new THREE.Mesh(sphereGeo, this.sphereMat);
     sphere.position.set(0, h/2, 0); sphere.renderOrder = 2; 
-    sphere.frustumCulled = false; portalGroup.add(sphere);
+    sphere.frustumCulled = false; frontGroup.add(sphere);
 
     let molduraMat = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
     let esp = 0.3; let halfW = w / 2; let halfH = h / 2;
@@ -168,21 +173,59 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     let frameGroup = new THREE.Group();
     frameGroup.add(leftF, rightF, topF, bottomF);
     frameGroup.children.forEach(c => { c.renderOrder = 3; });
-    portalGroup.add(frameGroup);
-    el.setObject3D('portal-mesh', portalGroup);
+    frontGroup.add(frameGroup);
+    
+    // Posicionar o lado frontal
+    frontGroup.position.set(0, 0, 0);
+    this.portalGroup.add(frontGroup);
+
+    // Criar o lado traseiro do portal (transparente com retângulo vermelho)
+    let backGroup = new THREE.Group();
+    
+    // Criar um plano transparente para o lado traseiro
+    let backPlaneGeo = new THREE.PlaneGeometry(w, h);
+    let backPlaneMat = new THREE.MeshBasicMaterial({ 
+      color: 0x000000, 
+      transparent: true, 
+      opacity: 0.0,  // Totalmente transparente
+      side: THREE.DoubleSide 
+    });
+    let backPlane = new THREE.Mesh(backPlaneGeo, backPlaneMat);
+    backPlane.position.set(0, h/2, 0);
+    backPlane.rotation.y = Math.PI; // Rotacionar para ficar na parte de trás
+    backGroup.add(backPlane);
+    
+    // Criar o retângulo vermelho no lado traseiro
+    let redRectGeo = new THREE.BoxGeometry(w - 2, h - 2, 0.1);
+    let redRectMat = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
+    let redRect = new THREE.Mesh(redRectGeo, redRectMat);
+    redRect.position.set(0, h/2, -0.05); // Um pouco atrás do plano
+    backGroup.add(redRect);
+    
+    // Posicionar o lado traseiro (virado para trás)
+    backGroup.position.set(0, 0, 0);
+    backGroup.rotation.y = Math.PI; // Rotacionar 180 graus para ficar na parte de trás
+    this.portalGroup.add(backGroup);
+    
+    // Inicializar o ângulo de rotação
+    this.rotationAngle = 0;
   },
-  tick: function() {
-      let cam = document.querySelector('a-camera');
-      if (!cam || !this.sphereMat) return;
-      let camZ = cam.object3D.position.z;
-      let portalZ = this.el.object3D.position.z; 
-      
-      let func = (camZ > portalZ) ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
-      this.sphereMat.stencilFunc = func;
-      
-      if (window.materiaisVirtuais) {
-          window.materiaisVirtuais.forEach(mat => mat.stencilFunc = func);
-      }
+  tick: function(time, timeDelta) {
+    let cam = document.querySelector('a-camera');
+    if (!cam || !this.sphereMat) return;
+    let camZ = cam.object3D.position.z;
+    let portalZ = this.el.object3D.position.z; 
+    
+    let func = (camZ > portalZ) ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
+    this.sphereMat.stencilFunc = func;
+    
+    if (window.materiaisVirtuais) {
+        window.materiaisVirtuais.forEach(mat => mat.stencilFunc = func);
+    }
+    
+    // Rotacionar o portal continuamente
+    this.rotationAngle += timeDelta / 1000; // Converter para segundos
+    this.portalGroup.rotation.y = this.rotationAngle;
   }
 });
 
