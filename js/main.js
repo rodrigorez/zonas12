@@ -99,6 +99,8 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.wasInsidePortal = false; // Para detectar transições de entrada/saída
     this.portalTransitionCooldown = 0; // Cooldown para evitar transições rápidas
     this.isCompletingTraversal = false; // Flag para indicar se está completando uma travessia
+    this.lastTraversalTime = 0; // Tempo da última travessia completa
+    this.traversalDebounceTime = 1000; // Tempo mínimo entre travessias (ms)
     
     // Criar o lado frontal do portal (dimensão)
     let frontGroup = new THREE.Group();
@@ -230,7 +232,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       // Dimensões do portal
       let portalWidth = this.data.width || 12.0;
       let portalHeight = this.data.height || 16.0;
-      let portalDepth = 1.0; // Profundidade do portal
+      let portalDepth = 0.2; // Profundidade reduzida do portal para evitar detecções espúrias
       
       // Calcular limites da bounding box 3D do portal
       let portalLeft = portalPos.x - (portalWidth / 2);
@@ -263,15 +265,24 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       
       // Saída do portal (trás para frente) durante travessia
       if (!isCurrentlyInsidePortal && this.wasInsidePortal && this.isCompletingTraversal) {
-          console.log(`>>> COMPLETING TRAVERSAL BACKWARD <<<`);
-          // Completar a travessia - alternar dimensão
-          this.showingPortalDimension = !this.showingPortalDimension;
-          this.isCompletingTraversal = false;
-          this.portalTransitionCooldown = 500; // 500ms cooldown
-          
-          // Debug logs
-          if (this.debugBox) {
-              console.log(`>>> PORTAL DIMENSION TOGGLED: ${this.showingPortalDimension ? 'SHOWING PORTAL DIMENSION' : 'SHOWING CAMERA DIMENSION'} <<<`);
+          // Verificar se o tempo de debounce já passou
+          let currentTime = time || Date.now();
+          if (currentTime - this.lastTraversalTime > this.traversalDebounceTime) {
+              console.log(`>>> COMPLETING TRAVERSAL BACKWARD <<<`);
+              // Completar a travessia - alternar dimensão
+              this.showingPortalDimension = !this.showingPortalDimension;
+              this.lastTraversalTime = currentTime;
+              this.isCompletingTraversal = false;
+              this.portalTransitionCooldown = 500; // 500ms cooldown
+              
+              // Debug logs
+              if (this.debugBox) {
+                  console.log(`>>> PORTAL DIMENSION TOGGLED: ${this.showingPortalDimension ? 'SHOWING PORTAL DIMENSION' : 'SHOWING CAMERA DIMENSION'} <<<`);
+              }
+          } else {
+              console.log(`>>> TRAVERSAL IGNORED - TOO FAST <<<`);
+              // Ignorar travessia muito rápida
+              this.isCompletingTraversal = false;
           }
       }
       
