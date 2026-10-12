@@ -85,42 +85,6 @@ const CONFIG_NAVEGACAO = {
 };
 
 // --- MÁQUINA DE ESTADOS (TRAVA 10s) ---
-AFRAME.registerComponent('limite-movimento', {
-  schema: {
-    portalZ: { default: CONFIG_NAVEGACAO.portalZ },
-    minX: { default: CONFIG_NAVEGACAO.minX },
-    maxX: { default: CONFIG_NAVEGACAO.maxX },
-    minZ: { default: CONFIG_NAVEGACAO.minZ },
-    tempoTrava: { default: CONFIG_NAVEGACAO.tempoTrava },
-    entradaOffset: { default: CONFIG_NAVEGACAO.entradaOffset },
-    saidaOffset: { default: CONFIG_NAVEGACAO.saidaOffset },
-    barreiraOffset: { default: CONFIG_NAVEGACAO.barreiraOffset }
-  },
-  init: function () { this.estado = 'inicio'; },
-  tick: function () {
-    let pos = this.el.object3D.position;
-    let zPortal = this.data.portalZ;
-    
-    if (this.estado === 'inicio' && pos.z < (zPortal + this.data.entradaOffset)) {
-      this.estado = 'dentro';
-    }
-    if (this.estado === 'dentro' && pos.z > (zPortal + this.data.saidaOffset)) {
-      this.estado = 'saiu';
-      setTimeout(() => { if (this.estado === 'saiu') this.estado = 'inicio'; }, this.data.tempoTrava);
-    }
-
-    if (pos.x < this.data.minX) pos.x = this.data.minX;
-    if (pos.x > this.data.maxX) pos.x = this.data.maxX;
-    
-    if (this.estado === 'saiu') {
-       let barreiraSegura = zPortal + this.data.barreiraOffset;
-       if (pos.z < barreiraSegura) pos.z = barreiraSegura;
-    } else {
-       if (pos.z < this.data.minZ) pos.z = this.data.minZ;
-    }
-  }
-});
-
 // --- PORTAL ESTÊNCIL PERFEITO ---
 AFRAME.registerComponent('portal-estencil-dinamico', {
   schema: { src: { type: 'selector' }, width: { default: 12.0 }, height: { default: 16.0 } },
