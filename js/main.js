@@ -8,9 +8,21 @@ AFRAME.registerComponent('abrir-modal', {
   schema: { url: { type: 'string' } },
   init: function () {
     this.el.addEventListener('click', () => {
+      if (!this.dimensaoAtual()) return;
       document.getElementById('iframe-obra').src = this.data.url;
       document.getElementById('modal-obra').style.display = 'flex';
     });
+  },
+  // Só abre obras da dimensão em que se está. Vê-las pela janela do portal não
+  // conta como estar lá dentro: é `NotEqualStencilFunc` (a dimensão atual, que é
+  // desenhada fora do quadro) e não `EqualStencilFunc` (a janela). O estêncil
+  // esconde a obra, mas o raycaster continua a apanhá-la: sem este teste dava para
+  // clicar numa obra invisível.
+  dimensaoAtual: function () {
+    let mesh = this.el.getObject3D('mesh');
+    if (!mesh || !mesh.material) return true;
+    let materiais = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    return materiais.every(mat => mat.stencilFunc === THREE.NotEqualStencilFunc);
   }
 });
 
@@ -29,10 +41,24 @@ window.portais = [];
 // essa dimensão, para uma obra registada mais tarde nunca aparecer na dimensão
 // errada nem com o bit de outro portal.
 function registarNaDimensao(dimensao, material) {
-  if (!window.dimensoes[dimensao]) window.dimensoes[dimensao] = [];
+  let dimensaoNova = !window.dimensoes[dimensao];
+  if (dimensaoNova) window.dimensoes[dimensao] = [];
   if (!window.dimensoes[dimensao].includes(material)) window.dimensoes[dimensao].push(material);
   let portal = window.portais.find(p => p && p.governaDimensao(dimensao));
-  if (portal) portal.aplicarEstado();
+  if (portal) {
+    portal.aplicarEstado();
+    return;
+  }
+  // Nenhum portal governa esta dimensão: fica escondida. O stencilFunc por omissão
+  // é Always, por isso sem isto o conteúdo apareceria sempre (um engano no índice
+  // da dimensão esconderia... ao contrário: mostraria o que devia estar escondido).
+  material.stencilRef = 0;
+  material.stencilFuncMask = 0;
+  material.stencilFunc = THREE.NeverStencilFunc;
+  if (dimensaoNova) {
+    console.warn(`[portal] A dimensão ${dimensao} não é governada por nenhum portal ` +
+      '(atributo `dimensoes`) — o conteúdo dela fica escondido.');
+  }
 }
 
 AFRAME.registerComponent('config-ar', {
@@ -161,9 +187,15 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
 
     let imgEl = this.data.src;
     if (!imgEl) imgEl = document.querySelector('#cidade-360'); 
-    let texture = new THREE.Texture(imgEl);
+    // Vídeo (por exemplo a webcam) tem de usar VideoTexture: uma Texture simples
+    // ficaria com o primeiro frame congelado, porque ninguém a marca para atualizar.
+    let ehVideo = !!(imgEl && imgEl.tagName === 'VIDEO');
+    let texture = ehVideo ? new THREE.VideoTexture(imgEl) : new THREE.Texture(imgEl);
     texture.minFilter = THREE.LinearFilter; texture.generateMipmaps = false;
-    if (imgEl && imgEl.complete) { texture.needsUpdate = true; } 
+    if (ehVideo) {
+      if (imgEl.readyState >= 2) { texture.needsUpdate = true; }
+      else { imgEl.addEventListener('loadeddata', () => { texture.needsUpdate = true; }); }
+    } else if (imgEl && imgEl.complete) { texture.needsUpdate = true; } 
     else if (imgEl) { imgEl.onload = () => { texture.needsUpdate = true; }; }
 
     let sphereGeo = new THREE.SphereGeometry(100, 64, 64);

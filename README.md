@@ -73,6 +73,8 @@ O portal é uma **janela entre dimensões**: o quadro vermelho mostra a dimensã
 
 O quadro é a janela: perto do portal a janela cresce até preencher o ecrã, por isso ao atravessar a dimensão seguinte passa a ocupar tudo.
 
+O fundo da dimensão do portal vem do `src` do portal, que pode ser uma imagem **ou um vídeo** (por exemplo a imagem da câmara): um vídeo é usado como `THREE.VideoTexture`, para animar. Sem `src`, a dimensão do portal fica sem fundo 3D e vê-se a câmara.
+
 A travessia é detetada pela colisão com a caixa, sempre dentro dela:
 
 - **Atravessar** o plano do quadro: passa para a dimensão seguinte
@@ -136,12 +138,21 @@ Limites desta abordagem (o stencil tem 8 bits, logo até 8 portais):
 
 - **Um material pertence a um só portal**: a dimensão que o portal A governa não pode ser governada pelo portal B (um material só testa um bit). Se dois portais partilharem a mesma dimensão, o último a aplicar o estado ganha.
 - **Fundos 360º sobrepostos**: cada portal tem a sua esfera de raio 100. Se dois portais estiverem visíveis ao mesmo tempo e ambos desenharem o fundo, ganha o que for desenhado por último (a ordem depende dos `renderOrder`). Numa cena com vários portais convém ajustar o `renderOrder` de cada fundo ou dar a cada dimensão a sua própria geometria.
+- **Até 8 portais**: o stencil tem 8 bits. Um 9.º portal avisa na consola e reutiliza o bit 1, o que estraga o 1.º portal.
+- **Dimensão sem portal fica escondida**: conteúdo registado com `material-virtual="dimensao: N"` numa dimensão que nenhum portal declara em `dimensoes` fica invisível (e a consola avisa), em vez de aparecer em todas as dimensões.
+
+#### Obras: clique só na dimensão atual
+
+O estêncil esconde a obra, mas o raycaster do A-Frame continua a apanhá-la (não vê o stencil nem `object3D.visible`). Por isso o `abrir-modal` só abre se a dimensão da obra for a **dimensão atual** do portal (`NotEqualStencilFunc`): vê-la pela janela, de fora, não chega — é preciso estar dentro da dimensão.
 
 ### Recursos Recentes
 
 - **Janela entre Dimensões**: o quadro vermelho mostra a dimensão atual por fora e a seguinte por dentro, nos dois sentidos
 - **Travessia por Colisão com a Caixa**: sem debounce, sem cooldown e sem distância; calculada no espaço do portal, por isso funciona com portais deslocados, rodados e em movimento
-- **Um Bit de Stencil por Portal**: portais independentes, cada um com a sua janela e as suas dimensões (`dimensoes`)
+- **Um Bit de Stencil por Portal**: portais independentes, cada um com a sua janela e as suas dimensões (`dimensoes`); até 8 portais
+- **Fundo por Portal com Vídeo**: o `src` do portal aceita vídeo (usado como `VideoTexture`), por exemplo a imagem da câmara
+- **Obras só na Dimensão Atual**: clicar numa obra doutra dimensão já não abre o modal
+- **Dimensão sem Portal Fica Escondida**: com aviso na consola, em vez de aparecer em todas as dimensões
 - **Caixa de Debug Igual à Real**: a caixa de debug é desenhada com a mesma dimensão, posição e rotação da caixa de colisão
 - **Sem Barreiras Invisíveis**: Removido sistema antigo de limites que causava colisões fantasmas
 
