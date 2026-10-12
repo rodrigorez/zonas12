@@ -99,7 +99,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.wasInsidePortal = false; // Para detectar transições de entrada/saída
     this.portalTransitionCooldown = 0; // Cooldown para evitar transições rápidas
     this.isCompletingTraversal = false; // Flag para indicar se está completando uma travessia
-    this.lastTraversalTime = 0; // Tempo da última travessia completa
+    this.lastTraversalTime = Date.now(); // Tempo da última travessia completa (inicializado com tempo atual)
     this.traversalDebounceTime = 5000; // Tempo mínimo entre travessias (ms) - aumentado para 5 segundos
     
     // Criar o lado frontal do portal (dimensão)
@@ -259,15 +259,25 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       // Sistema de travessia: detectar quando o usuário completa uma travessia do portal
       // Entrada no portal (frente para trás)
       if (isCurrentlyInsidePortal && !this.wasInsidePortal && !this.isCompletingTraversal) {
-          console.log(`>>> STARTING TRAVERSAL FORWARD >>>`);
-          this.isCompletingTraversal = true;
+          // Verificar se o tempo de debounce já passou antes de iniciar travessia
+          let currentTime = time || Date.now();
+          let timeSinceLastTraversal = currentTime - this.lastTraversalTime;
+          
+          if (timeSinceLastTraversal > this.traversalDebounceTime) {
+              console.log(`>>> STARTING TRAVERSAL FORWARD >>>`);
+              this.isCompletingTraversal = true;
+          } else {
+              console.log(`>>> TRAVERSAL START IGNORED - TOO SOON (elapsed: ${timeSinceLastTraversal}ms, needed: ${this.traversalDebounceTime}ms) <<<`);
+          }
       }
       
       // Saída do portal (trás para frente) durante travessia
       if (!isCurrentlyInsidePortal && this.wasInsidePortal && this.isCompletingTraversal) {
           // Verificar se o tempo de debounce já passou
           let currentTime = time || Date.now();
-          if (currentTime - this.lastTraversalTime > this.traversalDebounceTime) {
+          let timeSinceLastTraversal = currentTime - this.lastTraversalTime;
+          
+          if (timeSinceLastTraversal > this.traversalDebounceTime) {
               console.log(`>>> COMPLETING TRAVERSAL BACKWARD <<<`);
               // Completar a travessia - alternar dimensão
               this.showingPortalDimension = !this.showingPortalDimension;
@@ -278,9 +288,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
               // Debug logs
               if (this.debugBox) {
                   console.log(`>>> PORTAL DIMENSION TOGGLED: ${this.showingPortalDimension ? 'SHOWING PORTAL DIMENSION' : 'SHOWING CAMERA DIMENSION'} <<<`);
+                  console.log(`>>> Time since last traversal: ${timeSinceLastTraversal}ms <<<`);
               }
           } else {
-              console.log(`>>> TRAVERSAL IGNORED - TOO FAST (elapsed: ${currentTime - this.lastTraversalTime}ms) <<<`);
+              console.log(`>>> TRAVERSAL IGNORED - TOO FAST (elapsed: ${timeSinceLastTraversal}ms, needed: ${this.traversalDebounceTime}ms) <<<`);
               // Ignorar travessia muito rápida
               this.isCompletingTraversal = false;
           }
