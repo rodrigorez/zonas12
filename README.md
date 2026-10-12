@@ -64,25 +64,25 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 
 ### 1. Portal Estêncil Dinâmico
 
-O portal é uma "janela entre duas dimensões": o quadro vermelho troca o que se vê dentro e fora dele, conforme a posição da câmera em relação ao portal. O portal funciona como um interruptor que muda o estado quando atravessado.
+O portal é uma "janela entre duas dimensões": o quadro vermelho troca o que se vê dentro e fora dele, conforme a posição da câmera em relação ao portal. A dimensão mostrada é decidida, a cada frame, pelo lado do **plano** do portal em que a câmara está (sem estado guardado, sem cooldown e sem debounce).
 
-| Posição | Fundo do ecrã | Dentro do quadro vermelho |
+| Posição | Ecrã | Dentro do quadro vermelho |
 | --- | --- | --- |
-| **Fora** do portal | Câmera (realidade) | Dimensão do portal (imagem 360º) + obras |
-| **Dentro** do portal | Dimensão do portal (imagem 360º) | Câmera (realidade) |
+| **Fora** do portal | Câmera (realidade) + moldura vermelha | Câmera (realidade) — a dimensão ainda não é desenhada |
+| **Dentro** do portal | Dimensão do portal (imagem 360º) + obras | Câmera (realidade) — o quadro passa a ser a janela para o mundo real |
 
-Atravessar o portal é mudar de dimensão; as obras ficam acessíveis na dimensão interior.
+Atravessar o portal é mudar de dimensão; as obras ficam acessíveis apenas na dimensão interior (só são desenhadas depois de atravessar).
 
 Requisitos técnicos (não remover, o portal deixa de funcionar):
 
 - `renderer="...; stencil: true"` no `<a-scene>`: a partir do three r184 o buffer de stencil **não é criado por omissão**, e sem ele o portal desenha tudo em todo o lado (perde-se a troca de dimensões)
 - `renderer.sortObjects = false` em `config-ar` (`js/main.js`): o A-Frame 1.4.2 forçava este valor; no 1.8.x fica `true`, o que desenha as obras antes da máscara do portal e as faz falhar o teste de stencil
 - A ordem de desenho depende dos `renderOrder`: máscara (1) → esfera 360º (2) → moldura (3)
+- A função de stencil vem do lado do plano do portal: `THREE.NeverStencilFunc` fora (nada da dimensão é desenhado) e `THREE.NotEqualStencilFunc` dentro
 
 ### Recursos Recentes
 
-- **Sistema de Detecção 3D**: Implementado sistema de bounding box 3D para detecção precisa de colisão
-- **Interruptor Inteligente**: Portal funciona como interruptor que muda estado ao ser atravessado
+- **Troca de Dimensão sem Piscas**: a dimensão é decidida pelo plano do portal, o mesmo sítio onde a máscara troca de lado — deixou de haver estado, cooldown e debounce (causavam um pisca-pisca entre dimensões)
 - **Sem Barreiras Invisíveis**: Removido sistema antigo de limites que causava colisões fantasmas
 
 ### 2. Controles Mobile
@@ -111,26 +111,25 @@ Requisitos técnicos (não remover, o portal deixa de funcionar):
 ### 6. Controles do Portal
 
 - Pressione a tecla **R** para girar o portal 180 graus e alternar entre os lados
-- Pressione a tecla **D** para ativar/desativar o modo debug (mostra bounding box de colisão)
+- Pressione a tecla **D** para ativar/desativar o modo debug (mostra a área do portal)
 - O lado frontal mostra a dimensão com imagem panorâmica e moldura vermelha
 - O lado traseiro é transparente com apenas um retângulo vermelho visível
 
 ### Funcionamento do Portal
 
-O portal agora funciona como um interruptor inteligente:
+A dimensão mostrada não é guardada em estado: é recalculada em cada frame a partir da posição da câmara, comparada com o `z` do portal (`js/main.js`).
 
-- **Atravessar o portal**: Muda o estado da dimensão (uma única vez)
-- **Permanecer na nova dimensão**: Até decidir voltar atravessando novamente
-- **Sem oscilações**: Sistema estável com cooldown de 500ms entre transições
+- **Fora do portal** (`z` da câmara > `z` do portal): desenha-se apenas o mundo real da câmara; a esfera 360º e as obras não são desenhadas (`THREE.NeverStencilFunc`), mas a moldura vermelha continua visível
+- **Dentro do portal** (`z` da câmara < `z` do portal): a esfera 360º e as obras são desenhadas fora do quadro da máscara (`THREE.NotEqualStencilFunc`); ao olhar para trás, o quadro é a janela para o mundo real
+- **Troca sem piscas**: a troca acontece exatamente no plano do portal, o mesmo sítio onde a máscara muda de lado, portanto não há frames com a dimensão errada
 
 ### 7. Modo Debug
 
-Durante o desenvolvimento, você pode ativar o modo debug para visualizar a bounding box de colisão do portal:
+Durante o desenvolvimento, você pode ativar o modo debug para visualizar a área do portal onde a troca de dimensão acontece:
 
 - A caixa de debug aparece como um wireframe azul semi-transparente (1 metro de profundidade)
-- Ela mostra exatamente onde o sistema detecta colisões com o portal
-- Útil para verificar se a detecção de colisão está funcionando corretamente
-- Logs de debug mostram apenas informações relevantes quando o estado muda
+- Ela coincide com o plano do portal usado na troca de dimensão (moldura de 12 x 16)
+- Logs de debug mostram apenas informações relevantes quando a dimensão muda
 
 ## Tecnologias Utilizadas
 

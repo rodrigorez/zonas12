@@ -84,7 +84,6 @@ const CONFIG_NAVEGACAO = {
   barreiraOffset: 0.5   // portalZ + isto = z da barreira enquanto está "saiu"
 };
 
-// --- MÁQUINA DE ESTADOS (TRAVA 10s) ---
 // --- PORTAL ESTÊNCIL PERFEITO ---
 AFRAME.registerComponent('portal-estencil-dinamico', {
   schema: { src: { type: 'selector' }, width: { default: 12.0 }, height: { default: 16.0 } },
@@ -94,13 +93,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.portalGroup = new THREE.Group();
     el.setObject3D('portal-mesh', this.portalGroup);
 
-    // Sistema de estados para travessia do portal
-    this.showingPortalDimension = false; // Estado atual da dimensão sendo mostrada
-    this.wasInsidePortal = false; // Para detectar transições de entrada/saída
-    this.portalTransitionCooldown = 0; // Cooldown para evitar transições rápidas
-    this.isCompletingTraversal = false; // Flag para indicar se está completando uma travessia
-    this.lastTraversalTime = Date.now(); // Tempo da última travessia completa (inicializado com tempo atual)
-    this.traversalDebounceTime = 5000; // Tempo mínimo entre travessias (ms) - aumentado para 5 segundos
+    // Lado do plano do portal onde a câmara está. Só serve para registar a mudança
+    // no log: a dimensão desenhada é recalculada a cada tick a partir da posição da
+    // câmara (ver tick), para nunca ficar dessincronizada da máscara.
+    this.dentroDaDimensao = false;
     
     // Criar o lado frontal do portal (dimensão)
     let frontGroup = new THREE.Group();
@@ -215,113 +211,28 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.debugBox.renderOrder = 10; // Renderizar por cima de outros elementos
     this.portalGroup.add(this.debugBox);
   },
-  tick: function(time) {
+  tick: function() {
       let cam = document.querySelector('a-camera');
       if (!cam || !this.sphereMat) return;
-      
-      // Cooldown para evitar transições rápidas
-      if (this.portalTransitionCooldown > 0) {
-          this.portalTransitionCooldown -= Math.min(100, time - (this.lastTime || time));
-          this.lastTime = time;
+
+      // O plano do portal (mesmo z onde a máscara muda de lado) separa as duas
+      // dimensões. O lado é recalculado a cada frame em vez de guardado em estado:
+      // a troca acontece exactamente onde a máscara troca, portanto sem piscas.
+      let dentroDaDimensao = cam.object3D.position.z < this.el.object3D.position.z;
+
+      if (dentroDaDimensao !== this.dentroDaDimensao) {
+          this.dentroDaDimensao = dentroDaDimensao;
+          console.log(`>>> ${dentroDaDimensao ? 'DENTRO DA DIMENSÃO DO PORTAL' : 'FORA DO PORTAL (MUNDO REAL)'} <<<`);
       }
-      
-      // Obter posições da câmera e do portal
-      let camPos = cam.object3D.position;
-      let portalPos = this.el.object3D.position;
-      
-      // Dimensões do portal
-      let portalWidth = this.data.width || 12.0;
-      let portalHeight = this.data.height || 16.0;
-      let portalDepth = 0.2; // Profundidade reduzida do portal para evitar detecções espúrias
-      
-      // Calcular limites da bounding box 3D do portal
-      let portalLeft = portalPos.x - (portalWidth / 2);
-      let portalRight = portalPos.x + (portalWidth / 2);
-      let portalBottom = portalPos.y;
-      let portalTop = portalPos.y + portalHeight;
-      let portalFront = portalPos.z - (portalDepth / 2);
-      let portalBack = portalPos.z + (portalDepth / 2);
-      
-      // Verificar colisão 3D entre câmera e bounding box do portal
-      let isCurrentlyInsidePortal = (
-          camPos.x >= portalLeft && camPos.x <= portalRight &&
-          camPos.y >= portalBottom && camPos.y <= portalTop &&
-          camPos.z >= portalFront && camPos.z <= portalBack
-      );
-      
-      // Debug logs detalhados (mesmo sem debugBox ativo para diagnóstico)
-      if (this.debugBox || (isCurrentlyInsidePortal !== this.wasInsidePortal)) {
-          console.log(`Portal Detection - Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
-          console.log(`Portal Bounds: X[${portalLeft.toFixed(2)}, ${portalRight.toFixed(2)}], Y[${portalBottom.toFixed(2)}, ${portalTop.toFixed(2)}], Z[${portalFront.toFixed(2)}, ${portalBack.toFixed(2)}]`);
-          console.log(`Inside Portal: ${isCurrentlyInsidePortal} | Was Inside: ${this.wasInsidePortal} | Cooldown: ${this.portalTransitionCooldown.toFixed(0)}`);
-      }
-      
-      // Sistema de travessia: detectar quando o usuário completa uma travessia do portal
-      // Entrada no portal (frente para trás)
-      if (isCurrentlyInsidePortal && !this.wasInsidePortal && !this.isCompletingTraversal) {
-          // Verificar se o tempo de debounce já passou antes de iniciar travessia
-          let currentTime = time || Date.now();
-          let timeSinceLastTraversal = currentTime - this.lastTraversalTime;
-          
-          if (timeSinceLastTraversal > this.traversalDebounceTime) {
-              console.log(`>>> STARTING TRAVERSAL FORWARD >>>`);
-              this.isCompletingTraversal = true;
-          } else {
-              console.log(`>>> TRAVERSAL START IGNORED - TOO SOON (elapsed: ${timeSinceLastTraversal}ms, needed: ${this.traversalDebounceTime}ms) <<<`);
-          }
-      }
-      
-      // Saída do portal (trás para frente) durante travessia
-      if (!isCurrentlyInsidePortal && this.wasInsidePortal && this.isCompletingTraversal) {
-          // Verificar se o tempo de debounce já passou
-          let currentTime = time || Date.now();
-          let timeSinceLastTraversal = currentTime - this.lastTraversalTime;
-          
-          if (timeSinceLastTraversal > this.traversalDebounceTime) {
-              console.log(`>>> COMPLETING TRAVERSAL BACKWARD <<<`);
-              // Completar a travessia - alternar dimensão
-              this.showingPortalDimension = !this.showingPortalDimension;
-              this.lastTraversalTime = currentTime;
-              this.isCompletingTraversal = false;
-              this.portalTransitionCooldown = 500; // 500ms cooldown
-              
-              // Debug logs
-              if (this.debugBox) {
-                  console.log(`>>> PORTAL DIMENSION TOGGLED: ${this.showingPortalDimension ? 'SHOWING PORTAL DIMENSION' : 'SHOWING CAMERA DIMENSION'} <<<`);
-                  console.log(`>>> Time since last traversal: ${timeSinceLastTraversal}ms <<<`);
-              }
-          } else {
-              console.log(`>>> TRAVERSAL IGNORED - TOO FAST (elapsed: ${timeSinceLastTraversal}ms, needed: ${this.traversalDebounceTime}ms) <<<`);
-              // Ignorar travessia muito rápida
-              this.isCompletingTraversal = false;
-          }
-      }
-      
-      // Também verificar debounce para início de travessia
-      if (isCurrentlyInsidePortal && !this.wasInsidePortal && this.isCompletingTraversal) {
-          // Se já está em travessia mas detectou entrada novamente, pode ser flickering
-          let currentTime = time || Date.now();
-          if (currentTime - this.lastTraversalTime < this.traversalDebounceTime) {
-              console.log(`>>> RE-ENTRY IGNORED - STILL IN DEBOUNCE (elapsed: ${currentTime - this.lastTraversalTime}ms) <<<`);
-              // Ignorar re-entrada durante debounce
-              isCurrentlyInsidePortal = false; // Forçar a permanecer "fora" temporariamente
-          }
-      }
-      
-      // Resetar travessia se usuário sair do portal sem completar
-      if (!isCurrentlyInsidePortal && !this.wasInsidePortal && this.isCompletingTraversal) {
-          console.log(`>>> TRAVERSAL RESET <<<`);
-          this.isCompletingTraversal = false;
-      }
-      
-      // Atualizar estado anterior
-      this.wasInsidePortal = isCurrentlyInsidePortal;
-      
-      // Determinar a função stencil com base no estado do interruptor
-      let func = this.showingPortalDimension ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
-      
+
+      // Fora do portal: Never -> nada da dimensão (esfera 360º e obras) é desenhado,
+      // fica só o mundo real da câmara e a moldura vermelha.
+      // Dentro do portal: NotEqual -> a esfera e as obras são desenhadas fora do
+      // quadro da máscara, e o quadro passa a ser a janela para o mundo real.
+      let func = dentroDaDimensao ? THREE.NotEqualStencilFunc : THREE.NeverStencilFunc;
+
       this.sphereMat.stencilFunc = func;
-      
+
       if (window.materiaisVirtuais) {
           window.materiaisVirtuais.forEach(mat => mat.stencilFunc = func);
       }
