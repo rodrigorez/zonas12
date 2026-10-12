@@ -249,10 +249,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       return;
     }
     
-    // Criar nova caixa de debug mais visível
+    // Criar nova caixa de debug mais visível com profundidade 3D
     let w = this.data.width || 12.0;
     let h = this.data.height || 16.0;
-    let portalDepth = 0.1;
+    let portalDepth = 1.0; // Profundidade 3D realista
     
     // Criar wireframe azul mais proeminente
     let debugBoxGeo = new THREE.BoxGeometry(w, h, portalDepth);
@@ -276,12 +276,12 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       let camPos = cam.object3D.position;
       let portalPos = this.el.object3D.position;
       
-      // Dimensões do portal
+      // Dimensões do portal (agora com profundidade mais realista)
       let portalWidth = this.data.width || 12.0;
       let portalHeight = this.data.height || 16.0;
-      let portalDepth = 0.1; // Profundidade fina para detecção precisa
+      let portalDepth = 1.0; // Profundidade realista para detecção 3D (1 metro)
       
-      // Calcular limites da bounding box do portal
+      // Calcular limites da bounding box 3D do portal
       let portalLeft = portalPos.x - (portalWidth / 2);
       let portalRight = portalPos.x + (portalWidth / 2);
       let portalBottom = portalPos.y;
@@ -297,15 +297,18 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
           camPos.z >= portalFront && camPos.z <= portalBack
       );
       
+      // Console.log para debug (pode ser removido)
+      // console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
+      // console.log(`Portal bounds: X[${portalLeft.toFixed(2)}, ${portalRight.toFixed(2)}], Y[${portalBottom.toFixed(2)}, ${portalTop.toFixed(2)}], Z[${portalFront.toFixed(2)}, ${portalBack.toFixed(2)}]`);
+      // console.log(`Inside portal: ${isCameraInPortalBounds}`);
+      
       // Determinar a função stencil com base na colisão 3D
       let func;
       if (isCameraInPortalBounds) {
           // Se a câmera está dentro da bounding box do portal, mostrar a dimensão do portal
-          // Usamos EqualStencilFunc para mostrar a dimensão do portal quando dentro dos limites
           func = THREE.EqualStencilFunc;
       } else {
           // Se a câmera não está dentro da bounding box do portal, mostrar a câmera real
-          // Usamos NotEqualStencilFunc para mostrar a câmera real quando fora dos limites
           func = THREE.NotEqualStencilFunc;
       }
       
