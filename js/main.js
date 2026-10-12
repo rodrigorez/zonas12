@@ -33,26 +33,34 @@ window.portalAR = {
 // Temporários reutilizados nos ticks (evita alocar por frame).
 const _pontoMundo = new THREE.Vector3();
 const _pontoCaixa = new THREE.Vector3();
-const _pontoMascara = new THREE.Vector3();
 
-// Registra um material como conteúdo de uma dimensão.
-function registarNaDimensao(idDimensao, material) {
+// Registra uma malha (panorama ou obra) como conteúdo de uma dimensão.
+// `papel` é 'panorama' ou 'obra': só muda a ordem de desenho.
+function registarNaDimensao(idDimensao, mesh, papel) {
   let estado = window.portalAR;
   let id = Number(idDimensao);
   if (!(id >= 0 && id < LIMITE_DIMENSOES)) {
-    console.warn('[dimensao] ID ' + idDimensao + ' fora do limite 0..' + (LIMITE_DIMENSOES - 1) + '; material ignorado.');
+    console.warn('[dimensao] ID ' + idDimensao + ' fora do limite 0..' + (LIMITE_DIMENSOES - 1) + '; objeto ignorado.');
     return;
   }
   let lista = estado.dimensoes[id] || (estado.dimensoes[id] = []);
-  if (!lista.includes(material)) lista.push(material);
+  if (!lista.some(function (e) { return e.mesh === mesh; })) {
+    lista.push({
+      mesh: mesh,
+      material: mesh.material,
+      panorama: papel === 'panorama',
+      // O que o material queria antes de mexermos nele: é reposto quando a dimensão
+      // volta a ser a ativa.
+      profundidade: { teste: mesh.material.depthTest, escrita: mesh.material.depthWrite }
+    });
+  }
   estado.assinatura = null;
   aplicarEstadoEstencil();
 }
 
-// Escreve a regra de stencil num material, conforme o papel da sua dimensão:
-//  0 (dimensão ativa)  -> desenha em todo o lado onde nenhuma janela escreveu
-//  1..255 (valor)      -> desenha dentro da janela que mostra essa dimensão
-//  null (sem papel)    -> não desenha
+// Escreve a regra de stencil num material:
+//  1..255 (valor)  -> desenha dentro das janelas que mostram essa dimensão
+//  null (sem papel)-> não desenha
 // Só o teste muda; as operações ficam sempre em Keep, para nenhum destes materiais
 // escrever no stencil (quem escreve é só a máscara dos portais).
 function definirEstencil(material, ref) {
@@ -71,15 +79,44 @@ function definirEstencil(material, ref) {
   return material;
 }
 
+// Decide, por dimensão, o que cada material desenha:
+//  - dimensão ativa: **sem teste de stencil**, quem manda é a profundidade. A
+//    máscara de cada janela escreve profundidade, por isso o que está atrás de uma
+//    janela fica tapado por ela e o que está à frente desenha-se por cima dela. É
+//    isto que mantém as molduras inteiras quando estão à frente (ou no mesmo plano)
+//    de uma janela, e as esconde quando estão claramente atrás.
+//  - dimensão vista por uma janela: desenha só onde essa janela escreveu o valor
+//    dela e **ignora a profundidade** (o mundo da janela está do outro lado dela).
+//  - dimensão sem janela: não desenha.
 function aplicarEstadoEstencil() {
   let estado = window.portalAR;
   let ativa = estado.dimensaoAtiva;
+  let ordem = estado.ordem;
   Object.keys(estado.dimensoes).forEach(function (chave) {
     let id = Number(chave);
-    let ref = null;
-    if (id === ativa) ref = 0;
-    else if (estado.valores.has(id)) ref = estado.valores.get(id);
-    estado.dimensoes[chave].forEach(function (mat) { definirEstencil(mat, ref); });
+    let valor = estado.valores.has(id) ? estado.valores.get(id) : null;
+    estado.dimensoes[chave].forEach(function (entrada) {
+      let mat = entrada.material;
+      let ordemNormal = entrada.panorama ? ordem.panorama : ordem.obra;
+      if (id === ativa) {
+        mat.stencilWrite = false;
+        mat.depthTest = entrada.profundidade.teste;
+        mat.depthWrite = entrada.profundidade.escrita;
+        entrada.mesh.renderOrder = ordemNormal;
+      } else if (valor !== null) {
+        definirEstencil(mat, valor);
+        mat.depthTest = false;
+        mat.depthWrite = false;
+        // Sai antes das obras da dimensão ativa: as obras que estão à frente da
+        // janela desenham-se depois e por cima do conteúdo dela.
+        entrada.mesh.renderOrder = entrada.panorama ? ordem.panorama : ordem.panorama + 0.5;
+      } else {
+        definirEstencil(mat, null);
+        mat.depthTest = entrada.profundidade.teste;
+        mat.depthWrite = entrada.profundidade.escrita;
+        entrada.mesh.renderOrder = ordemNormal;
+      }
+    });
   });
   estado.portais.slice().forEach(function (portal) {
     portal.atualizarJanela();
@@ -128,32 +165,6 @@ AFRAME.registerComponent('gestor-dimensoes', {
       mostradas.forEach(function (d, i) { estado.valores.set(d, i + 1); });
       aplicarEstadoEstencil();
     }
-
-    // Isto corre TODOS os frames: a ordem depende da posição da câmara.
-    this.ordenarMascaras();
-  },
-  // As máscaras são desenhadas da mais distante para a mais próxima. A máscara não
-  // escreve profundidade, por isso, se duas se sobrepuserem no ecrã, a última a ser
-  // desenhada é a que fica com o stencil. Com esta ordem, é a do portal da frente —
-  // sem ela, a máscara de trás sobrescrevia a da frente e a zona de sobreposição
-  // mostrava a dimensão errada.
-  ordenarMascaras: function () {
-    let estado = window.portalAR;
-    let camara = document.querySelector('a-camera');
-    if (!camara) return;
-    camara.object3D.getWorldPosition(_pontoMundo);
-
-    let visiveis = [];
-    estado.portais.forEach(function (portal) {
-      if (!portal.portalGroup.visible) return;
-      portal.maskMesh.getWorldPosition(_pontoMascara);
-      portal._distanciaMascara = _pontoMascara.distanceTo(_pontoMundo);
-      visiveis.push(portal);
-    });
-    visiveis.sort(function (a, b) { return b._distanciaMascara - a._distanciaMascara; });
-    visiveis.forEach(function (portal, i) {
-      portal.maskMesh.renderOrder = estado.ordem.mascara + i * 0.01;
-    });
   }
 });
 
@@ -220,7 +231,7 @@ AFRAME.registerComponent('material-virtual', {
       if (node.isMesh && node.material) {
         node.renderOrder = ordem.obra;
         node.name = 'dimensao-' + this.data.dimensao + '-obra';
-        registarNaDimensao(this.data.dimensao, node.material);
+        registarNaDimensao(this.data.dimensao, node, 'obra');
       }
     });
   }
@@ -271,7 +282,7 @@ AFRAME.registerComponent('panorama-dimensao', {
     esfera.renderOrder = ordem.panorama;
     esfera.frustumCulled = false;
     this.el.setObject3D('panorama', esfera);
-    registarNaDimensao(this.data.dimensao, this.material);
+    registarNaDimensao(this.data.dimensao, esfera, 'panorama');
   },
   tick: function () {
     let esfera = this.el.getObject3D('panorama');
@@ -355,8 +366,14 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     let h = this.data.height;
     let ordem = window.portalAR.ordem;
 
+    // A máscara escreve o valor do stencil E profundidade no plano da janela. A
+    // profundidade é o que resolve duas coisas sem código nenhum: (1) quando duas
+    // janelas se sobrepõem no ecrã, ganha a do portal da frente (as de trás falham o
+    // teste de profundidade, logo não escrevem stencil); (2) tudo o que pertence à
+    // dimensão ativa e está ATRÁS da janela fica tapado por ela, e o que está à
+    // frente desenha-se por cima (é o que mantém as molduras inteiras).
     this.maskMat = new THREE.MeshBasicMaterial({
-      colorWrite: false, depthWrite: false, side: THREE.DoubleSide,
+      colorWrite: false, depthWrite: true, side: THREE.DoubleSide,
       stencilWrite: true, stencilFunc: THREE.AlwaysStencilFunc, stencilRef: 0,
       stencilWriteMask: 0xFF, stencilFuncMask: 0xFF,
       stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.ReplaceStencilOp
@@ -367,11 +384,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.maskMesh.renderOrder = ordem.mascara;
     this.portalGroup.add(this.maskMesh);
 
-    // A moldura do portal é um objeto da dimensão onde ele está, por isso obedece à
-    // mesma regra dessa dimensão (ref 0): desenha-se só onde nenhuma janela escreveu.
-    // Sem isto, a moldura de um portal que fica atrás da janela de outro portal era
-    // desenhada dentro dessa janela e cortava a imagem dela com barras vermelhas.
-    let moldura = definirEstencil(new THREE.MeshBasicMaterial({ color: 0xFF0000 }), 0);
+    // A moldura é geometria da dimensão onde o portal está. Não leva teste de
+    // stencil: quem decide se ela fica à frente ou atrás do conteúdo de uma janela é
+    // a profundidade (a máscara das janelas escreve profundidade no plano delas).
+    let moldura = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
     let esp = 0.3;
     let meiaLargura = w / 2;
     let meiaAltura = h / 2;
@@ -440,11 +456,11 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     let pos = this.data.caixaPosicao;
     let rot = this.data.caixaRotacao;
     let cor = new THREE.Color(0x0000FF);
-    // A caixa de debug é geometria do portal, logo da dimensão onde ele está: segue
-    // a mesma regra das molduras e das obras (só onde nenhuma janela escreveu).
+    // A caixa de debug é geometria do portal, logo segue a mesma regra da moldura:
+    // fica tapada pelas janelas que lhe estão à frente, pela profundidade.
     this.debugBox = new THREE.Mesh(
       new THREE.BoxGeometry(caixa.x, caixa.y, caixa.z),
-      definirEstencil(new THREE.MeshBasicMaterial({ color: cor, wireframe: true, transparent: true, opacity: 0.8, side: THREE.DoubleSide }), 0)
+      new THREE.MeshBasicMaterial({ color: cor, wireframe: true, transparent: true, opacity: 0.8, side: THREE.DoubleSide })
     );
     this.debugBox.name = this.nome + '-caixa-debug';
     this.debugBox.position.set(pos.x, pos.y, pos.z);

@@ -60,9 +60,12 @@
 
         <!-- Dimensões (uma entidade por dimensão, com o seu ID) -->
         <!-- O panorama de uma dimensão é o fundo 360º dela. O portal é só a porta. -->
-        <a-entity panorama-dimensao="dimensao: 1; src: #cidade-360; raio: 100;"></a-entity>
-        <a-entity panorama-dimensao="dimensao: 2; src: #praia; raio: 100;"></a-entity>
-        <a-entity panorama-dimensao="dimensao: 3; src: #skycloud; raio: 100;"></a-entity>
+        <!-- O panorama de uma dimensão é o fundo 360º dela. O portal é só a porta.
+             O raio tem de ser maior do que a distância a qualquer portal: o fundo da
+             dimensão ativa tem de estar sempre atrás do plano das janelas. -->
+        <a-entity panorama-dimensao="dimensao: 1; src: #cidade-360; raio: 500;"></a-entity>
+        <a-entity panorama-dimensao="dimensao: 2; src: #praia; raio: 500;"></a-entity>
+        <a-entity panorama-dimensao="dimensao: 3; src: #skycloud; raio: 500;"></a-entity>
 
         <!-- As dimensões 0, 1 e 2 formam um grafo completo (2 portais cada, um para cada
              uma das outras). A dimensão 2 tem 3 portais (dois para a 1 e um para a 3) e

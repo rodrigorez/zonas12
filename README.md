@@ -214,26 +214,32 @@ panorama, mesmas obras).
   **ignora o `renderOrder`** e desenha pela ordem da árvore — o que só funciona por acaso
   com um portal. Com vários, as máscaras têm de ser desenhadas antes de todo o conteúdo.
 - Ordem de desenho (`renderOrder`): máscara (1) → panorama (2) → obras (3) → moldura (4).
-- **As máscaras são ordenadas por distância à câmara, todos os frames** (`ordenarMascaras`):
-  a mais distante sai primeiro, a mais próxima por último (`1`, `1.01`, `1.02`, ...). A
-  máscara não escreve profundidade (`depthWrite: false`), por isso, quando dois portais se
-  sobrepõem no ecrã, ganha o stencil **da última máscara desenhada**. Sem esta ordenação a
-  máscara de trás sobrescrevia a da frente e a zona de sobreposição mostrava a dimensão
-  errada. Como a ordem depende de onde está a câmara, é recalculada a cada frame — não
-  pode ser fixada uma vez em `init`.
+  O conteúdo de uma dimensão vista por uma janela (panorama 2, obras 2.5) sai **antes**
+  das obras da dimensão ativa (3), para as obras que estão à frente da janela poderem
+  desenhar-se por cima do conteúdo dela.
+- **As máscaras escrevem profundidade** (`depthWrite: true`, além do stencil). É isto que
+  resolve duas coisas, sem código por frame:
+  1. Quando duas janelas se sobrepõem no ecrã, ganha a do **portal da frente**: a máscara
+     de trás falha o teste de profundidade e, com `stencilZFail: Keep`, não escreve
+     stencil.
+  2. Tudo o que pertence à **dimensão ativa** e está **atrás** de uma janela fica tapado
+     por ela; o que está **à frente** desenha-se por cima. É o que mantém a moldura de um
+     portal completa quando ela cruza a janela de outro portal (ou a sua própria) e a
+     esconde quando o portal está claramente atrás.
 - O stencil é limpo a 0 em cada frame: **0 = nenhuma janela aqui**, `1..255` = valor da
   janela que mostra essa dimensão.
 - A máscara (`stencilFunc: Always`, `stencilZPass: Replace`) escreve o valor da dimensão
   que a janela mostra.
-- **Tudo o que pertence a uma dimensão leva o teste de stencil dela** (`definirEstencil`):
-  conteúdo da dimensão ativa (`ref 0`), conteúdo de uma dimensão mostrada por uma janela
-  (`ref` = valor dessa janela) e dimensão sem janela (`Never`, não desenha). Isto inclui o
-  panorama, as obras, **a moldura do portal e a caixa de debug** — a moldura é a geometria
-  do portal, logo é da dimensão onde o portal está. Sem este teste na moldura aconteciam
-  dois defeitos visíveis: a moldura de um portal que fica **atrás** da janela de outro
-  portal era desenhada **dentro** dessa janela (barras vermelhas a cortar a imagem dela), e
-  como as barras da moldura têm 0,2 m de profundidade, a face interior de cada barra caía
-  **dentro da própria janela** (uma faixa vermelha fina junto ao rebordo).
+- **Cada material segue o papel da sua dimensão** (`aplicarEstadoEstencil`):
+  - **dimensão ativa**: **sem teste de stencil** — quem manda é a profundidade (item
+    anterior). Vale para o panorama, as obras, **a moldura do portal e a caixa de debug**.
+  - **dimensão vista por uma janela**: `Equal` com o valor dessa janela e
+    `depthTest: false` (o mundo da janela está "do outro lado" dela, a profundidade da
+    máscara não conta para ele).
+  - **dimensão sem janela**: `Never`, não desenha.
+- **O raio do panorama de uma dimensão tem de ser maior do que a distância a qualquer
+  portal** (`raio: 500` no `index.html`): o fundo da dimensão ativa tem de estar sempre
+  atrás do plano das janelas, senão apareceria dentro delas.
 - `gestor-dimensoes` (na cena) é o único que decide: deteta as travessias e atribui os
   valores de stencil por frame.
 
@@ -313,8 +319,8 @@ Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caix
 - A caixa de debug aparece como um wireframe azul semi-transparente (nome `portal-<id>-caixa-debug`)
 - Tem sempre as mesmas dimensões X, Y e Z, posição e rotação que a caixa de colisão (`caixa`, `caixaPosicao` e `caixaRotacao`)
 - Serve para ver exatamente onde a travessia dispara (é uma caixa por portal)
-- Como o resto da geometria do portal, a caixa de debug é tapada pela janela de outro
-  portal que lhe fique à frente (segue a regra de stencil da dimensão onde está)
+- Como o resto da geometria do portal, a caixa de debug é tapada pelas janelas que lhe
+  ficam à frente, pela profundidade (não tem teste de stencil próprio)
 - A consola regista apenas as mudanças relevantes (`[portal] Dimensao ativa: 2`)
 
 ## Tecnologias Utilizadas
