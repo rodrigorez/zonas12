@@ -100,6 +100,12 @@ Requisitos técnicos (não remover, o portal deixa de funcionar):
 - Aviso em faixa no topo do ecrã, que **não cobre** a cena 3D (o portal mantém-se sempre visível)
 - Mostra "Carregando..." ao iniciar e, se a câmera não estiver acessível, a mensagem de permissões
 
+### 6. Controles do Portal
+
+- Pressione a tecla **R** para girar o portal 180 graus e alternar entre os lados
+- O lado frontal mostra a dimensão com imagem panorâmica e moldura vermelha
+- O lado traseiro é transparente com apenas um retângulo vermelho visível
+
 ## Tecnologias Utilizadas
 
 - **A-Frame 1.8.0**: Framework de realidade aumentada/virtual
