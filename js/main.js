@@ -297,10 +297,12 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
           camPos.z >= portalFront && camPos.z <= portalBack
       );
       
-      // Console.log para debug (pode ser removido)
-      console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
-      console.log(`Portal bounds: X[${portalLeft.toFixed(2)}, ${portalRight.toFixed(2)}], Y[${portalBottom.toFixed(2)}, ${portalTop.toFixed(2)}], Z[${portalFront.toFixed(2)}, ${portalBack.toFixed(2)}]`);
-      console.log(`Inside portal: ${isCameraInPortalBounds}`);
+      // Console.log para debug (apenas quando debug está ativo)
+      if (this.debugBox) {
+          console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
+          console.log(`Portal bounds: X[${portalLeft.toFixed(2)}, ${portalRight.toFixed(2)}], Y[${portalBottom.toFixed(2)}, ${portalTop.toFixed(2)}], Z[${portalFront.toFixed(2)}, ${portalBack.toFixed(2)}]`);
+          console.log(`Inside portal: ${isCameraInPortalBounds}`);
+      }
       
       // Determinar a função stencil com base na colisão 3D
       let func;
