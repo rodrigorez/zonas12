@@ -206,6 +206,24 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     backGroup.rotation.y = Math.PI; // Rotacionar 180 graus para ficar na parte de trás
     this.portalGroup.add(backGroup);
     
+    // Criar caixa de debug (wireframe) para visualizar a bounding box de colisão
+    // Visível apenas durante desenvolvimento/debug
+    let debugMode = false; // Mudar para true para ativar debug
+    if (debugMode) {
+      let portalDepth = 0.1;
+      let debugBoxGeo = new THREE.BoxGeometry(w, h, portalDepth);
+      let debugBoxMat = new THREE.MeshBasicMaterial({ 
+        color: 0x00FF00, 
+        wireframe: true,
+        transparent: true,
+        opacity: 0.5
+      });
+      let debugBox = new THREE.Mesh(debugBoxGeo, debugBoxMat);
+      debugBox.position.set(0, h/2, 0);
+      debugBox.renderOrder = 10; // Renderizar por cima de outros elementos
+      this.portalGroup.add(debugBox);
+    }
+    
     // Inicializar o ângulo de rotação
     this.portalGroup.rotation.y = 0; // Começa com o lado frontal visível
     
@@ -215,7 +233,39 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
         // Girar 180 graus quando pressionar 'R'
         this.portalGroup.rotation.y += Math.PI;
       }
+      // Tecla 'd' para alternar modo debug
+      if (event.key === 'd' || event.key === 'D') {
+        this.toggleDebugMode();
+      }
     });
+  },
+  
+  // Função para alternar modo debug
+  toggleDebugMode: function() {
+    // Remover caixa de debug existente se houver
+    let existingDebugBox = this.debugBox;
+    if (existingDebugBox) {
+      this.portalGroup.remove(existingDebugBox);
+      this.debugBox = null;
+      return;
+    }
+    
+    // Criar nova caixa de debug
+    let w = this.data.width || 12.0;
+    let h = this.data.height || 16.0;
+    let portalDepth = 0.1;
+    
+    let debugBoxGeo = new THREE.BoxGeometry(w, h, portalDepth);
+    let debugBoxMat = new THREE.MeshBasicMaterial({ 
+      color: 0x00FF00, 
+      wireframe: true,
+      transparent: true,
+      opacity: 0.7
+    });
+    this.debugBox = new THREE.Mesh(debugBoxGeo, debugBoxMat);
+    this.debugBox.position.set(0, h/2, 0);
+    this.debugBox.renderOrder = 10; // Renderizar por cima de outros elementos
+    this.portalGroup.add(this.debugBox);
   },
   tick: function() {
       let cam = document.querySelector('a-camera');

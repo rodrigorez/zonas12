@@ -103,8 +103,16 @@ Requisitos técnicos (não remover, o portal deixa de funcionar):
 ### 6. Controles do Portal
 
 - Pressione a tecla **R** para girar o portal 180 graus e alternar entre os lados
+- Pressione a tecla **D** para ativar/desativar o modo debug (mostra bounding box de colisão)
 - O lado frontal mostra a dimensão com imagem panorâmica e moldura vermelha
 - O lado traseiro é transparente com apenas um retângulo vermelho visível
+
+### 7. Modo Debug
+
+Durante o desenvolvimento, você pode ativar o modo debug para visualizar a bounding box de colisão do portal:
+- A caixa de debug aparece como um wireframe verde semi-transparente
+- Ela mostra exatamente onde o sistema detecta colisões com o portal
+- Útil para verificar se a detecção de colisão está funcionando corretamente
 
 ## Tecnologias Utilizadas
 
