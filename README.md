@@ -64,7 +64,7 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 
 ### 1. Portal Estêncil Dinâmico
 
-O portal é uma "janela entre duas dimensões": o quadro vermelho troca o que se vê dentro e fora dele, conforme a posição da câmera em relação ao portal (z = -5).
+O portal é uma "janela entre duas dimensões": o quadro vermelho troca o que se vê dentro e fora dele, conforme a posição da câmera em relação ao portal. O portal funciona como um interruptor que muda o estado quando atravessado.
 
 | Posição | Fundo do ecrã | Dentro do quadro vermelho |
 |---|---|---|
@@ -79,6 +79,12 @@ Requisitos técnicos (não remover, o portal deixa de funcionar):
 - `renderer.sortObjects = false` em `config-ar` (`js/main.js`): o A-Frame 1.4.2 forçava este valor; no 1.8.x fica `true`, o que desenha as obras antes da máscara do portal e as faz falhar o teste de stencil
 - A ordem de desenho depende dos `renderOrder`: máscara (1) → esfera 360º (2) → moldura (3)
 
+### Recursos Recentes
+
+- **Sistema de Detecção 3D**: Implementado sistema de bounding box 3D para detecção precisa de colisão
+- **Interruptor Inteligente**: Portal funciona como interruptor que muda estado ao ser atravessado
+- **Sem Barreiras Invisíveis**: Removido sistema antigo de limites que causava colisões fantasmas
+
 ### 2. Controles Mobile
 
 - Sistema de navegação por D-pad para dispositivos móveis
@@ -91,9 +97,11 @@ Requisitos técnicos (não remover, o portal deixa de funcionar):
 
 ### 4. Limitação de Movimento
 
-- Sistema de estados para controlar movimentação do usuário
-- Impede que o usuário saia do ambiente virtual
-- Limites e tempos ficam em `CONFIG_NAVEGACAO` (`js/main.js`), num único sítio, e podem ser sobrepostos por atributo: `limite-movimento="maxX: 60; minX: -60"`
+- Sistema de estados para controlar movimentação do usuário **(REMOVIDO)**
+- Impede que o usuário saia do ambiente virtual **(REMOVIDO)**
+- Limites e tempos ficam em `CONFIG_NAVEGACAO` (`js/main.js`), num único sítio, e podem ser sobrepostos por atributo: `limite-movimento="maxX: 60; minX: -60"` **(COMPONENTE DESATIVADO)**
+
+**Nota**: O sistema antigo de limitação de movimento foi removido para evitar barreiras invisíveis que impediam a navegação fluida. O portal agora funciona com detecção 3D precisa sem restrições artificiais.
 
 ### 5. Feedback de Carregamento / Erro de Câmera
 
@@ -107,12 +115,20 @@ Requisitos técnicos (não remover, o portal deixa de funcionar):
 - O lado frontal mostra a dimensão com imagem panorâmica e moldura vermelha
 - O lado traseiro é transparente com apenas um retângulo vermelho visível
 
+### Funcionamento do Portal
+
+O portal agora funciona como um interruptor inteligente:
+- **Atravessar o portal**: Muda o estado da dimensão (uma única vez)
+- **Permanecer na nova dimensão**: Até decidir voltar atravessando novamente
+- **Sem oscilações**: Sistema estável com cooldown de 500ms entre transições
+
 ### 7. Modo Debug
 
 Durante o desenvolvimento, você pode ativar o modo debug para visualizar a bounding box de colisão do portal:
-- A caixa de debug aparece como um wireframe verde semi-transparente
+- A caixa de debug aparece como um wireframe azul semi-transparente (1 metro de profundidade)
 - Ela mostra exatamente onde o sistema detecta colisões com o portal
 - Útil para verificar se a detecção de colisão está funcionando corretamente
+- Logs de debug mostram apenas informações relevantes quando o estado muda
 
 ## Tecnologias Utilizadas
 
