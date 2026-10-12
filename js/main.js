@@ -15,20 +15,23 @@ AFRAME.registerComponent('abrir-modal', {
 });
 
 // --- CONFIGURAÇÃO GLOBAL ---
-// Dimensões do portal: dimensoes[m] guarda os materiais da dimensão m.
-// O índice 0 é o mundo real (nada 3D é desenhado, vê-se a câmara por baixo do
-// canvas transparente) e o índice 1 é a dimensão do portal (esfera 360º + obras).
-// Registar materiais num índice novo cria uma dimensão nova, e o interruptor do
-// portal passa a percorrer todas (ver aplicarEstado/tick).
+// Dimensões: dimensoes[m] guarda os materiais da dimensão m. O índice 0 é o mundo
+// real (nada 3D é desenhado, vê-se a câmara por baixo do canvas transparente).
+// Cada portal governa as dimensões que declara no atributo `dimensoes`.
 window.dimensoes = [];
 
-// Regista um material numa dimensão e aplica logo o estado atual do portal, para
-// uma obra registada mais tarde nunca aparecer na dimensão errada.
+// Portais ativos: a posição na lista dá o bit de stencil do portal (ver
+// reservarBit). Cada portal escreve e testa só o seu bit, para a janela de um
+// portal não se misturar com a dos outros.
+window.portais = [];
+
+// Regista um material numa dimensão e aplica logo o estado do portal que governa
+// essa dimensão, para uma obra registada mais tarde nunca aparecer na dimensão
+// errada nem com o bit de outro portal.
 function registarNaDimensao(dimensao, material) {
   if (!window.dimensoes[dimensao]) window.dimensoes[dimensao] = [];
   if (!window.dimensoes[dimensao].includes(material)) window.dimensoes[dimensao].push(material);
-  let portalEl = document.querySelector('[portal-estencil-dinamico]');
-  let portal = portalEl && portalEl.components['portal-estencil-dinamico'];
+  let portal = window.portais.find(p => p && p.governaDimensao(dimensao));
   if (portal) portal.aplicarEstado();
 }
 
@@ -107,7 +110,12 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     //    de lado — a troca de dimensão não se nota;
     //  - 'caixa': na face de entrada da caixa, que fica antes do quadro — a troca
     //    acontece antes do quadro e vê-se a dimensão errada até o atravessar.
-    gatilho: { type: 'string', default: 'plano', oneOf: ['plano', 'caixa'] }
+    gatilho: { type: 'string', default: 'plano', oneOf: ['plano', 'caixa'] },
+    // Dimensões que este portal percorre, por ordem (0 = mundo real). A esfera
+    // 360º do portal é o fundo da segunda dimensão da lista, que é a primeira a
+    // que o portal dá acesso. Portais diferentes devem governar dimensões
+    // diferentes, porque um material só pode testar o bit de um portal.
+    dimensoes: { type: 'array', default: [0, 1] }
   },
   init: function () {
     let el = this.el; let w = this.data.width; let h = this.data.height;
@@ -115,11 +123,20 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.portalGroup = new THREE.Group();
     el.setObject3D('portal-mesh', this.portalGroup);
 
+    // Este portal ocupa um bit do stencil: escreve a máscara do quadro e testa os
+    // materiais das suas dimensões só com esse bit.
+    this.bit = this.reservarBit();
+
+    // Dimensões que este portal percorre (a primeira é o mundo real).
+    this.listaDimensoes = this.data.dimensoes.map(Number);
+    if (this.listaDimensoes.length < 2) this.listaDimensoes = [0, 1];
+    // Dimensão que este portal dá acesso (leva o fundo 360º e as obras).
+    this.dimensaoAlvo = this.listaDimensoes[1];
+
     // Interruptor de dimensões: o estado avança quando a câmara atravessa a caixa
     // de colisão (ver o tick). Tudo é calculado no espaço do portal, por isso
     // segue o portal mesmo que este se mova ou rode.
     this.estadoAtual = 0;
-    this.dimensoes = window.dimensoes;
     this.dentroDaCaixa = false;   // colisão no frame anterior
     this.sinalZ = 1;              // de que lado do plano central a câmara estava
     this.travessiaIniciada = false;
@@ -134,8 +151,8 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     let maskGeo = new THREE.PlaneGeometry(w, h, 32, 32);
     let maskMat = new THREE.MeshBasicMaterial({
       colorWrite: false, depthWrite: false, side: THREE.DoubleSide,
-      stencilWrite: true, stencilFunc: THREE.AlwaysStencilFunc, stencilRef: 1,
-      stencilWriteMask: 0xFF, stencilFuncMask: 0xFF,
+      stencilWrite: true, stencilFunc: THREE.AlwaysStencilFunc, stencilRef: this.bit,
+      stencilWriteMask: this.bit, stencilFuncMask: this.bit,
       stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.ReplaceStencilOp
     });
 
@@ -152,7 +169,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     let sphereGeo = new THREE.SphereGeometry(100, 64, 64);
     this.sphereMat = new THREE.MeshBasicMaterial({ 
       map: texture, side: THREE.BackSide, depthWrite: false,
-      stencilWrite: true, stencilRef: 1, stencilWriteMask: 0xFF, stencilFuncMask: 0xFF,
+      stencilWrite: true, stencilRef: this.bit, stencilWriteMask: this.bit, stencilFuncMask: this.bit,
       stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.KeepStencilOp
     });
     
@@ -160,8 +177,8 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     sphere.position.set(0, h/2, 0); sphere.renderOrder = 2; 
     sphere.frustumCulled = false; frontGroup.add(sphere);
 
-    // A esfera 360º é o conteúdo da dimensão do portal (índice 1).
-    registarNaDimensao(1, this.sphereMat);
+    // A esfera 360º é o fundo da dimensão a que este portal dá acesso.
+    registarNaDimensao(this.dimensaoAlvo, this.sphereMat);
     this.aplicarEstado();
 
     let molduraMat = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
@@ -280,19 +297,44 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.portalGroup.add(this.debugBox);
   },
 
+  // Reserva o primeiro bit de stencil livre (o stencil tem 8 bits).
+  reservarBit: function() {
+    for (let i = 0; i < 8; i++) {
+      if (!window.portais[i]) { window.portais[i] = this; this.indicePortal = i; return 1 << i; }
+    }
+    console.warn('[portal] Sem bits de stencil livres (máximo de 8 portais).');
+    return 1;
+  },
+
+  // Liberta o bit quando o portal sai da cena.
+  remove: function() {
+    let i = window.portais.indexOf(this);
+    if (i >= 0) window.portais[i] = undefined;
+  },
+
+  governaDimensao: function(dimensao) {
+    return this.listaDimensoes.includes(dimensao);
+  },
+
   // Fora do quadro desenha-se a dimensão atual; dentro do quadro desenha-se a
   // dimensão seguinte — é a "janela" entre dimensões. A máscara só escreve o
-  // stencil quando está à frente da câmara, por isso o lado do plano decide o que
-  // o quadro mostra, e nada disto depende da posição no código.
-  // Escalável: com N dimensões registadas o quadro mostra sempre a seguinte.
+  // stencil quando está à frente da câmara, por isso é o lado do plano que decide
+  // o que o quadro mostra, sem nenhum teste de posição no código.
+  // Só mexe nas dimensões que este portal governa, e marca-as com o seu bit, para
+  // vários portais terem janelas independentes.
   aplicarEstado: function() {
-      let atual = this.estadoAtual;
-      let seguinte = (atual + 1) % window.dimensoes.length;
-      window.dimensoes.forEach((materiais, dimensao) => {
+      let lista = this.listaDimensoes;
+      let atual = lista[this.estadoAtual];
+      let seguinte = lista[(this.estadoAtual + 1) % lista.length];
+      lista.forEach((dimensao) => {
           let func = dimensao === atual ? THREE.NotEqualStencilFunc
                    : dimensao === seguinte ? THREE.EqualStencilFunc
                    : THREE.NeverStencilFunc;
-          materiais.forEach(mat => { mat.stencilFunc = func; });
+          (window.dimensoes[dimensao] || []).forEach(mat => {
+              mat.stencilRef = this.bit;
+              mat.stencilFuncMask = this.bit;
+              mat.stencilFunc = func;
+          });
       });
   },
 
@@ -341,9 +383,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       this.sinalZ = sinalZ;
 
       if (atravessou) {
-          this.estadoAtual = (this.estadoAtual + 1) % this.dimensoes.length;
+          this.estadoAtual = (this.estadoAtual + 1) % this.listaDimensoes.length;
           this.aplicarEstado();
-          console.log(`>>> PORTAL: DIMENSÃO ${this.estadoAtual + 1} DE ${this.dimensoes.length} <<<`);
+          let dimensao = this.listaDimensoes[this.estadoAtual];
+          console.log(`>>> PORTAL: DIMENSÃO ${dimensao} DE ${window.dimensoes.length - 1} <<<`);
       }
   }
 });

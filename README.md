@@ -101,6 +101,7 @@ A caixa é declarada no atributo do portal (`js/main.js`, schema do componente) 
 | `caixaPosicao` | Centro da caixa (espaço do portal) | `0 8 0` |
 | `caixaRotacao` | Rotação da caixa, em graus | `0 0 0` |
 | `gatilho` | Onde a travessia dispara: `plano` (plano central da caixa) ou `caixa` (face de entrada) | `plano` |
+| `dimensoes` | Dimensões que este portal percorre, por ordem | `0, 1` |
 
 Exemplo: `portal-estencil-dinamico="src: #cidade-360; caixa: 12 16 1; caixaPosicao: 0 8 0;"`
 
@@ -111,19 +112,36 @@ Exemplo: `portal-estencil-dinamico="src: #cidade-360; caixa: 12 16 1; caixaPosic
 As dimensões vivem em `window.dimensoes` (`js/main.js`): cada índice é uma dimensão e guarda os materiais que lhe pertencem.
 
 - `dimensoes[0]` é o mundo real (não desenha nada)
-- `dimensoes[1]` é a dimensão do portal (esfera 360º + obras)
+- `dimensoes[1]` é a dimensão do projeto (esfera 360º + obras), governada pelo portal que declara `dimensoes: 0, 1`
 - Cada obra declara a sua dimensão com `material-virtual="dimensao: 1"` (omissão `1`)
 
-Registar materiais num índice novo cria uma dimensão nova e o interruptor passa a percorrer todas (atravessar cicla 1 → 2 → 3 → 1), com o quadro a mostrar sempre a dimensão seguinte.
+Registar materiais num índice novo cria uma dimensão nova. Para um portal a percorrer mais do que duas, basta acrescentá-las à lista dele: `dimensoes: 0, 1, 2` — atravessar cicla 0 → 1 → 2 → 0, com o quadro a mostrar sempre a dimensão seguinte (cada dimensão a mais precisa do seu próprio conteúdo).
 
-#### Vários portais (limitação atual)
+#### Vários portais (um bit de stencil por portal)
 
-`window.dimensoes` e os seus materiais são **globais**: cada portal aplica o seu estado a todos os materiais da dimensão. Com dois portais em estados diferentes, o último a correr (`aplicarEstado`) sobrescreve o teste de stencil do outro — um deles fica a mostrar a dimensão errada. Antes de usar vários portais ao mesmo tempo é preciso decidir a arquitetura (por exemplo, um bit de stencil por portal, ou os materiais da dimensão pertencerem a um portal).
+Cada portal ocupa um **bit do stencil** (`window.portais`, `reservarBit`): escreve a máscara do seu quadro e testa os materiais das suas dimensões só com esse bit. Assim a janela de um portal não se mistura com a dos outros, e portais diferentes podem estar em dimensões diferentes ao mesmo tempo.
+
+- Um portal percorre as dimensões que declara: `dimensoes: 0, 1` (mundo real ↔ dimensão 1) ou, por exemplo, `dimensoes: 0, 2` para outro portal
+- A esfera 360º do portal é registada na **segunda** dimensão da lista, que é a que ele dá acesso
+- O portal só mexe nos materiais das dimensões que governa; cada material fica marcado com o bit desse portal (`stencilRef` e `stencilFuncMask`)
+
+Exemplo com dois portais independentes:
+
+```html
+<a-entity position="0 0 -5"  portal-estencil-dinamico="src: #cidade-360; dimensoes: 0, 1"></a-entity>
+<a-entity position="0 0 -30" portal-estencil-dinamico="src: #praia;       dimensoes: 0, 2"></a-entity>
+```
+
+Limites desta abordagem (o stencil tem 8 bits, logo até 8 portais):
+
+- **Um material pertence a um só portal**: a dimensão que o portal A governa não pode ser governada pelo portal B (um material só testa um bit). Se dois portais partilharem a mesma dimensão, o último a aplicar o estado ganha.
+- **Fundos 360º sobrepostos**: cada portal tem a sua esfera de raio 100. Se dois portais estiverem visíveis ao mesmo tempo e ambos desenharem o fundo, ganha o que for desenhado por último (a ordem depende dos `renderOrder`). Numa cena com vários portais convém ajustar o `renderOrder` de cada fundo ou dar a cada dimensão a sua própria geometria.
 
 ### Recursos Recentes
 
 - **Janela entre Dimensões**: o quadro vermelho mostra a dimensão atual por fora e a seguinte por dentro, nos dois sentidos
 - **Travessia por Colisão com a Caixa**: sem debounce, sem cooldown e sem distância; calculada no espaço do portal, por isso funciona com portais deslocados, rodados e em movimento
+- **Um Bit de Stencil por Portal**: portais independentes, cada um com a sua janela e as suas dimensões (`dimensoes`)
 - **Caixa de Debug Igual à Real**: a caixa de debug é desenhada com a mesma dimensão, posição e rotação da caixa de colisão
 - **Sem Barreiras Invisíveis**: Removido sistema antigo de limites que causava colisões fantasmas
 
