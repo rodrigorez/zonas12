@@ -72,7 +72,7 @@ zonas12/
 
 ## Estado atual do código (v0.0.2)
 
-Marcado pela branch `0.0.2`. Resumo do que existe hoje: `index.html` (183 linhas),
+Marcado pela branch `v0.0.2`. Resumo do que existe hoje: `index.html` (183 linhas),
 `js/main.js` (547 linhas), `css/style.css` (74 linhas) e `assets/images/`.
 
 ### O que está implementado
