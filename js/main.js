@@ -300,12 +300,13 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       // Determinar a função stencil com base na colisão 3D
       let func;
       if (isCameraInPortalBounds) {
-          // Se a câmera está dentro da bounding box do portal, usar a lógica de troca de dimensão
-          func = (camPos.z > portalPos.z) ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
+          // Se a câmera está dentro da bounding box do portal, mostrar a dimensão do portal
+          // Usamos EqualStencilFunc para mostrar a dimensão do portal quando dentro dos limites
+          func = THREE.EqualStencilFunc;
       } else {
-          // Se a câmera não está dentro da bounding box do portal, manter a lógica baseada apenas na posição Z
-          // Isso permite que a dimensão seja determinada pela posição relativa à face do portal
-          func = (camPos.z > portalPos.z) ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
+          // Se a câmera não está dentro da bounding box do portal, mostrar a câmera real
+          // Usamos NotEqualStencilFunc para mostrar a câmera real quando fora dos limites
+          func = THREE.NotEqualStencilFunc;
       }
       
       this.sphereMat.stencilFunc = func;
