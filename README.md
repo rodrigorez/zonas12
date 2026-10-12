@@ -62,99 +62,147 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 
 ## Funcionalidades Principais
 
-### 1. Portal Estêncil Dinâmico
+### 1. Dimensões e Portais (arquitetura modular)
 
-O portal é uma **janela entre dimensões**: o quadro vermelho mostra a dimensão do outro lado e, ao atravessá-lo, troca-se de dimensão. Quem deteta a travessia é uma **caixa de colisão**, calculada no espaço do portal — não há nenhuma posição nem distância fixa no mundo.
+O projeto é um **grafo de dimensões** ligadas por portais. Há dois tipos de objeto,
+cada um com o seu **ID próprio**, e esse ID aparece em tudo o que lhe pertence:
 
-| Estado | Fora do quadro vermelho | Dentro do quadro vermelho |
+| Objeto | IDs | Onde aparece o ID |
 | --- | --- | --- |
-| **1 — Mundo real** | Câmera (realidade) | Dimensão do portal (esfera 360º + obras) |
-| **2 — Portal** | Dimensão do portal (esfera 360º + obras) | Câmera (realidade) |
+| **Dimensão** | `0..511` | `panorama-dimensao="dimensao: 7"`, `material-virtual="dimensao: 7"`, `data-dimensao`, classe `dimensao-7`, nome dos objetos 3D (`dimensao-7-panorama`, `dimensao-7-obra`) |
+| **Portal** | `0..511` | `portal-estencil-dinamico="portalId: 3; ..."`, `data-portal-id`, classe `portal-3`, nome dos objetos 3D (`portal-3-mascara`, `portal-3-moldura-0`, `portal-3-caixa-debug`) |
 
-O quadro é a janela: perto do portal a janela cresce até preencher o ecrã, por isso ao atravessar a dimensão seguinte passa a ocupar tudo.
+**Cada portal é um módulo independente**: tem as suas duas dimensões, a sua caixa de
+colisão, o seu `gatilho`, a sua caixa de debug e a sua geometria. Não partilha estado
+com os outros portais.
 
-O fundo da dimensão do portal vem do `src` do portal, que pode ser uma imagem **ou um vídeo** (por exemplo a imagem da câmara): um vídeo é usado como `THREE.VideoTexture`, para animar. Sem `src`, a dimensão do portal fica sem fundo 3D e vê-se a câmara.
+#### O estado: a dimensão ativa
 
-A travessia é detetada pela colisão com a caixa, sempre dentro dela:
+Há uma só fonte de verdade — `window.portalAR.dimensaoAtiva`, a dimensão onde o
+utilizador está (`js/main.js`). Todos os portais e todo o conteúdo leem daqui, por
+isso vários portais nunca ficam em desacordo:
 
-- **Atravessar** o plano do quadro: passa para a dimensão seguinte
-- **Estar** dentro da caixa sem atravessar: não muda nada
-- **Atravessar outra vez** (ao voltar): volta à dimensão anterior
+- **Dimensão ativa** (onde estás): o conteúdo dela é desenhado em todo o lado onde
+  nenhuma janela escreveu.
+- **Dimensão mostrada por uma janela**: o conteúdo dela só é desenhado dentro dessa janela.
+- **Dimensões que não estão em jogo**: não são desenhadas.
 
-Com 2 dimensões isto é uma alternância: atravessar → dimensão 2; atravessar de novo → dimensão 1.
+#### O portal é a porta
 
-Como tudo é calculado no espaço do portal (`worldToLocal` + a rotação da caixa), o portal pode estar **deslocado, rodado ou em movimento** — a travessia acompanha-o sempre (`js/main.js`, `tick`).
+Um portal liga **duas** dimensões (`dimensaoA` e `dimensaoB`), de forma **bidirecional**:
 
-Requisitos técnicos (não remover, o portal deixa de funcionar):
+| Onde estás | O quadro mostra |
+| --- | --- |
+| `dimensaoA` | `dimensaoB` |
+| `dimensaoB` | `dimensaoA` |
 
-- `renderer="...; stencil: true"` no `<a-scene>`: a partir do three r184 o buffer de stencil **não é criado por omissão**, e sem ele o portal desenha tudo em todo o lado (perde-se a troca de dimensões)
-- `renderer.sortObjects = false` em `config-ar` (`js/main.js`): o A-Frame 1.4.2 forçava este valor; no 1.8.x fica `true`, o que desenha as obras antes da máscara do portal e as faz falhar o teste de stencil
-- A ordem de desenho depende dos `renderOrder`: máscara (1) → esfera 360º (2) → moldura (3)
-- A dimensão atual usa `THREE.NotEqualStencilFunc`, a seguinte `THREE.EqualStencilFunc` e as restantes `THREE.NeverStencilFunc` (`aplicarEstado`)
-- A máscara do quadro (`stencilFunc: Always`, `stencilZPass: Replace`) é quem escreve o stencil; é ela que faz a janela funcionar
+Atravessar o portal (pela caixa de colisão) muda a **dimensão ativa** para o outro lado.
 
-#### Caixa de colisão e caixa de debug
+O `pertenceA` (opcional) diz em que dimensão é que a porta fica. Sem ele, a porta
+aparece em qualquer uma das duas. É isto que permite ter, por exemplo, **7 portas do
+lado da dimensão 1 e 7 portas do lado da dimensão 2**: cada grupo só se vê na sua
+dimensão.
 
-A caixa é declarada no atributo do portal (`js/main.js`, schema do componente) e é a **única** fonte da sua geometria — a caixa de debug é construída com exatamente os mesmos valores, pelo que nunca pode divergir:
+#### Cenários que esta arquitetura permite
+
+| Cenário | Como se escreve |
+| --- | --- |
+| Dimensão central que dá acesso a todas | Um portal por destino: `dimensaoA: 0; dimensaoB: N`, todos na dimensão central |
+| 7 portais da dimensão 1 para a 2 | 7 portais `dimensaoA: 1; dimensaoB: 2; pertenceA: 1` |
+| 7 portais da dimensão 2 para a 1 | 7 portais `dimensaoA: 1; dimensaoB: 2; pertenceA: 2` |
+| Atravessar para "qualquer" outra dimensão | Um portal entre as duas; atravessar em qualquer sentido |
+| Vários portais a mostrar dimensões diferentes no mesmo ecrã | Cada janela recebe um valor de stencil próprio |
+
+Exemplo — uma central (0) com dois destinos, e conteúdo nas dimensões:
+
+```html
+<a-entity panorama-dimensao="dimensao: 1; src: #cidade-360"></a-entity>
+<a-entity panorama-dimensao="dimensao: 2; src: #praia"></a-entity>
+
+<a-entity position="-10 0 -12" portal-estencil-dinamico="portalId: 0; dimensaoA: 0; dimensaoB: 1"></a-entity>
+<a-entity position=" 10 0 -12" portal-estencil-dinamico="portalId: 1; dimensaoA: 0; dimensaoB: 2"></a-entity>
+
+<a-box position="0 1.5 -30" material-virtual="dimensao: 1" abrir-modal="url: assets/images/praia.jpg"></a-box>
+```
+
+#### Atributos do portal
 
 | Atributo | Significado | Omissão |
 | --- | --- | --- |
-| `caixa` | Tamanho X, Y, Z | `12 16 1` |
+| `portalId` | ID do portal | `0` |
+| `dimensaoA`, `dimensaoB` | As duas dimensões que a porta liga | `0` e `1` |
+| `pertenceA` | Dimensão onde a porta fica (`-1` = qualquer das duas) | `-1` |
+| `width`, `height` | Tamanho do quadro | `12`, `16` |
+| `caixa` | Tamanho X, Y, Z da caixa de colisão | `12 16 1` |
 | `caixaPosicao` | Centro da caixa (espaço do portal) | `0 8 0` |
 | `caixaRotacao` | Rotação da caixa, em graus | `0 0 0` |
-| `gatilho` | Onde a travessia dispara: `plano` (plano central da caixa) ou `caixa` (face de entrada) | `plano` |
-| `dimensoes` | Dimensões que este portal percorre, por ordem | `0, 1` |
+| `gatilho` | Onde a travessia dispara: `plano` (plano do quadro) ou `caixa` (face de entrada) | `plano` |
 
-Exemplo: `portal-estencil-dinamico="src: #cidade-360; caixa: 12 16 1; caixaPosicao: 0 8 0;"`
+A caixa é a **única** fonte da sua geometria: a caixa de debug usa exatamente os mesmos
+valores (`caixa`, `caixaPosicao`, `caixaRotacao`), pelo que nunca pode divergir.
 
-**Porquê `plano` por omissão:** a máscara do quadro só escreve o stencil quando está à frente da câmara, ou seja, o quadro só é uma janela de um dos lados. A troca de dimensão tem de acontecer no plano do quadro, que é o plano central da caixa — é o único ponto em que a troca não se nota. Com `gatilho: caixa` (face de entrada, meia espessura antes do quadro) fica-se ~0,55 m com a dimensão errada durante a travessia, com a caixa por omissão.
+**Porquê `plano` por omissão:** a máscara só escreve o stencil quando está à frente da
+câmara, ou seja, o quadro só é uma janela de um dos lados. A troca tem de acontecer no
+plano do quadro, que é o plano central da caixa — é o único ponto em que a troca não se
+nota. Com `gatilho: caixa` fica-se ~0,55 m com a dimensão errada durante a travessia.
 
-#### Escalar para outras dimensões
+#### Conteúdo: pertence à dimensão, não ao portal
 
-As dimensões vivem em `window.dimensoes` (`js/main.js`): cada índice é uma dimensão e guarda os materiais que lhe pertencem.
+- `panorama-dimensao="dimensao: 7; src: #imagem"` — o fundo 360º da dimensão 7. O `src`
+  aceita imagem **ou vídeo**; um vídeo é usado como `THREE.VideoTexture`, por isso anima
+  (por exemplo a imagem da câmara: `src: #webcam-video`).
+- `material-virtual="dimensao: 7"` — uma obra que pertence à dimensão 7.
 
-- `dimensoes[0]` é o mundo real (não desenha nada)
-- `dimensoes[1]` é a dimensão do projeto (esfera 360º + obras), governada pelo portal que declara `dimensoes: 0, 1`
-- Cada obra declara a sua dimensão com `material-virtual="dimensao: 1"` (omissão `1`)
+Assim, várias portas que mostram a mesma dimensão mostram **o mesmo mundo** (mesmo
+panorama, mesmas obras).
 
-Registar materiais num índice novo cria uma dimensão nova. Para um portal a percorrer mais do que duas, basta acrescentá-las à lista dele: `dimensoes: 0, 1, 2` — atravessar cicla 0 → 1 → 2 → 0, com o quadro a mostrar sempre a dimensão seguinte (cada dimensão a mais precisa do seu próprio conteúdo).
+#### Limites
 
-#### Vários portais (um bit de stencil por portal)
+- **512 dimensões** e **512 portais** (IDs de organização).
+- **255 janelas ao mesmo tempo**: o stencil tem 8 bits e cada janela que mostra uma
+  dimensão diferente precisa de um valor. Se houver mais, a consola avisa e as restantes
+  ficam sem janela (sem estragar as outras).
+- Uma dimensão sem conteúdo 3D mostra a câmara (o canvas é transparente). É o caso da
+  dimensão 0.
 
-Cada portal ocupa um **bit do stencil** (`window.portais`, `reservarBit`): escreve a máscara do seu quadro e testa os materiais das suas dimensões só com esse bit. Assim a janela de um portal não se mistura com a dos outros, e portais diferentes podem estar em dimensões diferentes ao mesmo tempo.
+#### Requisitos técnicos (não remover, o portal deixa de funcionar)
 
-- Um portal percorre as dimensões que declara: `dimensoes: 0, 1` (mundo real ↔ dimensão 1) ou, por exemplo, `dimensoes: 0, 2` para outro portal
-- A esfera 360º do portal é registada na **segunda** dimensão da lista, que é a que ele dá acesso
-- O portal só mexe nos materiais das dimensões que governa; cada material fica marcado com o bit desse portal (`stencilRef` e `stencilFuncMask`)
+- `renderer="...; stencil: true"` no `<a-scene>`: a partir do three r184 o buffer de
+  stencil **não é criado por omissão**.
+- `renderer.sortObjects = true` em `config-ar` (`js/main.js`): com `false` o three
+  **ignora o `renderOrder`** e desenha pela ordem da árvore — o que só funciona por acaso
+  com um portal. Com vários, as máscaras têm de ser desenhadas antes de todo o conteúdo.
+- Ordem de desenho (`renderOrder`): máscara (1) → panorama (2) → obras (3) → moldura (4).
+- O stencil é limpo a 0 em cada frame: **0 = nenhuma janela aqui**, `1..255` = valor da
+  janela que mostra essa dimensão.
+- A máscara (`stencilFunc: Always`, `stencilZPass: Replace`) escreve o valor da dimensão
+  que a janela mostra.
+- `gestor-dimensoes` (na cena) é o único que decide: deteta as travessias e atribui os
+  valores de stencil por frame.
 
-Exemplo com dois portais independentes:
+#### Obras: clique só na dimensão onde estás
 
-```html
-<a-entity position="0 0 -5"  portal-estencil-dinamico="src: #cidade-360; dimensoes: 0, 1"></a-entity>
-<a-entity position="0 0 -30" portal-estencil-dinamico="src: #praia;       dimensoes: 0, 2"></a-entity>
-```
-
-Limites desta abordagem (o stencil tem 8 bits, logo até 8 portais):
-
-- **Um material pertence a um só portal**: a dimensão que o portal A governa não pode ser governada pelo portal B (um material só testa um bit). Se dois portais partilharem a mesma dimensão, o último a aplicar o estado ganha.
-- **Fundos 360º sobrepostos**: cada portal tem a sua esfera de raio 100. Se dois portais estiverem visíveis ao mesmo tempo e ambos desenharem o fundo, ganha o que for desenhado por último (a ordem depende dos `renderOrder`). Numa cena com vários portais convém ajustar o `renderOrder` de cada fundo ou dar a cada dimensão a sua própria geometria.
-- **Até 8 portais**: o stencil tem 8 bits. Um 9.º portal avisa na consola e reutiliza o bit 1, o que estraga o 1.º portal.
-- **Dimensão sem portal fica escondida**: conteúdo registado com `material-virtual="dimensao: N"` numa dimensão que nenhum portal declara em `dimensoes` fica invisível (e a consola avisa), em vez de aparecer em todas as dimensões.
-
-#### Obras: clique só na dimensão atual
-
-O estêncil esconde a obra, mas o raycaster do A-Frame continua a apanhá-la (não vê o stencil nem `object3D.visible`). Por isso o `abrir-modal` só abre se a dimensão da obra for a **dimensão atual** do portal (`NotEqualStencilFunc`): vê-la pela janela, de fora, não chega — é preciso estar dentro da dimensão.
+O estêncil esconde a obra, mas o raycaster do A-Frame continua a apanhá-la (não vê o
+stencil nem `object3D.visible`). Por isso o `abrir-modal` só abre se a dimensão da obra
+for a **dimensão ativa**: vê-la pela janela não conta.
 
 ### Recursos Recentes
 
-- **Janela entre Dimensões**: o quadro vermelho mostra a dimensão atual por fora e a seguinte por dentro, nos dois sentidos
-- **Travessia por Colisão com a Caixa**: sem debounce, sem cooldown e sem distância; calculada no espaço do portal, por isso funciona com portais deslocados, rodados e em movimento
-- **Um Bit de Stencil por Portal**: portais independentes, cada um com a sua janela e as suas dimensões (`dimensoes`); até 8 portais
-- **Fundo por Portal com Vídeo**: o `src` do portal aceita vídeo (usado como `VideoTexture`), por exemplo a imagem da câmara
-- **Obras só na Dimensão Atual**: clicar numa obra doutra dimensão já não abre o modal
-- **Dimensão sem Portal Fica Escondida**: com aviso na consola, em vez de aparecer em todas as dimensões
-- **Caixa de Debug Igual à Real**: a caixa de debug é desenhada com a mesma dimensão, posição e rotação da caixa de colisão
-- **Sem Barreiras Invisíveis**: Removido sistema antigo de limites que causava colisões fantasmas
+- **Grafo de Dimensões**: portais bidirecionais entre duas dimensões (qualquer par), com
+  uma dimensão ativa global — permite a central que dá acesso a todas
+- **IDs em Tudo**: cada dimensão e cada portal tem um ID que aparece nos atributos,
+  classes, `data-*` e nomes dos objetos 3D
+- **Tracejo por Colisão com a Caixa**: sem debounce, sem cooldown e sem distância;
+  calculada no espaço do portal, por isso funciona com portais deslocados, rodados e em
+  movimento, e com muitos portais ao mesmo tempo
+- **Portais Pertencem a uma Dimensão**: `pertenceA` separa os portais de cada lado
+- **Conteúdo por Dimensão**: panorama (imagem ou vídeo) e obras pertencem à dimensão, por
+  isso várias portas mostram o mesmo mundo
+- **Obras só na Dimensão Ativa**: clicar numa obra doutra dimensão não abre o modal
+- **Caixa de Debug Igual à Real**: a caixa de debug é desenhada com a mesma dimensão,
+  posição e rotação da caixa de colisão
+- **Sem Barreiras Invisíveis**: Removido sistema antigo de limites que causava colisões
+  fantasmas
 
 ### 2. Controles Mobile
 
@@ -181,27 +229,34 @@ O estêncil esconde a obra, mas o raycaster do A-Frame continua a apanhá-la (n�
 
 ### 6. Controles do Portal
 
-- Pressione a tecla **R** para girar o portal 180 graus e alternar entre os lados
-- Pressione a tecla **D** para ativar/desativar o modo debug (mostra a área do portal)
-- O lado frontal mostra a dimensão com imagem panorâmica e moldura vermelha
-- O lado traseiro é transparente com apenas um retângulo vermelho visível
+- Pressione a tecla **R** para girar o portal 180 graus (a janela continua a funcionar
+  nos dois sentidos, porque a máscara é de face dupla)
+- Pressione a tecla **D** para ativar/desativar o modo debug (mostra a caixa de colisão)
+- A moldura vermelha marca a porta; dentro dela vê-se a dimensão do outro lado
 
 ### Funcionamento do Portal
 
-A travessia é detetada pela colisão com a caixa, sempre dentro dela (`js/main.js`, `tick`):
+Tudo é decidido por frame em `gestor-dimensoes` (`js/main.js`), pela colisão com a caixa
+e pelo `dimensaoAtiva`:
 
-- **Estado 1 (mundo real)**: fora do quadro vê-se a câmara; dentro do quadro vê-se a dimensão do portal (`Equal`)
-- **Estado 2 (portal)**: fora do quadro vê-se a dimensão do portal; dentro do quadro vê-se a câmara (`NotEqual`)
-- **Sem piscas**: a troca de estado acontece no plano central da caixa, exatamente onde a máscara do quadro muda de lado, por isso não há frames com a dimensão errada (com `gatilho: caixa` há, ver acima)
+- **Onde estás**: o conteúdo da tua dimensão desenha em todo o lado onde nenhuma janela
+  escreveu (`Equal 0`).
+- **O que a janela mostra**: o conteúdo da dimensão do outro lado desenha dentro do
+  quadro (`Equal` com o valor daquela dimensão).
+- **Sem piscas**: a troca acontece no plano central da caixa, exatamente onde a máscara
+  muda de lado, por isso não há frames com a dimensão errada (com `gatilho: caixa` há,
+  ver acima).
+- **Vários portais**: cada janela que mostra uma dimensão diferente recebe um valor de
+  stencil próprio, por isso portais com destinos diferentes coexistem no mesmo ecrã.
 
 ### 7. Modo Debug
 
 Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caixa de colisão do portal:
 
-- A caixa de debug aparece como um wireframe azul semi-transparente
+- A caixa de debug aparece como um wireframe azul semi-transparente (nome `portal-<id>-caixa-debug`)
 - Tem sempre as mesmas dimensões X, Y e Z, posição e rotação que a caixa de colisão (`caixa`, `caixaPosicao` e `caixaRotacao`)
-- Serve para ver exatamente onde o interruptor dispara
-- Logs de debug mostram apenas informações relevantes quando a dimensão muda (`>>> PORTAL: DIMENSÃO 2 DE 2 <<<`)
+- Serve para ver exatamente onde a travessia dispara (é uma caixa por portal)
+- A consola regista apenas as mudanças relevantes (`[portal] Dimensao ativa: 2`)
 
 ## Tecnologias Utilizadas
 

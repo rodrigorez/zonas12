@@ -42,7 +42,7 @@
     <!-- Cena A-Frame -->
     <div id="container-3d">
       <!-- renderer: o stencil é obrigatório para o portal (buffer de stencil) -->
-      <a-scene config-ar renderer="alpha: true; antialias: true; stencil: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable">
+      <a-scene config-ar gestor-dimensoes renderer="alpha: true; antialias: true; stencil: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable">
         
         <a-assets>
           <img id="cidade-360" src="assets/images/forest.jpg" crossorigin="anonymous">
@@ -58,39 +58,43 @@
           <a-cursor color="#ffffff" opacity="0.8" objects=".interactable"></a-cursor>
         </a-camera>
 
-        <!-- Portal -->
-        <a-entity position="0 0 -5" portal-estencil-dinamico="src: #cidade-360; width: 12.0; height: 16.0;"></a-entity>
+        <!-- Dimensões (uma entidade por dimensão, com o seu ID) -->
+        <!-- O panorama de uma dimensão é o fundo 360º dela. O portal é só a porta. -->
+        <a-entity panorama-dimensao="dimensao: 1; src: #cidade-360; raio: 100;"></a-entity>
+
+        <!-- Portal: portal-id proprio, liga duas dimensoes (bidirecional) -->
+        <a-entity position="0 0 -5" portal-estencil-dinamico="portalId: 0; dimensaoA: 0; dimensaoB: 1; width: 12.0; height: 16.0;"></a-entity>
 
         <!-- Obras da Galeria (Em Z = -60, bem dentro da cidade) -->
         <a-entity position="0 0 -60">
           
           <a-box 
             class="interactable"
-            material-virtual src="#galeriaFoto1" position="-44 1.5 5" rotation="0 15 0" width="4" height="3" depth="0.1"
+            material-virtual="dimensao: 1" src="#galeriaFoto1" position="-44 1.5 5" rotation="0 15 0" width="4" height="3" depth="0.1"
             abrir-modal="url: assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg">
           </a-box>
 
           <a-box 
             class="interactable"
-            material-virtual src="#galeriaFoto2" position="-24 1.5 5" width="4" height="3" depth="0.1"
+            material-virtual="dimensao: 1" src="#galeriaFoto2" position="-24 1.5 5" width="4" height="3" depth="0.1"
             abrir-modal="url: assets/images/eiffel.jpg">
           </a-box>
 
           <a-box 
             class="interactable"
-            material-virtual src="#video" position="4 1.5 5" rotation="0 -15 0" width="4" height="3" depth="0.1"
+            material-virtual="dimensao: 1" src="#video" position="4 1.5 5" rotation="0 -15 0" width="4" height="3" depth="0.1"
             abrir-modal="url: assets/images/compequicolor1024vr.mp4">
           </a-box>
 
           <a-box 
             class="interactable"
-            material-virtual src="#praia" position="24 1.5 5" width="4" height="3" depth="0.1"
+            material-virtual="dimensao: 1" src="#praia" position="24 1.5 5" width="4" height="3" depth="0.1"
             abrir-modal="url: assets/images/praia.jpg">
           </a-box>
 
           <a-box 
             class="interactable"
-            material-virtual src="#skycloud" position="44 1.5 5" width="4" height="3" depth="0.1"
+            material-virtual="dimensao: 1" src="#skycloud" position="44 1.5 5" width="4" height="3" depth="0.1"
             abrir-modal="url: assets/images/skycloud.jpg">
           </a-box>
 
