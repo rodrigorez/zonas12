@@ -1,0 +1,538 @@
+{
+  "version": 1,
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "camera"
+    },
+    {
+      "id": 1,
+      "kind": "image",
+      "asset": "cidade-360",
+      "radius": 500
+    },
+    {
+      "id": 2,
+      "kind": "image",
+      "asset": "praia",
+      "radius": 500
+    },
+    {
+      "id": 3,
+      "kind": "image",
+      "asset": "skycloud",
+      "radius": 500
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 1,
+      "kind": "image",
+      "asset": "galeriaFoto1",
+      "position": [
+        -44,
+        1.5,
+        -55
+      ],
+      "rotation": [
+        0,
+        15,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal",
+      "url": "assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg"
+    },
+    {
+      "id": 1,
+      "dimension": 1,
+      "kind": "image",
+      "asset": "galeriaFoto2",
+      "position": [
+        -24,
+        1.5,
+        -55
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal",
+      "url": "assets/images/eiffel.jpg"
+    },
+    {
+      "id": 2,
+      "dimension": 1,
+      "kind": "video",
+      "asset": "video",
+      "position": [
+        4,
+        1.5,
+        -55
+      ],
+      "rotation": [
+        0,
+        -15,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal",
+      "url": "assets/images/compequicolor1024vr.mp4"
+    },
+    {
+      "id": 3,
+      "dimension": 1,
+      "kind": "image",
+      "asset": "praia",
+      "position": [
+        24,
+        1.5,
+        -55
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal",
+      "url": "assets/images/praia.jpg"
+    },
+    {
+      "id": 4,
+      "dimension": 1,
+      "kind": "image",
+      "asset": "skycloud",
+      "position": [
+        44,
+        1.5,
+        -55
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal",
+      "url": "assets/images/skycloud.jpg"
+    },
+    {
+      "id": 5,
+      "dimension": 2,
+      "kind": "image",
+      "asset": "skycloud",
+      "position": [
+        -20,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal",
+      "url": "assets/images/skycloud.jpg"
+    },
+    {
+      "id": 6,
+      "dimension": 2,
+      "kind": "image",
+      "asset": "galeriaFoto2",
+      "position": [
+        0,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal",
+      "url": "assets/images/eiffel.jpg"
+    },
+    {
+      "id": 7,
+      "dimension": 2,
+      "kind": "image",
+      "asset": "galeriaFoto1",
+      "position": [
+        20,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal",
+      "url": "assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg"
+    },
+    {
+      "id": 8,
+      "dimension": 3,
+      "kind": "image",
+      "asset": "praia",
+      "position": [
+        -15,
+        1.5,
+        -110
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal",
+      "url": "assets/images/praia.jpg"
+    },
+    {
+      "id": 9,
+      "dimension": 3,
+      "kind": "image",
+      "asset": "cidade-360",
+      "position": [
+        15,
+        1.5,
+        -110
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal",
+      "url": "assets/images/forest.jpg"
+    }
+  ],
+  "portals": [
+    {
+      "id": 0,
+      "dimensionA": 0,
+      "dimensionB": 1,
+      "ownedBy": 0,
+      "position": [
+        -6,
+        0,
+        -8
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      }
+    },
+    {
+      "id": 1,
+      "dimensionA": 0,
+      "dimensionB": 2,
+      "ownedBy": 0,
+      "position": [
+        6,
+        0,
+        -8
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      }
+    },
+    {
+      "id": 2,
+      "dimensionA": 1,
+      "dimensionB": 0,
+      "ownedBy": 1,
+      "position": [
+        -25,
+        0,
+        -45
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      }
+    },
+    {
+      "id": 3,
+      "dimensionA": 1,
+      "dimensionB": 2,
+      "ownedBy": 1,
+      "position": [
+        25,
+        0,
+        -45
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      }
+    },
+    {
+      "id": 4,
+      "dimensionA": 2,
+      "dimensionB": 1,
+      "ownedBy": 2,
+      "position": [
+        -25,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      }
+    },
+    {
+      "id": 5,
+      "dimensionA": 2,
+      "dimensionB": 1,
+      "ownedBy": 2,
+      "position": [
+        25,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      }
+    },
+    {
+      "id": 6,
+      "dimensionA": 2,
+      "dimensionB": 3,
+      "ownedBy": 2,
+      "position": [
+        0,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      }
+    },
+    {
+      "id": 7,
+      "dimensionA": 3,
+      "dimensionB": 2,
+      "ownedBy": 3,
+      "position": [
+        0,
+        0,
+        -120
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      }
+    }
+  ]
+}

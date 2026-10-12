@@ -1,0 +1,11 @@
+{
+  "language": "pt",
+  "name": "Português",
+  "strings": {
+    "app.title": "Portal AR – Galeria Imersiva com Controlos Mobile",
+    "app.loading": "Carregando...",
+    "app.start": "ATIVAR EXPOSIÇÃO",
+    "artwork.back": "Voltar para a Galeria",
+    "camera.error": "Não foi possível acessar a câmera. Por favor, verifique as permissões."
+  }
+}

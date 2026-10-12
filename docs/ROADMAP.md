@@ -100,7 +100,7 @@ trazido de onde existe (não está nesta máquina, ao que foi possível verifica
 `import` é o que torna as dependências visíveis e impossíveis de contornar.
 
 **A D2 já pagou o custo do 1A.** Com o JSON decidido (D2), o `index.html` passa a fazer
-`fetch('data/cena.json')`, e o `fetch` **já não funciona por `file://`**. Ou seja: a
+`fetch('data/scene.json')`, e o `fetch` **já não funciona por `file://`**. Ou seja: a
 exposição passa a exigir HTTP de qualquer maneira, e o único senão do 1A deixa de existir.
 Sobra o ganho (dependências explícitas) sem custo adicional.
 
@@ -116,9 +116,9 @@ build no projeto agora é peso sem retorno imediato.
 
 | Opção | Como funciona | Ganhos | Perdas / consequências |
 | --- | --- | --- | --- |
-| **2A. JSON no projeto + importar/exportar** (recomendada para a 1.ª fase) | `data/cena.json` é a verdade; o editor carrega, edita em memória e **descarrega** o ficheiro; o `index.html` lê o JSON | Site continua **100% estático**; funciona no GitHub Pages; o ficheiro está versionado (dá para ver o diff de uma alteração e reverter) | Gravar exige **substituir o ficheiro à mão** (fricção em cada alteração); o editor não "grava sozinho" |
+| **2A. JSON no projeto + importar/exportar** (recomendada para a 1.ª fase) | `data/scene.json` é a verdade; o editor carrega, edita em memória e **descarrega** o ficheiro; o `index.html` lê o JSON | Site continua **100% estático**; funciona no GitHub Pages; o ficheiro está versionado (dá para ver o diff de uma alteração e reverter) | Gravar exige **substituir o ficheiro à mão** (fricção em cada alteração); o editor não "grava sozinho" |
 | 2B. `localStorage` | O editor grava no browser; a app lê de lá | CRUD imediato, zero servidor, zero ficheiros | O dado **fica preso a um browser** (não viaja, não versiona); testar no telemóvel vê outra cena; limpar dados do browser apaga a exposição |
-| 2C. Servidor local com escrita | Pequeno servidor (`node`/`python`) expõe `GET/POST/PUT/DELETE` e escreve `data/cena.json` no disco | CRUD real com "Gravar", sem passos manuais; continua a poder ser estático no que se publica (o servidor só serve o editor) | Mais um processo para arrancar; um servidor **a escrever no repositório** é risco (acidentes apagam a cena) → exige cópias de segurança e um endpoint de "exportar" |
+| 2C. Servidor local com escrita | Pequeno servidor (`node`/`python`) expõe `GET/POST/PUT/DELETE` e escreve `data/scene.json` no disco | CRUD real com "Gravar", sem passos manuais; continua a poder ser estático no que se publica (o servidor só serve o editor) | Mais um processo para arrancar; um servidor **a escrever no repositório** é risco (acidentes apagam a cena) → exige cópias de segurança e um endpoint de "exportar" |
 | 2D. Base de dados | SQLite/Postgres atrás de uma API | Muitos utilizadores, histórico, consultas | Incompatível com o estado atual (site estático); peso enorme para uma exposição |
 
 **Recomendação: 2A agora, 2C depois** se a fricção de gravar incomodar. A razão é
@@ -323,10 +323,9 @@ zonas12/
 └── .harness/                fora do repositório (está no .gitignore)
 ```
 
-Nota de nomenclatura: as pastas de **código** são em inglês (D10); os **dados** ficam com o
-nome que já existe (`data/cena.json`) porque são conteúdo. Passar a `data/scene.json` é uma
-decisão pequena a tomar na Fase 0 — depois obriga a mexer em 3 sítios (JSON, `app.js`,
-conversor).
+Nota de nomenclatura: as pastas de **código** são em inglês (D10), e os ficheiros de dados
+também: `data/scene.json` é a exposição e `data/scene-example.json` é a cena de exemplo
+(decisão D13).
 
 ### 5.7 Idiomas: código, interface e documentação
 
@@ -500,16 +499,18 @@ O editor deve impedi-las **antes** de exportar.
 Cada fase tem um critério de verificação **medido no browser**, como temos feito.
 
 ### Fase 0 — Congelar o contrato *(sem código de produção)*
+
+**Estado: concluída em 2026-10-12.** O que ficou feito está em §13.
 - **Entregável:**
   1. Este ROADMAP com as decisões fechadas (§11), o **glossário PT→EN** oficial (§5.7) e as
      **regras da interface traduzível** aceites.
   2. A lista de testes de regressão (§10) aceite como critério de aceitação.
   3. `i18n/pt.json` com as chaves que já existem (o "Carregando...", o "ATIVAR EXPOSIÇÃO", as
      mensagens de erro da câmara) — o catálogo nasce aqui, não na Fase 4.
-  4. `data/cena-exemplo.json` — a cena atual **convertida para JSON** (feita por script que lê
+  4. `data/scene-example.json` — a cena atual **convertida para JSON** (feita por script que lê
      o `index.html`, não à mão), com o esquema acordado, incluindo o formato do texto de
      conteúdo por língua.
-  5. Uma cópia da cena atual em `data/cena.json` (a exposição).
+  5. Uma cópia da cena atual em `data/scene.json` (a exposição).
 - **Verificação:** os testes de regressão passam **antes** de mexer (linha de base); e o JSON
   convertido, ao ser reaplicado, dá os mesmos valores que o HTML (comparar campo a campo).
 - **Porquê agora:** o JSON é o contrato de que tudo o resto depende (núcleo, módulos,
@@ -539,7 +540,7 @@ Cada fase tem um critério de verificação **medido no browser**, como temos fe
 ### Fase 3 — A cena vem de dados
 - **Entregável:** `js/scene/scene-builder.js` + `schema.js` + `validation.js`; o
   `index.html` passa a ter `<a-scene>` sem entidades e a cena é construída de
-  `data/cena.json` (com `data/cena-exemplo.json` como fixture/testes).
+  `data/scene.json` (com `data/scene-example.json` como fixture/testes).
 - **Verificação:** a cena de exemplo comporta-se **igual** à de hoje (T1–T8 sobre o exemplo);
   a conversão campo a campo do JSON confere com os valores que o HTML tinha.
 - **Risco:** perder um atributo na conversão. Mitigação: o script da Fase 0 é a fonte da
@@ -557,7 +558,7 @@ Cada fase tem um critério de verificação **medido no browser**, como temos fe
 - **Risco:** o editor e a exposição divergirem. Mitigação: o editor usa os **mesmos** módulos.
 
 ### Fase 5 — Gravação direta *(só se a fricção de 2A incomodar)*
-- **Entregável:** servidor local mínimo que lê/grava `data/cena.json`, **fora** do que se
+- **Entregável:** servidor local mínimo que lê/grava `data/scene.json`, **fora** do que se
   publica; endpoint de exportar; cópia de segurança antes de gravar.
 - **Verificação:** editar, gravar, recarregar a exposição e ver a alteração.
 
@@ -584,6 +585,23 @@ Estes já foram medidos manualmente; passam a ser o critério de aceitação de 
 | T8 | Consola | sem erros nem avisos |
 | T9 *(novo)* | Criar/destruir portais em ciclo | 1 listener de teclado, registos limpos |
 
+### Linha de base medida (2026-10-12, Fase 0)
+
+Medido com a cena a correr, **antes** de mexer em qualquer código. É o valor a que cada
+fase se compara.
+
+| # | Teste | Linha de base |
+| --- | --- | --- |
+| T1 | Travessias dos 8 portais | 8/8 corretas |
+| T2 | Bordo da moldura cortado | 0 poses em 69 testadas |
+| T3 | Contorno da moldura fecha | 0 falhas em 956 amostras |
+| T4 | Janela no hub (portal 0) | fora transparente `0,0,0,0`; centro `157,165,159,255` |
+| T5 | Portal de trás atrás de um da frente | moldura de trás 27060 px, **0** dentro da janela da frente |
+| T6 | Clique na obra | abre na dimensão ativa; não abre noutra |
+| T7 | Chegada aos portais | 1 troca por travessia (sem ping-pong) |
+| T8 | Consola | 0 erros, 0 avisos, 0 pedidos falhados |
+| — | Conversão HTML→JSON (validação campo a campo) | **161 campos** comparados, **0 diferenças** |
+
 ---
 
 ## 11. Decisões
@@ -594,7 +612,7 @@ Estes já foram medidos manualmente; passam a ser o critério de aceitação de 
 | # | Decisão | Estado | Escolha |
 | --- | --- | --- | --- |
 | D1 | Formato dos módulos | **FECHADA** (2026-10-12) | **ES Modules nativos com `import`/`export`, sem build.** Custo aceite: passar a servir por HTTP (já obrigatório pela D2) |
-| D2 | Onde vive o dado do editor | **FECHADA** (2026-10-12) | **JSON no projeto (`data/cena.json`) + botões Importar/Exportar.** Site 100% estático, o ficheiro fica versionado. Consequência aceite: gravar exige substituir o ficheiro à mão |
+| D2 | Onde vive o dado do editor | **FECHADA** (2026-10-12) | **JSON no projeto (`data/scene.json`) + botões Importar/Exportar.** Site 100% estático, o ficheiro fica versionado. Consequência aceite: gravar exige substituir o ficheiro à mão |
 | D3 | Como o editor vê a cena | **FECHADA** (2026-10-12) | **Formulários/tabelas por módulo + pré-visualização da cena ao lado.** Sem manipuladores 3D |
 | D4 | Estrutura da segunda página | **FECHADA** (2026-10-12) | **`editor.html` separado**, a importar o núcleo e os 4 módulos. A exposição (`index.html`) não leva código de edição |
 | D5 | O que é o módulo da câmara | **FECHADA** (2026-10-12) | **As duas**: câmara-jogador (posição, movimento, controles) e câmara-real (webcam/AR), em secções separadas do mesmo módulo |
@@ -604,7 +622,8 @@ Estes já foram medidos manualmente; passam a ser o critério de aceitação de 
 | D9 | A cena atual é conteúdo real ou demo | **FECHADA** (2026-10-12) | **É demonstração, mas fica no repositório como cena de exemplo** (serve de teste e de montra) |
 | D10 | Idioma do código | **FECHADA** (2026-10-12) | **Inglês no código** (identificadores, comentários, mensagens de consola, chaves do JSON); **português na documentação e nos textos da interface** |
 | D11 | Arquitetura de render | **FECHADA** (2026-10-12) | **Manter o stencil partilhado e o núcleo.** Não migrar para *render-to-texture* por portal (ver §5.0) |
-| D12 | Idiomas | **FECHADA** (2026-10-12) | **Código em inglês, documentação em português, interface preparada para vários idiomas** (catálogo em `i18n/`, português como língua de origem). Variante da D12 a confirmar: recomendada a **A** (catálogo para a interface + campos por idioma nos dados), língua escolhida por `?lang=` |
+| D12 | Idiomas | **FECHADA** (2026-10-12) | **Código em inglês, documentação em português, interface preparada para vários idiomas** (catálogo em `i18n/`, português como língua de origem). Variante confirmada: **A** — catálogo para a interface + **campos por idioma nos dados**; língua escolhida por `?lang=`, com português por omissão |
+| D13 | Nome dos ficheiros de dados | **FECHADA** (2026-10-12) | **`data/scene.json`** (a exposição) e **`data/scene-example.json`** (a cena de exemplo/fixture) — inglês, coerente com a D10 |
 
 ### Efeitos da D7 na execução
 
@@ -719,7 +738,7 @@ alteram comportamento.
 | Não renomear o que existe | Zero risco imediato | Fica misto **para sempre** (a pior opção a longo prazo, e contradiz a decisão) |
 
 **Consequências a não esquecer:**
-- As **chaves do JSON mudam para inglês** (§6 já refletido), o que altera o `data/cena.json`.
+- As **chaves do JSON mudam para inglês** (§6 já refletido), o que altera o `data/scene.json`.
 - Os **atributos no HTML** mudam (`dimensaoA` → `dimensionA`, `caixa` → `box`, …) e com eles
   a cena de exemplo — a migração da Fase 3 tem de os converter.
 - As **mensagens de consola** passam a inglês (`[portal] Active dimension: 2`) — afeta os
@@ -734,12 +753,12 @@ alteram comportamento.
 
   | Ficheiro | Papel | Quem o lê |
   | --- | --- | --- |
-  | `data/cena-exemplo.json` | **Fixture**: a cena atual (4 dimensões, 8 portais, 10 obras). É a referência dos testes (§10) e a montra | testes de regressão; botão "carregar exemplo" no editor |
-  | `data/cena.json` | A cena da exposição (começa como cópia fiel do exemplo) | `index.html` |
+  | `data/scene-example.json` | **Fixture**: a cena atual (4 dimensões, 8 portais, 10 obras). É a referência dos testes (§10) e a montra | testes de regressão; botão "carregar exemplo" no editor |
+  | `data/scene.json` | A cena da exposição (começa como cópia fiel do exemplo) | `index.html` |
 
 - Ganho: pode-se substituir ou limpar a cena real sem perder a referência que os testes
   precisam. **Perda a vigiar:** os dois podem divergir — mitigação: um teste que valida o
-  exemplo (T1–T8 correm sobre `cena-exemplo.json`).
+  exemplo (T1–T8 correm sobre `scene-example.json`).
 - A migração (Fase 3) continua a ter de ser **fiel**: os T1–T8 só valem se a cena de exemplo
   se comportar exatamente como hoje (8/8 travessias, 0 cortes de bordo, etc.).
 - Isto dá conteúdo concreto à Fase 6: os testes correm contra a fixture, não contra a cena
@@ -806,14 +825,14 @@ alteram comportamento.
 
 ### Efeitos da D2 na execução
 
-- O editor **nunca escreve em disco**: carrega `data/cena.json` (via `fetch`) e descarrega o
+- O editor **nunca escreve em disco**: carrega `data/scene.json` (via `fetch`) e descarrega o
   resultado por *download*; a pessoa substitui o ficheiro e faz `commit`.
 - Como não há escrita, **a Fase 5 (servidor) sai do caminho crítico** e passa a ser apenas
   uma comodidade futura, se a fricção incomodar.
 - Passa a haver um requisito de *ferramenta*: ao gravar, os **diffs do JSON** são a prova de
   cada alteração — por isso o JSON tem de ser estável e legível (chaves ordenadas, indentação
   de 2 espaços, sem campos vazios), senão cada gravação gera ruído no `git diff`.
-- O `index.html` passa a depender de `fetch('data/cena.json')` → **obriga a servir por HTTP**
+- O `index.html` passa a depender de `fetch('data/scene.json')` → **obriga a servir por HTTP**
   (reforça a D1: o custo do `file://` já existe de qualquer forma).
 - O editor tem de ter, além de CRUD: **"Exportar"**, **"Importar"** e **"Validar"**
   (as leis da §8). Sem validação, exportar torna-se a forma mais fácil de estragar a cena.
@@ -848,27 +867,39 @@ alteram comportamento.
 | D10 | Idioma | Código em inglês; documentação e interface em português |
 | D11 | Arquitetura de render | Stencil partilhado + núcleo (sem *render-to-texture*) |
 | D12 | Idiomas | Código em inglês, docs em português, interface traduzível (catálogo `i18n/`, PT como origem) |
+| D13 | Ficheiros de dados | `data/scene.json` + `data/scene-example.json` |
 
 **Roadmap aprovado em 2026-10-12.**
 
 ### O que fica decidido, em uma frase
 
 O código passa a **ES Modules em inglês** (núcleo + 4 módulos), a cena passa a viver em
-**`data/cena.json`** (com uma cena de exemplo versionada para testes), os assets organizam-se
+**`data/scene.json`** (com uma cena de exemplo versionada para testes), os assets organizam-se
 por tipo com prefixo de dimensão organizativo, e o **`editor.html`** é uma ferramenta
 separada, de formulários, que usa os mesmos módulos e exporta o JSON — sem nada a escrever em
 disco.
 
-### Próximo passo (Fase 0, ainda sem código de produção)
+### Fase 0 — concluída em 2026-10-12
 
-1. **Glossário PT→EN** (§5.7) e as 6 regras da interface traduzível — aceitar.
-2. Aceitar a lista de **testes de regressão** (§10) como critério de aceitação de cada fase.
-3. **Variante da D12**: confirmar a **A** (catálogo para a interface + campos por idioma nos
-   dados) e `?lang=` para escolher a língua.
-4. Nome do ficheiro de dados: `data/scene.json` ou `data/cena.json`.
-5. `i18n/pt.json` com as chaves que já existem na interface.
-6. Escrever o **conversor** `tools/html-to-scene-json/` (lê o `index.html`, escreve o JSON) e
-   gerar a cena de exemplo.
-7. Validar o JSON convertido contra o HTML, **campo a campo**, com a cena a funcionar como hoje.
+| # | Item | Estado |
+| --- | --- | --- |
+| 1 | Glossário PT→EN (§5.7) e as 6 regras da interface traduzível | ✅ |
+| 2 | Testes de regressão (§10) aceites como critério de aceitação | ✅ |
+| 3 | Variante da D12 confirmada (**A**) e `?lang=` para a língua | ✅ |
+| 4 | Nome dos ficheiros de dados decidido (D13) | ✅ |
+| 5 | `i18n/pt.json` com as 6 chaves que já existem na interface | ✅ |
+| 6 | Conversor `tools/html-to-scene-json/convert.mjs` | ✅ |
+| 7 | Validador `tools/html-to-scene-json/validate.mjs` (contagens, integridade, L1, L4, L5) | ✅ |
+| 8 | `data/scene.json` + `data/scene-example.json` gerados | ✅ |
+| 9 | Linha de base medida e registada (§10) | ✅ |
 
-Só depois disto começa a Fase 1 (núcleo).
+Ficou também corrigida, nesta fase, uma regressão da limpeza da raiz: o `<link rel="icon">`
+apontava para um ficheiro que saiu da raiz e o browser passou a pedir `/favicon.ico` (404 na
+consola). Passou a `<link rel="icon" href="data:,">`, que não pede nada — a console voltou a
+0 erros (T8).
+
+### Próximo passo: Fase 1 (o núcleo)
+
+Mover as ≈120 linhas globais para `js/core/` com `import`/`export`, **renomeando ao mover**
+(glossário §5.7) e sem alterar comportamento: no fim, a linha de base de §10 tem de dar
+exatamente os mesmos números.
