@@ -130,10 +130,8 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.portalGroup = new THREE.Group();
     el.setObject3D('portal-mesh', this.portalGroup);
 
-    // Estados para controle de detecção
+    // Estados para controle de detecção limpo
     this.isInsidePortal = false; // Estado atual da câmera em relação ao portal
-    this.lastState = false; // Último estado registrado para evitar repetições
-    this.lastDebugLog = 0; // Tempo do último log de debug
     
     // Criar o lado frontal do portal (dimensão)
     let frontGroup = new THREE.Group();
@@ -255,7 +253,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.debugBox.renderOrder = 10; // Renderizar por cima de outros elementos
     this.portalGroup.add(this.debugBox);
   },
-  tick: function(time) {
+  tick: function() {
       let cam = document.querySelector('a-camera');
       if (!cam || !this.sphereMat) return;
       
@@ -263,10 +261,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       let camPos = cam.object3D.position;
       let portalPos = this.el.object3D.position;
       
-      // Dimensões do portal (voltando para 1 unidade de profundidade)
+      // Dimensões do portal
       let portalWidth = this.data.width || 12.0;
       let portalHeight = this.data.height || 16.0;
-      let portalDepth = 1.0; // Profundidade realista (1 metro)
+      let portalDepth = 1.0; // Profundidade do portal
       
       // Calcular limites da bounding box 3D do portal
       let portalLeft = portalPos.x - (portalWidth / 2);
@@ -277,43 +275,25 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       let portalBack = portalPos.z + (portalDepth / 2);
       
       // Verificar colisão 3D entre câmera e bounding box do portal
-      // A câmera é tratada como um ponto para simplificação
-      let isCameraInPortalBounds = (
+      let isInsidePortal = (
           camPos.x >= portalLeft && camPos.x <= portalRight &&
           camPos.y >= portalBottom && camPos.y <= portalTop &&
           camPos.z >= portalFront && camPos.z <= portalBack
       );
       
-      // Atualizar estado apenas quando muda
-      let previousState = this.isInsidePortal;
-      this.isInsidePortal = isCameraInPortalBounds;
-      
-      // Console.log para debug (apenas quando debug está ativo e estado muda)
-      if (this.debugBox) {
-          let currentTime = time || Date.now();
-          // Limitar logs a uma vez a cada 100ms para evitar spam
-          if (currentTime - this.lastDebugLog > 100) {
-              console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
-              console.log(`Portal bounds: X[${portalLeft.toFixed(2)}, ${portalRight.toFixed(2)}], Y[${portalBottom.toFixed(2)}, ${portalTop.toFixed(2)}], Z[${portalFront.toFixed(2)}, ${portalBack.toFixed(2)}]`);
-              console.log(`Inside portal: ${isCameraInPortalBounds}`);
-              this.lastDebugLog = currentTime;
-          }
+      // Atualizar estado apenas se mudou
+      if (isInsidePortal !== this.isInsidePortal) {
+          this.isInsidePortal = isInsidePortal;
           
-          // Mostrar apenas quando o estado muda
-          if (previousState !== this.isInsidePortal) {
-              console.log(`>>> STATE CHANGED: ${this.isInsidePortal ? 'ENTERED' : 'EXITED'} PORTAL <<<`);
+          // Debug logs apenas quando o estado muda
+          if (this.debugBox) {
+              console.log(`>>> ${this.isInsidePortal ? 'ENTERED' : 'EXITED'} PORTAL <<<`);
+              console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
           }
       }
       
       // Determinar a função stencil com base no estado atual
-      let func;
-      if (this.isInsidePortal) {
-          // Se a câmera está dentro do portal, mostrar a dimensão do portal
-          func = THREE.EqualStencilFunc;
-      } else {
-          // Se a câmera não está dentro do portal, mostrar a câmera real
-          func = THREE.NotEqualStencilFunc;
-      }
+      let func = this.isInsidePortal ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
       
       this.sphereMat.stencilFunc = func;
       
