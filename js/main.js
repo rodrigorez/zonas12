@@ -94,10 +94,11 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.portalGroup = new THREE.Group();
     el.setObject3D('portal-mesh', this.portalGroup);
 
-    // Sistema de estados como interruptor (true = dimensão do portal, false = câmera)
+    // Sistema de estados para travessia do portal
     this.showingPortalDimension = false; // Estado atual da dimensão sendo mostrada
     this.wasInsidePortal = false; // Para detectar transições de entrada/saída
     this.portalTransitionCooldown = 0; // Cooldown para evitar transições rápidas
+    this.isCompletingTraversal = false; // Flag para indicar se está completando uma travessia
     
     // Criar o lado frontal do portal (dimensão)
     let frontGroup = new THREE.Group();
@@ -253,28 +254,31 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
           console.log(`Inside Portal: ${isCurrentlyInsidePortal} | Was Inside: ${this.wasInsidePortal} | Cooldown: ${this.portalTransitionCooldown.toFixed(0)}`);
       }
       
-      // Detectar transição de entrada no portal (apenas quando entra E não está em cooldown)
-      if (isCurrentlyInsidePortal && !this.wasInsidePortal && this.portalTransitionCooldown <= 0) {
-          // Alternar estado da dimensão (interruptor)
+      // Sistema de travessia: detectar quando o usuário completa uma travessia do portal
+      // Entrada no portal (frente para trás)
+      if (isCurrentlyInsidePortal && !this.wasInsidePortal && !this.isCompletingTraversal) {
+          console.log(`>>> STARTING TRAVERSAL FORWARD >>>`);
+          this.isCompletingTraversal = true;
+      }
+      
+      // Saída do portal (trás para frente) durante travessia
+      if (!isCurrentlyInsidePortal && this.wasInsidePortal && this.isCompletingTraversal) {
+          console.log(`>>> COMPLETING TRAVERSAL BACKWARD <<<`);
+          // Completar a travessia - alternar dimensão
           this.showingPortalDimension = !this.showingPortalDimension;
+          this.isCompletingTraversal = false;
           this.portalTransitionCooldown = 500; // 500ms cooldown
           
           // Debug logs
           if (this.debugBox) {
-              console.log(`>>> PORTAL TRANSITION: ${this.showingPortalDimension ? 'SHOWING PORTAL DIMENSION' : 'SHOWING CAMERA DIMENSION'} <<<`);
-              console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
+              console.log(`>>> PORTAL DIMENSION TOGGLED: ${this.showingPortalDimension ? 'SHOWING PORTAL DIMENSION' : 'SHOWING CAMERA DIMENSION'} <<<`);
           }
       }
       
-      // Durante o cooldown, manter o estado de "dentro do portal" mesmo que a detecção mude
-      // Isso previne flickering quando a câmera oscila na borda do portal
-      let effectiveInsidePortal = isCurrentlyInsidePortal;
-      if (this.portalTransitionCooldown > 0 && this.wasInsidePortal) {
-          effectiveInsidePortal = true;
-          // Mostrar apenas quando há mudança real para evitar spam
-          if (isCurrentlyInsidePortal !== this.wasInsidePortal) {
-              console.log(`!!! Maintaining inside state during cooldown !!!`);
-          }
+      // Resetar travessia se usuário sair do portal sem completar
+      if (!isCurrentlyInsidePortal && !this.wasInsidePortal && this.isCompletingTraversal) {
+          console.log(`>>> TRAVERSAL RESET <<<`);
+          this.isCompletingTraversal = false;
       }
       
       // Atualizar estado anterior
