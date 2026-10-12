@@ -1,9 +1,12 @@
 # Roadmap — Módulos de construção e página de edição
 
-> **Estado: PROPOSTA.** As decisões já fechadas estão registadas na secção
-> [11](#11-decisões) com data. As que continuam em aberto estão identificadas como tal.
-> Nada foi implementado: nenhum ficheiro de código foi criado ou alterado por este plano.
-> Este documento é o guia de desenvolvimento; o `README.md` descreve o que **já** existe.
+> **Estado: APROVADO em 2026-10-12.** As decisões estruturais estão fechadas e registadas na
+> secção [11](#11-decisões) com data. Nada de código foi implementado: este documento é o
+> guia de desenvolvimento, e o `README.md` descreve o que **já** existe.
+>
+> **Como usar:** escolher a fase seguinte na secção [9](#9-fases-de-execução), executá-la, e
+> só a dar como fechada quando o **critério de verificação** dela passar. Uma fase de cada
+> vez; cada decisão nova entra na secção 11 com data.
 
 ---
 
@@ -89,8 +92,8 @@ trazido de onde existe (não está nesta máquina, ao que foi possível verifica
 
 | Opção | Como funciona | Ganhos | Perdas / consequências |
 | --- | --- | --- | --- |
-| **1A. ES Modules nativos** (recomendada) | `js/nucleo/*.js` e `js/modulos/*.js` com `import`/`export`; `<script type="module">` | Dependências explícitas (é o ponto do pedido); sem globais; o browser já sabe; zero build | **Abrir o `index.html` com duplo clique (file://) deixa de funcionar** (CORS): passa a ser obrigatório servir por HTTP — é o que já fazemos em todos os testes |
-| 1B. Scripts + namespace | `js/modulos/portal.js` define `window.PortalAR.Portal = {...}`; `<script>` na ordem | Continua a funcionar por `file://`; zero build | Ordem dos `<script>` passa a ser contrato implícito; sem análise estática; é o estado atual com outro nome |
+| **1A. ES Modules nativos** (recomendada) | `js/core/*.js` e `js/modules/*.js` com `import`/`export`; `<script type="module">` | Dependências explícitas (é o ponto do pedido); sem globais; o browser já sabe; zero build | **Abrir o `index.html` com duplo clique (file://) deixa de funcionar** (CORS): passa a ser obrigatório servir por HTTP — é o que já fazemos em todos os testes |
+| 1B. Scripts + namespace | `js/modules/portal.js` define `window.PortalAR.Portal = {...}`; `<script>` na ordem | Continua a funcionar por `file://`; zero build | Ordem dos `<script>` passa a ser contrato implícito; sem análise estática; é o estado atual com outro nome |
 | 1C. Bundler + TypeScript | `esbuild`/`vite` a partir de `src/`, gera um `dist/app.js` único | Tipos (contratos verificados em tempo de compilação); **o bundle único volta a funcionar por `file://`**; um só ficheiro a publicar | Dependências npm e passo de build **de volta à raiz** (contradiz a limpeza que fizemos); mais uma coisa para instalar/atualizar |
 
 **Recomendação: 1A.** O objetivo declarado é escalar com módulos independentes — e o
@@ -171,7 +174,73 @@ ponto de vista de quem usa o editor.
 Nomes e campos são **proposta** (a rever na Fase 0). Pela decisão D10, os identificadores
 estão em **inglês**; a documentação e os textos da interface ficam em português.
 
-### 5.1 Núcleo (`js/nucleo/`)
+### 5.0 Porquê um núcleo (e o que ele não é)
+
+Medido no código de hoje: **≈120 linhas das 586 (≈20%) já são um núcleo** — só não têm nome
+nem fronteira. A Fase 1 não cria nada de novo: **move, nomeia e fecha**.
+
+| O que | Onde está hoje | Linhas |
+| --- | --- | --- |
+| Limites (512 / 512 / 255) | `js/main.js:13-15` | 3 |
+| Estado partilhado (`window.portalAR`) | `js/main.js:17-31` | 15 |
+| `registarNaDimensao()` | `js/main.js:39-65` | 27 |
+| `definirEstencil()` | `js/main.js:66-90` | 25 |
+| `aplicarEstadoEstencil()` | `js/main.js:91-125` | 35 |
+| `definirDimensaoAtiva()` | `js/main.js:127-138` | 12 |
+| Atribuição de valores do `gestor-dimensoes` | `js/main.js:145-168` | ~20 |
+
+Os restantes **~80%** são os 4 módulos — e esses passam a ser independentes **uns dos
+outros** (não de todos).
+
+#### As três razões (com provas deste projeto)
+
+1. **O stencil é global por natureza.** `aplicarEstadoEstencil()` tem de percorrer todas as
+   dimensões para distribuir valores. Um portal isolado não sabe que valor escrever sem saber
+   quem mais está a ser mostrado. Não é escolha de arquitetura: é o que o buffer de 8 bits
+   obriga.
+2. **A dimensão ativa tem de ter uma só verdade.** O bug original do flicker nasceu de
+   **duas** fontes de verdade: a máscara trocava no plano do quadro e um booleano trocava na
+   borda da caixa — 0,10 m com a dimensão errada. Duas fontes, o bug outra vez.
+3. **A ordem de desenho é uma decisão única.** máscara (1) → panorama (2 / **2.5** nas
+   janelas) → obras (3) → moldura (4). Se cada módulo escolhesse o seu `renderOrder`, voltava
+   o bordo da moldura cortado (110 poses de 360, medido).
+
+#### Direção das dependências
+
+```
+        index.html            editor.html
+             │                    │
+   ┌─────────┴────────┬───────────┴─────────┐
+dimensão            obra                portal          câmara
+   └─────────┬────────┴─────────┬─────────┘
+             │   todos dependem de
+          NÚCLEO  ────────────────► não depende de nenhum módulo
+```
+
+#### O que o núcleo nunca faz (é isto que o mantém pequeno)
+
+- criar objetos 3D (é dos módulos)
+- ler JSON (é do construtor de cena)
+- conhecer o DOM do editor
+- ler o teclado
+- falar com o `document` (nem `querySelector('a-camera')`)
+
+Ganho de escala: um módulo novo (um 5.º tipo de conteúdo) entra sem tocar nos outros quatro —
+regista-se no núcleo e pronto.
+
+#### A alternativa sem núcleo, e porque não a escolhemos
+
+Existe arquitetura sem stencil partilhado: cada portal desenha a sua dimensão para uma textura
+própria (*render-to-texture*) e aplica-a no quadro.
+
+| | Ganhos | Custos |
+| --- | --- | --- |
+| *Render-to-texture* por portal | Portais independentes no render; desaparece o acoplamento da ordem das máscaras | **N portais a mostrar a mesma dimensão = N desenhos** (hoje os portais 4 e 5 partilham um valor e um desenho); portal dentro de portal exige render recursivo; **continua a precisar de um registo partilhado** (o núcleo ficaria menor, não desaparecia); deita fora o modelo medido esta semana |
+
+**Decisão (D11): manter o stencil partilhado e o núcleo.** Trocávamos ~120 linhas que existem
+e funcionam por um render mais caro e mais arriscado — e no fim continuaria a haver núcleo.
+
+### 5.1 Núcleo (`js/core/`)
 
 O único sítio que conhece a cena toda.
 
@@ -228,6 +297,35 @@ O único sítio que conhece a cena toda.
 - **API:** `position()`, `setPosition(p)`, `enable()`, `disable()`.
 - **Ganho imediato:** resolve A5 — deixa de haver `document.querySelector('a-camera')`
   espalhado por 3 sítios.
+
+### 5.6 Estrutura-alvo do repositório
+
+Resultado das decisões D1 (ES Modules), D4 (`editor.html`), D6 (`docs/` + `tools/`), D7
+(assets por tipo) e D10 (nomes em inglês):
+
+```text
+zonas12/
+├── index.html               exposição: só marcação + <script type="module" src="js/app.js">
+├── editor.html              ferramenta de edição
+├── README.md                documentação (o que existe hoje)
+├── docs/ROADMAP.md          plano e decisões (este ficheiro)
+├── css/{style.css, editor.css}
+├── js/
+│   ├── app.js               arranque da exposição
+│   ├── editor.js            arranque do editor
+│   ├── core/                estado, registos, stencil, ordem de desenho, eventos, limites
+│   ├── modules/             dimension.js, artwork.js, portal.js, camera.js
+│   └── scene/               scene-builder.js, schema.js, validation.js
+├── data/                    scene.json + scene-example.json
+├── assets/{panoramas,artworks,video}/
+├── tools/                   conversor HTML→JSON, processamento de assets
+└── .harness/                fora do repositório (está no .gitignore)
+```
+
+Nota de nomenclatura: as pastas de **código** são em inglês (D10); os **dados** ficam com o
+nome que já existe (`data/cena.json`) porque são conteúdo. Passar a `data/scene.json` é uma
+decisão pequena a tomar na Fase 0 — depois obriga a mexer em 3 sítios (JSON, `app.js`,
+conversor).
 
 ---
 
@@ -334,7 +432,7 @@ Cada fase tem um critério de verificação **medido no browser**, como temos fe
   conhecer `document.querySelector('a-camera')`.
 
 ### Fase 2 — Os 4 módulos
-- **Entregável:** `js/modulos/dimensao.js`, `obra.js`, `portal.js`, `camara.js`; `main.js`
+- **Entregável:** `js/modules/dimension.js`, `artwork.js`, `portal.js`, `camera.js`; `main.js`
   fica só com o arranque (`config-ar`).
 - **Correções incluídas:** A2/A3 (um único `keydown`), A4 (`remove` em todos os módulos),
   A5 (câmara centralizada), A7 (travessia no portal, valores no núcleo).
@@ -406,6 +504,7 @@ Estes já foram medidos manualmente; passam a ser o critério de aceitação de 
 | D8 | Skills do projeto vazias | **FECHADA** (2026-10-12) | **Deixar como está por agora** (não se mexe). Registado como dívida: as 89 pastas vazias ficam, e não se usa nenhuma skill do projeto |
 | D9 | A cena atual é conteúdo real ou demo | **FECHADA** (2026-10-12) | **É demonstração, mas fica no repositório como cena de exemplo** (serve de teste e de montra) |
 | D10 | Idioma do código | **FECHADA** (2026-10-12) | **Inglês no código** (identificadores, comentários, mensagens de consola, chaves do JSON); **português na documentação e nos textos da interface** |
+| D11 | Arquitetura de render | **FECHADA** (2026-10-12) | **Manter o stencil partilhado e o núcleo.** Não migrar para *render-to-texture* por portal (ver §5.0) |
 
 ### Efeitos da D7 na execução
 
@@ -556,7 +655,7 @@ alteram comportamento.
 
 ### Efeitos da D5 na execução
 
-- `js/modulos/camara.js` tem **duas partes com ciclos de vida independentes**:
+- `js/modules/camera.js` tem **duas partes com ciclos de vida independentes**:
   `camara-jogador` (estado desde o arranque) e `camara-real` (só liga quando o utilizador
   autoriza). Nenhuma pode depender da outra para funcionar.
 - Resolve o acoplamento A5: os 3 `querySelector('a-camera')` (`js/main.js:290`, `480`, `521`)
@@ -577,7 +676,7 @@ alteram comportamento.
   `js/editor.js` (editor). `index.html` e `editor.html` só têm a marcação e uma tag de
   script cada.
 - O código de edição **não pode** ser importado por `app.js` — regra verificável (basta
-  procurar imports de `js/editor/` dentro de `js/modulos/` e `js/nucleo/`).
+  procurar imports de `js/editor/` dentro de `js/modules/` e `js/core/`).
 - O `editor.html` não leva a UI de exposição (botão "ATIVAR EXPOSIÇÃO", D-pad, modal de
   obra): é uma ferramenta, não um modo de exibição.
 
@@ -653,6 +752,9 @@ alteram comportamento.
 | D8 | Skills vazias | Deixar como está (dívida registada) |
 | D9 | Cena atual | Demonstração, mantida como cena de exemplo |
 | D10 | Idioma | Código em inglês; documentação e interface em português |
+| D11 | Arquitetura de render | Stencil partilhado + núcleo (sem *render-to-texture*) |
+
+**Roadmap aprovado em 2026-10-12.**
 
 ### O que fica decidido, em uma frase
 
@@ -666,8 +768,9 @@ disco.
 
 1. Fixar o **glossário PT→EN** (§11/D10) — é o que impede três traduções para a mesma coisa.
 2. Aceitar a lista de **testes de regressão** (§10) como critério de aceitação de cada fase.
-3. Escrever o **conversor** `tools/html-to-scene-json/` (lê o `index.html`, escreve o JSON) e
-   gerar `data/cena-exemplo.json`.
-4. Validar o JSON convertido contra o HTML, **campo a campo**, com a cena a funcionar como hoje.
+3. Decidir o nome do ficheiro de dados: `data/cena.json` (como está) ou `data/scene.json`.
+4. Escrever o **conversor** `tools/html-to-scene-json/` (lê o `index.html`, escreve o JSON) e
+   gerar a cena de exemplo.
+5. Validar o JSON convertido contra o HTML, **campo a campo**, com a cena a funcionar como hoje.
 
 Só depois disto começa a Fase 1 (núcleo).
