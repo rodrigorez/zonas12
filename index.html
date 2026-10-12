@@ -63,13 +63,19 @@
         <a-entity panorama-dimensao="dimensao: 1; src: #cidade-360; raio: 100;"></a-entity>
         <a-entity panorama-dimensao="dimensao: 2; src: #praia; raio: 100;"></a-entity>
 
-        <!-- Portais do hub: ficam na realidade (pertenceA: 0) e levam às dimensões -->
+        <!-- Cada dimensão tem 2 portais: um para cada uma das outras duas (grafo completo) -->
+
+        <!-- Portais da dimensão 0 (realidade / hub) -->
         <a-entity position="-6 0 -8" portal-estencil-dinamico="portalId: 0; dimensaoA: 0; dimensaoB: 1; pertenceA: 0; width: 8; height: 10;"></a-entity>
         <a-entity position=" 6 0 -8" portal-estencil-dinamico="portalId: 1; dimensaoA: 0; dimensaoB: 2; pertenceA: 0; width: 8; height: 10;"></a-entity>
 
-        <!-- Portais de volta: um dentro de cada dimensão (pertenceA: 1 e 2) -->
-        <a-entity position="0 0 -45" portal-estencil-dinamico="portalId: 2; dimensaoA: 1; dimensaoB: 0; pertenceA: 1; width: 12; height: 16;"></a-entity>
-        <a-entity position="0 0 -45" portal-estencil-dinamico="portalId: 3; dimensaoA: 2; dimensaoB: 0; pertenceA: 2; width: 12; height: 16;"></a-entity>
+        <!-- Portais da dimensão 1 (cidade 360º) -->
+        <a-entity position="-25 0 -45" portal-estencil-dinamico="portalId: 2; dimensaoA: 1; dimensaoB: 0; pertenceA: 1; width: 10; height: 12;"></a-entity>
+        <a-entity position=" 25 0 -45" portal-estencil-dinamico="portalId: 3; dimensaoA: 1; dimensaoB: 2; pertenceA: 1; width: 10; height: 12;"></a-entity>
+
+        <!-- Portais da dimensão 2 (praia) -->
+        <a-entity position="-25 0 -80" portal-estencil-dinamico="portalId: 4; dimensaoA: 2; dimensaoB: 0; pertenceA: 2; width: 10; height: 12;"></a-entity>
+        <a-entity position=" 25 0 -80" portal-estencil-dinamico="portalId: 5; dimensaoA: 2; dimensaoB: 1; pertenceA: 2; width: 10; height: 12;"></a-entity>
 
         <!-- Obras da dimensão 1 (cidade 360º), em Z = -60 -->
         <a-entity position="0 0 -60">
@@ -106,8 +112,8 @@
 
         </a-entity>
 
-        <!-- Obras da dimensão 2 (praia), no mesmo sítio: cada dimensão tem o seu conteúdo -->
-        <a-entity position="0 0 -60">
+        <!-- Obras da dimensão 2 (praia), mais fundo: cada dimensão tem o seu conteúdo -->
+        <a-entity position="0 0 -95">
 
           <a-box 
             class="interactable"

@@ -127,19 +127,27 @@ Exemplo — uma central (0) com dois destinos, e conteúdo nas dimensões:
 
 #### Cena atual (`index.html`)
 
-O `index.html` já tem um hub com dois destinos, para servir de referência:
+O `index.html` monta um **grafo completo de 3 dimensões**: cada dimensão tem 2 portais, um
+para cada uma das outras duas.
 
-| O que | Onde |
-| --- | --- |
-| Dimensão 0 (realidade) | O hub: vê-se a câmara e os dois portais |
-| Dimensão 1 (cidade 360º) | `panorama-dimensao="dimensao: 1; src: #cidade-360"` + 5 obras |
-| Dimensão 2 (praia) | `panorama-dimensao="dimensao: 2; src: #praia"` + 3 obras |
-| Portais do hub | `portalId: 0` (0↔1) e `portalId: 1` (0↔2), ambos `pertenceA: 0`, em `x = -6` e `x = +6` |
-| Portais de volta | `portalId: 2` (1↔0) e `portalId: 3` (2↔0), `pertenceA: 1` e `pertenceA: 2`, em `z = -45` |
+| Dimensão | Conteúdo | Portais (id: liga para onde) |
+| --- | --- | --- |
+| **0** (realidade / hub) | Vê-se a câmara | `0 → 1`, `1 → 2` — em `x = ∓6`, `z = -8` |
+| **1** (cidade 360º) | `#cidade-360` + 5 obras | `2 → 0`, `3 → 2` — em `x = ∓25`, `z = -45` |
+| **2** (praia) | `#praia` + 3 obras | `4 → 0`, `5 → 1` — em `x = ∓25`, `z = -80` |
 
-No hub vês os dois quadros ao mesmo tempo (um para cada dimensão). Dentro de cada
-dimensão só aparece o portal de volta dessa dimensão, porque os portais do hub têm
-`pertenceA: 0`.
+Cada portal tem `pertenceA` igual à sua dimensão, por isso dentro de uma dimensão só se
+vêem os 2 portais dela. As travessias são todas bidirecionais (o mesmo portal serve de ida
+e de volta):
+
+```
+0 ⇄ 1 (portal 0)      0 ⇄ 2 (portal 1)
+1 ⇄ 0 (portal 2)      1 ⇄ 2 (portal 3)
+2 ⇄ 0 (portal 4)      2 ⇄ 1 (portal 5)
+```
+
+As posições foram escolhidas para que o ponto onde se chega (o portal atravessado) nunca
+caia dentro da caixa de outro portal — sem isso haveria trocas em cadeia ao chegar.
 
 #### Atributos do portal
 
