@@ -132,8 +132,8 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
 
     // Estados para controle de detecção
     this.isInsidePortal = false; // Estado atual da câmera em relação ao portal
-    this.lastDetectionTime = 0; // Tempo da última detecção válida
-    this.detectionCooldown = 500; // Tempo mínimo entre detecções (ms)
+    this.lastState = false; // Último estado registrado para evitar repetições
+    this.lastDebugLog = 0; // Tempo do último log de debug
     
     // Criar o lado frontal do portal (dimensão)
     let frontGroup = new THREE.Group();
@@ -236,10 +236,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       return;
     }
     
-    // Criar nova caixa de debug mais visível com profundidade aumentada
+    // Criar nova caixa de debug com profundidade realista
     let w = this.data.width || 12.0;
     let h = this.data.height || 16.0;
-    let portalDepth = 5.0; // Profundidade aumentada para testes (5 metros)
+    let portalDepth = 1.0; // Profundidade realista (1 metro)
     
     // Criar wireframe azul mais proeminente
     let debugBoxGeo = new THREE.BoxGeometry(w, h, portalDepth);
@@ -263,10 +263,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       let camPos = cam.object3D.position;
       let portalPos = this.el.object3D.position;
       
-      // Dimensões do portal (agora com profundidade maior para testes)
+      // Dimensões do portal (voltando para 1 unidade de profundidade)
       let portalWidth = this.data.width || 12.0;
       let portalHeight = this.data.height || 16.0;
-      let portalDepth = 5.0; // Profundidade maior para testes (5 metros)
+      let portalDepth = 1.0; // Profundidade realista (1 metro)
       
       // Calcular limites da bounding box 3D do portal
       let portalLeft = portalPos.x - (portalWidth / 2);
@@ -284,31 +284,24 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
           camPos.z >= portalFront && camPos.z <= portalBack
       );
       
-      // Console.log para debug (apenas quando debug está ativo)
+      // Atualizar estado apenas quando muda
+      let previousState = this.isInsidePortal;
+      this.isInsidePortal = isCameraInPortalBounds;
+      
+      // Console.log para debug (apenas quando debug está ativo e estado muda)
       if (this.debugBox) {
-          console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
-          console.log(`Portal bounds: X[${portalLeft.toFixed(2)}, ${portalRight.toFixed(2)}], Y[${portalBottom.toFixed(2)}, ${portalTop.toFixed(2)}], Z[${portalFront.toFixed(2)}, ${portalBack.toFixed(2)}]`);
-          console.log(`Inside portal: ${isCameraInPortalBounds}`);
-          console.log(`Current state: ${this.isInsidePortal ? 'INSIDE' : 'OUTSIDE'}`);
-      }
-      
-      // Sistema de estados com cooldown para evitar oscilações
-      let currentTime = time || Date.now();
-      
-      // Se a câmera entrou no portal e não está em cooldown
-      if (isCameraInPortalBounds && !this.isInsidePortal && (currentTime - this.lastDetectionTime > this.detectionCooldown)) {
-          this.isInsidePortal = true;
-          this.lastDetectionTime = currentTime;
-          if (this.debugBox) {
-              console.log('>>> ENTERED PORTAL <<<');
+          let currentTime = time || Date.now();
+          // Limitar logs a uma vez a cada 100ms para evitar spam
+          if (currentTime - this.lastDebugLog > 100) {
+              console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
+              console.log(`Portal bounds: X[${portalLeft.toFixed(2)}, ${portalRight.toFixed(2)}], Y[${portalBottom.toFixed(2)}, ${portalTop.toFixed(2)}], Z[${portalFront.toFixed(2)}, ${portalBack.toFixed(2)}]`);
+              console.log(`Inside portal: ${isCameraInPortalBounds}`);
+              this.lastDebugLog = currentTime;
           }
-      }
-      // Se a câmera saiu do portal e não está em cooldown
-      else if (!isCameraInPortalBounds && this.isInsidePortal && (currentTime - this.lastDetectionTime > this.detectionCooldown)) {
-          this.isInsidePortal = false;
-          this.lastDetectionTime = currentTime;
-          if (this.debugBox) {
-              console.log('>>> EXITED PORTAL <<<');
+          
+          // Mostrar apenas quando o estado muda
+          if (previousState !== this.isInsidePortal) {
+              console.log(`>>> STATE CHANGED: ${this.isInsidePortal ? 'ENTERED' : 'EXITED'} PORTAL <<<`);
           }
       }
       
