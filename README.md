@@ -66,8 +66,8 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 
 O portal é uma "janela entre duas dimensões": o quadro vermelho troca o que se vê dentro e fora dele, conforme a posição da câmera em relação ao portal. O portal funciona como um interruptor que muda o estado quando atravessado.
 
-| Posição | Fundo do ecrã | Dentro do quadro vermelho |
-|---|---|---|
+| Posição | Fundo do ecrã | Dentro do quadro vermelho | 
+| --- | --- | --- | 
 | **Fora** do portal | Câmera (realidade) | Dimensão do portal (imagem 360º) + obras |
 | **Dentro** do portal | Dimensão do portal (imagem 360º) | Câmera (realidade) |
 
@@ -78,6 +78,7 @@ Requisitos técnicos (não remover, o portal deixa de funcionar):
 - `renderer="...; stencil: true"` no `<a-scene>`: a partir do three r184 o buffer de stencil **não é criado por omissão**, e sem ele o portal desenha tudo em todo o lado (perde-se a troca de dimensões)
 - `renderer.sortObjects = false` em `config-ar` (`js/main.js`): o A-Frame 1.4.2 forçava este valor; no 1.8.x fica `true`, o que desenha as obras antes da máscara do portal e as faz falhar o teste de stencil
 - A ordem de desenho depende dos `renderOrder`: máscara (1) → esfera 360º (2) → moldura (3)
+
 
 ### Recursos Recentes
 
@@ -118,6 +119,7 @@ Requisitos técnicos (não remover, o portal deixa de funcionar):
 ### Funcionamento do Portal
 
 O portal agora funciona como um interruptor inteligente:
+
 - **Atravessar o portal**: Muda o estado da dimensão (uma única vez)
 - **Permanecer na nova dimensão**: Até decidir voltar atravessando novamente
 - **Sem oscilações**: Sistema estável com cooldown de 500ms entre transições
@@ -125,6 +127,7 @@ O portal agora funciona como um interruptor inteligente:
 ### 7. Modo Debug
 
 Durante o desenvolvimento, você pode ativar o modo debug para visualizar a bounding box de colisão do portal:
+
 - A caixa de debug aparece como um wireframe azul semi-transparente (1 metro de profundidade)
 - Ela mostra exatamente onde o sistema detecta colisões com o portal
 - Útil para verificar se a detecção de colisão está funcionando corretamente
