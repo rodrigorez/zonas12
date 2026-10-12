@@ -148,7 +148,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     frontGroup.position.set(0, 0, 0);
     this.portalGroup.add(frontGroup);
 
-    // Criar o lado traseiro do portal (transparente com retângulo vermelho)
+    // Criar o lado traseiro do portal (apenas transparente)
     let backGroup = new THREE.Group();
     
     // Criar um plano transparente para o lado traseiro
@@ -162,13 +162,6 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     let backPlane = new THREE.Mesh(backPlaneGeo, backPlaneMat);
     backPlane.position.set(0, h/2, 0);
     backGroup.add(backPlane);
-    
-    // Criar o retângulo vermelho no lado traseiro
-    let redRectGeo = new THREE.BoxGeometry(w - 2, h - 2, 0.1);
-    let redRectMat = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
-    let redRect = new THREE.Mesh(redRectGeo, redRectMat);
-    redRect.position.set(0, h/2, -0.05); // Um pouco atrás do plano
-    backGroup.add(redRect);
     
     // Posicionar o lado traseiro (virado para trás)
     backGroup.position.set(0, 0, 0);
