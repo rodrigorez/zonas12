@@ -49,10 +49,28 @@ function registarNaDimensao(idDimensao, material) {
   aplicarEstadoEstencil();
 }
 
-// Teste de stencil de cada material, conforme o papel da sua dimensão:
+// Escreve a regra de stencil num material, conforme o papel da sua dimensão:
 //  0 (dimensão ativa)  -> desenha em todo o lado onde nenhuma janela escreveu
 //  1..255 (valor)      -> desenha dentro da janela que mostra essa dimensão
-//  sem papel           -> não desenha
+//  null (sem papel)    -> não desenha
+// Só o teste muda; as operações ficam sempre em Keep, para nenhum destes materiais
+// escrever no stencil (quem escreve é só a máscara dos portais).
+function definirEstencil(material, ref) {
+  material.stencilWrite = true;
+  material.stencilWriteMask = 0xFF;
+  material.stencilFuncMask = 0xFF;
+  material.stencilFail = THREE.KeepStencilOp;
+  material.stencilZFail = THREE.KeepStencilOp;
+  material.stencilZPass = THREE.KeepStencilOp;
+  if (ref === null) {
+    material.stencilFunc = THREE.NeverStencilFunc;
+    return material;
+  }
+  material.stencilFunc = THREE.EqualStencilFunc;
+  material.stencilRef = ref;
+  return material;
+}
+
 function aplicarEstadoEstencil() {
   let estado = window.portalAR;
   let ativa = estado.dimensaoAtiva;
@@ -61,20 +79,7 @@ function aplicarEstadoEstencil() {
     let ref = null;
     if (id === ativa) ref = 0;
     else if (estado.valores.has(id)) ref = estado.valores.get(id);
-    estado.dimensoes[chave].forEach(function (mat) {
-      mat.stencilWrite = true;
-      mat.stencilWriteMask = 0xFF;
-      mat.stencilFuncMask = 0xFF;
-      mat.stencilFail = THREE.KeepStencilOp;
-      mat.stencilZFail = THREE.KeepStencilOp;
-      mat.stencilZPass = THREE.KeepStencilOp;
-      if (ref === null) {
-        mat.stencilFunc = THREE.NeverStencilFunc;
-      } else {
-        mat.stencilFunc = THREE.EqualStencilFunc;
-        mat.stencilRef = ref;
-      }
-    });
+    estado.dimensoes[chave].forEach(function (mat) { definirEstencil(mat, ref); });
   });
   estado.portais.slice().forEach(function (portal) {
     portal.atualizarJanela();
@@ -362,7 +367,11 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.maskMesh.renderOrder = ordem.mascara;
     this.portalGroup.add(this.maskMesh);
 
-    let moldura = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
+    // A moldura do portal é um objeto da dimensão onde ele está, por isso obedece à
+    // mesma regra dessa dimensão (ref 0): desenha-se só onde nenhuma janela escreveu.
+    // Sem isto, a moldura de um portal que fica atrás da janela de outro portal era
+    // desenhada dentro dessa janela e cortava a imagem dela com barras vermelhas.
+    let moldura = definirEstencil(new THREE.MeshBasicMaterial({ color: 0xFF0000 }), 0);
     let esp = 0.3;
     let meiaLargura = w / 2;
     let meiaAltura = h / 2;
@@ -431,9 +440,11 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     let pos = this.data.caixaPosicao;
     let rot = this.data.caixaRotacao;
     let cor = new THREE.Color(0x0000FF);
+    // A caixa de debug é geometria do portal, logo da dimensão onde ele está: segue
+    // a mesma regra das molduras e das obras (só onde nenhuma janela escreveu).
     this.debugBox = new THREE.Mesh(
       new THREE.BoxGeometry(caixa.x, caixa.y, caixa.z),
-      new THREE.MeshBasicMaterial({ color: cor, wireframe: true, transparent: true, opacity: 0.8, side: THREE.DoubleSide })
+      definirEstencil(new THREE.MeshBasicMaterial({ color: cor, wireframe: true, transparent: true, opacity: 0.8, side: THREE.DoubleSide }), 0)
     );
     this.debugBox.name = this.nome + '-caixa-debug';
     this.debugBox.position.set(pos.x, pos.y, pos.z);

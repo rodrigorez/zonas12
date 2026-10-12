@@ -208,6 +208,15 @@ panorama, mesmas obras).
   janela que mostra essa dimensão.
 - A máscara (`stencilFunc: Always`, `stencilZPass: Replace`) escreve o valor da dimensão
   que a janela mostra.
+- **Tudo o que pertence a uma dimensão leva o teste de stencil dela** (`definirEstencil`):
+  conteúdo da dimensão ativa (`ref 0`), conteúdo de uma dimensão mostrada por uma janela
+  (`ref` = valor dessa janela) e dimensão sem janela (`Never`, não desenha). Isto inclui o
+  panorama, as obras, **a moldura do portal e a caixa de debug** — a moldura é a geometria
+  do portal, logo é da dimensão onde o portal está. Sem este teste na moldura aconteciam
+  dois defeitos visíveis: a moldura de um portal que fica **atrás** da janela de outro
+  portal era desenhada **dentro** dessa janela (barras vermelhas a cortar a imagem dela), e
+  como as barras da moldura têm 0,2 m de profundidade, a face interior de cada barra caía
+  **dentro da própria janela** (uma faixa vermelha fina junto ao rebordo).
 - `gestor-dimensoes` (na cena) é o único que decide: deteta as travessias e atribui os
   valores de stencil por frame.
 
@@ -287,6 +296,8 @@ Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caix
 - A caixa de debug aparece como um wireframe azul semi-transparente (nome `portal-<id>-caixa-debug`)
 - Tem sempre as mesmas dimensões X, Y e Z, posição e rotação que a caixa de colisão (`caixa`, `caixaPosicao` e `caixaRotacao`)
 - Serve para ver exatamente onde a travessia dispara (é uma caixa por portal)
+- Como o resto da geometria do portal, a caixa de debug é tapada pela janela de outro
+  portal que lhe fique à frente (segue a regra de stencil da dimensão onde está)
 - A consola regista apenas as mudanças relevantes (`[portal] Dimensao ativa: 2`)
 
 ## Tecnologias Utilizadas
