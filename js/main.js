@@ -220,10 +220,41 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
   tick: function() {
       let cam = document.querySelector('a-camera');
       if (!cam || !this.sphereMat) return;
-      let camZ = cam.object3D.position.z;
-      let portalZ = this.el.object3D.position.z; 
       
-      let func = (camZ > portalZ) ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
+      // Obter posições da câmera e do portal
+      let camPos = cam.object3D.position;
+      let portalPos = this.el.object3D.position;
+      
+      // Dimensões do portal
+      let portalWidth = this.data.width || 12.0;
+      let portalHeight = this.data.height || 16.0;
+      
+      // Calcular limites do portal
+      let portalLeft = portalPos.x - (portalWidth / 2);
+      let portalRight = portalPos.x + (portalWidth / 2);
+      let portalTop = portalPos.y + portalHeight;
+      let portalBottom = portalPos.y;
+      
+      // Verificar se a câmera está horizontalmente alinhada com o portal
+      let isHorizontallyAligned = (camPos.x >= portalLeft) && (camPos.x <= portalRight);
+      
+      // Verificar se a câmera está verticalmente alinhada com o portal
+      let isVerticallyAligned = (camPos.y >= portalBottom) && (camPos.y <= portalTop);
+      
+      // Verificar se a câmera está alinhada com o portal (dentro dos limites horizontais e verticais)
+      let isAlignedWithPortal = isHorizontallyAligned && isVerticallyAligned;
+      
+      // Determinar a função stencil com base na posição relativa da câmera
+      let func;
+      if (isAlignedWithPortal) {
+          // Se a câmera está alinhada com o portal, usar a lógica original de troca de dimensão
+          func = (camPos.z > portalPos.z) ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
+      } else {
+          // Se a câmera não está alinhada com o portal, manter a dimensão atual
+          // Com base na posição Z relativa ao portal
+          func = (camPos.z > portalPos.z) ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
+      }
+      
       this.sphereMat.stencilFunc = func;
       
       if (window.materiaisVirtuais) {
