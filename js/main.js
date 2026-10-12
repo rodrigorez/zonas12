@@ -109,10 +109,12 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.portalGroup = new THREE.Group();
     el.setObject3D('portal-mesh', this.portalGroup);
 
-    // Interruptor de dimensões: o estado avança quando a câmara ENTRA na caixa de
-    // colisão (fora -> dentro). Começa na dimensão 1 (mundo real).
+    // Interruptor de dimensões: o estado avança quando a câmara atravessa o plano
+    // do quadro (o plano central da caixa de colisão) estando dentro da caixa.
+    // sinalZ guarda de que lado do plano a câmara estava no frame anterior
+    // (null = ainda não houve primeiro tick).
     this.estadoAtual = 0;
-    this.dentroDaCaixa = false;
+    this.sinalZ = null;
     this.dimensoes = window.dimensoes;
 
     // Caixa de colisão, no espaço do portal. Os mesmos valores alimentam a caixa
@@ -271,12 +273,18 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.portalGroup.add(this.debugBox);
   },
 
-  // Mostra a dimensão do estado atual e esconde as restantes. Escalável: qualquer
-  // dimensão registada em window.dimensoes entra na rotação do interruptor.
+  // Fora do quadro desenha-se a dimensão atual; dentro do quadro desenha-se a
+  // dimensão seguinte — é a "janela" entre dimensões. A máscara só escreve o
+  // stencil quando está à frente da câmara, por isso o lado do plano decide o que
+  // o quadro mostra, e nada disto depende da posição no código.
+  // Escalável: com N dimensões registadas o quadro mostra sempre a seguinte.
   aplicarEstado: function() {
-      let ativa = this.estadoAtual;
+      let atual = this.estadoAtual;
+      let seguinte = (atual + 1) % window.dimensoes.length;
       window.dimensoes.forEach((materiais, dimensao) => {
-          let func = dimensao === ativa ? THREE.AlwaysStencilFunc : THREE.NeverStencilFunc;
+          let func = dimensao === atual ? THREE.NotEqualStencilFunc
+                   : dimensao === seguinte ? THREE.EqualStencilFunc
+                   : THREE.NeverStencilFunc;
           materiais.forEach(mat => { mat.stencilFunc = func; });
       });
   },
@@ -299,14 +307,24 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
           Math.abs(_pontoCaixa.z) <= this.caixaMeio.z
       );
 
-      // Interruptor: a dimensão avança ao ENTRAR na caixa (fora -> dentro), uma vez
-      // por travessia. Ficar dentro da caixa não volta a mudar o estado.
-      if (dentroDaCaixa && !this.dentroDaCaixa) {
-          this.estadoAtual = (this.estadoAtual + 1) % this.dimensoes.length;
+      // O interruptor dispara ao atravessar o plano do quadro — e só dentro da
+      // caixa. É o único ponto em que a troca não se nota: é aí que a máscara muda
+      // de lado e a janela entre as duas dimensões roda.
+      let sinalZ = _pontoCaixa.z < 0 ? -1 : 1;
+      if (this.sinalZ === null) {
+          // Primeiro tick: alinha o estado com o lado onde a câmara está, sem
+          // contar como travessia.
+          this.sinalZ = sinalZ;
+          this.estadoAtual = sinalZ < 0 ? 1 : 0;
           this.aplicarEstado();
-          console.log(`>>> PORTAL: DIMENSÃO ${this.estadoAtual + 1} DE ${this.dimensoes.length} <<<`);
+      } else if (sinalZ !== this.sinalZ) {
+          if (dentroDaCaixa) {
+              this.estadoAtual = (this.estadoAtual + 1) % this.dimensoes.length;
+              this.aplicarEstado();
+              console.log(`>>> PORTAL: DIMENSÃO ${this.estadoAtual + 1} DE ${this.dimensoes.length} <<<`);
+          }
+          this.sinalZ = sinalZ;
       }
-      this.dentroDaCaixa = dentroDaCaixa;
   }
 });
 
