@@ -253,7 +253,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
           console.log(`Inside Portal: ${isCurrentlyInsidePortal} | Was Inside: ${this.wasInsidePortal} | Cooldown: ${this.portalTransitionCooldown.toFixed(0)}`);
       }
       
-      // Detectar transição de entrada no portal (apenas quando entra)
+      // Detectar transição de entrada no portal (apenas quando entra E não está em cooldown)
       if (isCurrentlyInsidePortal && !this.wasInsidePortal && this.portalTransitionCooldown <= 0) {
           // Alternar estado da dimensão (interruptor)
           this.showingPortalDimension = !this.showingPortalDimension;
@@ -266,14 +266,18 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
           }
       }
       
-      // Mostrar flickering suspeito
+      // Ignorar saídas breves durante o cooldown (previne flickering)
       if (!isCurrentlyInsidePortal && this.wasInsidePortal && this.portalTransitionCooldown > 0) {
-          console.log(`!!! FLICKERING DETECTED: Camera briefly outside portal during cooldown !!!`);
+          // Durante o cooldown, manter o estado anterior se a saída for breve
+          // Isso previne o flickering quando a câmera sai momentaneamente do portal
+          console.log(`!!! Brief exit during cooldown ignored - maintaining previous state !!!`);
+          isCurrentlyInsidePortal = true; // Forçar a permanecer "dentro" durante o cooldown
       }
       
-      // Atualizar estado anterior
-      this.wasInsidePortal = isCurrentlyInsidePortal;
-      this.lastTime = time;
+      // Atualizar estado anterior apenas quando não estiver em cooldown
+      if (this.portalTransitionCooldown <= 0) {
+          this.wasInsidePortal = isCurrentlyInsidePortal;
+      }
       
       // Determinar a função stencil com base no estado do interruptor
       let func = this.showingPortalDimension ? THREE.EqualStencilFunc : THREE.NotEqualStencilFunc;
