@@ -197,6 +197,13 @@ panorama, mesmas obras).
   **ignora o `renderOrder`** e desenha pela ordem da árvore — o que só funciona por acaso
   com um portal. Com vários, as máscaras têm de ser desenhadas antes de todo o conteúdo.
 - Ordem de desenho (`renderOrder`): máscara (1) → panorama (2) → obras (3) → moldura (4).
+- **As máscaras são ordenadas por distância à câmara, todos os frames** (`ordenarMascaras`):
+  a mais distante sai primeiro, a mais próxima por último (`1`, `1.01`, `1.02`, ...). A
+  máscara não escreve profundidade (`depthWrite: false`), por isso, quando dois portais se
+  sobrepõem no ecrã, ganha o stencil **da última máscara desenhada**. Sem esta ordenação a
+  máscara de trás sobrescrevia a da frente e a zona de sobreposição mostrava a dimensão
+  errada. Como a ordem depende de onde está a câmara, é recalculada a cada frame — não
+  pode ser fixada uma vez em `init`.
 - O stencil é limpo a 0 em cada frame: **0 = nenhuma janela aqui**, `1..255` = valor da
   janela que mostra essa dimensão.
 - A máscara (`stencilFunc: Always`, `stencilZPass: Replace`) escreve o valor da dimensão

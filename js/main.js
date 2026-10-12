@@ -30,9 +30,10 @@ window.portalAR = {
   ordem: { mascara: 1, panorama: 2, obra: 3, moldura: 4, debug: 10 }
 };
 
-// Temporários reutilizados no tick dos portais (evita alocar por frame).
+// Temporários reutilizados nos ticks (evita alocar por frame).
 const _pontoMundo = new THREE.Vector3();
 const _pontoCaixa = new THREE.Vector3();
+const _pontoMascara = new THREE.Vector3();
 
 // Registra um material como conteúdo de uma dimensão.
 function registarNaDimensao(idDimensao, material) {
@@ -116,11 +117,38 @@ AFRAME.registerComponent('gestor-dimensoes', {
     }
 
     let assinatura = estado.dimensaoAtiva + '|' + mostradas.join(',');
-    if (assinatura === estado.assinatura) return;
-    estado.assinatura = assinatura;
-    estado.valores = new Map();
-    mostradas.forEach(function (d, i) { estado.valores.set(d, i + 1); });
-    aplicarEstadoEstencil();
+    if (assinatura !== estado.assinatura) {
+      estado.assinatura = assinatura;
+      estado.valores = new Map();
+      mostradas.forEach(function (d, i) { estado.valores.set(d, i + 1); });
+      aplicarEstadoEstencil();
+    }
+
+    // Isto corre TODOS os frames: a ordem depende da posição da câmara.
+    this.ordenarMascaras();
+  },
+  // As máscaras são desenhadas da mais distante para a mais próxima. A máscara não
+  // escreve profundidade, por isso, se duas se sobrepuserem no ecrã, a última a ser
+  // desenhada é a que fica com o stencil. Com esta ordem, é a do portal da frente —
+  // sem ela, a máscara de trás sobrescrevia a da frente e a zona de sobreposição
+  // mostrava a dimensão errada.
+  ordenarMascaras: function () {
+    let estado = window.portalAR;
+    let camara = document.querySelector('a-camera');
+    if (!camara) return;
+    camara.object3D.getWorldPosition(_pontoMundo);
+
+    let visiveis = [];
+    estado.portais.forEach(function (portal) {
+      if (!portal.portalGroup.visible) return;
+      portal.maskMesh.getWorldPosition(_pontoMascara);
+      portal._distanciaMascara = _pontoMascara.distanceTo(_pontoMundo);
+      visiveis.push(portal);
+    });
+    visiveis.sort(function (a, b) { return b._distanciaMascara - a._distanciaMascara; });
+    visiveis.forEach(function (portal, i) {
+      portal.maskMesh.renderOrder = estado.ordem.mascara + i * 0.01;
+    });
   }
 });
 
