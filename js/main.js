@@ -249,10 +249,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       return;
     }
     
-    // Criar nova caixa de debug mais visível com profundidade 3D
+    // Criar nova caixa de debug mais visível com profundidade aumentada
     let w = this.data.width || 12.0;
     let h = this.data.height || 16.0;
-    let portalDepth = 1.0; // Profundidade 3D realista
+    let portalDepth = 5.0; // Profundidade aumentada para testes (5 metros)
     
     // Criar wireframe azul mais proeminente
     let debugBoxGeo = new THREE.BoxGeometry(w, h, portalDepth);
@@ -260,7 +260,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       color: 0x0000FF, // Azul
       wireframe: true,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.8,
       side: THREE.DoubleSide
     });
     this.debugBox = new THREE.Mesh(debugBoxGeo, debugBoxMat);
@@ -276,10 +276,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       let camPos = cam.object3D.position;
       let portalPos = this.el.object3D.position;
       
-      // Dimensões do portal (agora com profundidade mais realista)
+      // Dimensões do portal (agora com profundidade maior para testes)
       let portalWidth = this.data.width || 12.0;
       let portalHeight = this.data.height || 16.0;
-      let portalDepth = 1.0; // Profundidade realista para detecção 3D (1 metro)
+      let portalDepth = 5.0; // Profundidade maior para testes (5 metros)
       
       // Calcular limites da bounding box 3D do portal
       let portalLeft = portalPos.x - (portalWidth / 2);
@@ -298,9 +298,9 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       );
       
       // Console.log para debug (pode ser removido)
-      // console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
-      // console.log(`Portal bounds: X[${portalLeft.toFixed(2)}, ${portalRight.toFixed(2)}], Y[${portalBottom.toFixed(2)}, ${portalTop.toFixed(2)}], Z[${portalFront.toFixed(2)}, ${portalBack.toFixed(2)}]`);
-      // console.log(`Inside portal: ${isCameraInPortalBounds}`);
+      console.log(`Camera: (${camPos.x.toFixed(2)}, ${camPos.y.toFixed(2)}, ${camPos.z.toFixed(2)})`);
+      console.log(`Portal bounds: X[${portalLeft.toFixed(2)}, ${portalRight.toFixed(2)}], Y[${portalBottom.toFixed(2)}, ${portalTop.toFixed(2)}], Z[${portalFront.toFixed(2)}, ${portalBack.toFixed(2)}]`);
+      console.log(`Inside portal: ${isCameraInPortalBounds}`);
       
       // Determinar a função stencil com base na colisão 3D
       let func;
