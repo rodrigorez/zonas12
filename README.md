@@ -84,6 +84,8 @@ Requisitos técnicos (não remover, o portal deixa de funcionar):
 - **Sistema de Detecção 3D**: Implementado sistema de bounding box 3D para detecção precisa de colisão
 - **Interruptor Inteligente**: Portal funciona como interruptor que muda estado ao ser atravessado
 - **Sem Barreiras Invisíveis**: Removido sistema antigo de limites que causava colisões fantasmas
+- **Sistema de Travessia Controlada**: Portal só muda dimensão quando travessia é completada
+- **Proteção Contra Flickering**: Múltiplas camadas de proteção contra oscilações indesejadas
 
 ### 2. Controles Mobile
 
@@ -117,20 +119,22 @@ Requisitos técnicos (não remover, o portal deixa de funcionar):
 
 ### Funcionamento do Portal
 
-O portal agora funciona como um interruptor inteligente:
+O portal agora funciona como um interruptor inteligente com sistema de travessia controlada:
 
-- **Atravessar o portal**: Muda o estado da dimensão (uma única vez)
-- **Permanecer na nova dimensão**: Até decidir voltar atravessando novamente
-- **Sem oscilações**: Sistema estável com cooldown de 500ms entre transições
+- **Atravessar o portal**: Muda o estado da dimensão apenas quando travessia é completada
+- **Proteção contra flickering**: Múltiplas camadas de proteção (bounding box otimizado, debounce temporal, cooldown)
+- **Comportamento natural**: Portal só muda dimensão quando usuário completa intencionalmente a travessia
+- **Tempo mínimo entre usos**: 1 segundo entre travessias para evitar acionamentos acidentais
 
 ### 7. Modo Debug
 
 Durante o desenvolvimento, você pode ativar o modo debug para visualizar a bounding box de colisão do portal:
 
-- A caixa de debug aparece como um wireframe azul semi-transparente (1 metro de profundidade)
+- A caixa de debug aparece como um wireframe azul semi-transparente (0.2 metros de profundidade)
 - Ela mostra exatamente onde o sistema detecta colisões com o portal
 - Útil para verificar se a detecção de colisão está funcionando corretamente
 - Logs de debug mostram apenas informações relevantes quando o estado muda
+- Sistema de travessia controlada com proteção contra flickering
 
 ## Tecnologias Utilizadas
 
