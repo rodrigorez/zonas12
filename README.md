@@ -100,8 +100,9 @@ a **passe inversa** da validação que garante isso (ver abaixo).
 
 > ⚠️ **Medido em 2026-10-13:** o índice estava incompleto. Faltavam **13** `SKILL.md` — entre
 > eles `3d-games`, `vr-ar` e `web-games`, os mais úteis a este projeto — e **75** `.md` de
-> referência; e descrevia como "cópia" o espelho Cline, que tem **43 pastas e 0 ficheiros**.
+> referência; e descrevia como "cópia" o espelho Cline, que tinha **43 pastas e 0 ficheiros**.
 > A causa foi o validador só perguntar *"as minhas linhas resolvem?"*, nunca o contrário.
+> (O esqueleto Cline e as falsas "junções" já foram **apagados** — ver 🗑️ *Garbage* no índice.)
 
 #### Manter atualizado (obrigatório)
 
