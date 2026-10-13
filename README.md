@@ -13,7 +13,8 @@ zonas12/
 ├── css/
 │   └── style.css       estilos da página, HUD, modal e D-pad
 ├── js/
-│   └── app.js          entrada do módulo: componentes, movimento, carregamento
+│   ├── app.js          entrada do módulo: componentes, movimento, carregamento
+│   └── core/           núcleo: estado, registos, stencil, eventos, limites
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos + página de edição)
 ├── assets/
@@ -78,11 +79,13 @@ zonas12/
 ## Estado atual do código (v0.0.2)
 
 Marcado pela branch `v0.0.2`. Resumo do que existe hoje: `index.html` (213 linhas),
-`js/app.js` (607 linhas), `css/style.css` (84 linhas), `assets/images/`, `data/scene.json`,
-`i18n/pt.json` e as ferramentas em `tools/`.
+`js/app.js` (485 linhas), `js/core/` (7 ficheiros), `css/style.css` (84 linhas),
+`assets/images/`, `data/scene.json`, `i18n/pt.json` e as ferramentas em `tools/`.
 
-O `js/app.js` é a **entrada do módulo** (`<script type="module">`): é o passo 1 da Fase 1
-do roadmap, que dá origem ao núcleo em `js/core/` e aos 4 módulos.
+O `js/app.js` é a **entrada do módulo** (`<script type="module">`). O `js/core/` é o
+**núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as regras de stencil —
+a única parte global, porque o stencil é um recurso de toda a cena. Os 4 módulos
+(dimensão, obra, portal, câmara) são a Fase 2.
 
 ### O que está implementado
 
@@ -151,8 +154,8 @@ com os outros portais.
 
 #### O estado: a dimensão ativa
 
-Há uma só fonte de verdade — `window.portalAR.dimensaoAtiva`, a dimensão onde o
-utilizador está (`js/app.js`). Todos os portais e todo o conteúdo leem daqui, por
+Há uma só fonte de verdade — `window.portalAR.activeDimension` (`js/core/state.js`), a
+dimensão onde o utilizador está. Todos os portais e todo o conteúdo leem daqui, por
 isso vários portais nunca ficam em desacordo:
 
 - **Dimensão ativa** (onde estás): o conteúdo dela é desenhado em todo o lado onde
@@ -374,8 +377,9 @@ for a **dimensão ativa**: vê-la pela janela não conta.
 
 ### Funcionamento do Portal
 
-Tudo é decidido por frame em `gestor-dimensoes` (`js/app.js`), pela colisão com a caixa
-e pelo `dimensaoAtiva`:
+Tudo é decidido por frame: `gestor-dimensoes` (`js/app.js`) deteta as travessias e o
+núcleo (`js/core/stencil.js`) atribui os valores de stencil e decide o que cada material
+desenha, a partir da colisão com a caixa e de `state.activeDimension`:
 
 - **Onde estás**: o conteúdo da tua dimensão desenha-se em todo o lado **excepto** onde uma
   janela está *à frente* (é a profundidade que decide, não o stencil).

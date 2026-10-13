@@ -522,8 +522,31 @@ Cada fase tem um critério de verificação **medido no browser**, como temos fe
   editor). Descobrir um erro no esquema depois dos módulos prontos custa muito mais.
 
 ### Fase 1 — Núcleo, sem mudar comportamento
+
+**Estado: concluída em 2026-10-13.** Feita em dois passos, cada um com a linha de base a
+passar: (1) `js/main.js` → `js/app.js`, carregado como módulo ES; (2) extração do núcleo.
+
+| O que | Onde ficou |
+| --- | --- |
+| Limites (512 / 512 / 255) | `js/core/limits.js` |
+| Estado da cena | `js/core/state.js` |
+| Barramento de eventos | `js/core/events.js` |
+| Stencil (`applyStencilRule`, `applyStencilState`, `syncStencilValues`) | `js/core/stencil.js` |
+| Registos (`registerContent`, `registerPortal`, `unregisterPortal`) | `js/core/registry.js` |
+| Dimensão ativa (`setActiveDimension`) | `js/core/active-dimension.js` |
+| API pública do núcleo | `js/core/index.js` |
+
+`js/app.js` passou de 607 para 485 linhas. O núcleo **deixou de conhecer portais**:
+anuncia `stencil:changed` e cada janela atualiza-se sozinha. Verificado com a cena a
+correr: os mesmos números da linha de base (8/8 travessias, 0 cortes de bordo em 70
+poses, alfa 0/255/0 no hub, contribuição da moldura de trás 0 px, clique só na dimensão
+ativa, 0 erros de consola).
+
+**Ficou por fazer (Fase 2), de propósito:** A2/A3 (um único `keydown` para a cena toda, e
+removê-lo no `remove`), A4 (`remove` no panorama e nas obras) e A7 (a travessia passa para
+o portal). São correções de comportamento, e a Fase 1 não muda comportamento.
 - **Entregável:** `js/core/` com estado, registos, `applyStencilState()`,
-  `setActiveDimension()` e eventos. O `main.js` passa a chamar o núcleo.
+  `setActiveDimension()` e eventos. O arranque (`js/app.js`) passa a chamar o núcleo.
 - **D10 aplica-se aqui:** o código que se move é **renomeado ao mover** (glossário da Fase 0)
   e as mensagens de consola passam a inglês. Um componente por commit, para os diffs serem
   revistos um a um.
@@ -533,7 +556,7 @@ Cada fase tem um critério de verificação **medido no browser**, como temos fe
   conhecer `document.querySelector('a-camera')`.
 
 ### Fase 2 — Os 4 módulos
-- **Entregável:** `js/modules/dimension.js`, `artwork.js`, `portal.js`, `camera.js`; `main.js`
+- **Entregável:** `js/modules/dimension.js`, `artwork.js`, `portal.js`, `camera.js`; `js/app.js`
   fica só com o arranque (`config-ar`).
 - **Correções incluídas:** A2/A3 (um único `keydown`), A4 (`remove` em todos os módulos),
   A5 (câmara centralizada), A7 (travessia no portal, valores no núcleo).
@@ -916,8 +939,9 @@ apontava para um ficheiro que saiu da raiz e o browser passou a pedir `/favicon.
 consola). Passou a `<link rel="icon" href="data:,">`, que não pede nada — a console voltou a
 0 erros (T8).
 
-### Próximo passo: Fase 1 (o núcleo)
+### Próximo passo: Fase 2 (os 4 módulos)
 
-Mover as ≈120 linhas globais para `js/core/` com `import`/`export`, **renomeando ao mover**
-(glossário §5.7) e sem alterar comportamento: no fim, a linha de base de §10 tem de dar
-exatamente os mesmos números.
+Dividir `js/app.js` em `js/modules/dimension.js`, `artwork.js`, `portal.js` e `camera.js`,
+renomeando ao mover (glossário §5.7) e corrigindo, no mesmo passo, os pontos A2, A3, A4,
+A5 e A7 de §2.1. A linha de base de §10 tem de continuar a dar os mesmos números, mais o
+T9 (criar e destruir portais em ciclo: 1 listener de teclado e registos limpos).

@@ -1,182 +1,59 @@
+// --- CORE ---
+// The scene state, the registries and the stencil rules live in js/core/ (decision D1).
+// This file is the application: the A-Frame components, the movement and the interface.
+import {
+  state,
+  MAX_PORTALS,
+  registerContent,
+  registerPortal,
+  unregisterPortal,
+  applyStencilState,
+  syncStencilValues,
+  setActiveDimension,
+  on
+} from './core/index.js';
+
 // --- LÓGICA DO MODAL (JANELA SOBREPOSTA) ---
 function fecharObra() {
   document.getElementById('modal-obra').style.display = 'none';
   document.getElementById('iframe-obra').src = "";
 }
 
-// --- LIMITES E ESTADO GLOBAL ---
-// Cada dimensão e cada portal têm um ID próprio, e esse ID aparece em tudo o que
-// lhes pertence: atributos (dimensao-a/dimensao-b/portal-id), `data-dimensao`,
-// `data-portal-id`, classes (`dimensao-7`, `portal-3`) e nomes dos objetos 3D.
-// Os limites são só de organização; o único recurso físico é o stencil (8 bits),
-// que permite 255 janelas abertas ao mesmo tempo.
-const LIMITE_DIMENSOES = 512;
-const LIMITE_PORTAIS = 512;
-const LIMITE_JANELAS = 255;
-
-window.portalAR = {
-  // Onde o utilizador está. É a única fonte de verdade: todos os portais e todo o
-  // conteúdo leem daqui, por isso vários portais nunca ficam em desacordo.
-  dimensaoAtiva: 0,
-  // id da dimensão -> materiais (panorama, obras) que lhe pertencem
-  dimensoes: Object.create(null),
-  // componentes dos portais registados
-  portais: [],
-  // id da dimensão -> valor de stencil (1..255) da janela que a mostra
-  valores: new Map(),
-  // evita reaplicar o mesmo estado a cada frame
-  assinatura: null,
-  // ordem de desenho (com sortObjects = true, o renderOrder manda)
-  ordem: { mascara: 1, panorama: 2, obra: 3, moldura: 4, debug: 10 }
-};
-
 // --- DEBUG AND TEST HANDLE ---
-// The console and the regression scripts (docs/ROADMAP.md section 10) need to drive the
-// scene without depending on the module scope. The application itself does not use this.
-// The names are already the final ones (D10); the internal functions are renamed as they
-// move to js/core/.
+// The console and the regression scripts (docs/ROADMAP.md section 10) drive the scene
+// through this. The application itself does not use it.
+window.portalAR = state;
 window.portalDebug = {
-  state: window.portalAR,
-  setActiveDimension: definirDimensaoAtiva,
-  applyStencilState: aplicarEstadoEstencil,
-  registerContent: registarNaDimensao
+  state: state,
+  setActiveDimension: setActiveDimension,
+  applyStencilState: applyStencilState,
+  syncStencilValues: syncStencilValues,
+  registerContent: registerContent,
+  on: on
 };
 
-// Temporários reutilizados nos ticks (evita alocar por frame).
+// Temporary vectors reused in the ticks (avoids allocating per frame).
 const _pontoMundo = new THREE.Vector3();
 const _pontoCaixa = new THREE.Vector3();
-
-// Registra uma malha (panorama ou obra) como conteúdo de uma dimensão.
-// `papel` é 'panorama' ou 'obra': só muda a ordem de desenho.
-function registarNaDimensao(idDimensao, mesh, papel) {
-  let estado = window.portalAR;
-  let id = Number(idDimensao);
-  if (!(id >= 0 && id < LIMITE_DIMENSOES)) {
-    console.warn('[dimensao] ID ' + idDimensao + ' fora do limite 0..' + (LIMITE_DIMENSOES - 1) + '; objeto ignorado.');
-    return;
-  }
-  let lista = estado.dimensoes[id] || (estado.dimensoes[id] = []);
-  if (!lista.some(function (e) { return e.mesh === mesh; })) {
-    lista.push({
-      mesh: mesh,
-      material: mesh.material,
-      panorama: papel === 'panorama',
-      // O que o material queria antes de mexermos nele: é reposto quando a dimensão
-      // volta a ser a ativa.
-      profundidade: { teste: mesh.material.depthTest, escrita: mesh.material.depthWrite }
-    });
-  }
-  estado.assinatura = null;
-  aplicarEstadoEstencil();
-}
-
-// Escreve a regra de stencil num material:
-//  1..255 (valor)  -> desenha dentro das janelas que mostram essa dimensão
-//  null (sem papel)-> não desenha
-// Só o teste muda; as operações ficam sempre em Keep, para nenhum destes materiais
-// escrever no stencil (quem escreve é só a máscara dos portais).
-function definirEstencil(material, ref) {
-  material.stencilWrite = true;
-  material.stencilWriteMask = 0xFF;
-  material.stencilFuncMask = 0xFF;
-  material.stencilFail = THREE.KeepStencilOp;
-  material.stencilZFail = THREE.KeepStencilOp;
-  material.stencilZPass = THREE.KeepStencilOp;
-  if (ref === null) {
-    material.stencilFunc = THREE.NeverStencilFunc;
-    return material;
-  }
-  material.stencilFunc = THREE.EqualStencilFunc;
-  material.stencilRef = ref;
-  return material;
-}
-
-// Decide, por dimensão, o que cada material desenha:
-//  - dimensão ativa: **sem teste de stencil**, quem manda é a profundidade. A
-//    máscara de cada janela escreve profundidade, por isso o que está atrás de uma
-//    janela fica tapado por ela e o que está à frente desenha-se por cima dela. É
-//    isto que mantém as molduras inteiras quando estão à frente (ou no mesmo plano)
-//    de uma janela, e as esconde quando estão claramente atrás.
-//  - dimensão vista por uma janela: desenha só onde essa janela escreveu o valor
-//    dela e **ignora a profundidade** (o mundo da janela está do outro lado dela).
-//  - dimensão sem janela: não desenha.
-function aplicarEstadoEstencil() {
-  let estado = window.portalAR;
-  let ativa = estado.dimensaoAtiva;
-  let ordem = estado.ordem;
-  Object.keys(estado.dimensoes).forEach(function (chave) {
-    let id = Number(chave);
-    let valor = estado.valores.has(id) ? estado.valores.get(id) : null;
-    estado.dimensoes[chave].forEach(function (entrada) {
-      let mat = entrada.material;
-      let ordemNormal = entrada.panorama ? ordem.panorama : ordem.obra;
-      if (id === ativa) {
-        mat.stencilWrite = false;
-        mat.depthTest = entrada.profundidade.teste;
-        mat.depthWrite = entrada.profundidade.escrita;
-        entrada.mesh.renderOrder = ordemNormal;
-      } else if (valor !== null) {
-        definirEstencil(mat, valor);
-        mat.depthTest = false;
-        mat.depthWrite = false;
-        // Sai antes das obras da dimensão ativa: as obras que estão à frente da
-        // janela desenham-se depois e por cima do conteúdo dela.
-        entrada.mesh.renderOrder = entrada.panorama ? ordem.panorama : ordem.panorama + 0.5;
-      } else {
-        definirEstencil(mat, null);
-        mat.depthTest = entrada.profundidade.teste;
-        mat.depthWrite = entrada.profundidade.escrita;
-        entrada.mesh.renderOrder = ordemNormal;
-      }
-    });
-  });
-  estado.portais.slice().forEach(function (portal) {
-    portal.atualizarJanela();
-  });
-}
-
-// Muda a dimensão ativa. Quem atravessa um portal chama isto.
-function definirDimensaoAtiva(id) {
-  let estado = window.portalAR;
-  if (estado.dimensaoAtiva === id) return;
-  estado.dimensaoAtiva = id;
-  estado.assinatura = null;
-  console.info('[portal] Dimensao ativa: ' + id);
-  aplicarEstadoEstencil();
-}
 
 // --- GESTOR DAS DIMENSÕES E JANELAS ---
 // Corre uma vez por frame na cena: deteta as travessias e decide que dimensão
 // cada janela mostra e com que valor de stencil. Um só sítio decide, para vários
 // portais nunca entrarem em desacordo.
 AFRAME.registerComponent('gestor-dimensoes', {
-  init: function () {
-    window.portalAR.valores = new Map();
-  },
   tick: function () {
-    let estado = window.portalAR;
-    estado.portais.slice().forEach(function (portal) {
+    let estado = state;
+    estado.portals.slice().forEach(function (portal) {
       portal.detetarTravessia();
     });
 
     let mostradas = [];
-    estado.portais.forEach(function (portal) {
+    estado.portals.forEach(function (portal) {
       let d = portal.dimensaoMostrada();
-      if (d !== null && d !== estado.dimensaoAtiva && mostradas.indexOf(d) < 0) mostradas.push(d);
+      if (d !== null && d !== estado.activeDimension && mostradas.indexOf(d) < 0) mostradas.push(d);
     });
-    mostradas.sort(function (a, b) { return a - b; });
-    if (mostradas.length > LIMITE_JANELAS) {
-      console.warn('[portal] ' + mostradas.length + ' janelas excedem o limite do stencil (' + LIMITE_JANELAS + '); as restantes ficam sem janela.');
-      mostradas = mostradas.slice(0, LIMITE_JANELAS);
-    }
-
-    let assinatura = estado.dimensaoAtiva + '|' + mostradas.join(',');
-    if (assinatura !== estado.assinatura) {
-      estado.assinatura = assinatura;
-      estado.valores = new Map();
-      mostradas.forEach(function (d, i) { estado.valores.set(d, i + 1); });
-      aplicarEstadoEstencil();
-    }
+    // The core assigns the stencil values and only reapplies when something changed.
+    syncStencilValues(mostradas);
   }
 });
 
@@ -222,7 +99,7 @@ AFRAME.registerComponent('abrir-modal', {
   dimensaoAtual: function () {
     let atributo = this.el.getAttribute('material-virtual');
     if (!atributo) return true;
-    return Number(atributo.dimensao) === window.portalAR.dimensaoAtiva;
+    return Number(atributo.dimensao) === state.activeDimension;
   }
 });
 
@@ -238,12 +115,12 @@ AFRAME.registerComponent('material-virtual', {
   applyStencil: function () {
     let mesh = this.el.getObject3D('mesh');
     if (!mesh) return;
-    let ordem = window.portalAR.ordem;
+    let ordem = state.drawOrder;
     mesh.traverse((node) => {
       if (node.isMesh && node.material) {
-        node.renderOrder = ordem.obra;
+        node.renderOrder = ordem.artwork;
         node.name = 'dimensao-' + this.data.dimensao + '-obra';
-        registarNaDimensao(this.data.dimensao, node, 'obra');
+        registerContent(this.data.dimensao, node, 'artwork');
       }
     });
   }
@@ -284,7 +161,7 @@ AFRAME.registerComponent('panorama-dimensao', {
       fonte.onload = () => { textura.needsUpdate = true; };
     }
 
-    let ordem = window.portalAR.ordem;
+    let ordem = state.drawOrder;
     this.material = new THREE.MeshBasicMaterial({
       map: textura, side: THREE.BackSide, depthWrite: false,
       stencilWrite: true, stencilWriteMask: 0xFF, stencilFuncMask: 0xFF
@@ -294,7 +171,7 @@ AFRAME.registerComponent('panorama-dimensao', {
     esfera.renderOrder = ordem.panorama;
     esfera.frustumCulled = false;
     this.el.setObject3D('panorama', esfera);
-    registarNaDimensao(this.data.dimensao, esfera, 'panorama');
+    registerContent(this.data.dimensao, esfera, 'panorama');
   },
   tick: function () {
     let esfera = this.el.getObject3D('panorama');
@@ -328,10 +205,10 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     gatilho: { type: 'string', default: 'plano', oneOf: ['plano', 'caixa'] }
   },
   init: function () {
-    let estado = window.portalAR;
+    let estado = state;
     let id = this.data.portalId;
-    if (id < 0 || id >= LIMITE_PORTAIS) {
-      console.warn('[portal] ID ' + id + ' fora do limite 0..' + (LIMITE_PORTAIS - 1) + '; usa 0.');
+    if (id < 0 || id >= MAX_PORTALS) {
+      console.warn('[portal] ID ' + id + ' fora do limite 0..' + (MAX_PORTALS - 1) + '; usa 0.');
       id = 0;
       this.data.portalId = 0;
     }
@@ -355,19 +232,20 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       if (evento.key === 'd' || evento.key === 'D') this.toggleDebugMode();
     });
 
-    estado.portais.push(this);
+    registerPortal(this);
+    // The core does not know about portals: it announces the stencil changed and every
+    // window refreshes itself.
+    this._desinscreverEstencil = on('stencil:changed', () => this.atualizarJanela());
     this.atualizarJanela();
   },
   remove: function () {
-    let lista = window.portalAR.portais;
-    let i = lista.indexOf(this);
-    if (i >= 0) lista.splice(i, 1);
-    window.portalAR.assinatura = null;
+    if (this._desinscreverEstencil) this._desinscreverEstencil();
+    unregisterPortal(this);
   },
   // A dimensão que esta janela mostra agora (null se o portal não diz respeito à
   // dimensão onde se está, ou se pertence a outra dimensão).
   dimensaoMostrada: function () {
-    let ativa = window.portalAR.dimensaoAtiva;
+    let ativa = state.activeDimension;
     if (this.data.pertenceA >= 0 && ativa !== this.data.pertenceA) return null;
     if (ativa === this.data.dimensaoA) return this.data.dimensaoB;
     if (ativa === this.data.dimensaoB) return this.data.dimensaoA;
@@ -376,7 +254,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
   criarQuadro: function () {
     let w = this.data.width;
     let h = this.data.height;
-    let ordem = window.portalAR.ordem;
+    let ordem = state.drawOrder;
 
     // A máscara escreve o valor do stencil E profundidade no plano da janela. A
     // profundidade é o que resolve duas coisas sem código nenhum: (1) quando duas
@@ -393,7 +271,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.maskMesh = new THREE.Mesh(new THREE.PlaneGeometry(w, h, 32, 32), this.maskMat);
     this.maskMesh.name = this.nome + '-mascara';
     this.maskMesh.position.set(0, h / 2, 0);
-    this.maskMesh.renderOrder = ordem.mascara;
+    this.maskMesh.renderOrder = ordem.mask;
     this.portalGroup.add(this.maskMesh);
 
     // A moldura é geometria da dimensão onde o portal está. Não leva teste de
@@ -415,17 +293,17 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     pecas[3].position.set(0, -esp / 2, 0);
     pecas.forEach((peca, i) => {
       peca.name = this.nome + '-moldura-' + i;
-      peca.renderOrder = ordem.moldura;
+      peca.renderOrder = ordem.frame;
       this.portalGroup.add(peca);
     });
   },
   // Diz à máscara que valor escrever (o da dimensão que a janela mostra).
   atualizarJanela: function () {
-    let estado = window.portalAR;
+    let estado = state;
     let mostrada = this.dimensaoMostrada();
     this.portalGroup.visible = mostrada !== null;
     if (mostrada === null) { this.maskMat.stencilWrite = false; return; }
-    let valor = estado.valores.get(mostrada);
+    let valor = estado.stencilValues.get(mostrada);
     if (valor === undefined) {
       // Sem valor livre no stencil: a janela fica sem efeito em vez de escrever
       // um valor errado (0, que é a dimensão ativa).
@@ -481,7 +359,7 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
       THREE.MathUtils.degToRad(rot.y),
       THREE.MathUtils.degToRad(rot.z)
     );
-    this.debugBox.renderOrder = window.portalAR.ordem.debug;
+    this.debugBox.renderOrder = state.drawOrder.debug;
     this.portalGroup.add(this.debugBox);
   },
   // Colisão com a caixa, no espaço do portal (posição e rotação incluídas): não há
@@ -520,8 +398,8 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.sinalZ = sinalZ;
     if (!atravessou) return;
 
-    let ativa = window.portalAR.dimensaoAtiva;
-    definirDimensaoAtiva(ativa === this.data.dimensaoA ? this.data.dimensaoB : this.data.dimensaoA);
+    let ativa = state.activeDimension;
+    setActiveDimension(ativa === this.data.dimensaoA ? this.data.dimensaoB : this.data.dimensaoA);
   }
 });
 
