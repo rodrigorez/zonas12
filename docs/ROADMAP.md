@@ -184,7 +184,7 @@ estão em **inglês**; a documentação e os textos da interface ficam em portug
 Medido no código de hoje: **≈120 linhas das 586 (≈20%) já são um núcleo** — só não têm nome
 nem fronteira. A Fase 1 não cria nada de novo: **move, nomeia e fecha**.
 
-| O que | Onde está hoje | Linhas |
+| O que | Onde estava na v0.0.2 | Linhas |
 | --- | --- | --- |
 | Limites (512 / 512 / 255) | `js/main.js:13-15` | 3 |
 | Estado partilhado (`window.portalAR`) | `js/main.js:17-31` | 15 |
@@ -887,7 +887,7 @@ alteram comportamento.
 | Regressão de render ao modularizar | Média | Alto (é o coração do projeto) | Fase 1 e 2 sem mudar regras; T1–T8 a cada passo |
 | Editor e exposição divergirem | Média | Alto | Partilhar os módulos (D4 opção 4A) |
 | Perder a cena ao gravar | Baixa | Alto | Fase 0/2A: JSON versionado + exportar antes de gravar; cópia antes de qualquer escrita |
-| Crescimento do `main.js` outra vez | Média | Médio | Regra: `main.js` só com o arranque; revisão no fim de cada fase |
+| Crescimento do `js/app.js` outra vez | Média | Médio | Regra: `js/app.js` só com o arranque e os componentes; revisão no fim de cada fase |
 | Complexidade do editor atrasar a exposição | Média | Médio | O editor não bloqueia a exposição: a Fase 3 entrega valor mesmo sem Fase 4 |
 
 ---
