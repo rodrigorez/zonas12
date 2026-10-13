@@ -112,14 +112,18 @@ do que não ter índice.
 - Se a camada é nova, ganha **linha própria no `📍 Location Map`** — e **nenhum número** fica em
   nota de cabeçalho.
 - O que sai de cena vai para o `HARNESS_LOG.md`, **com o motivo** — o registo não se apaga.
-- Antes de dar a alteração por fechada, correr **as três passes** que estão no fim do
-  `skills_index.md` (secção `🔧 Manutenção`):
+- Antes de dar a alteração por fechada, correr o script de validação — sai com **código 0** só
+  quando as três passes estão verdes:
+
+```powershell
+powershell -File .harness/skills/.agent/scripts/validate_skills_index.ps1
+```
 
 | Passe | Pergunta | Tem de dar |
 | :--- | :--- | :--- |
-| **1 — direta** (`índice → disco`) | as entradas que tenho resolvem? | `em falta=0` |
-| **2 — quantidades** | algum número do `Location Map` mente? | `erradas=0` |
-| **3 — inversa** (`disco → índice`) | ficou algo de fora do índice? | `ausentes=0` |
+| **1 — direta** (`índice → disco`) | as entradas que tenho resolvem? | `missing=0` |
+| **2 — quantidades** | algum número do `Location Map` mente? | `wrong=0` |
+| **3 — inversa** (`disco → índice`) | ficou algo de fora do índice? | `unlisted=0` |
 
 > **Só a passe 1 não chega.** Ela pergunta *"as linhas que tenho resolvem?"* e, por construção,
 > **nunca** encontra o que não está no índice — foi essa assimetria que deixou passar skills

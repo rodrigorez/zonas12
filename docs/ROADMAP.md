@@ -126,9 +126,12 @@ passes:
 
 | Passe | Pergunta | Onde corre |
 | :--- | :--- | :--- |
-| **1 — direta** (`índice → disco`) | as entradas resolvem? | `skills_index.md` → `🔧 Manutenção` |
+| **1 — direta** (`índice → disco`) | as entradas resolvem? | `validate_skills_index.ps1` |
 | **2 — quantidades** | algum número do `Location Map` mente? | idem |
 | **3 — inversa** (`disco → índice`) | ficou algo de fora? | idem |
+
+O código é `.harness/skills/.agent/scripts/validate_skills_index.ps1` e sai com **código 0** só
+quando as três estão verdes. Fica fora do índice de propósito: o índice é para consultar.
 
 A **passe 2** fecha a lacuna que deixou passar o erro original: o índice declarava números que
 ninguém conferia. A **passe 3** é a única que olha para o disco à procura do que **falta**.
