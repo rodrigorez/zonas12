@@ -86,7 +86,7 @@ zonas12/
 Sempre que forem pedidas **skills** — ou quando a tarefa pedir uma competência que o harness
 já cobre — a busca é **obrigatoriamente nesta ordem**:
 
-1. Abrir **`.harness/skills/.agent/skills_index.md`** — é o índice único e cobre todo o
+1. Abrir **`.harness/skills/.agent/skills_index.md`** — é o **índice único** e cobre todo o
    `.agent/` (rules, agents, skills, sub-skills, workflows, scripts, ferramentas, vendors,
    standalone e quarentena).
 2. Identificar no índice a skill/agent/workflow pretendido (pelos *triggers*) e **ir ao
@@ -95,14 +95,13 @@ já cobre — a busca é **obrigatoriamente nesta ordem**:
 3. **Só se o índice não tiver** o que se procura é que se faz busca livre (`grep`/`glob`).
 
 O índice é a **única porta de entrada** do harness: não se faz `list_dir` às cegas nas
-subpastas "para ver o que há". Para isso ser verdade, o índice tem de estar **completo** — e é
-a **passe inversa** da validação que garante isso (ver abaixo).
+subpastas "para ver o que há". Para isso ser verdade, ele tem de estar **completo** — e são as
+passes **2** e **3** da validação que garantem isso.
 
-> ⚠️ **Medido em 2026-10-13:** o índice estava incompleto. Faltavam **13** `SKILL.md` — entre
-> eles `3d-games`, `vr-ar` e `web-games`, os mais úteis a este projeto — e **75** `.md` de
-> referência; e descrevia como "cópia" o espelho Cline, que tinha **43 pastas e 0 ficheiros**.
-> A causa foi o validador só perguntar *"as minhas linhas resolvem?"*, nunca o contrário.
-> (O esqueleto Cline e as falsas "junções" já foram **apagados** — ver 🗑️ *Garbage* no índice.)
+> **Divisão de responsabilidades — não repetir números.** O `skills_index.md` é o **único dono
+> das quantidades**; o `HARNESS_LOG.md` guarda a história (quarentena, remoções, medições);
+> este README tem a **regra**; o `docs/ROADMAP.md` tem o **porquê** (D15). Se um número mudar,
+> muda-se **num sítio só**.
 
 #### Manter atualizado (obrigatório)
 
@@ -110,24 +109,26 @@ Quem acrescentar, remover, mover ou renomear **qualquer** item do harness tem de
 o índice na mesma alteração**. O índice e esta regra andam juntos — um índice a mentir é pior
 do que não ter índice.
 
-- Acrescentar/remover linhas **e** ajustar as **quantidades** no `📍 Location Map`
-  (e as notas de cabeçalho das secções).
-- O que sai de cena vai para a secção `🗑️ Garbage` do índice, **com motivo** — o registo não
-  se apaga.
-- Antes de dar a alteração por fechada, correr **os dois comandos** que estão no fim do
+- Se a camada é nova, ganha **linha própria no `📍 Location Map`** — e **nenhum número** fica em
+  nota de cabeçalho.
+- O que sai de cena vai para o `HARNESS_LOG.md`, **com o motivo** — o registo não se apaga.
+- Antes de dar a alteração por fechada, correr **as três passes** que estão no fim do
   `skills_index.md` (secção `🔧 Manutenção`):
-  - **passe direta** (`índice → disco`): todas as entradas resolvem — `em falta=0`;
-  - **passe inversa** (`disco → índice`): nenhum `SKILL.md` fica de fora — `ausentes=0` — e as
-    contagens declaradas (`reference docs`, `skill tooling`, `shared data`, `vendor SKILL.md`,
-    `cline`, `repos .git`) batem com o disco.
 
-> **Só a passe direta não chega.** Ela pergunta *"as linhas que tenho resolvem?"* e, por
-> construção, **nunca** encontra o que não está no índice. Foi essa assimetria que produziu o
-> erro de 2026-10-13.
+| Passe | Pergunta | Tem de dar |
+| :--- | :--- | :--- |
+| **1 — direta** (`índice → disco`) | as entradas que tenho resolvem? | `em falta=0` |
+| **2 — quantidades** | algum número do `Location Map` mente? | `erradas=0` |
+| **3 — inversa** (`disco → índice`) | ficou algo de fora do índice? | `ausentes=0` |
 
-A mesma informação vive em `docs/ROADMAP.md` (§3, decisão D15). Os três ficheiros andam
-juntos: `README.md` (esta regra) → `docs/ROADMAP.md` (o porquê e o histórico) →
-`skills_index.md` (o inventário e a validação).
+> **Só a passe 1 não chega.** Ela pergunta *"as linhas que tenho resolvem?"* e, por construção,
+> **nunca** encontra o que não está no índice — foi essa assimetria que deixou passar skills
+> inteiras. A passe 2 existe porque este número mentiu três vezes; e apanhou uma mentira nova
+> **minutos** depois de ela ser escrita.
+
+A mesma informação vive em `docs/ROADMAP.md` (§3, decisão D15). Os três ficheiros andam juntos,
+**sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
+`skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
 ## Estado atual do código (v0.0.3)
 

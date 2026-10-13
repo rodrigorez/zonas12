@@ -10,19 +10,19 @@
 >
 > **Atualização (2026-10-13, 2.ª):** a decisão **D15 — harness de skills do projeto** foi
 > fechada e registada em §11. A **D8 foi reaberta e substituída**: `.harness/skills/` **já não
-> está vazia** (44 skills locais + 38 `SKILL.md` de vendors) e o material herdado de outro
+> está vazia** (skills locais e de 5 vendors, todas indexadas) e o material herdado de outro
 > projeto foi posto em quarentena — ver §3. O `.harness/` está fora do repositório
 > (`.gitignore`), por isso isto não mexe em código de produção.
 >
 > **Atualização (2026-10-13, 3.ª):** auditoria do harness **ao disco** corrigiu o índice. O
-> índice omitia **13** `SKILL.md` (incluindo `3d-games`, `vr-ar` e `web-games`), **75** `.md` de
-> referência e **15** ferramentas; dava como "cópia" o espelho Cline, que tem **43 pastas e 0
-> ficheiros**; e chamava "junções" a pastas vulgares. A causa era o validador só fazer
-> `índice → disco`. Passou a ter **duas passes**, ambas obrigatórias — ver §3. Na mesma ronda
-> **limpou-se** o que era vazio de facto: o esqueleto Cline (88 pastas, 0 ficheiros), as 3 falsas
-> "junções" e o `__pycache__` — 507 → 411 pastas. Ficaram de propósito os 5 repos `.git` dos
+> índice omitia skills inteiras (incluindo `3d-games`, `vr-ar` e `web-games`), documentação de
+> apoio e ferramentas; dava como "cópia" um espelho que não tinha um único ficheiro; e chamava
+> "junções" a pastas vulgares. A causa era o validador só fazer
+> `índice → disco`. Passou a ter **três passes**, todas obrigatórias — ver §3. Na mesma ronda
+> **limpou-se** o que era vazio de facto: o esqueleto Cline, as falsas
+> "junções" e o `__pycache__`. Ficaram de propósito os repos `.git` dos
 > vendors, que **são funcionais** (servem o `sync-all-vendors.ps1`). Nada disto é código de
-> produção.
+> produção — e os números desta auditoria estão em `HARNESS_LOG.md`, não aqui.
 >
 > **Como usar:** escolher a fase seguinte na secção [9](#9-fases-de-execução), executá-la, e
 > só a dar como fechada quando o **critério de verificação** dela passar. Uma fase de cada
@@ -88,132 +88,67 @@ desenho — exatamente a família de bugs que passámos a semana a corrigir.
 
 ## 3. Skills do projeto — resolvido (D8 reaberta → D15)
 
-**Estado anterior (medido em 2026-10-12):** `.harness/skills/` tinha **89 pastas vazias,
-0 ficheiros** — não havia nada para ler, e a D8 registou a dívida de "deixar como está":
+**O que se decidiu.** O harness de `.harness/skills/` passa a ser **material ativo do projeto**,
+com um **índice único** (`skills_index.md`) como porta de entrada obrigatória. A **D8** — que
+dizia "não se usa nenhuma skill do projeto" — foi reaberta e substituída pela **D15**.
 
-```
-.harness/skills/cline/global-skills/skills/   89 pastas, 0 ficheiros
-   ├── plan-writing/          (sem SKILL.md)
-   ├── brainstorming/         (sem SKILL.md)
-   ├── architecture/          (sem SKILL.md)
-   └── ... 46 outras          (todas vazias)
-```
+**Porque a D8 caiu.** A D8 partia de uma premissa medida em 2026-10-12: `.harness/skills/` tinha
+**89 pastas vazias e 0 ficheiros** — não havia nada para ler, e "não usar nada" era a única
+escolha honesta. Essa premissa **deixou de ser verdade**: a pasta foi depois preenchida com um
+harness completo (rules, agents, skills, workflows, scripts e 5 vendors). Não fazia sentido
+manter a decisão de não usar nada quando passou a haver o que usar.
 
-Entretanto verificaram-se alternativas (`~/.cline/data` sem pasta `skills`;
-`~/Documents/Cline/Rules` e `~/Documents/Cline/Workflows` vazias).
+**Onde estão os detalhes — este documento não os repete.**
 
-**Estado medido (2026-10-13): a premissa da D8 caiu — a pasta já não está vazia.** Tem um
-harness completo:
+| Preciso de… | Onde |
+| :--- | :--- |
+| A **regra de busca** (obrigatória) e como manter | `README.md`, regra 5 |
+| O **inventário** e **todas as quantidades** | `.harness/skills/.agent/skills_index.md` → `📍 Location Map` |
+| A **história**: quarentena, remoções, medições | `.harness/skills/.agent/HARNESS_LOG.md` |
+| A **decisão** e o seu custo | §11 (D15) e §13 |
 
-| Camada | Local (a partir da raiz) | Qtd |
-| --- | --- | --- |
-| Regras (P0) | `.harness/skills/.agent/rules/GEMINI.md` | 1 |
-| Agents | `.harness/skills/.agent/agents/` | 20 |
-| Skills | `.harness/skills/.agent/skills/` | 44 |
-| Sub-skills aninhadas | `.harness/skills/.agent/skills/{mãe}/{sub}/` | **11** |
-| `.md` de referência | `.harness/skills/.agent/skills/{skill}/` | **75** |
-| Workflows (slash commands) | `.harness/skills/.agent/workflows/` | 11 |
-| Scripts de sessão | `.harness/skills/.agent/scripts/` | 4 |
-| Scripts por skill (`.py`) | `.harness/skills/.agent/skills/{skill}/scripts/` | 16 |
-| Ferramentas do organizador | `.harness/skills/.agent/skills/skill-organizer/scripts/` | **15** |
-| Vendors externos | `.harness/skills/.agent/vendor/{vendor}/skills/` | **38** `SKILL.md` = 36 skills + 1 boilerplate + 1 duplicado (5 vendors) |
-| Ficheiros fora de padrão | `.harness/skills/.agent/` (ver 📄 *Standalone*) | **4** |
-| Dados partilhados | `.harness/skills/.agent/.shared/ui-ux-pro-max/` | **27** |
-| Quarentena | `.harness/skills/.agent/garbage/` | 5 |
-| **Total** | `.harness/skills/` | **1126 ficheiros, 411 pastas, 20,3 MB** (após a limpeza) |
-
-**Índice único:** `.harness/skills/.agent/skills_index.md` é o índice do **`.agent/` inteiro**
-(rules, agents, skills, sub-skills, workflows, scripts, ferramentas, vendors, standalone e
-quarentena), com a raiz dos caminhos declarada no topo.
-
-**Validação em duas passes (2026-10-13).** A primeira versão do validador só fazia
-`índice → disco`, e por isso anunciava **131/131 resolvem** enquanto o índice **omitia**
-material. O critério passou a ser **duas** passes, ambas obrigatórias:
-
-| Passe | Pergunta | Resultado medido |
-| --- | --- | --- |
-| Direta (`índice → disco`) | as linhas que tenho resolvem? | `entradas=161  em falta=0` |
-| Inversa (`disco → índice`) | o que está em disco está no índice? | `SKILL.md no disco=93  ausentes=0` |
-
-**A lição:** a passe direta **nunca** encontra o que não está no índice — por construção. Só a
-inversa revelou os **13** `SKILL.md` em falta (entre eles `3d-games`, `vr-ar` e `web-games`) e
-a ficção do espelho Cline.
+> **Divisão de responsabilidades (P2).** As quantidades do harness vivem **num sítio só** — no
+> `📍 Location Map` do índice. Este roadmap, o `README.md` e o índice andam juntos, mas **sem
+> repetirem números**: foi a repetição que obrigava a editar três ficheiros cada vez que uma
+> contagem mudava.
 
 **Regra de busca (obrigatória).** Sempre que forem pedidas **skills**, a busca faz-se nesta
 ordem: **(1)** abrir `.harness/skills/.agent/skills_index.md`; **(2)** ir ao caminho que a linha
 indica; **(3)** só se o índice não tiver o que se procura é que se faz busca livre
-(`grep`/`glob`). O índice é a **única porta de entrada** do harness — não se percorrem as
-subpastas às cegas. A regra está replicada no `README.md` (regra 5) para quem não lê o roadmap.
+(`grep`/`glob`). O índice é a **única porta de entrada** — não se percorrem as subpastas às
+cegas. A regra está replicada no `README.md` (regra 5) para quem não lê o roadmap.
 
-**Manutenção (obrigatória).** Quem acrescentar, remover, mover ou renomear qualquer item do
-harness atualiza o **índice na mesma alteração**: linhas, quantidades do `📍 Location Map`,
-notas de cabeçalho das secções, e o registo em `🗑️ Garbage` do que sai (com motivo). O índice
-traz, no fim, os **dois comandos de validação** — a passe direta (`em falta=0`) **e** a passe
-inversa (`ausentes=0`, com as contagens declaradas a bater com o disco) — e são eles o critério
-de fecho da alteração.
+**Validação — três passes, não uma (2026-10-13).** A primeira versão do validador só fazia
+`índice → disco`, e por isso **anunciava que estava tudo bem enquanto o índice omitia
+material**: skills inteiras, documentação de apoio e ferramentas. Por construção, uma validação
+só nessa direção **nunca** encontra o que não está no índice. O critério passou a ser três
+passes:
 
-**Quarentena.** O harness é uma cópia do kit de outro projeto (`Gabinete`) e trazia caminhos e
-nomes desse projeto. Foi isolado em `.agent/garbage/` o que só faz sentido lá:
+| Passe | Pergunta | Onde corre |
+| :--- | :--- | :--- |
+| **1 — direta** (`índice → disco`) | as entradas resolvem? | `skills_index.md` → `🔧 Manutenção` |
+| **2 — quantidades** | algum número do `Location Map` mente? | idem |
+| **3 — inversa** (`disco → índice`) | ficou algo de fora? | idem |
 
-| Item | Motivo |
-| --- | --- |
-| `garbage/scripts/project_sync.py` | caminhos `c:/.../Projeto/Gabinete/...` **hardcoded** |
-| `garbage/workflows/update-{3d,audio,layout}.md` | escrevem em `GABINETE_DESIGN_SYSTEM.md` / `DESIGN_HISTORY.md` e chamam o script acima |
+A **passe 2** fecha a lacuna que deixou passar o erro original: o índice declarava números que
+ninguém conferia. A **passe 3** é a única que olha para o disco à procura do que **falta**.
 
-As **referências** a `CODEBASE.md`, `ARCHITECTURE.md` e `GABINETE_DESIGN_SYSTEM.md` dentro de
-ficheiros ainda ativos (rules e agents) tornaram-se condicionais ou foram reapontadas para o
-índice. Dois scripts referenciados mas **inexistentes** (`dependency_analyzer.py`,
-`bundle_analyzer.py`) foram removidos do `GEMINI.md` e do `verify_all.py`.
+**A lição, registada:** um índice que valida apenas a si próprio não pode detectar o que não
+está nele. Foi o que aconteceu — e é a razão de a passe 3 existir.
 
-**O que isto resolve:** as skills úteis a este projeto passam a ser localizáveis —
-`game-development` com as sub-skills **`3d-games`** (rendering, shaders, câmara),
-**`web-games`** (browser, otimização) e **`vr-ar`** (conforto, interação), o mais próximo de
-A-Frame que o harness tem; `frontend-design` e `mobile-design` (HUD/UI); `webapp-testing`
-(Playwright, que já usamos); `testing-patterns`; `systematic-debugging`;
-`documentation-templates`; `i18n-localization` (a D12 usa `i18n/`); `clean-code`; e, no pack
-*superpowers*, `verification-before-completion`, `writing-plans` e
-`finishing-a-development-branch`. Deixa de haver razão para não usar skills do projeto.
+**O que isto resolve.** O harness deixa de ser um bloqueio e passa a ser utilizável — incluindo
+as três sub-skills mais próximas de A-Frame (`3d-games`, `web-games` e `vr-ar`), que estavam
+invisíveis porque o índice só listava a skill-mãe. A lista completa está no `skills_index.md`.
 
-**Limpeza feita (2026-10-13) — e as correções.** O "espelho Cline" e duas das três "junções" de
-descoberta não tinham **conteúdo nenhum**: eram pastas vazias. Foram apagadas.
-
-| O que | Medido antes | Estado |
-| --- | --- | --- |
-| Espelho Cline (`cline/`) | 88 pastas, **0 ficheiros** | **apagado** — não era referenciado por nada no `.agent/` |
-| `.agents/`, `.claude/`, `.opencode/` | 3 pastas, **0 ficheiros**, `LinkType=''` | **apagadas** — não eram junções, e nenhum script as criou |
-| `__pycache__` do `/ui-ux-pro-max` | 2 `.pyc` | **apagado** — regenera-se quando os scripts correm |
-
-Medido: 507 → **411** pastas, 1128 → **1126** ficheiros, 20,4 → **20,3 MB**.
-
-**Três propostas de limpeza foram rejeitadas depois de inspecionar — é a parte que importa:**
-
-| Item | Porque **não** se apaga |
-| --- | --- |
-| 5 repos `.git` dos vendors (~4,4 MB) | **São funcionais:** o `sync-all-vendors.ps1` procura-os (`-Filter ".git"`) e corre `git pull` em cada; o `update-registry.ps1` lê o commit com `git -C … log -1`. Apagá-los partia a sincronização de vendors |
-| `frontend-slides/plugins/` (80 ficheiros) | É **conteúdo do clone do vendor** (estrutura de *plugin* do Claude Code). Apagar seria modificação local — o `git pull` traria de volta |
-| `skills/doc.md` (177 linhas) | É o **guia do kit** *"Antigravity Skills"*. Não era lixo, só estava sem explicação; passou a 📄 *Standalone files* |
-
-Se um dia se quiser expor os skills dos vendors às outras ferramentas, corre-se
-`create-junctions.ps1 -VendorName <vendor>` — isso recria a estrutura **a sério**, com conteúdo.
-
-**Peso e estrutura.** `.harness/skills/` tem **1126 ficheiros, 411 pastas, 20,3 MB** (após a
-limpeza), dos quais **894** (79%) são de vendors. Há **5 repositórios Git** (`superpowers`
-3.327 KB, `zarazhangrui/frontend-slides` 726 KB, `petar-nauka/fact-check` 167 KB,
-`blader/humanizer` 119 KB, `zarazhangrui/call-me` 54 KB — ~4,4 MB) e **são funcionais**: é neles
-que o `sync-all-vendors.ps1` faz `git pull` e de onde o `update-registry.ps1` lê o commit. Também
-explicam os 70 `.sample` (14 hooks × 5) e os 5 `.pack`. Os restantes ficheiros de peso são
-dependências legítimas: 54 `.ttf` e 117 `.xsd`.
-
-**Consequência do `.gitignore`.** `.harness/` está no `.gitignore` (linha 1), por isso nada
-disto toca no repositório — e **nada do harness existe num clone ou no GitHub**. A regra de
-busca (§5 do README) e a manutenção obrigatória valem **só nesta máquina**: são inexequíveis a
-partir do repositório. Se a regra do `.gitignore` cair, há que remover os 5 repos aninhados
-**antes**, senão viram *gitlinks* e estragam o histórico.
+**Peso, quarentena e o `.gitignore`.** O material herdado de outro projeto (`Gabinete`) está
+isolado em `.agent/garbage/` e o que foi removido está registado com motivo. `.harness/` está no
+`.gitignore` (linha 1): **nada** do harness — nem o índice, nem o log — existe num clone ou no
+GitHub, e a regra de busca vale **só nesta máquina**. As medições de peso e a razão pela qual os
+5 repos `.git` dos vendors **não** se apagam estão em `HARNESS_LOG.md` §7 e §4.
 
 **Decisão:** D8 **reaberta e substituída** pela **D15** (§11).
 
 ---
-
 
 ## 4. Decisões estruturais (opções com causa e consequência)
 
@@ -840,7 +775,7 @@ existe para resolver. Fica **antes** da Fase 4 para o editor já nascer com sele
   0 ficheiros), as 3 falsas "junções" de descoberta e o `__pycache__`. Mantidos de propósito: os
   **5 repos `.git`** dos vendors (**funcionais** — o `sync-all-vendors.ps1` faz `git pull`
   neles), o `frontend-slides/plugins/` (conteúdo do clone) e o `skills/doc.md` (guia do kit).
-  Índice verificado nas **duas passes** (`entradas=161  em falta=0`; `SKILL.md=93  ausentes=0`).
+  Índice verificado nas **três passes** (ver `🔧 Manutenção`, no próprio índice).
   Resta só decidir se o conteúdo de `.agent/garbage/` é adaptado ao projeto ou apagado de vez.
 - **Verificação:** `npm test`-like (ou `node testes/regressao.mjs`) verde na `main`.
 
@@ -911,22 +846,23 @@ estados**, nunca valores absolutos de cor, e dar margem às fronteiras geométri
 | D5 | O que é o módulo da câmara | **FECHADA** (2026-10-12) | **As duas**: câmara-jogador (posição, movimento, controles) e câmara-real (webcam/AR), em secções separadas do mesmo módulo |
 | D6 | Onde vivem a documentação de planeamento e as ferramentas | **FECHADA** (2026-10-12) | **`docs/` para o roadmap e `tools/` para o script de assets**, ambos versionados. A raiz mantém só o essencial (`index.html`, `README.md`, `css/`, `js/`, `assets/`) |
 | D7 | Organização dos assets | **FECHADA** (2026-10-12) | **Separar por tipo** (`assets/panoramas/`, `assets/artworks/`, `assets/video/`) + prefixo `d<N>-` no nome do ficheiro, na variante **organizativa (P1)**: o prefixo diz onde o ficheiro mora; quem o usa está no JSON |
-| D8 | Skills do projeto vazias | **REABERTA E SUBSTITUÍDA** pela D15 (2026-10-13) | Motivo escrito: **a premissa caiu** — a pasta não estava vazia (`.harness/skills/` tem 44 skills locais e 55 `SKILL.md`, mais 38 `SKILL.md` de vendors = 36 skills reais, medido em §3). A escolha de "não se usa nenhuma skill do projeto" deixou de se justificar |
+| D8 | Skills do projeto vazias | **REABERTA E SUBSTITUÍDA** pela D15 (2026-10-13) | Motivo escrito: **a premissa caiu** — a pasta não estava vazia (tem skills locais e de 5 vendors; quantidades em `📍 Location Map`). A escolha de "não se usa nenhuma skill do projeto" deixou de se justificar |
 | D9 | A cena atual é conteúdo real ou demo | **FECHADA** (2026-10-12) | **É demonstração, mas fica no repositório como cena de exemplo** (serve de teste e de montra) |
 | D10 | Idioma do código | **FECHADA** (2026-10-12) | **Inglês no código** (identificadores, comentários, mensagens de consola, chaves do JSON); **português na documentação e nos textos da interface** |
 | D11 | Arquitetura de render | **FECHADA** (2026-10-12) | **Manter o stencil partilhado e o núcleo.** Não migrar para *render-to-texture* por portal (ver §5.0) |
 | D12 | Idiomas | **FECHADA** (2026-10-12) | **Código em inglês, documentação em português, interface preparada para vários idiomas** (catálogo em `i18n/`, português como língua de origem). Variante confirmada: **A** — catálogo para a interface + **campos por idioma nos dados**; língua escolhida por `?lang=`, com português por omissão |
 | D13 | Nome dos ficheiros de dados | **FECHADA** (2026-10-12) | **`data/scene.json`** (a exposição) e **`data/scene-example.json`** (a cena de exemplo/fixture) — inglês, coerente com a D10 |
 | D14 | Mundos e portas de mundo | **FECHADA** (2026-10-13) | **Um endereço por mundo, com recarga de página** (`/praia/`, pasta por sala, arranque com `<base href="../">`); o **portão é um mundo** (o de entrada, com a câmara/AR); a **porta de mundo** mostra um retrato estático do destino **com paralaxe** e a travessia **navega** (`?from=<slug>` opcional); a chegada é **atrás da porta inversa** (V-d); o portal passa a ter **dois eixos** — `window` e `action` — com **tabelas de comportamentos** no módulo do portal; **sem manifesto** (M5) e **sem dados de outro mundo** a atravessar a fronteira |
-| D15 | Harness de skills do projeto | **FECHADA** (2026-10-13) — **emendada no mesmo dia** | **Usar o harness de `.harness/skills/` com um índice único e verificado.** O índice `.agent/skills_index.md` passa a cobrir o **`.agent/` inteiro** (rules, agents, skills, sub-skills, workflows, scripts, ferramentas, vendors, standalone, quarentena) e a declarar a raiz dos caminhos; as entradas são **validadas contra o disco em duas passes** — `índice → disco` (`entradas=161  em falta=0`) **e** `disco → índice` (`SKILL.md no disco=93  ausentes=0`, mais as contagens declaradas). O material herdado de outro projeto (`Gabinete`) é **isolado em `.agent/garbage/`** (`project_sync.py`, `update-{3d,audio,layout}.md`) e as referências a `CODEBASE.md` / `ARCHITECTURE.md` / `GABINETE_DESIGN_SYSTEM.md` em ficheiros ativos tornam-se condicionais ou apontam para o índice. Scripts referenciados mas **inexistentes** são removidos. **Limpeza (2026-10-13):** apagados o esqueleto Cline (88 pastas, 0 ficheiros), as 3 falsas "junções" de descoberta e o `__pycache__`; mantidos os 5 repos `.git` dos vendors (**funcionais** — servem o `sync-all-vendors.ps1`), o `frontend-slides/plugins/` (conteúdo do clone) e o `skills/doc.md` (guia do kit). **Custo aceite:** as pastas de descoberta automática dos vendors não existem; recriá-las é um comando quando se quiser |
+| D15 | Harness de skills do projeto | **FECHADA** (2026-10-13) — **emendada no mesmo dia** | **Usar o harness de `.harness/skills/` com um índice único e verificado.** O índice `.agent/skills_index.md` passa a cobrir o **`.agent/` inteiro** (rules, agents, skills, sub-skills, workflows, scripts, ferramentas, vendors, standalone, quarentena) e a declarar a raiz dos caminhos; as entradas são **validadas contra o disco em três passes** — `índice → disco`, **quantidades** e `disco → índice`. O material herdado de outro projeto (`Gabinete`) é **isolado em `.agent/garbage/`** (`project_sync.py`, `update-{3d,audio,layout}.md`) e as referências a `CODEBASE.md` / `ARCHITECTURE.md` / `GABINETE_DESIGN_SYSTEM.md` em ficheiros ativos tornam-se condicionais ou apontam para o índice. Scripts referenciados mas **inexistentes** são removidos. **Limpeza (2026-10-13):** apagados o esqueleto Cline (88 pastas, 0 ficheiros), as 3 falsas "junções" de descoberta e o `__pycache__`; mantidos os 5 repos `.git` dos vendors (**funcionais** — servem o `sync-all-vendors.ps1`), o `frontend-slides/plugins/` (conteúdo do clone) e o `skills/doc.md` (guia do kit). **Custo aceite:** as pastas de descoberta automática dos vendors não existem; recriá-las é um comando quando se quiser |
 
 > **Emenda da D15 (2026-10-13, 3.ª atualização).** A primeira versão do índice foi dada como
-> fechada com **uma** passe de validação (`131/131`) — e essa passe **não consegue** detectar
+> fechada com **uma** passe de validação — e essa passe **não consegue** detectar
 > material que *falta* no índice, porque só pergunta se as linhas que existem resolvem. Medido
-> ao disco, o índice omitia **13** `SKILL.md` (entre eles `3d-games`, `vr-ar` e `web-games`),
-> **75** `.md` de referência e **15** ferramentas; dava como "cópia" um espelho Cline com **43
-> pastas e 0 ficheiros**; e chamava "junções" a pastas vulgares. Corrigido em §3, no
-> `skills_index.md` e no `README.md` (regra 5), com a **passe inversa** a passar a obrigatória.
+> ao disco, o índice omitia skills inteiras, documentação de apoio e ferramentas, e descrevia
+> como "cópia" um espelho que não tinha um único ficheiro. Corrigido em §3, no
+> `skills_index.md` e no `README.md` (regra 5): passou a haver **três** passes, com a inversa a
+> olhar para o disco à procura do que falta. **Os números exatos desta auditoria estão em
+> `HARNESS_LOG.md`.**
 
 ### Efeitos da D14 na execução
 
@@ -1262,7 +1198,7 @@ alteram comportamento.
 | D12 | Idiomas | Código em inglês, docs em português, interface traduzível (catálogo `i18n/`, PT como origem) |
 | D13 | Ficheiros de dados | `data/scene.json` + `data/scene-example.json` |
 | D14 | Mundos e portas de mundo | Um endereço por mundo (com recarga); o portão é um mundo de entrada; a porta de mundo é um retrato com paralaxe + navegação (`?from=` opcional); o portal passa a ter dois eixos (`window`/`action`) com tabelas de comportamentos no módulo |
-| D15 | Harness de skills | Usar o harness de `.harness/skills/` com **índice único** (`.agent/skills_index.md`, cobrindo todo o `.agent/`) **validado contra o disco em duas passes** (`entradas=161  em falta=0`; `SKILL.md=93  ausentes=0`); **quarentena** em `.agent/garbage/` do material herdado do `Gabinete`; **limpeza** feita (esqueleto Cline, falsas junções e `__pycache__` apagados; os repos `.git` dos vendors mantidos por serem funcionais) |
+| D15 | Harness de skills | Usar o harness de `.harness/skills/` com **índice único** (`.agent/skills_index.md`, cobrindo todo o `.agent/`) **validado contra o disco em três passes**; **quarentena** em `.agent/garbage/` do material herdado do `Gabinete`; **limpeza** feita (esqueleto Cline, falsas junções e `__pycache__` apagados; os repos `.git` dos vendors mantidos por serem funcionais) |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -1272,7 +1208,7 @@ alteram comportamento.
 **D15 fechada em 2026-10-13, emendada no mesmo dia** — harness de skills: estado medido em §3,
 decisão (e emenda) em §11, e a limpeza da Fase 6 em §9. **Reabre e substitui a D8.** A emenda
 corrigiu um índice que omitia **13** `SKILL.md` e **75** `.md`, porque o validador só corria
-numa direção; passou a exigir **duas passes**. Não é código de produção: `.harness/` está fora
+numa direção; passou a exigir **três passes** — a inversa e a das quantidades. Não é código de produção: `.harness/` está fora
 do repositório (`.gitignore`), por isso nada disto altera o que se publica.
 
 ### O que fica decidido, em uma frase
