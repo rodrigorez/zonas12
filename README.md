@@ -26,7 +26,7 @@ zonas12/
 │   │   ├── favicon.ico                       vazio, sem uso
 │   │   └── vscode-config/settings.json       configuração do editor
 │   ├── imagenTeste/    capturas de ecrã usadas para diagnosticar problemas
-│   └── skills/         material auxiliar de trabalho
+│   └── skills/         harness de skills para IA — índice em .agent/skills_index.md (regra 5)
 └── .gitignore
 ````
 
@@ -66,15 +66,67 @@ zonas12/
 - Utilize `index.html` como ponto de entrada principal
 - Mantenha a raiz limpa: o que não é essencial vai para `.harness/`
 - Arquivos em `.harness/` são históricos e não devem ser modificados
+  **(exceção: `skills/` é material ativo e mantém-se atualizado — regra 5)**
 
 #### Para IA
 
 - SEMPRE use `assets/images/` para novos assets
 - SEMPRE documente componentes novos no `README.md`
 - NUNCA ponha na raiz nada que não seja preciso para o projeto funcionar
-- NÃO modifique arquivos em `.harness/`
+- NÃO modifique o material **histórico** de `.harness/` (`dev/`, `imagenTeste/`) — o
+  `.harness/skills/` é ferramenta ativa e mantém-se atualizado (regra 5)
+- SEMPRE procure skills primeiro no `.harness/skills/.agent/skills_index.md` e só depois no
+  caminho que a linha indica (regra 5)
+- SEMPRE atualize o `skills_index.md` na mesma alteração em que mexe no harness (regra 5)
 - Ao mexer no render (stencil/profundidade), leia primeiro *Requisitos técnicos* e
   *Estado atual do código* neste README
+
+### 5. Skills do projeto (busca obrigatória)
+
+Sempre que forem pedidas **skills** — ou quando a tarefa pedir uma competência que o harness
+já cobre — a busca é **obrigatoriamente nesta ordem**:
+
+1. Abrir **`.harness/skills/.agent/skills_index.md`** — é o índice único e cobre todo o
+   `.agent/` (rules, agents, skills, sub-skills, workflows, scripts, ferramentas, vendors,
+   standalone e quarentena).
+2. Identificar no índice a skill/agent/workflow pretendido (pelos *triggers*) e **ir ao
+   caminho que a linha indica** (`SKILL.md`, `{name}.md`, `{cmd}.md`, `{name}.py`, ou o caminho
+   completo em 📄 *Standalone files*).
+3. **Só se o índice não tiver** o que se procura é que se faz busca livre (`grep`/`glob`).
+
+O índice é a **única porta de entrada** do harness: não se faz `list_dir` às cegas nas
+subpastas "para ver o que há". Para isso ser verdade, o índice tem de estar **completo** — e é
+a **passe inversa** da validação que garante isso (ver abaixo).
+
+> ⚠️ **Medido em 2026-10-13:** o índice estava incompleto. Faltavam **13** `SKILL.md` — entre
+> eles `3d-games`, `vr-ar` e `web-games`, os mais úteis a este projeto — e **75** `.md` de
+> referência; e descrevia como "cópia" o espelho Cline, que tem **43 pastas e 0 ficheiros**.
+> A causa foi o validador só perguntar *"as minhas linhas resolvem?"*, nunca o contrário.
+
+#### Manter atualizado (obrigatório)
+
+Quem acrescentar, remover, mover ou renomear **qualquer** item do harness tem de **atualizar
+o índice na mesma alteração**. O índice e esta regra andam juntos — um índice a mentir é pior
+do que não ter índice.
+
+- Acrescentar/remover linhas **e** ajustar as **quantidades** no `📍 Location Map`
+  (e as notas de cabeçalho das secções).
+- O que sai de cena vai para a secção `🗑️ Garbage` do índice, **com motivo** — o registo não
+  se apaga.
+- Antes de dar a alteração por fechada, correr **os dois comandos** que estão no fim do
+  `skills_index.md` (secção `🔧 Manutenção`):
+  - **passe direta** (`índice → disco`): todas as entradas resolvem — `em falta=0`;
+  - **passe inversa** (`disco → índice`): nenhum `SKILL.md` fica de fora — `ausentes=0` — e as
+    contagens declaradas (`reference docs`, `skill tooling`, `shared data`, `vendor SKILL.md`,
+    `cline`, `repos .git`) batem com o disco.
+
+> **Só a passe direta não chega.** Ela pergunta *"as linhas que tenho resolvem?"* e, por
+> construção, **nunca** encontra o que não está no índice. Foi essa assimetria que produziu o
+> erro de 2026-10-13.
+
+A mesma informação vive em `docs/ROADMAP.md` (§3, decisão D15). Os três ficheiros andam
+juntos: `README.md` (esta regra) → `docs/ROADMAP.md` (o porquê e o histórico) →
+`skills_index.md` (o inventário e a validação).
 
 ## Estado atual do código (v0.0.3)
 
