@@ -136,6 +136,29 @@ a única parte global, porque o stencil é um recurso de toda a cena. Os 4 módu
 - A dimensão 0 não tem conteúdo 3D: dentro das janelas que a mostram vê-se a imagem real
   da câmara (o canvas é transparente).
 
+## Mundos e portas de mundo — planeado, não implementado
+
+> ⚠️ **Nada desta secção existe no código.** É planeamento aprovado em **2026-10-13**
+> (decisão **D14**, registada em [docs/ROADMAP.md](docs/ROADMAP.md), §11). Fica aqui para o
+> conceito não viver só no roadmap.
+
+Um **mundo** é o que hoje é a cena inteira: um conjunto fechado de dimensões, com os seus
+portais internos e o seu conteúdo. Passa a haver **um endereço por mundo** (`/praia/`) e um
+**portão** — o mundo de entrada, na raiz, com a câmara/AR — com uma porta para cada sala.
+Dentro de uma sala só se navega pelas dimensões dessa sala.
+
+| Hoje | Planeado |
+| --- | --- |
+| Uma página, uma cena, quatro dimensões | Uma **pasta por mundo**, com o seu próprio JSON e o seu arranque `index.html` |
+| O portal liga duas dimensões (`dimensaoA`/`dimensaoB`) | O portal passa a ter **dois eixos**: `window` (o que a janela mostra) e `action` (o que a travessia faz) |
+| A travessia muda a dimensão ativa | A **porta de mundo** mostra um **retrato** do destino (imagem panorâmica, com paralaxe) e a travessia **navega para a URL** e recarrega a página |
+| Técnica do stencil | **Igual dentro de cada sala** — as leis L1–L8 e os testes T1–T8 continuam a valer |
+
+Como o isolamento é por endereço, **nada do outro mundo é lido** pela página de origem: só
+atravessam o *slug* do destino, um parâmetro opcional `?from=<slug>` e a imagem do retrato.
+O formato dos dados, as leis novas (L9–L18), os testes (T10–T12) e a fase de execução
+(**Fase 3B**) estão em [docs/ROADMAP.md](docs/ROADMAP.md).
+
 ## Funcionalidades Principais
 
 ### 1. Dimensões e Portais (arquitetura modular)
