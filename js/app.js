@@ -30,6 +30,18 @@ window.portalAR = {
   ordem: { mascara: 1, panorama: 2, obra: 3, moldura: 4, debug: 10 }
 };
 
+// --- DEBUG AND TEST HANDLE ---
+// The console and the regression scripts (docs/ROADMAP.md section 10) need to drive the
+// scene without depending on the module scope. The application itself does not use this.
+// The names are already the final ones (D10); the internal functions are renamed as they
+// move to js/core/.
+window.portalDebug = {
+  state: window.portalAR,
+  setActiveDimension: definirDimensaoAtiva,
+  applyStencilState: aplicarEstadoEstencil,
+  registerContent: registarNaDimensao
+};
+
 // Temporários reutilizados nos ticks (evita alocar por frame).
 const _pontoMundo = new THREE.Vector3();
 const _pontoCaixa = new THREE.Vector3();
@@ -583,3 +595,12 @@ function tratarErroCamera(error) {
   document.body.appendChild(errorMsg);
   document.getElementById('btn-iniciar').style.display = 'none';
 }
+
+// --- TEMPORARY BRIDGE TO THE INTERFACE ---
+// index.html still calls these from inline attributes (onclick) and from its own inline
+// script. Now that this file is a module, its scope is no longer global, so they have to be
+// reachable from window. Removed in Fase 4, when the interface becomes a module with its
+// own listeners.
+window.fecharObra = fecharObra;
+window.configurarBotoesMobile = configurarBotoesMobile;
+window.tratarErroCamera = tratarErroCamera;

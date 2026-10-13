@@ -13,7 +13,7 @@ zonas12/
 ├── css/
 │   └── style.css       estilos da página, HUD, modal e D-pad
 ├── js/
-│   └── main.js         toda a lógica (dimensões, portais, stencil, obras)
+│   └── app.js          entrada do módulo: componentes, movimento, carregamento
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos + página de edição)
 ├── assets/
@@ -77,8 +77,12 @@ zonas12/
 
 ## Estado atual do código (v0.0.2)
 
-Marcado pela branch `v0.0.2`. Resumo do que existe hoje: `index.html` (183 linhas),
-`js/main.js` (547 linhas), `css/style.css` (74 linhas) e `assets/images/`.
+Marcado pela branch `v0.0.2`. Resumo do que existe hoje: `index.html` (213 linhas),
+`js/app.js` (607 linhas), `css/style.css` (84 linhas), `assets/images/`, `data/scene.json`,
+`i18n/pt.json` e as ferramentas em `tools/`.
+
+O `js/app.js` é a **entrada do módulo** (`<script type="module">`): é o passo 1 da Fase 1
+do roadmap, que dá origem ao núcleo em `js/core/` e aos 4 módulos.
 
 ### O que está implementado
 
@@ -148,7 +152,7 @@ com os outros portais.
 #### O estado: a dimensão ativa
 
 Há uma só fonte de verdade — `window.portalAR.dimensaoAtiva`, a dimensão onde o
-utilizador está (`js/main.js`). Todos os portais e todo o conteúdo leem daqui, por
+utilizador está (`js/app.js`). Todos os portais e todo o conteúdo leem daqui, por
 isso vários portais nunca ficam em desacordo:
 
 - **Dimensão ativa** (onde estás): o conteúdo dela é desenhado em todo o lado onde
@@ -279,7 +283,9 @@ panorama, mesmas obras).
 
 - `renderer="...; stencil: true"` no `<a-scene>`: a partir do three r184 o buffer de
   stencil **não é criado por omissão**.
-- `renderer.sortObjects = true` em `config-ar` (`js/main.js`): com `false` o three
+- `<script type="module" src="js/app.js">`: a entrada é um módulo ES (D1 do roadmap), por
+  isso o projeto tem de ser servido por HTTP.
+- `renderer.sortObjects = true` em `config-ar` (`js/app.js`): com `false` o three
   **ignora o `renderOrder`** e desenha pela ordem da árvore — o que só funciona por acaso
   com um portal. Com vários, as máscaras têm de ser desenhadas antes de todo o conteúdo.
 - Ordem de desenho (`renderOrder`): máscara (1) → panorama (2) → obras (3) → moldura (4).
@@ -350,7 +356,7 @@ for a **dimensão ativa**: vê-la pela janela não conta.
 
 - Sistema de estados para controlar movimentação do usuário **(REMOVIDO)**
 - Impede que o usuário saia do ambiente virtual **(REMOVIDO)**
-- O componente `limite-movimento` e a configuração `CONFIG_NAVEGACAO` foram removidos (já não existem no `js/main.js`) **(REMOVIDO)**
+- O componente `limite-movimento` e a configuração `CONFIG_NAVEGACAO` foram removidos (já não existem no `js/app.js`) **(REMOVIDO)**
 
 **Nota**: O sistema antigo de limitação de movimento foi removido para evitar barreiras invisíveis que impediam a navegação fluida. O portal agora funciona com detecção 3D precisa sem restrições artificiais.
 
@@ -368,7 +374,7 @@ for a **dimensão ativa**: vê-la pela janela não conta.
 
 ### Funcionamento do Portal
 
-Tudo é decidido por frame em `gestor-dimensoes` (`js/main.js`), pela colisão com a caixa
+Tudo é decidido por frame em `gestor-dimensoes` (`js/app.js`), pela colisão com a caixa
 e pelo `dimensaoAtiva`:
 
 - **Onde estás**: o conteúdo da tua dimensão desenha-se em todo o lado **excepto** onde uma
@@ -403,9 +409,10 @@ Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caix
 
 ### 1. Executar o Projeto
 
-1. Sirva a pasta do projeto por HTTP (por exemplo `python -m http.server 8123`) e abra
-   `http://127.0.0.1:8123/index.html` — abrir o arquivo directamente também funciona, mas
-   algumas texturas exigem HTTP
+1. **Sirva a pasta por HTTP** — abrir o `index.html` com duplo clique **já não funciona**:
+   a entrada é um módulo ES (`js/app.js`) e os módulos não carregam por `file://`. Na raiz
+   do projeto, por exemplo: `python -m http.server 8123`, e abra
+   `http://127.0.0.1:8123/index.html`
 2. Clique no botão "ATIVAR EXPOSIÇÃO"
 3. Permita o acesso à câmera quando solicitado (é a dimensão 0, a realidade)
 4. Explore o ambiente utilizando o mouse (desktop) ou o D-pad (mobile)

@@ -53,6 +53,11 @@ independentes. São factos verificados por leitura do ficheiro.
 | A7 | `gestor-dimensoes.tick()` | Deteta travessias **e** atribui valores de stencil | Duas responsabilidades no mesmo sítio; a travessia é do portal, a atribuição é do núcleo |
 | A8 | `config-ar` | `sortObjects`, `autoClearStencil`, `setClearColor` | É configuração de render: tem de ser única e correr antes de tudo |
 
+> **Nota (Fase 1).** As referências de linha desta tabela são da **v0.0.2**, quando a
+> lógica estava toda em `js/main.js`. Depois do passo 1 da Fase 1 esse ficheiro passou a
+> ser `js/app.js` (entrada de módulo) e as linhas deslocaram-se; a Fase 2 leva cada bloco
+> para `js/modules/`.
+
 **Leitura destes factos:** o pedido de "4 módulos independentes" é possível, mas **não é
 possível sem um núcleo**. A alternativa (módulos verdadeiramente autónomos) obrigaria a
 duplicar a lógica de stencil em cada um, e a primeira coisa a divergir seria a ordem de
@@ -595,12 +600,25 @@ fase se compara.
 | T1 | Travessias dos 8 portais | 8/8 corretas |
 | T2 | Bordo da moldura cortado | 0 poses em 69 testadas |
 | T3 | Contorno da moldura fecha | 0 falhas em 956 amostras |
-| T4 | Janela no hub (portal 0) | fora transparente `0,0,0,0`; centro `157,165,159,255` |
-| T5 | Portal de trás atrás de um da frente | moldura de trás 27060 px, **0** dentro da janela da frente |
+| T4 | Janela no hub (portal 0) | **alfa**: 0 fora, 255 no centro (métrica por alfa, não por cor) |
+| T5 | Portal de trás atrás de um da frente | contribuição da moldura de trás **dentro** da janela da frente: **0 px** (medido por diferença, com margem de 3 px) |
 | T6 | Clique na obra | abre na dimensão ativa; não abre noutra |
 | T7 | Chegada aos portais | 1 troca por travessia (sem ping-pong) |
 | T8 | Consola | 0 erros, 0 avisos, 0 pedidos falhados |
 | — | Conversão HTML→JSON (validação campo a campo) | **161 campos** comparados, **0 diferenças** |
+
+**Lição de método (Fase 1).** Duas destas medições eram frágeis e foram corrigidas:
+
+- **T4** comparava a **cor exata** de um panorama fotográfico — que muda com o texel
+  amostrado. Passou a comparar **alfa** (0 fora, 255 dentro), que é o que o teste quer
+  provar.
+- **T5** contava pixels vermelhos **sem margem** e apanhava uma **coluna de 1 px** da
+  moldura do próprio portal, exatamente na aresta do polígono da janela — deu 509 px numa
+  execução e 0 noutra, sem qualquer diferença no render. Passou a medir por **diferença**
+  (com a moldura de trás visível e escondida) e com **margem de 3 px**: contribuição 0.
+
+Regra para a automação (Fase 6): medir **presença/ausência** ou **diferença entre dois
+estados**, nunca valores absolutos de cor, e dar margem às fronteiras geométricas.
 
 ---
 

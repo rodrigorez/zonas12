@@ -1,20 +1,19 @@
 #!/usr/bin/env node
-// Fase 0 do roadmap (docs/ROADMAP.md): converte a cena escrita a mao em index.html
-// para data/scene.json.
+// Phase 0 of the roadmap (docs/ROADMAP.md): converts the hand-written scene in index.html
+// into data/scene.json.
 //
-// Porque existe um script: converter 8 portais e 10 obras a mao convidava a trocar
-// campos (dimensaoA -> dimensionA, caixa -> box, pertenceA -> ownedBy). O script faz a
-// conversao uma vez, de forma repetivel, e tools/html-to-scene-json/validate.mjs
-// confere o resultado.
+// Why a script: converting 8 portals and 10 artworks by hand invited swapped fields
+// (dimensaoA -> dimensionA, caixa -> box, pertenceA -> ownedBy). The script does the
+// conversion once, repeatably, and tools/html-to-scene-json/validate.mjs checks it.
 //
-// Le:
-//   index.html    entidades da cena (assets, camara, dimensoes, portais, obras)
-//   js/main.js    valores que ainda vivem no codigo (caixa, gatilho, moldura, velocidade)
-// Escreve:
-//   data/scene.json           cena da exposicao
-//   data/scene-example.json   a mesma cena, mantida como exemplo/fixture (D9)
+// Reads:
+//   index.html    the scene entities (assets, camera, dimensions, portals, artworks)
+//   js/app.js     values that still live in the code (box, trigger, frame, speed)
+// Writes:
+//   data/scene.json           the exhibition scene
+//   data/scene-example.json   the same scene, kept as example/fixture (D9)
 //
-// Uso: node tools/html-to-scene-json/convert.mjs
+// Usage: node tools/html-to-scene-json/convert.mjs
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -27,7 +26,7 @@ const warnings = [];
 const warn = (message) => warnings.push(message);
 
 const html = readFileSync(join(root, 'index.html'), 'utf8');
-const js = readFileSync(join(root, 'js', 'main.js'), 'utf8');
+const js = readFileSync(join(root, 'js', 'app.js'), 'utf8');
 
 // ---------------------------------------------------------------- helpers
 
@@ -50,11 +49,11 @@ function round(value, decimals = 4) {
   return Number(Number(value).toFixed(decimals));
 }
 
-// Le um valor que ainda vive no codigo (js/main.js). Falha alto em vez de inventar.
+// Reads a value that still lives in the code. Fails loudly instead of inventing one.
 function fromCode(regexp, label) {
   const m = js.match(regexp);
   if (!m) {
-    warn(`could not read "${label}" from js/main.js - the JSON will miss it`);
+    warn(`could not read "${label}" from js/app.js - the JSON will miss it`);
     return null;
   }
   return m;
