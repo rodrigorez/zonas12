@@ -102,6 +102,11 @@ passes **2** e **3** da validação que garantem isso.
 > das quantidades**; o `HARNESS_LOG.md` guarda a história (quarentena, remoções, medições);
 > este README tem a **regra**; o `docs/ROADMAP.md` tem o **porquê** (D15). Se um número mudar,
 > muda-se **num sítio só**.
+>
+> **Língua — uma regra só (D10).** No índice, **prosa em português** e **identificadores em
+> inglês**: nomes de skills/agents/scripts, caminhos, comandos e as palavras-chave da coluna
+> *Gatilhos* (são chaves de correspondência, não texto). Nenhuma célula mistura as duas — a
+> regra está declarada no cabeçalho do `skills_index.md`.
 
 #### Manter atualizado (obrigatório)
 
