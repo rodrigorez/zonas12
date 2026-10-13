@@ -76,9 +76,9 @@ zonas12/
 - Ao mexer no render (stencil/profundidade), leia primeiro *Requisitos técnicos* e
   *Estado atual do código* neste README
 
-## Estado atual do código (v0.0.2)
+## Estado atual do código (v0.0.3)
 
-Marcado pela branch `v0.0.2`. Resumo do que existe hoje: `index.html` (213 linhas),
+Marcado pela branch `v0.0.3`. Resumo do que existe hoje: `index.html` (213 linhas),
 `js/app.js` (485 linhas), `js/core/` (7 ficheiros), `css/style.css` (84 linhas),
 `assets/images/`, `data/scene.json`, `i18n/pt.json` e as ferramentas em `tools/`.
 
