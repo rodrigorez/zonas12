@@ -4,6 +4,14 @@ html, body {
   touch-action: none; /* Previne zoom e scroll acidental no telemóvel */
 }
 
+/* Texto que existe para leitores de ecrã e para motores, sem ocupar espaço no ecrã.
+   (Não usar num elemento que precise de ser focado.) */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap;
+}
+
 /* Elementos de Fundo (Câmara Web) */
 #container-video {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;

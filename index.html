@@ -12,6 +12,18 @@
     <meta property="og:image" content="assets/images/praia.jpg" />
     <meta property="og:image:alt" content="Panorama 360º da dimensão 2 (praia)" />
     <link rel="icon" href="data:,">
+
+    <!-- Dados estruturados: leitura por motores de busca e por motores de IA.
+         Sem `url`, de propósito: não há endereço canónico antes da D14. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Portal AR – Galeria Imersiva com Controlos Mobile",
+        "inLanguage": "pt-BR",
+        "description": "Galeria imersiva em A-Frame: panoramas 360º ligados por portais de stencil, atravessáveis por telemóvel ou computador."
+      }
+    </script>
     
     <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
@@ -19,6 +31,10 @@
   </head>
   
   <body>
+    <!-- Título principal da página. É o único heading e não se vê: a cena ocupa o ecrã
+         todo, mas um leitor de ecrã e um motor de IA precisam de saber qual é o tema. -->
+    <h1 class="sr-only">Portal AR – Galeria Imersiva</h1>
+
     <!-- Loading indicator -->
     <div class="loading-overlay" id="loading-overlay" role="status" aria-live="polite">
       Carregando...

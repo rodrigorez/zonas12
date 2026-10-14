@@ -148,8 +148,8 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 
 ## Estado atual do código (v0.0.3)
 
-Marcado pela branch `v0.0.3`. Resumo do que existe hoje: `index.html` (223 linhas),
-`js/app.js` (485 linhas), `js/core/` (7 ficheiros), `css/style.css` (88 linhas),
+Marcado pela branch `v0.0.3`. Resumo do que existe hoje: `index.html` (239 linhas),
+`js/app.js` (485 linhas), `js/core/` (7 ficheiros), `css/style.css` (96 linhas),
 `assets/images/`, `data/scene.json`, `i18n/pt.json` e as ferramentas em `tools/`.
 
 O `js/app.js` é a **entrada do módulo** (`<script type="module">`). O `js/core/` é o
