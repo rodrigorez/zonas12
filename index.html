@@ -4,6 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Portal AR – Galeria Imersiva com Controlos Mobile</title>
+    <meta name="description" content="Galeria imersiva em A-Frame: panoramas 360º ligados por portais de stencil, atravessáveis por telemóvel ou computador." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Portal AR – Galeria Imersiva com Controlos Mobile" />
+    <meta property="og:description" content="Galeria imersiva em A-Frame: panoramas 360º ligados por portais de stencil, atravessáveis por telemóvel ou computador." />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:image" content="assets/images/praia.jpg" />
+    <meta property="og:image:alt" content="Panorama 360º da dimensão 2 (praia)" />
     <link rel="icon" href="data:,">
     
     <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
@@ -13,25 +20,27 @@
   
   <body>
     <!-- Loading indicator -->
-    <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-overlay" id="loading-overlay" role="status" aria-live="polite">
       Carregando...
     </div>
 
     <!-- OVERLAY: Janela Modal -->
     <div id="modal-obra">
       <button onclick="fecharObra()">Voltar para a Galeria</button>
-      <iframe id="iframe-obra" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <iframe id="iframe-obra" src="" title="Obra aberta em página externa" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 
     <!-- Interface Inicial -->
     <button id="btn-iniciar" onclick="iniciarCena()">ATIVAR EXPOSIÇÃO</button>
 
-    <!-- CONTROLOS MOBILE (Só aparecem se for smartphone/tablet) -->
-    <div id="controles-mobile">
-      <div id="btn-frente" class="dpad-btn">▲</div>
-      <div id="btn-tras" class="dpad-btn">▼</div>
-      <div id="btn-esq" class="dpad-btn">◄</div>
-      <div id="btn-dir" class="dpad-btn">►</div>
+    <!-- CONTROLOS MOBILE (Só aparecem se for smartphone/tablet).
+         São <button> e não <div>: assim chegam à árvore de acessibilidade com um nome
+         ("Avançar", "Recuar", …) em vez de um glifo sem significado. -->
+    <div id="controles-mobile" role="group" aria-label="Controlos de movimento">
+      <button type="button" id="btn-frente" class="dpad-btn" aria-label="Avançar">▲</button>
+      <button type="button" id="btn-tras" class="dpad-btn" aria-label="Recuar">▼</button>
+      <button type="button" id="btn-esq" class="dpad-btn" aria-label="Esquerda">◄</button>
+      <button type="button" id="btn-dir" class="dpad-btn" aria-label="Direita">►</button>
     </div>
 
     <!-- Fundo de Câmera -->
@@ -44,12 +53,13 @@
       <!-- renderer: o stencil é obrigatório para o portal (buffer de stencil) -->
       <a-scene config-ar gestor-dimensoes renderer="alpha: true; antialias: true; stencil: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable">
         
+        <!-- alt nos pré-carregamentos: o <a-assets> não é desenhado, mas o HTML é lido. -->
         <a-assets>
-          <img id="cidade-360" src="assets/images/forest.jpg" crossorigin="anonymous">
-          <img id="galeriaFoto1" src="assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg" crossorigin="anonymous">
-          <img id="galeriaFoto2" src="assets/images/eiffel.jpg" crossorigin="anonymous">
-          <img id="praia" src="assets/images/praia.jpg" crossorigin="anonymous">
-          <img id="skycloud" src="assets/images/skycloud.jpg" crossorigin="anonymous">
+          <img id="cidade-360" src="assets/images/forest.jpg" crossorigin="anonymous" alt="Panorama 360º da dimensão 1 (cidade)">
+          <img id="galeriaFoto1" src="assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg" crossorigin="anonymous" alt="Fotografia usada como obra nas dimensões 1 e 2">
+          <img id="galeriaFoto2" src="assets/images/eiffel.jpg" crossorigin="anonymous" alt="Fotografia usada como obra nas dimensões 1 e 2">
+          <img id="praia" src="assets/images/praia.jpg" crossorigin="anonymous" alt="Panorama 360º da dimensão 2 (praia)">
+          <img id="skycloud" src="assets/images/skycloud.jpg" crossorigin="anonymous" alt="Panorama 360º da dimensão 3 (céu)">
           <video id="video" src="assets/images/compequicolor1024vr.mp4" crossorigin="anonymous" autoplay loop="true" muted></video>
         </a-assets>
 
