@@ -24,10 +24,12 @@
 > vendors, que **são funcionais** (servem o `sync-all-vendors.ps1`). Nada disto é código de
 > produção — e os números desta auditoria estão em `HARNESS_LOG.md`, não aqui.
 >
-> **Atualização (2026-10-14):** a lei **L6** foi reescrita pela decisão **D16** (§11) — a lei
-> passou a enunciar o **invariante**, porque quem fixa `sortObjects = true` é o A-Frame (medido
-> na fonte, na 1.8.0). Comportamento inalterado: a única linha de código tocada foi um
-> comentário. A mesma ronda fechou as pendências de SEO e de acessibilidade do `index.html`.
+> **Atualização (2026-10-14):** a lei **L6** foi reescrita pela decisão **D16** (§11) — passou a
+> enunciar o **invariante**, porque quem fixa `sortObjects = true` é o A-Frame (medido na fonte,
+> na 1.8.0); a única linha de código tocada foi um comentário. A mesma ronda fechou as
+> pendências de SEO e de acessibilidade do `index.html` e a **D17** (§11) acrescentou uma
+> **quarta passe** ao validador do índice: o *frontmatter* de cada agent, conferido contra o
+> disco.
 >
 > **Como usar:** escolher a fase seguinte na secção [9](#9-fases-de-execução), executá-la, e
 > só a dar como fechada quando o **critério de verificação** dela passar. Uma fase de cada
@@ -123,7 +125,7 @@ indica; **(3)** só se o índice não tiver o que se procura é que se faz busca
 (`grep`/`glob`). O índice é a **única porta de entrada** — não se percorrem as subpastas às
 cegas. A regra está replicada no `README.md` (regra 5) para quem não lê o roadmap.
 
-**Validação — três passes, não uma (2026-10-13).** A primeira versão do validador só fazia
+**Validação — três passes, não uma (2026-10-13; uma quarta em 2026-10-14, D17).** A primeira versão do validador só fazia
 `índice → disco`, e por isso **anunciava que estava tudo bem enquanto o índice omitia
 material**: skills inteiras, documentação de apoio e ferramentas. Por construção, uma validação
 só nessa direção **nunca** encontra o que não está no índice. O critério passou a ser três
@@ -134,15 +136,19 @@ passes:
 | **1 — direta** (`índice → disco`) | as entradas resolvem? | `validate_skills_index.ps1` |
 | **2 — quantidades** | algum número do `Location Map` mente? | idem |
 | **3 — inversa** (`disco → índice`) | ficou algo de fora? | idem |
+| **4 — frontmatter** (`agent → disco`) | alguma skill citada num `skills:` de agent não existe? | idem |
 
 O código é `.harness/skills/.agent/scripts/validate_skills_index.ps1` e sai com **código 0** só
-quando as três estão verdes. Fica fora do índice de propósito: o índice é para consultar.
+quando as quatro estão verdes. Fica fora do índice de propósito: o índice é para consultar.
 
 A **passe 2** fecha a lacuna que deixou passar o erro original: o índice declarava números que
-ninguém conferia. A **passe 3** é a única que olha para o disco à procura do que **falta**.
+ninguém conferia. A **passe 3** é a única que olha para o disco à procura do que **falta**. A
+**passe 4** (D17) fecha a última direção que faltava: nada conferia o que um agent afirma **de
+si** — um `skills:` a citar uma skill inexistente passava invisível às outras três.
 
 **A lição, registada:** um índice que valida apenas a si próprio não pode detectar o que não
-está nele. Foi o que aconteceu — e é a razão de a passe 3 existir.
+está nele. Foi o que aconteceu — e é a razão de a passe 3 existir. A passe 4 é a variante da
+mesma lição: quem só olha para o índice também não vê um ficheiro a mentir sobre si próprio.
 
 **O que isto resolve.** O harness deixa de ser um bloqueio e passa a ser utilizável — incluindo
 as três sub-skills mais próximas de A-Frame (`3d-games`, `web-games` e `vr-ar`), que estavam
@@ -865,7 +871,7 @@ estados**, nunca valores absolutos de cor, e dar margem às fronteiras geométri
 | D12 | Idiomas | **FECHADA** (2026-10-12) | **Código em inglês, documentação em português, interface preparada para vários idiomas** (catálogo em `i18n/`, português como língua de origem). Variante confirmada: **A** — catálogo para a interface + **campos por idioma nos dados**; língua escolhida por `?lang=`, com português por omissão |
 | D13 | Nome dos ficheiros de dados | **FECHADA** (2026-10-12) | **`data/scene.json`** (a exposição) e **`data/scene-example.json`** (a cena de exemplo/fixture) — inglês, coerente com a D10 |
 | D14 | Mundos e portas de mundo | **FECHADA** (2026-10-13) | **Um endereço por mundo, com recarga de página** (`/praia/`, pasta por sala, arranque com `<base href="../">`); o **portão é um mundo** (o de entrada, com a câmara/AR); a **porta de mundo** mostra um retrato estático do destino **com paralaxe** e a travessia **navega** (`?from=<slug>` opcional); a chegada é **atrás da porta inversa** (V-d); o portal passa a ter **dois eixos** — `window` e `action` — com **tabelas de comportamentos** no módulo do portal; **sem manifesto** (M5) e **sem dados de outro mundo** a atravessar a fronteira |
-| D15 | Harness de skills do projeto | **FECHADA** (2026-10-13) — **emendada no mesmo dia** | **Usar o harness de `.harness/skills/` com um índice único e verificado.** O índice `.agent/skills_index.md` passa a cobrir o **`.agent/` inteiro** (rules, agents, skills, sub-skills, workflows, scripts, ferramentas, vendors, standalone, quarentena) e a declarar a raiz dos caminhos; as entradas são **validadas contra o disco em três passes** — `índice → disco`, **quantidades** e `disco → índice`. O material herdado de outro projeto (`Gabinete`) é **isolado em `.agent/garbage/`** (`project_sync.py`, `update-{3d,audio,layout}.md`) e as referências a `CODEBASE.md` / `ARCHITECTURE.md` / `GABINETE_DESIGN_SYSTEM.md` em ficheiros ativos tornam-se condicionais ou apontam para o índice. Scripts referenciados mas **inexistentes** são removidos. **Limpeza (2026-10-13):** apagados o esqueleto Cline (88 pastas, 0 ficheiros), as 3 falsas "junções" de descoberta e o `__pycache__`; mantidos os 5 repos `.git` dos vendors (**funcionais** — servem o `sync-all-vendors.ps1`), o `frontend-slides/plugins/` (conteúdo do clone) e o `skills/doc.md` (guia do kit). **Custo aceite:** as pastas de descoberta automática dos vendors não existem; recriá-las é um comando quando se quiser |
+| D15 | Harness de skills do projeto | **FECHADA** (2026-10-13) — **emendada no mesmo dia** e pela **D17** (2026-10-14: quatro passes) | **Usar o harness de `.harness/skills/` com um índice único e verificado.** O índice `.agent/skills_index.md` passa a cobrir o **`.agent/` inteiro** (rules, agents, skills, sub-skills, workflows, scripts, ferramentas, vendors, standalone, quarentena) e a declarar a raiz dos caminhos; as entradas são **validadas contra o disco em três passes** — `índice → disco`, **quantidades** e `disco → índice`. O material herdado de outro projeto (`Gabinete`) é **isolado em `.agent/garbage/`** (`project_sync.py`, `update-{3d,audio,layout}.md`) e as referências a `CODEBASE.md` / `ARCHITECTURE.md` / `GABINETE_DESIGN_SYSTEM.md` em ficheiros ativos tornam-se condicionais ou apontam para o índice. Scripts referenciados mas **inexistentes** são removidos. **Limpeza (2026-10-13):** apagados o esqueleto Cline (88 pastas, 0 ficheiros), as 3 falsas "junções" de descoberta e o `__pycache__`; mantidos os 5 repos `.git` dos vendors (**funcionais** — servem o `sync-all-vendors.ps1`), o `frontend-slides/plugins/` (conteúdo do clone) e o `skills/doc.md` (guia do kit). **Custo aceite:** as pastas de descoberta automática dos vendors não existem; recriá-las é um comando quando se quiser |
 
 > **Emenda da D15 (2026-10-13, 3.ª atualização).** A primeira versão do índice foi dada como
 > fechada com **uma** passe de validação — e essa passe **não consegue** detectar
@@ -877,6 +883,7 @@ estados**, nunca valores absolutos de cor, e dar margem às fronteiras geométri
 > `HARNESS_LOG.md`.**
 
 | D16 | A origem da garantia de ordenação (lei **L6**) | **FECHADA** (2026-10-14) | **A lei passa a enunciar o invariante, não a ação.** Medido na fonte do A-Frame 1.8.0 (`src/systems/renderer.js`): `sortObjects` **não** é propriedade do schema e o sistema do `renderer` fixa `renderer.sortObjects = true` e `setOpaqueSort(sortFrontToBack)` na inicialização, «seja qual for a configuração» — logo a garantia é **do framework**, e a linha de `js/app.js` é uma **confirmação** que fica (documenta a intenção e protege contra uma versão que mude a omissão), com o comentário corrigido para citar a medição. `stencil` **é** propriedade do schema (omissão `false`) e continua a ser responsabilidade do projeto. **Custo aceite:** enquanto a omissão não mudar, a linha é redundante — e um leitor pode julgá-la indispensável |
+| D17 | Quarta passe de validação (frontmatter dos agents) | **FECHADA** (2026-10-14) | **O `validate_skills_index.ps1` ganha uma quarta passe, `agent → disco`:** lê o `skills:` do *frontmatter* de cada `agents/*.md` e confere cada token contra `skills/{token}/SKILL.md`. **Motivo escrito:** as passes 1–3 olham todas para dentro do índice e, por construção, **não podem** ver um agent a citar uma skill inexistente — foi assim que passou o `refactoring-patterns` do `code-archaeologist` (§14.4 do `HARNESS_LOG.md`), apanhado por auditoria manual e não pelo validador. **Custo aceite:** a regra deixa de ser "três passes" e passa a **quatro** em três ficheiros (este, o `README.md` e o `skills_index.md`) — a repetição que a D15 quis evitar é paga em três linhas |
 
 > **Emenda da L6 (2026-10-14) — decisão D16.** A lei L6 enunciava a **ação**
 > (`renderer.sortObjects = true`) como se fosse ela a criar a garantia. Medido na fonte do
@@ -1220,8 +1227,9 @@ alteram comportamento.
 | D12 | Idiomas | Código em inglês, docs em português, interface traduzível (catálogo `i18n/`, PT como origem) |
 | D13 | Ficheiros de dados | `data/scene.json` + `data/scene-example.json` |
 | D14 | Mundos e portas de mundo | Um endereço por mundo (com recarga); o portão é um mundo de entrada; a porta de mundo é um retrato com paralaxe + navegação (`?from=` opcional); o portal passa a ter dois eixos (`window`/`action`) com tabelas de comportamentos no módulo |
-| D15 | Harness de skills | Usar o harness de `.harness/skills/` com **índice único** (`.agent/skills_index.md`, cobrindo todo o `.agent/`) **validado contra o disco em três passes**; **quarentena** em `.agent/garbage/` do material herdado do `Gabinete`; **limpeza** feita (esqueleto Cline, falsas junções e `__pycache__` apagados; os repos `.git` dos vendors mantidos por serem funcionais) |
+| D15 | Harness de skills | Usar o harness de `.harness/skills/` com **índice único** (`.agent/skills_index.md`, cobrindo todo o `.agent/`) **validado contra o disco em três passes**; **quarentena** em `.agent/garbage/` do material herdado do `Gabinete`; **limpeza** feita (esqueleto Cline, falsas junções e `__pycache__` apagados; os repos `.git` dos vendors mantidos por serem funcionais); **emendada pela D17** com uma quarta passe (`agent → disco`) |
 | D16 | Origem da garantia de ordenação (lei L6) | A lei enuncia o invariante (`stencil: true` + `sortObjects` ativo), não a ação: quem fixa `sortObjects = true` é o A-Frame 1.8.0 (medido na fonte); a linha de `js/app.js` fica como confirmação |
+| D17 | Quarta passe de validação | O validador do índice passa a conferir o `skills:` de cada agent contra o disco (`agent → disco`) — a direção que as outras três passes não tomavam |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -1240,6 +1248,14 @@ do A-Frame 1.8.0, é o framework que fixa `sortObjects = true` na inicializaçã
 opacos respeita o `renderOrder`. **Nada de comportamento mudou** — a única linha de código
 tocada foi um comentário. Na mesma ronda fecharam-se as pendências de SEO e de acessibilidade do
 `index.html` (registo em `HARNESS_LOG.md`).
+
+**D17 fechada em 2026-10-14** — o validador do índice passa a ter **quatro** passes: a nova
+pergunta o *frontmatter* de cada agent contra o disco, a única direção que as outras três não
+tomavam — e é exatamente a direção em que o `refactoring-patterns` do `code-archaeologist`
+passou. Na mesma ronda o `checklist.py` passou a correr as verificações do projeto
+(`project_sync.py` — existia, adaptado, e ninguém o chamava) e o `lint_runner.py` deixou de
+ficar verde sem verificar nada: em vez de "No linters found" com código 0, parseia os módulos
+com o `node`. Registo e medições em `HARNESS_LOG.md`.
 
 ### O que fica decidido, em uma frase
 

@@ -118,7 +118,7 @@ do que não ter índice.
   nota de cabeçalho.
 - O que sai de cena vai para o `HARNESS_LOG.md`, **com o motivo** — o registo não se apaga.
 - Antes de dar a alteração por fechada, correr o script de validação — sai com **código 0** só
-  quando as três passes estão verdes:
+  quando as quatro passes estão verdes:
 
 ```powershell
 powershell -File .harness/skills/.agent/scripts/validate_skills_index.ps1
@@ -129,13 +129,20 @@ powershell -File .harness/skills/.agent/scripts/validate_skills_index.ps1
 | **1 — direta** (`índice → disco`) | as entradas que tenho resolvem? | `missing=0` |
 | **2 — quantidades** | algum número do `Location Map` mente? | `wrong=0` |
 | **3 — inversa** (`disco → índice`) | ficou algo de fora do índice? | `unlisted=0` |
+| **4 — frontmatter** (`agent → disco`) | alguma skill citada por um agent não existe? | `bad=0` |
 
 > **Só a passe 1 não chega.** Ela pergunta *"as linhas que tenho resolvem?"* e, por construção,
 > **nunca** encontra o que não está no índice — foi essa assimetria que deixou passar skills
 > inteiras. A passe 2 existe porque este número mentiu três vezes; e apanhou uma mentira nova
 > **minutos** depois de ela ser escrita.
 
-A mesma informação vive em `docs/ROADMAP.md` (§3, decisão D15). Os três ficheiros andam juntos,
+> **E a passe 4 (2026-10-14, decisão D17).** As passes 1–3 olham todas **para dentro do
+> índice**: só vêem o que o índice diz saber. Nada conferia o *frontmatter* de um agent contra o
+> disco — um token a apontar para uma skill inexistente era invisível às três, e foi assim que
+> passou o `refactoring-patterns` do `code-archaeologist`. A passe 4 percorre `agent → disco`, a
+> direção que nenhuma das outras toma.
+
+A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**). Os três ficheiros andam juntos,
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
