@@ -14,9 +14,16 @@ import {
 } from './core/index.js';
 
 // --- LÓGICA DO MODAL (JANELA SOBREPOSTA) ---
+// O modal é um diálogo: ao abrir, o foco entra nele (ver `abrir-modal`), e sai com Escape.
+// O ouvinte é registado na abertura e retirado aqui — um por abertura, nunca um por obra.
+function aoTeclarNoModal(evento) {
+  if (evento.key === 'Escape') fecharObra();
+}
+
 function fecharObra() {
   document.getElementById('modal-obra').style.display = 'none';
   document.getElementById('iframe-obra').src = "";
+  document.removeEventListener('keydown', aoTeclarNoModal);
 }
 
 // --- DEBUG AND TEST HANDLE ---
@@ -92,6 +99,9 @@ AFRAME.registerComponent('abrir-modal', {
       if (!this.dimensaoAtual()) return;
       document.getElementById('iframe-obra').src = this.data.url;
       document.getElementById('modal-obra').style.display = 'flex';
+      document.getElementById('btn-fechar-obra').focus();
+      document.removeEventListener('keydown', aoTeclarNoModal);
+      document.addEventListener('keydown', aoTeclarNoModal);
     });
   },
   // Só abre obras da dimensão onde se está. Vê-las pela janela do portal não
@@ -448,15 +458,6 @@ function configurarBotoesMobile() {
   atualizarMovimentoMobile();
 }
 
-function mostrarLoading() {
-  const loadingOverlay = document.createElement('div');
-  loadingOverlay.className = 'loading-overlay';
-  loadingOverlay.id = 'loading-overlay';
-  loadingOverlay.innerHTML = 'Carregando...';
-  loadingOverlay.style.display = 'flex';
-  document.body.appendChild(loadingOverlay);
-}
-
 function esconderLoading() {
   const loadingOverlay = document.getElementById('loading-overlay');
   if (loadingOverlay) {
@@ -467,8 +468,14 @@ function esconderLoading() {
 function tratarErroCamera(error) {
   console.error('Erro ao acessar a câmera:', error);
   esconderLoading();
+  // Um aviso por vez: esta função pode correr mais de uma vez (permissão recusada e, mais
+  // tarde, um erro a meio) e sem isto os avisos acumulavam-se no ecrã.
+  const anterior = document.getElementById('erro-camera');
+  if (anterior) anterior.remove();
   const errorMsg = document.createElement('div');
   errorMsg.className = 'loading-overlay';
+  errorMsg.id = 'erro-camera';
+  errorMsg.setAttribute('role', 'alert');
   errorMsg.innerHTML = 'Não foi possível acessar a câmera. Por favor, verifique as permissões.';
   errorMsg.style.display = 'flex';
   document.body.appendChild(errorMsg);

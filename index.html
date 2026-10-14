@@ -41,8 +41,8 @@
     </div>
 
     <!-- OVERLAY: Janela Modal -->
-    <div id="modal-obra">
-      <button onclick="fecharObra()">Voltar para a Galeria</button>
+    <div id="modal-obra" role="dialog" aria-modal="true" aria-label="Obra aberta">
+      <button id="btn-fechar-obra" onclick="fecharObra()">Voltar para a Galeria</button>
       <iframe id="iframe-obra" src="" title="Obra aberta em página externa" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 
@@ -59,9 +59,10 @@
       <button type="button" id="btn-dir" class="dpad-btn" aria-label="Direita">►</button>
     </div>
 
-    <!-- Fundo de Câmera -->
+    <!-- Fundo de Câmera. `aria-hidden`: é a imagem real por trás da cena, não conteúdo com
+         equivalente textual — para quem não vê, não há nada a anunciar. -->
     <div id="container-video">
-      <video id="webcam-video" autoplay playsinline muted></video>
+      <video id="webcam-video" autoplay playsinline muted aria-hidden="true"></video>
     </div>
 
     <!-- Cena A-Frame -->
