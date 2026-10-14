@@ -165,7 +165,9 @@ a única parte global, porque o stencil é um recurso de toda a cena. Os 4 módu
 
 ### Modelo de render (ler antes de mexer)
 
-1. `renderer.sortObjects = true` e `stencil: true` no `<a-scene>`.
+1. `stencil: true` no `<a-scene>` e `sortObjects` ativo no renderer — **é ele que faz valer o
+   `renderOrder`**. Quem o fixa é o A-Frame (não o atributo: `sortObjects` não está no schema do
+   `renderer`); a linha de `js/app.js` confirma-o (lei **L6**, decisão **D16**).
 2. Ordem de desenho: máscaras (1) → panoramas (2; **2.5** para os das janelas) → obras (3)
    → molduras (4) → caixa de debug (10).
 3. A **máscara** de cada portal escreve o valor do stencil (`Replace`) **e profundidade** no
@@ -374,9 +376,12 @@ panorama, mesmas obras).
   stencil **não é criado por omissão**.
 - `<script type="module" src="js/app.js">`: a entrada é um módulo ES (D1 do roadmap), por
   isso o projeto tem de ser servido por HTTP.
-- `renderer.sortObjects = true` em `config-ar` (`js/app.js`): com `false` o three
+- `renderer.sortObjects` ativo (`config-ar`, em `js/app.js`): com `false` o three
   **ignora o `renderOrder`** e desenha pela ordem da árvore — o que só funciona por acaso
   com um portal. Com vários, as máscaras têm de ser desenhadas antes de todo o conteúdo.
+  **Quem fixa o valor é o A-Frame** (1.8.0, `src/systems/renderer.js`, na inicialização e
+  «seja qual for a configuração»); a linha do projeto confirma-o e fica — lei **L6**,
+  decisão **D16**.
 - Ordem de desenho (`renderOrder`): máscara (1) → panorama (2) → obras (3) → moldura (4).
   O conteúdo de uma dimensão vista por uma janela (panorama 2, obras 2.5) sai **antes**
   das obras da dimensão ativa (3), para as obras que estão à frente da janela poderem

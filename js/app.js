@@ -67,10 +67,11 @@ AFRAME.registerComponent('config-ar', {
     let renderer = this.el.renderer;
     if (!renderer) return;
     renderer.setClearColor(0x000000, 0);
-    // sortObjects TEM de ser true: com false o three ignora o renderOrder e
-    // desenha pela ordem da árvore, o que só funciona por acaso com um portal.
-    // Com vários, as máscaras têm de ser desenhadas antes de todo o conteúdo
-    // (renderOrder: máscara 1, panorama 2, obras 3, moldura 4).
+    // Confirma o que o A-Frame 1.8.0 já fixa ao inicializar o sistema do renderer
+    // (src/systems/renderer.js): com sortObjects a false o three ignora o renderOrder e
+    // desenha pela ordem da árvore, o que só funciona por acaso com um portal. Com vários,
+    // as máscaras têm de ser desenhadas antes de todo o conteúdo.
+    // (renderOrder: máscara 1, panorama 2, obras 3, moldura 4)
     renderer.sortObjects = true;
     // O stencil é limpo a 0 em cada frame; 0 significa "nenhuma janela aqui".
     renderer.autoClearStencil = true;

@@ -24,6 +24,11 @@
 > vendors, que **são funcionais** (servem o `sync-all-vendors.ps1`). Nada disto é código de
 > produção — e os números desta auditoria estão em `HARNESS_LOG.md`, não aqui.
 >
+> **Atualização (2026-10-14):** a lei **L6** foi reescrita pela decisão **D16** (§11) — a lei
+> passou a enunciar o **invariante**, porque quem fixa `sortObjects = true` é o A-Frame (medido
+> na fonte, na 1.8.0). Comportamento inalterado: a única linha de código tocada foi um
+> comentário. A mesma ronda fechou as pendências de SEO e de acessibilidade do `index.html`.
+>
 > **Como usar:** escolher a fase seguinte na secção [9](#9-fases-de-execução), executá-la, e
 > só a dar como fechada quando o **critério de verificação** dela passar. Uma fase de cada
 > vez; cada decisão nova entra na secção 11 com data.
@@ -636,7 +641,7 @@ O editor deve impedi-las **antes** de exportar.
 | L3 | Quem pertence à dimensão ativa **não** leva teste de stencil | O bordo da moldura fica **cortado** (110 poses de 360, medido) |
 | L4 | Ponto de chegada fora das caixas dos outros portais | Trocas em cadeia ao chegar (ping-pong entre dimensões) |
 | L5 | ≤255 dimensões distintas visíveis ao mesmo tempo | Aviso na consola e janelas sem efeito (o valor de stencil não existe) |
-| L6 | `renderer.sortObjects = true` e `stencil: true` | O three **ignora** o `renderOrder`; tudo o que está organizado por ordem quebra |
+| L6 | `stencil: true` na cena **e** `sortObjects` ativo no renderer — é ele que faz valer o `renderOrder` | O three **ignora** o `renderOrder` e desenha pela ordem da árvore: tudo o que está organizado por ordem (máscara → panorama → obra → moldura) quebra |
 | L7 | Panorama/obra criados só no `update` (A-Frame chama `init` **e** `update`) | O objeto é criado duas vezes (aconteceu com o panorama) |
 | L8 | Um só `keydown` para toda a cena | Hoje há um por portal: `R` roda todos, `D` liga a debug em todos (A2) |
 | L9 | Todo o `asset` do JSON existe em disco (inclui o retrato de cada porta de mundo) | Imagem que não aparece (proposta pela D7, registada aqui) |
@@ -653,6 +658,10 @@ O editor deve impedi-las **antes** de exportar.
 As leis **L1–L8** vêm de defeitos medidos. As leis **L9–L18** vêm da D14 (planeamento):
 L9 e L10 foram propostas pela D7 e ficam aqui registadas; L11–L18 nascem dos mundos e das
 portas de mundo. **Nenhuma delas está implementada.**
+
+A **L6** foi reescrita em 2026-10-14 (**D16**): passou a enunciar o **invariante a validar**, e
+não a ação — medido na fonte do A-Frame 1.8.0, é o framework que fixa `sortObjects = true` na
+inicialização. A lei não nasceu de um defeito diferente; o que mudou foi quem *cria* a garantia.
 
 ---
 
@@ -866,6 +875,16 @@ estados**, nunca valores absolutos de cor, e dar margem às fronteiras geométri
 > `skills_index.md` e no `README.md` (regra 5): passou a haver **três** passes, com a inversa a
 > olhar para o disco à procura do que falta. **Os números exatos desta auditoria estão em
 > `HARNESS_LOG.md`.**
+
+| D16 | A origem da garantia de ordenação (lei **L6**) | **FECHADA** (2026-10-14) | **A lei passa a enunciar o invariante, não a ação.** Medido na fonte do A-Frame 1.8.0 (`src/systems/renderer.js`): `sortObjects` **não** é propriedade do schema e o sistema do `renderer` fixa `renderer.sortObjects = true` e `setOpaqueSort(sortFrontToBack)` na inicialização, «seja qual for a configuração» — logo a garantia é **do framework**, e a linha de `js/app.js` é uma **confirmação** que fica (documenta a intenção e protege contra uma versão que mude a omissão), com o comentário corrigido para citar a medição. `stencil` **é** propriedade do schema (omissão `false`) e continua a ser responsabilidade do projeto. **Custo aceite:** enquanto a omissão não mudar, a linha é redundante — e um leitor pode julgá-la indispensável |
+
+> **Emenda da L6 (2026-10-14) — decisão D16.** A lei L6 enunciava a **ação**
+> (`renderer.sortObjects = true`) como se fosse ela a criar a garantia. Medido na fonte do
+> A-Frame 1.8.0, quem a cria é o framework: o sistema do `renderer` fixa `sortObjects = true`
+> na inicialização e a ordenação de opacos respeita `groupOrder` → `renderOrder` → profundidade.
+> A lei passa a enunciar o invariante (`stencil: true` na cena e `sortObjects` ativo), o
+> `README.md` diz o mesmo e o comentário de `js/app.js` cita a medição.
+> **Comportamento inalterado:** a única linha de código tocada é um comentário.
 
 ### Efeitos da D14 na execução
 
@@ -1202,6 +1221,7 @@ alteram comportamento.
 | D13 | Ficheiros de dados | `data/scene.json` + `data/scene-example.json` |
 | D14 | Mundos e portas de mundo | Um endereço por mundo (com recarga); o portão é um mundo de entrada; a porta de mundo é um retrato com paralaxe + navegação (`?from=` opcional); o portal passa a ter dois eixos (`window`/`action`) com tabelas de comportamentos no módulo |
 | D15 | Harness de skills | Usar o harness de `.harness/skills/` com **índice único** (`.agent/skills_index.md`, cobrindo todo o `.agent/`) **validado contra o disco em três passes**; **quarentena** em `.agent/garbage/` do material herdado do `Gabinete`; **limpeza** feita (esqueleto Cline, falsas junções e `__pycache__` apagados; os repos `.git` dos vendors mantidos por serem funcionais) |
+| D16 | Origem da garantia de ordenação (lei L6) | A lei enuncia o invariante (`stencil: true` + `sortObjects` ativo), não a ação: quem fixa `sortObjects = true` é o A-Frame 1.8.0 (medido na fonte); a linha de `js/app.js` fica como confirmação |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -1213,6 +1233,13 @@ decisão (e emenda) em §11, e a limpeza da Fase 6 em §9. **Reabre e substitui 
 corrigiu um índice que omitia **13** `SKILL.md` e **75** `.md`, porque o validador só corria
 numa direção; passou a exigir **três passes** — a inversa e a das quantidades. Não é código de produção: `.harness/` está fora
 do repositório (`.gitignore`), por isso nada disto altera o que se publica.
+
+**D16 fechada em 2026-10-14** — a lei **L6** passa a enunciar o **invariante** de ordenação
+(`stencil: true` na cena e `sortObjects` ativo) em vez da **ação** que a criava: medido na fonte
+do A-Frame 1.8.0, é o framework que fixa `sortObjects = true` na inicialização e a ordenação de
+opacos respeita o `renderOrder`. **Nada de comportamento mudou** — a única linha de código
+tocada foi um comentário. Na mesma ronda fecharam-se as pendências de SEO e de acessibilidade do
+`index.html` (registo em `HARNESS_LOG.md`).
 
 ### O que fica decidido, em uma frase
 
