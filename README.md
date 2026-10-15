@@ -152,8 +152,9 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 
 ## Estado atual do código (v0.0.4)
 
-Marcado pela branch `v0.0.4`. É o estado depois da **Fase 2** do roadmap (os 4 módulos) e é o
-que está em **teste de utilizador**; a versão publicada continua a ser a `v0.0.3`, marcada pela
+Marcado pela branch `v0.0.4` e **publicado** em <https://rodrigorez.github.io/zonas12/> (o GitHub
+Pages serve o `main`). É o estado depois da **Fase 2** do roadmap (os 4 módulos), testado pelo
+autor em 2026-10-15 — local e no endereço publicado. A versão anterior é a `v0.0.3`, marcada pela
 branch com o mesmo nome. Resumo do que existe hoje: `index.html` (240 linhas),
 `js/app.js` (**78 linhas**), `js/core/` (7 ficheiros, 207 linhas), `js/modules/`
 (**4 ficheiros**, 608 linhas), `css/style.css` (96 linhas), `assets/images/`,
