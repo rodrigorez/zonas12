@@ -33,36 +33,37 @@ window.portalDebug = {
 // assigns stencil values.
 startFrameDriver();
 
-AFRAME.registerComponent('config-ar', {
+AFRAME.registerComponent('ar-config', {
   init: function () {
     this.el.setAttribute('embedded', '');
-    this.aplicarConfigRenderer();
-    this.el.addEventListener('render-target-loaded', () => this.aplicarConfigRenderer());
+    this.applyRendererConfig();
+    this.el.addEventListener('render-target-loaded', () => this.applyRendererConfig());
   },
-  aplicarConfigRenderer: function () {
-    let renderer = this.el.renderer;
+  applyRendererConfig: function () {
+    const renderer = this.el.renderer;
     if (!renderer) return;
     renderer.setClearColor(0x000000, 0);
-    // Confirma o que o A-Frame 1.8.0 já fixa ao inicializar o sistema do renderer
-    // (src/systems/renderer.js): com sortObjects a false o three ignora o renderOrder e
-    // desenha pela ordem da árvore, o que só funciona por acaso com um portal. Com vários,
-    // as máscaras têm de ser desenhadas antes de todo o conteúdo.
-    // (renderOrder: máscara 1, panorama 2, obras 3, moldura 4)
+    // Confirms what A-Frame 1.8.0 already fixes when it initialises the renderer system
+    // (src/systems/renderer.js): with sortObjects false, three ignores the renderOrder and
+    // draws in tree order, which only works by accident with a portal. With several, the masks
+    // have to be drawn before all the content.
+    // (renderOrder: mask 1, panorama 2, artworks 3, frame 4)
     renderer.sortObjects = true;
-    // O stencil é limpo a 0 em cada frame; 0 significa "nenhuma janela aqui".
+    // The stencil is cleared to 0 every frame; 0 means "no window here".
     renderer.autoClearStencil = true;
   }
 });
 
-// Atalhos de teclado de desenvolvimento: um ouvinte só para a cena inteira, a iterar o
-// registo dos portais. Registar um ouvinte por portal (como antes) deixava um ouvinte morto
-// por cada portal criado e destruído — e o portal removido ficava vivo na closure, sem poder
-// ser recolhido. Criar e destruir portais em ciclo é o teste T9 (docs/ROADMAP.md secção 10).
-document.addEventListener('keydown', (evento) => {
-  let tecla = evento.key.toLowerCase();
-  if (tecla !== 'r' && tecla !== 'd') return;
+// Development keyboard shortcuts: one listener for the whole scene, walking the portal
+// registry. Registering one listener per portal (as before) left a dead listener behind for
+// every portal created and destroyed — and the removed portal stayed alive in the closure,
+// with no way of being collected. Creating and destroying portals in a loop is test T9
+// (docs/ROADMAP.md section 10).
+document.addEventListener('keydown', (event) => {
+  const key = event.key.toLowerCase();
+  if (key !== 'r' && key !== 'd') return;
   state.portals.slice().forEach(function (portal) {
-    if (tecla === 'r') portal.rotate();
+    if (key === 'r') portal.rotate();
     else portal.toggleDebugMode();
   });
 });
@@ -70,8 +71,8 @@ document.addEventListener('keydown', (evento) => {
 // --- TEMPORARY BRIDGE TO THE INTERFACE ---
 // index.html still calls these from inline attributes (onclick) and from its own inline
 // script. Now that this file is a module, its scope is no longer global, so they have to be
-// reachable from window. Removed in Fase 4, when the interface becomes a module with its
-// own listeners.
+// reachable from window. The three names are the interface's, so they keep their Portuguese
+// spelling until Fase 4 removes the bridge with the inline script.
 window.fecharObra = closeArtwork;
 window.configurarBotoesMobile = setupMobileControls;
 window.tratarErroCamera = reportCameraError;

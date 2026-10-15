@@ -68,7 +68,7 @@
     <!-- Cena A-Frame -->
     <div id="container-3d">
       <!-- renderer: o stencil é obrigatório para o portal (buffer de stencil) -->
-      <a-scene config-ar renderer="alpha: true; antialias: true; stencil: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable">
+      <a-scene ar-config renderer="alpha: true; antialias: true; stencil: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable">
         
         <!-- alt nos pré-carregamentos: o <a-assets> não é desenhado, mas o HTML é lido. -->
         <a-assets>
