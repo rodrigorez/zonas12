@@ -8,14 +8,15 @@
 //
 // Reads:
 //   index.html    the scene entities (assets, camera, dimensions, portals, artworks)
-//   js/app.js     values that still live in the code (box, trigger, frame, speed)
+//   js/           values that still live in the code (box, trigger, frame, speed): the entry
+//                 point plus every module, because Fase 2 moved them out of the entry point
 // Writes:
 //   data/scene.json           the exhibition scene
 //   data/scene-example.json   the same scene, kept as example/fixture (D9)
 //
 // Usage: node tools/html-to-scene-json/convert.mjs
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -26,7 +27,20 @@ const warnings = [];
 const warn = (message) => warnings.push(message);
 
 const html = readFileSync(join(root, 'index.html'), 'utf8');
-const js = readFileSync(join(root, 'js', 'app.js'), 'utf8');
+
+// The entry point and every module, in a stable order. The values read below from the code
+// (box, trigger, frame, player speed) left the entry point in Fase 2.
+const codeFiles = ['js/app.js'];
+const modulesDir = join(root, 'js', 'modules');
+if (existsSync(modulesDir)) {
+  for (const name of readdirSync(modulesDir).sort()) {
+    if (name.endsWith('.js')) codeFiles.push('js/modules/' + name);
+  }
+}
+const code = codeFiles.map((relative) => ({
+  relative,
+  text: readFileSync(join(root, relative), 'utf8')
+}));
 
 // ---------------------------------------------------------------- helpers
 
@@ -51,12 +65,12 @@ function round(value, decimals = 4) {
 
 // Reads a value that still lives in the code. Fails loudly instead of inventing one.
 function fromCode(regexp, label) {
-  const m = js.match(regexp);
-  if (!m) {
-    warn(`could not read "${label}" from js/app.js - the JSON will miss it`);
-    return null;
+  for (const file of code) {
+    const m = file.text.match(regexp);
+    if (m) return m;
   }
-  return m;
+  warn(`could not read "${label}" from ${codeFiles.join(' + ')} - the JSON will miss it`);
+  return null;
 }
 
 // A-Frame attribute list -> { chave: valor }. Usado nos atributos compostos,
@@ -131,12 +145,12 @@ for (const tag of tags(html)) {
     continue;
   }
 
-  if (tag.startsWith('<a-box') && attr(tag, 'material-virtual') !== null) {
-    const dim = componentes(attr(tag, 'material-virtual'));
+  if (tag.startsWith('<a-box') && attr(tag, 'dimensional-material') !== null) {
+    const dim = componentes(attr(tag, 'dimensional-material'));
     const asset = (attr(tag, 'src') || '').replace('#', '');
     const own = attrVec3(tag, 'position') || [0, 0, 0];
     const off = offsetAtual();
-    const url = (attr(tag, 'abrir-modal') || '').trim();
+    const url = (attr(tag, 'open-artwork') || '').trim();
     const size = [
       round(attr(tag, 'width') ?? 1),
       round(attr(tag, 'height') ?? 1),
@@ -144,7 +158,7 @@ for (const tag of tags(html)) {
     ];
     artworks.push({
       id: artworks.length,
-      dimension: round(dim.dimensao),
+      dimension: round(dim.dimension),
       kind: assetType(asset) || 'image',
       asset,
       position: [round(off[0] + own[0]), round(off[1] + own[1]), round(off[2] + own[2])],
@@ -206,7 +220,7 @@ const schemaCaixaRot = fromCode(
 const schemaGatilho = fromCode(/gatilho:\s*\{\s*type:\s*'string',\s*default:\s*'([^']+)'/, 'portal trigger (gatilho)');
 const corMoldura = fromCode(/let moldura = new THREE\.MeshBasicMaterial\(\{\s*color:\s*0x([0-9A-Fa-f]{6})/, 'frame colour');
 const espMoldura = fromCode(/let esp = ([\d.]+);/, 'frame thickness');
-const velocidade = fromCode(/const VELOCIDADE = ([\d.]+);/, 'player speed (VELOCIDADE)');
+const velocidade = fromCode(/const MOBILE_SPEED = ([\d.]+);/, 'player speed (MOBILE_SPEED)');
 
 const vec = (m) => (m ? [round(m[1]), round(m[2]), round(m[3])] : null);
 

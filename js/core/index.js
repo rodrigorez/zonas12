@@ -7,5 +7,5 @@ export { MAX_DIMENSIONS, MAX_PORTALS, MAX_WINDOWS } from './limits.js';
 export { state } from './state.js';
 export { on, off, emit } from './events.js';
 export { applyStencilRule, applyStencilState, syncStencilValues } from './stencil.js';
-export { registerContent, registerPortal, unregisterPortal } from './registry.js';
+export { registerContent, unregisterContent, registerPortal, unregisterPortal } from './registry.js';
 export { setActiveDimension } from './active-dimension.js';

@@ -790,6 +790,15 @@ corte deixam de valer — a mesma nota que a §2.1 faz para as referências da v
 Um bloco por commit — a regra da Fase 1 mantém-se: um componente por commit, para os diffs serem
 revistos um a um.
 
+**Correção ao plano (2026-10-15, ao abrir a B2).** Renomear um componente **obriga** a mexer no
+`index.html` e nas ferramentas **no mesmo commit**: com o nome antigo no HTML o componente não
+existe e o `validate.mjs` passa a contar **0** obras, e o conversor — que lê do código os valores
+que lá vivem (caixa, gatilho, moldura, velocidade) — deixa de os encontrar e escreve `null` no
+JSON. Logo **cada bloco leva o seu renomeio** (código + HTML + as regexes de `convert.mjs` e
+`validate.mjs`) e a **B6** passa a ser a verificação final, em vez de um commit só de renomeios.
+O `fromCode` do conversor passou a ler o ponto de entrada **e** todos os módulos, para não voltar
+a partir quando o valor seguinte mudar de ficheiro.
+
 | # | Bloco | Fecha |
 | --- | --- | --- |
 | **B0** | Preparação: fechar §14/R5–R7, branch a partir do estado atual, re-medir a linha de base | — |
@@ -798,16 +807,24 @@ revistos um a um.
 | **B3** | `js/modules/dimension.js` — `dimension-panorama` **com `remove()`**; `followCamera` pede a posição à câmara | A4 |
 | **B4** | `js/modules/portal.js` — `stencil-portal`: schema renomeado (`ownedBy`, `box`, `boxPosition`, `trigger`, `frame`), travessia **dentro** do portal, `remove()` completo e os nomes dos objetos 3D em inglês | A4, A7 |
 | **B5** | `js/app.js` magro: só o arranque (`ar-config`, o ouvinte único, o driver de frame e as duas pontes). Alvo: **≤100 linhas** | — |
-| **B6** | Ferramentas e HTML alinhados com os nomes novos (tabela abaixo) | — |
+| **B6** | Verificação final das ferramentas e do HTML (cada bloco já leva o seu renomeio — ver acima) | — |
 | **B7** | Documentação: README §*Estado atual do código*, §2.1 e §13 deste roadmap | — |
 
-**Feito até agora (2026-10-15):** B0 a meio — a linha de base estática está verde
-(`validate.mjs`: 4 dimensões, 10 obras, 8 portais) e as três decisões de §14 continuam **por
-fechar**. **B1** feito: `js/modules/camera.js` criado; o `app.js` deixou de conhecer o
-`a-camera` (faltam os **2** sítios que são do panorama, em B3, e do portal, em B4) e perdeu 71
-linhas (546 → 481). Verificado com a cena a correr: cena carregada, **8** portais, **3**
-panoramas e a consola sem erros; o erro de câmara e o D-pad (4,2 m em 250 ms, o passo de 0,1 m
-por frame) testados pela ponte da interface, que continua a valer.
+**Feito até agora (2026-10-15):** **B0** fechada — linha de base estática verde (`validate.mjs`:
+4 dimensões, 10 obras, 8 portais) e as três decisões de §14 fechadas no mesmo dia (**D19**).
+**B1** feito: `js/modules/camera.js` criado; o `app.js` deixou de conhecer o `a-camera` (faltam os
+**2** sítios que são do panorama, em B3, e do portal, em B4) e perdeu 71 linhas (546 → 481).
+Verificado com a cena a correr: cena carregada, **8** portais, **3** panoramas e a consola sem
+erros; o erro de câmara e o D-pad (4,2 m em 250 ms, o passo de 0,1 m por frame) testados pela
+ponte da interface, que continua a valer. **B2** feito: `js/modules/artwork.js` criado (obra,
+modal, `cursor-listener`), o núcleo ganhou `unregisterContent()` e o `app.js` perdeu o modal e
+mais dois componentes (481 → 371 linhas). A metade da **A4** que é das obras está fechada: das
+**10** obras, tirar 2 da dimensão 3 deixou o registo dessa dimensão em **1** entrada (o panorama,
+cujo `remove()` é a B3). O `data-dimension`, a classe `dimension-N` e o nome
+`dimension-N-artwork` substituíram os nomes em português; o modal abre só na dimensão ativa e
+fecha pela ponte. E o conversor, depois de regenerado, dá **0 diferenças** no `data/scene.json`
+(161 campos), com o T2 e o T3 pela varredura: **0** de **84** poses com bordo cortado e **0**
+falhas em **15 712** amostras.
 
 #### Metas de sucesso
 
@@ -839,7 +856,7 @@ continuam abertas: não são desta fase.
 | Sítio | Porque não pode ficar para trás |
 | --- | --- |
 | `tools/regression/pose-sweep.mjs` | Cria o rig com os atributos antigos (`portalId`, `dimensaoA`, `dimensaoB`, `pertenceA`, `caixa`, `caixaPosicao`) e encontra os objetos por `-mascara` e `-moldura-N`. É o **único** instrumento automático que existe (§10) |
-| `tools/html-to-scene-json/convert.mjs` e `validate.mjs` | Fazem *parsing* do `index.html` pelos quatro nomes de atributos; sem eles o validador conta 0 obras e 0 portais — e mente |
+| `tools/html-to-scene-json/convert.mjs` e `validate.mjs` | Fazem *parsing* do `index.html` pelos quatro nomes de atributos; sem eles o validador conta 0 obras e 0 portais — e mente. O `convert.mjs` vai mais longe: lê do **código** os valores que lá vivem (caixa, gatilho, moldura, velocidade), por isso um valor que mude de ficheiro tem de ser seguido |
 | `window.portalAR` / `window.portalDebug` | É a alça da consola e dos scripts de regressão: **não** se renomeia nesta fase |
 | Ponte de interface (`window.fecharObra`, `configurarBotoesMobile`, `tratarErroCamera`) | O `index.html` chama-as por atributos inline; ficam até à Fase 4 |
 | Ordem de desenho, máscara, profundidade e `sortObjects` | São as leis L2, L3 e L6: a fase **move** código, não muda regras |
@@ -1045,6 +1062,8 @@ janelas (T4 e T5); e exige um browser com **aceleração de GPU** — em render 
 | D16 | A origem da garantia de ordenação (lei **L6**) | **FECHADA** (2026-10-14) | **A lei passa a enunciar o invariante, não a ação.** Medido na fonte do A-Frame 1.8.0 (`src/systems/renderer.js`): `sortObjects` **não** é propriedade do schema e o sistema do `renderer` fixa `renderer.sortObjects = true` e `setOpaqueSort(sortFrontToBack)` na inicialização, «seja qual for a configuração» — logo a garantia é **do framework**, e a linha de `js/app.js` é uma **confirmação** que fica (documenta a intenção e protege contra uma versão que mude a omissão), com o comentário corrigido para citar a medição. `stencil` **é** propriedade do schema (omissão `false`) e continua a ser responsabilidade do projeto. **Custo aceite:** enquanto a omissão não mudar, a linha é redundante — e um leitor pode julgá-la indispensável |
 | D17 | Quarta passe de validação (frontmatter dos agents) | **FECHADA** (2026-10-14) | **O `validate_skills_index.ps1` ganha uma quarta passe, `agent → disco`:** lê o `skills:` do *frontmatter* de cada `agents/*.md` e confere cada token contra `skills/{token}/SKILL.md`. **Motivo escrito:** as passes 1–3 olham todas para dentro do índice e, por construção, **não podem** ver um agent a citar uma skill inexistente — foi assim que passou o `refactoring-patterns` do `code-archaeologist` (§14.4 do `HARNESS_LOG.md`), apanhado por auditoria manual e não pelo validador. **Custo aceite:** a regra deixa de ser "três passes" e passa a **quatro** em três ficheiros (este, o `README.md` e o `skills_index.md`) — a repetição que a D15 quis evitar é paga em três linhas |
 | D18 | O que fica na quarentena (`.agent/garbage/`) | **FECHADA** (2026-10-14) | **Mantém-se como referência: não se adapta nem se apaga.** Motivo escrito: o `.harness/` **não tem histórico Git**, logo o que se apagar aqui não se recupera (política do §2 do `HARNESS_LOG.md`), e os 6 ficheiros que lá estão têm todos estatuto explícito no `garbage/README.md` — os **originais** do que foi adaptado por cópia (`project_sync.py`, de onde nasceu `.agent/scripts/project_sync.py`), os originais dos workflows adaptados (`update-3d`, `update-layout`), o que **não** foi adaptado por não ter alvo neste projeto (`update-audio`: não há áudio) e o que foi retirado por apontar para outro harness (`update-symlinks.ps1`). **Custo aceite:** 6 ficheiros mortos que a passe 2 do índice continua a contar (`Quarentena`=6) e que nada carrega |
+
+| D19 | As três fronteiras que a Fase 2 tinha em aberto (R5–R7) | **FECHADA** (2026-10-15) | **(1) O driver de frame vive no módulo do portal.** Depois do A7 o `gestor-dimensoes` deixa de existir: é o módulo do portal que percorre `state.portals`, pede a posição do jogador à câmara e passa as dimensões mostradas ao núcleo (`syncStencilValues`) — o núcleo não conhece portais (§5.0) e o `app.js` fica só com o arranque. **(2) O modal da obra e o `cursor-listener` vivem em `js/modules/artwork.js`:** os dois são da obra (§5.3) e o modal é DOM desta aplicação, não do editor (§5.0). **(3) Os *hooks* em português passam a inglês** — `data-dimensao` → `data-dimension`, `dimension-<id>` na classe e `dimension-<id>-<papel>` no nome do objeto 3D: são código e caem na D10. Medido ao disco ao fechar a decisão: o `css/style.css` **não** usa nenhum deles (usa os ids `#modal-obra` e `#btn-frente`), logo o renomeio não arrasta CSS. **Custo aceite:** o README §*Estado atual do código* diz que o ID «aparece nos atributos, em `data-dimensao` …» e passa a ter de ser acertado |
 
 > **Emenda da L6 (2026-10-14) — decisão D16.** A lei L6 enunciava a **ação**
 > (`renderer.sortObjects = true`) como se fosse ela a criar a garantia. Medido na fonte do
@@ -1470,8 +1489,8 @@ que faltam fechar estão em §14 (R5–R7).
 ## 14. Pendências registadas (2026-10-15)
 
 O que fica em aberto depois de a documentação ser alinhada com o código. Cada linha tem o
-motivo e o que a fecha. **R5–R7 nascem do plano da Fase 2 (§9)** e são decisões a fechar antes
-de B2 e de B4.
+motivo e o que a fecha. **R5–R7 nasceram do plano da Fase 2 (§9) e foram fechadas no mesmo dia**
+(decisão **D19**, §11).
 
 **R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
 apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o
@@ -1484,10 +1503,15 @@ e repetível — `tools/regression/pose-sweep.mjs`, descrita em §10 — com **0
 cortado e **0** falhas em 11 180 amostras, e com duas avarias injetadas que provam que o
 instrumento **falha quando deve** (3 212 e 10 072 amostras em falta, nas duas).
 
+**R5, R6 e R7 — fechados em 2026-10-15** (decisão **D19**, §11). Eram as três fronteiras que o
+plano da Fase 2 não fixava: quem corre o `syncStencilValues()` por frame depois do A7, onde
+vivem o modal da obra e o `cursor-listener`, e se os *hooks* de HTML em português passam a
+inglês. Fechadas **antes** de B2 e de B4, como o plano exigia. Ao medi-las ao disco descobriu-se
+que a premissa de uma delas estava errada: o `css/style.css` **não** usa `data-dimensao` nem a
+classe `interactable` — usa os ids `#modal-obra` e `#btn-frente` —, logo o renomeio não arrasta
+CSS nenhum.
+
 | # | Pendência | Porque fica | O que a fecha |
 | --- | --- | --- | --- |
 | R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`) e o §13 diz «as 6 chaves»; as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Acertar a contagem no §13 e juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` |
 | R4 | **O texto de conteúdo por língua nunca chegou aos dados** | O entregável 4 da Fase 0 diz que `data/scene-example.json` inclui «o formato do texto de conteúdo por língua» e a D12-A diz `title: { "pt": …, "en": … }` — mas `data/scene.json` tem `dimensions: {id, kind}` e `artworks: {id, dimension, kind, asset, position, rotation, size, interaction, url}`, sem nenhum campo por língua, e nem o `convert.mjs` nem o `validate.mjs` mencionam idioma. A cena atual não tem texto (as dimensões não têm nome e as obras não têm título), logo o formato está **documentado** (§5.7 e §6) mas não **instanciado** | Levar os campos por língua ao esquema, ao conversor e ao validador — é decisão de contrato, a tomar antes da Fase 3, a fase em que a cena passa a vir dos dados |
-| R5 | **Quem corre o `syncStencilValues()` por frame depois do A7** | O `gestor-dimensoes` faz hoje as duas coisas que o A7 separa: deteta as travessias **e** agrega as dimensões mostradas. Tirar-lhe a travessia deixa em aberto quem percorre os portais a cada frame — e o núcleo não pode ser esse alguém (não conhece portais, §5.0) | Confirmar a recomendação — **o módulo do portal expõe o driver de frame e o `app.js` chama-o no arranque** — e registá-la em §11, antes de B4 |
-| R6 | **Onde vivem o modal da obra e o `cursor-listener`** | O plano da Fase 2 não fixa esta fronteira: os dois estão ligados à obra (§5.3), mas o modal é DOM e o `cursor-listener` só marca o que é clicável; a §5.0 diz o que o núcleo **não** faz, não onde isto fica | Confirmar a recomendação (**os dois em `js/modules/artwork.js`**), antes de B2 |
-| R7 | **Os `data-dimensao`, `data-portal-id` e a classe `interactable` também passam a inglês?** | São código, logo caem na D10, mas são *hooks* que o `css/style.css` usa: renomeá-los obriga a mexer no CSS no mesmo commit | Confirmar antes de B2/B4 — recomendação: **sim** (deixá-los em português é dívida de nomenclatura) |

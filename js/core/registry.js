@@ -26,6 +26,19 @@ export function registerContent(dimensionId, mesh, role) {
   applyStencilState();
 }
 
+// The counterpart of registerContent: content that leaves the scene has to leave the registry
+// too, or the core keeps configuring materials that no longer exist (docs/ROADMAP.md, A4). A
+// dimension left without content is dropped, so "this dimension has content" stays true.
+export function unregisterContent(dimensionId, mesh) {
+  const id = Number(dimensionId);
+  const list = state.dimensions[id];
+  if (!list) return;
+  const i = list.findIndex(function (entry) { return entry.mesh === mesh; });
+  if (i >= 0) list.splice(i, 1);
+  if (list.length === 0) delete state.dimensions[id];
+  state.signature = null;
+}
+
 // A portal registers itself so the scene can be listed and traversed. The core never calls
 // methods on portals: it announces the stencil changed and each window refreshes itself.
 export function registerPortal(portal) {

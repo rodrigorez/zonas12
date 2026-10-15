@@ -15,64 +15,7 @@ import {
   on
 } from './core/index.js';
 import { setupMobileControls, reportCameraError } from './modules/camera.js';
-
-// --- LÓGICA DO MODAL (JANELA SOBREPOSTA) ---
-// O modal é um diálogo: ao abrir, o foco entra nele e o resto da página fica `inert` (fora do
-// alcance do tab, do rato e do leitor de ecrã); sai com Escape. O ouvinte é registado na
-// abertura e retirado no fecho — um por abertura, nunca um por obra.
-// Não há foco para devolver ao fechar: quem abre o modal é uma obra 3D, que não é focável.
-function aoTeclarNoModal(evento) {
-  if (evento.key === 'Escape') {
-    fecharObra();
-    return;
-  }
-  if (evento.key !== 'Tab') return;
-  // `inert` tira o resto da página do alcance, mas o ciclo tem de se fechar dentro do modal:
-  // sem isto, o Tab a partir do último controlo sairia para o `body`. O movimento é feito aqui
-  // e não deixado ao browser porque, com o foco dentro do iframe, os eventos vão para o
-  // documento do frame e o Tab nativo escapava sem ninguém o poder travar.
-  let focaveis = document.querySelectorAll('#modal-obra button, #modal-obra [tabindex]:not([tabindex="-1"])');
-  if (focaveis.length === 0) return;
-  evento.preventDefault();
-  let atual = [...focaveis].indexOf(document.activeElement);
-  let passo = evento.shiftKey ? -1 : 1;
-  let proximo = (atual + passo + focaveis.length) % focaveis.length;
-  focaveis[proximo].focus();
-}
-
-// Tudo o que não é o modal. `inert` prende o foco dentro do diálogo sem ter de interceptar o
-// Tab à mão — e resolve o mesmo problema para o rato e para a árvore de acessibilidade.
-function alternarInert(ativo) {
-  [...document.body.children].forEach((elemento) => {
-    if (elemento.id === 'modal-obra') return;
-    if (ativo) elemento.setAttribute('inert', '');
-    else elemento.removeAttribute('inert');
-  });
-}
-
-function fecharObra() {
-  document.getElementById('modal-obra').style.display = 'none';
-  document.getElementById('iframe-obra').src = "";
-  alternarInert(false);
-  document.removeEventListener('keydown', aoTeclarNoModal);
-}
-
-// As teclas do modal têm de valer também dentro da obra embutida. Ao clicar lá dentro, o foco
-// passa para o documento do frame e mais nenhum evento de teclado chega ao documento de fora:
-// o Escape deixava de fechar e o Tab deixava de estar preso ao diálogo. Nas obras da mesma
-// origem dá para ouvir o documento do frame (o ouvinte é o mesmo, e usa sempre o `document` de
-// fora); nas de outra origem não há acesso — aí resta o botão "Voltar para a Galeria", que não
-// depende do teclado.
-document.getElementById('iframe-obra').addEventListener('load', function () {
-  try {
-    let documentoDoFrame = this.contentDocument;
-    if (!documentoDoFrame) return;
-    documentoDoFrame.removeEventListener('keydown', aoTeclarNoModal);
-    documentoDoFrame.addEventListener('keydown', aoTeclarNoModal);
-  } catch (erro) {
-    // Obra de outra origem: sem acesso ao documento do frame.
-  }
-});
+import { closeArtwork } from './modules/artwork.js';
 
 // --- DEBUG AND TEST HANDLE ---
 // The console and the regression scripts (docs/ROADMAP.md section 10) drive the scene
@@ -130,59 +73,6 @@ AFRAME.registerComponent('config-ar', {
     renderer.sortObjects = true;
     // O stencil é limpo a 0 em cada frame; 0 significa "nenhuma janela aqui".
     renderer.autoClearStencil = true;
-  }
-});
-
-AFRAME.registerComponent('cursor-listener', {
-  init: function () {
-    this.el.setAttribute('class', 'interactable');
-  }
-});
-
-// --- MODAL DE OBRA ---
-AFRAME.registerComponent('abrir-modal', {
-  schema: { url: { type: 'string' } },
-  init: function () {
-    this.el.addEventListener('click', () => {
-      if (!this.dimensaoAtual()) return;
-      document.getElementById('iframe-obra').src = this.data.url;
-      document.getElementById('modal-obra').style.display = 'flex';
-      alternarInert(true);
-      document.getElementById('btn-fechar-obra').focus();
-      document.removeEventListener('keydown', aoTeclarNoModal);
-      document.addEventListener('keydown', aoTeclarNoModal);
-    });
-  },
-  // Só abre obras da dimensão onde se está. Vê-las pela janela do portal não
-  // conta. O raycaster não vê o stencil, por isso sem este teste dava para clicar
-  // numa obra invisível de outra dimensão.
-  dimensaoAtual: function () {
-    let atributo = this.el.getAttribute('material-virtual');
-    if (!atributo) return true;
-    return Number(atributo.dimensao) === state.activeDimension;
-  }
-});
-
-// --- OBRAS DE UMA DIMENSÃO ---
-AFRAME.registerComponent('material-virtual', {
-  schema: { dimensao: { type: 'int', default: 0 } },
-  init: function () {
-    this.el.setAttribute('data-dimensao', this.data.dimensao);
-    this.el.classList.add('dimensao-' + this.data.dimensao);
-    this.el.addEventListener('loaded', () => this.applyStencil());
-    if (this.el.getObject3D('mesh')) this.applyStencil();
-  },
-  applyStencil: function () {
-    let mesh = this.el.getObject3D('mesh');
-    if (!mesh) return;
-    let ordem = state.drawOrder;
-    mesh.traverse((node) => {
-      if (node.isMesh && node.material) {
-        node.renderOrder = ordem.artwork;
-        node.name = 'dimensao-' + this.data.dimensao + '-obra';
-        registerContent(this.data.dimensao, node, 'artwork');
-      }
-    });
   }
 });
 
@@ -476,6 +366,6 @@ document.addEventListener('keydown', (evento) => {
 // script. Now that this file is a module, its scope is no longer global, so they have to be
 // reachable from window. Removed in Fase 4, when the interface becomes a module with its
 // own listeners.
-window.fecharObra = fecharObra;
+window.fecharObra = closeArtwork;
 window.configurarBotoesMobile = setupMobileControls;
 window.tratarErroCamera = reportCameraError;
