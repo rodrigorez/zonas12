@@ -29,7 +29,8 @@
 > na 1.8.0); a única linha de código tocada foi um comentário. A mesma ronda fechou as
 > pendências de SEO e de acessibilidade do `index.html` e a **D17** (§11) acrescentou uma
 > **quarta passe** ao validador do índice: o *frontmatter* de cada agent, conferido contra o
-> disco.
+> disco. A **D18** (§11) fechou a quarentena do harness — mantém-se como referência —, que era o
+> último ponto em aberto da Fase 6.
 >
 > **Como usar:** escolher a fase seguinte na secção [9](#9-fases-de-execução), executá-la, e
 > só a dar como fechada quando o **critério de verificação** dela passar. Uma fase de cada
@@ -794,7 +795,8 @@ existe para resolver. Fica **antes** da Fase 4 para o editor já nascer com sele
   **5 repos `.git`** dos vendors (**funcionais** — o `sync-all-vendors.ps1` faz `git pull`
   neles), o `frontend-slides/plugins/` (conteúdo do clone) e o `skills/doc.md` (guia do kit).
   Índice verificado nas **três passes** (ver `🔧 Manutenção`, no próprio índice).
-  Resta só decidir se o conteúdo de `.agent/garbage/` é adaptado ao projeto ou apagado de vez.
+  O que restava decidir sobre `.agent/garbage/` foi **fechado em 2026-10-14 pela D18** (§11):
+  **mantém-se como referência** — não se adapta nem se apaga.
 - **Verificação:** `npm test`-like (ou `node testes/regressao.mjs`) verde na `main`.
 
 ---
@@ -884,6 +886,7 @@ estados**, nunca valores absolutos de cor, e dar margem às fronteiras geométri
 
 | D16 | A origem da garantia de ordenação (lei **L6**) | **FECHADA** (2026-10-14) | **A lei passa a enunciar o invariante, não a ação.** Medido na fonte do A-Frame 1.8.0 (`src/systems/renderer.js`): `sortObjects` **não** é propriedade do schema e o sistema do `renderer` fixa `renderer.sortObjects = true` e `setOpaqueSort(sortFrontToBack)` na inicialização, «seja qual for a configuração» — logo a garantia é **do framework**, e a linha de `js/app.js` é uma **confirmação** que fica (documenta a intenção e protege contra uma versão que mude a omissão), com o comentário corrigido para citar a medição. `stencil` **é** propriedade do schema (omissão `false`) e continua a ser responsabilidade do projeto. **Custo aceite:** enquanto a omissão não mudar, a linha é redundante — e um leitor pode julgá-la indispensável |
 | D17 | Quarta passe de validação (frontmatter dos agents) | **FECHADA** (2026-10-14) | **O `validate_skills_index.ps1` ganha uma quarta passe, `agent → disco`:** lê o `skills:` do *frontmatter* de cada `agents/*.md` e confere cada token contra `skills/{token}/SKILL.md`. **Motivo escrito:** as passes 1–3 olham todas para dentro do índice e, por construção, **não podem** ver um agent a citar uma skill inexistente — foi assim que passou o `refactoring-patterns` do `code-archaeologist` (§14.4 do `HARNESS_LOG.md`), apanhado por auditoria manual e não pelo validador. **Custo aceite:** a regra deixa de ser "três passes" e passa a **quatro** em três ficheiros (este, o `README.md` e o `skills_index.md`) — a repetição que a D15 quis evitar é paga em três linhas |
+| D18 | O que fica na quarentena (`.agent/garbage/`) | **FECHADA** (2026-10-14) | **Mantém-se como referência: não se adapta nem se apaga.** Motivo escrito: o `.harness/` **não tem histórico Git**, logo o que se apagar aqui não se recupera (política do §2 do `HARNESS_LOG.md`), e os 6 ficheiros que lá estão têm todos estatuto explícito no `garbage/README.md` — os **originais** do que foi adaptado por cópia (`project_sync.py`, de onde nasceu `.agent/scripts/project_sync.py`), os originais dos workflows adaptados (`update-3d`, `update-layout`), o que **não** foi adaptado por não ter alvo neste projeto (`update-audio`: não há áudio) e o que foi retirado por apontar para outro harness (`update-symlinks.ps1`). **Custo aceite:** 6 ficheiros mortos que a passe 2 do índice continua a contar (`Quarentena`=6) e que nada carrega |
 
 > **Emenda da L6 (2026-10-14) — decisão D16.** A lei L6 enunciava a **ação**
 > (`renderer.sortObjects = true`) como se fosse ela a criar a garantia. Medido na fonte do
@@ -1230,6 +1233,7 @@ alteram comportamento.
 | D15 | Harness de skills | Usar o harness de `.harness/skills/` com **índice único** (`.agent/skills_index.md`, cobrindo todo o `.agent/`) **validado contra o disco em três passes**; **quarentena** em `.agent/garbage/` do material herdado do `Gabinete`; **limpeza** feita (esqueleto Cline, falsas junções e `__pycache__` apagados; os repos `.git` dos vendors mantidos por serem funcionais); **emendada pela D17** com uma quarta passe (`agent → disco`) |
 | D16 | Origem da garantia de ordenação (lei L6) | A lei enuncia o invariante (`stencil: true` + `sortObjects` ativo), não a ação: quem fixa `sortObjects = true` é o A-Frame 1.8.0 (medido na fonte); a linha de `js/app.js` fica como confirmação |
 | D17 | Quarta passe de validação | O validador do índice passa a conferir o `skills:` de cada agent contra o disco (`agent → disco`) — a direção que as outras três passes não tomavam |
+| D18 | Quarentena do harness | Mantém-se como referência (os originais do que foi adaptado, o que não tem alvo e o que foi retirado) — apagar perderia-os, porque o `.harness/` não tem Git |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -1256,6 +1260,11 @@ passou. Na mesma ronda o `checklist.py` passou a correr as verificações do pro
 (`project_sync.py` — existia, adaptado, e ninguém o chamava) e o `lint_runner.py` deixou de
 ficar verde sem verificar nada: em vez de "No linters found" com código 0, parseia os módulos
 com o `node`. Registo e medições em `HARNESS_LOG.md`.
+
+**D18 fechada em 2026-10-14** — a quarentena do harness **fica como está**, com o motivo escrito:
+sem histórico Git dentro do `.harness/`, apagar é irreversível, e cada um dos 6 ficheiros já tem
+estatuto declarado no `garbage/README.md`. Fecha o último ponto que a Fase 6 tinha deixado em
+aberto — a Fase 6 passa a ter só os testes de §10 por fazer.
 
 ### O que fica decidido, em uma frase
 
