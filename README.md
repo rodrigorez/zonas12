@@ -157,9 +157,11 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 
 ## Estado atual do código (depois da Fase 3)
 
-O que está **publicado** é a `v0.0.4` — o estado depois da Fase 2, marcado pela branch com o mesmo
+O que está **marcado** é a `v0.0.4` — o estado depois da Fase 2, marcado pela branch com o mesmo
 nome e testado pelo autor em 2026-10-15. Este código é o estado **depois da Fase 3** (a cena vem
-de dados), ainda por marcar e publicar. Resumo do que existe hoje: `index.html` (**82 linhas**),
+de dados): está no `main` e é o que <https://rodrigorez.github.io/zonas12/> serve, **ainda sem
+versão marcada** — a marcação (a `v0.0.5`) é feita depois de o autor o testar. Resumo do que
+existe hoje: `index.html` (**82 linhas**),
 `js/app.js` (**117**), `js/core/` (7 ficheiros, **207**), `js/modules/` (4 ficheiros, **825**),
 `js/scene/` (**3 ficheiros**, 628), `css/style.css` (96), `data/scene.json` (a cena, **594
 linhas**), `data/scene-example.json` (o fixture), `i18n/pt.json` e as ferramentas em `tools/`.
