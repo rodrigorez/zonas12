@@ -1171,7 +1171,8 @@ valores vivem.
 
 ### Fase 3B — Mundos e portas de mundo (D14)
 
-**Estado: plano registado em 2026-10-15 — nada implementado.** O plano foi escrito **antes** de
+**Estado: plano registado (B0) e linha de base re-medida (B1) em 2026-10-15 — nada de código de
+produção tocado.** O plano foi escrito **antes** de
 mexer em código, como nas fases anteriores, e as decisões de contrato que a fase exigia foram
 fechadas na mesma altura: **D24** (a divisão da cena de hoje em mundos), **D25** (a forma da porta
 no formato **v3**), **D26** (o retrato como dimensão derivada), **D27** (a divisão dos assets da
@@ -1276,6 +1277,36 @@ fez.
 | **B8** | Ferramentas: o migrador com guarda, o **grafo de mundos** no validador, a normalização e os retratos, e o verificador «os 4 arranques são iguais» e «o nome da pasta é o `world.slug`» | As ferramentas da D14 |
 | **B9** | Verificação final no browser: T1 por sala, T10–T12, T4/T5/T8 **em cada mundo**, o ciclo portão→sala→portão e o telemóvel | — |
 | **B10** | Documentação (README §Estrutura, §Estado, §Cena atual, §Atributos do portal, §Como usar, §Melhorias; roadmap §5.6, §6, §7, §9, §13, §14) e o marco **v0.0.6** | — |
+
+**Feito até agora (2026-10-15):** **B0** — plano e decisões registados (§9, §11, §6, §8, §13), commit
+`4c13673`, só documentação; **B1** — linha de base re-medida **antes** de mexer em código, com os
+números abaixo.
+
+#### Linha de base re-medida no B1 (2026-10-15)
+
+Medida no browser, com a cena construída de dados (`?scene=example`, que é hoje o mesmo ficheiro da
+exposição), e pela linha de comando. **Nada de código foi tocado** — é o valor a que a fase se
+compara bloco a bloco.
+
+| Teste | Medição no B1 | Instrumento |
+| --- | --- | --- |
+| **T1/T7** | **8 de 8** travessias, **1** transição por portal, destino certo, **0** ping-pong (a andar, passo de 0,2 m ao longo do eixo da caixa) | `setPosition` por passo + `state.activeDimension` por frame |
+| **T2** | **0** poses com o bordo cortado, de **84** (84 avaliadas, 0 não avaliáveis) | `tools/regression/pose-sweep.mjs` |
+| **T3** | **0** falhas em **15 714** amostras · **420** controlos com **0** falhas · método **válido** · buffer **1046×608** · 1,07 s | idem (o número de amostras depende do tamanho da janela) |
+| **Avarias injetadas** | `fault: 'bar'` e `fault: 'stencil'` → T2 **falha** nas duas (o instrumento falha quando deve) | idem |
+| **T4** | alfa **255** dentro da janela do hub (155,164,160 — a fotografia da cidade) e **0** fora (acima e à esquerda) | `gl.readPixels`, como na varredura |
+| **T6** | com a dimensão 1 ativa o clique **abre** o modal, com o `src` derivado do catálogo (D20); com a dimensão 0 ativa o **mesmo clique não abre**; `fecharObra()` repõe | `page.mouse` + projeção do centro da obra |
+| **T8** | **0** erros, **0** avisos, **0** pedidos falhados na carga | `console.error`/`warn` instrumentados + eventos de erro em captura + `fetch` |
+| **T9** | **1** `keydown` no `document` na carga (4 no `window`, do A-Frame) e **1** depois de criar e destruir **20** portais em ciclo, com o registo de volta a **8** portas, **0** entidades e **0** nomes `portal-63` deixados e **0** ouvintes acrescentados | contadores em `EventTarget.prototype`, pelas fábricas |
+| **`validate.mjs`** | **OK** nos dois ficheiros: 4 dimensões, 10 obras, 8 portais, 6 assets, **7** janelas distintas (exit 0) | `node tools/scene/validate.mjs` |
+| **O JSON** | **265** chaves, 595 linhas, `version: 2` | contagem por regex + `ConvertFrom-Json` |
+
+**Não re-medido no B1, de propósito:** o **T5** (a moldura de trás dentro da janela da frente) exige
+o rig de dois portais e mede a **ordem de desenho**, que a 3B não muda; fica para o B7, comparado
+com os **0 px** (e **6 768** px de controlo) da v0.0.5. Uma observação do instrumento, para não ser
+confundida com defeito: fechar o modal **a meio do carregamento** aborta o pedido do `iframe`
+(`ERR_ABORTED`) — é o `closeArtwork()` a limpar o `src`, não um pedido falhado da cena (o T8 é
+medido na carga, sem interação).
 
 #### Metas medidas (cada uma com o instrumento)
 
