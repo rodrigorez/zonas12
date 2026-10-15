@@ -150,13 +150,14 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código
+## Estado atual do código (v0.0.4)
 
-A versão publicada é a `v0.0.3` (branch com o mesmo nome); a `v0.0.4` foi criada em
-2026-10-15 e este é o `main` com a **Fase 2** do roadmap concluída. Resumo do que existe
-hoje: `index.html` (240 linhas), `js/app.js` (**78 linhas**), `js/core/` (7 ficheiros,
-207 linhas), `js/modules/` (**4 ficheiros**, 608 linhas), `css/style.css` (96 linhas),
-`assets/images/`, `data/scene.json`, `i18n/pt.json` e as ferramentas em `tools/`.
+Marcado pela branch `v0.0.4`. É o estado depois da **Fase 2** do roadmap (os 4 módulos) e é o
+que está em **teste de utilizador**; a versão publicada continua a ser a `v0.0.3`, marcada pela
+branch com o mesmo nome. Resumo do que existe hoje: `index.html` (240 linhas),
+`js/app.js` (**78 linhas**), `js/core/` (7 ficheiros, 207 linhas), `js/modules/`
+(**4 ficheiros**, 608 linhas), `css/style.css` (96 linhas), `assets/images/`,
+`data/scene.json`, `i18n/pt.json` e as ferramentas em `tools/`.
 
 O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
 regras de stencil — a única parte global, porque o stencil é um recurso de toda a cena.
