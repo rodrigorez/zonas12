@@ -1268,8 +1268,8 @@ fez.
 | --- | --- | --- |
 | **B0** | O plano e as decisões **D24–D28** registados (§9, §11, §6, §8, §13) — **documentação, sem código** | — |
 | **B1** | Linha de base re-medida **antes** de mexer: T1–T9, a varredura de poses, a consola, o `validate.mjs` e as 265 chaves do JSON | — |
-| **B2** | `schema.js` v3 e `validation.js` com as leis L10, L11, L13–L18, **uma avaria injetada por lei** | As leis dos mundos, no dado |
-| **B3** | A **migração de formato** por script (`dimensionA`/`dimensionB` → `window: dimension-pair`, `action: enter-window`), com a comparação campo a campo: **8 portais, 0 diferenças**; e os números do B1 **iguais** (mudou o formato, não o comportamento) | D22, no dado |
+| **B2** | **O formato passa a v3, ponta a ponta**: `schema.js` v3 (o `world`, os dois eixos, a obrigatoriedade condicional e os ids declarados até 447), a tabela pura dos eixos (`js/modules/portal-kinds.js`), o migrador por script (`tools/migration/scene-v3.mjs`, com a comparação campo a campo) e o dado migrado, **mais** a fábrica e o componente a lerem o eixo | D22 e D25, no dado |
+| **B3** | As **leis dos mundos** no validador — L10, L11, L13, L14 (com o leitor de pixels da linha de comando), L15, L16, L17 e L18 —, **uma avaria injetada por lei**, e o esqueleto do grafo de mundos | As leis dos mundos, no dado |
 | **B4** | As **duas tabelas** no módulo do portal e `createPortal` a lê-las, com o caminho do par inalterado | Os dois eixos |
 | **B5** | D7 e L14: `assets/{panoramas,artworks,video,previews}`, os panoramas normalizados a **2048×1024** e os retratos gerados | L14 e L9 |
 | **B6** | **A separação em mundos**: `data/worlds/*.json`, as dimensões renumeradas por mundo, `cameras.real.enabled` só no portão, as portas a `navigate` com `?from`, a **chegada** (L16) e as dimensões derivadas | D24 e D26 |
@@ -1278,9 +1278,33 @@ fez.
 | **B9** | Verificação final no browser: T1 por sala, T10–T12, T4/T5/T8 **em cada mundo**, o ciclo portão→sala→portão e o telemóvel | — |
 | **B10** | Documentação (README §Estrutura, §Estado, §Cena atual, §Atributos do portal, §Como usar, §Melhorias; roadmap §5.6, §6, §7, §9, §13, §14) e o marco **v0.0.6** | — |
 
+**Uma emenda ao plano, com motivo escrito (2026-10-15, ao abrir o B2).** O plano separava «o esquema
+novo» (B2) da «migração do dado» (B3). Não se separam: desde a Fase 3 o `app.js` **lê e valida o
+JSON ao arrancar**, logo um B2 só com o `schema.js` v3 e o dado ainda em v2 deixaria a exposição a
+recusar a cena entre dois commits. (Na Fase 3 a mesma janela existiu e era inofensiva: ninguém lia o
+JSON nessa altura — o corte do `index.html` só chegou no B5.) O B2 passou a ser **o formato v3 ponta
+a ponta** — esquema, tabela dos eixos, migrador, dado e a fábrica a ler o eixo —, e as **leis dos
+mundos** passaram a B3. O resultado do B1 continua a ser a linha de base: o B2 prova-se por
+**0 diferenças** na migração e pelos **mesmos números do B1** no browser.
+
 **Feito até agora (2026-10-15):** **B0** — plano e decisões registados (§9, §11, §6, §8, §13), commit
 `4c13673`, só documentação; **B1** — linha de base re-medida **antes** de mexer em código, com os
-números abaixo.
+números abaixo; **B2** — o formato v3 ponta a ponta, com a prova na tabela seguinte.
+
+#### O que o B2 entregou e mediu (2026-10-15)
+
+| Item | Medição |
+| --- | --- |
+| A migração (`tools/migration/scene-v3.mjs`) | **16** valores movidos para dentro do eixo, **135** comparados, **0** diferenças; e o validador verde no ficheiro escrito |
+| A guarda do migrador | a segunda corrida **recusa** (`declares version 3 and this migration reads version 2`) — o ficheiro que ele escreveu é o registo |
+| `validate.mjs` | **OK** nos dois ficheiros: 4 dimensões, 10 obras, 8 portais, 6 assets, **7** janelas distintas (o mesmo que no B1) |
+| T1/T7 | **8 de 8**, 1 transição por portal, destino certo — igual ao B1 |
+| T2/T3 | **0** de **84** poses, **0** falhas em **15 714** amostras, **420** controlos a 0, buffer **1046×608** — igual ao B1 |
+| T4 | **255** dentro (155,164,160) e **0** fora — exactamente o mesmo pixel do B1 |
+| T6 | o clique abre na dimensão ativa (com o `src` derivado do catálogo) e não abre com a 0 ativa |
+| T8 | **0** erros, **0** avisos, **0** pedidos falhados |
+| T9 | **1** `keydown` e **0** delta depois de criar e destruir 20 portais, registo de volta a 8, 0 objetos deixados |
+| **Armadilha medida (outra vez a cache)** | O browser servia o `portal.js` **antigo** mesmo depois de uma recarga, e a primeira medição parecia boa: a porta lia os eixos errados **sem um único erro de consola**. Só com `Network.clearBrowserCache` + `cacheDisabled` apareceu o erro verdadeiro (uma tabela que eu não tinha importado). É a lição da Fase 3 (§10) a repetir-se: **medir sem cache, sempre** |
 
 #### Linha de base re-medida no B1 (2026-10-15)
 

@@ -1,9 +1,9 @@
-// The shape of the scene file: what data/scene.json may contain, version 2.
+// The shape of a world file: what data/worlds/*.json may contain, version 3.
 //
 // Why a description instead of code that reads it: four different readers need to agree on the
 // format — the scene builder (js/scene/scene-builder.js), the validator (js/scene/validation.js,
-// which is also what tools/scene/validate.mjs runs), the converter that writes the
-// file (tools/migration/convert.mjs) and, later, the editor (Fase 4). Written once, they
+// which is also what tools/scene/validate.mjs runs), the migration that writes the
+// file (tools/migration/) and, later, the editor (Fase 4). Written once, they
 // cannot drift apart.
 //
 // Because of that this file has to stay pure: no DOM, no A-Frame, no three. It holds data only.
@@ -13,6 +13,10 @@
 //         artwork opens is derived from the catalogue. `url` is left for `interaction: link`.
 //   D21 — content text is a map by language (`{ "pt": ..., "en": ... }`), never a plain string.
 //   D23 — `version: 2`, and a reader refuses a version it does not know.
+//   D24/D25 (Fase 3B) — `version: 3`: one file per world (`world.slug`, and the name by language)
+//         and the portal with two independent axes — `window` (what it shows) and `action` (what
+//         the traversal does) — with the pair of dimensions inside `window`. What each kind
+//         requires is a rule of the node, because it depends on the kind.
 //
 // What is NOT here:
 //   - the laws of the scene (L1, L4, L5, L9, L12 …): they live in validation.js, next to the
@@ -23,8 +27,9 @@
 //     the converter: it reads the component and writes the value into the JSON.
 
 import { MAX_DIMENSIONS, MAX_PORTALS } from '../core/index.js';
+import { WINDOW_KINDS, ACTION_KINDS } from '../modules/portal-kinds.js';
 
-export const SCENE_VERSION = 2;
+export const SCENE_VERSION = 3;
 
 // Languages of the content text (D12, variant A). Portuguese is the origin language: a text map
 // that does not have the requested language falls back to it.
@@ -49,6 +54,9 @@ export const TRIGGER_KINDS = ['plane', 'box'];
 //   const     the only value the format accepts (validateScene reports it before anything else)
 //   positive  every part has to be greater than zero
 //   default   the value the builder uses when the field is absent
+//   rules     on an object, what a value of one of its fields requires or forbids in the others
+//             (`window` and `action` ask for different fields per kind): a list of
+//             { when: { field: value }, require: [...], forbid: [...] }
 //
 // 'text' is a map by language: { "pt": "...", "en": "..." }, with at least one language.
 // 'asset' is a key of the `assets` catalogue.
@@ -60,6 +68,20 @@ const vec3 = (defaultValue) => (defaultValue === undefined
 
 export const SCENE = {
   version: { type: 'int', required: true, const: SCENE_VERSION },
+
+  // Which world this file describes (D24/D25): the slug is the address, and it is the folder name
+  // (D28). It is also what a door of another world writes into `?from` when it sends the visitor
+  // here, and what the doors of this world use to find their arrival door (see `arrivalFrom`).
+  world: {
+    type: 'object',
+    required: true,
+    fields: {
+      slug: { type: 'string', required: true },
+      // The name of the room in each language. Optional, like every content text, and the
+      // validator warns when it is missing: nobody shows it yet (the editor is Fase 4).
+      name: text
+    }
+  },
 
   // Where the visitor starts and how fast the on-screen D-pad walks (metres per frame).
   cameras: {
@@ -136,9 +158,7 @@ export const SCENE = {
     type: 'array',
     item: {
       id: { type: 'int', required: true, id: true, max: MAX_PORTALS - 1 },
-      dimensionA: { type: 'int', required: true, ref: 'dimensions' },
-      dimensionB: { type: 'int', required: true, ref: 'dimensions' },
-      // The dimension the door stands in: -1 means it shows up in either of the two.
+      // The dimension the door stands in: -1 means it shows up in either of the two it links.
       ownedBy: { type: 'int', required: true, ref: 'dimensions', plusMinusOne: true },
       position: vec3([0, 0, 0]),
       rotation: vec3([0, 0, 0]),
@@ -158,7 +178,49 @@ export const SCENE = {
           color: { type: 'string', default: '#ff0000' },
           thickness: { type: 'number', default: 0.3, positive: true }
         }
-      }
+      },
+      // The first axis (D14): what the window shows. The three kinds and the legal combinations
+      // live in js/modules/portal-kinds.js, and the names come from there so the reader and the
+      // module cannot drift apart.
+      window: {
+        type: 'object',
+        required: true,
+        fields: {
+          kind: { type: 'enum', oneOf: WINDOW_KINDS, required: true },
+          // With 'dimension-pair', the two dimensions the window pairs. The one that is shown is
+          // the one that is not active, so the order of the pair does not matter (D22).
+          dimensionA: { type: 'int', ref: 'dimensions' },
+          dimensionB: { type: 'int', ref: 'dimensions' },
+          // With 'preview', the portrait: a name of the assets catalogue (D20, never a path) and
+          // the radius of its sphere. A smaller radius is a stronger parallax (D14).
+          asset: { type: 'asset' },
+          radius: { type: 'number', positive: true }
+        },
+        rules: [
+          { when: { kind: 'dimension-pair' }, require: ['dimensionA', 'dimensionB'], forbid: ['asset', 'radius'] },
+          { when: { kind: 'preview' }, require: ['asset', 'radius'], forbid: ['dimensionA', 'dimensionB'] },
+          { when: { kind: 'none' }, forbid: ['dimensionA', 'dimensionB', 'asset', 'radius'] }
+        ]
+      },
+      // The second axis: what the traversal does. `target` is the slug of the world this door
+      // opens, and it is the only thing that crosses the boundary (D14).
+      action: {
+        type: 'object',
+        required: true,
+        fields: {
+          kind: { type: 'enum', oneOf: ACTION_KINDS, required: true },
+          target: { type: 'string' }
+        },
+        rules: [
+          { when: { kind: 'navigate' }, require: ['target'], forbid: [] },
+          { when: { kind: 'enter-window' }, require: [], forbid: ['target'] },
+          { when: { kind: 'none' }, require: [], forbid: ['target'] }
+        ]
+      },
+      // Which world this door is the arrival door for (D14, law L17): a visitor coming from that
+      // world appears behind it. Optional — without it, arriving uses the position the camera
+      // declares, and the validator warns.
+      arrivalFrom: { type: 'string' }
     }
   }
 };

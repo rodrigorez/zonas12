@@ -19,7 +19,10 @@
 //   D21 — content text is a map by language. The Portuguese of an asset description is read from
 //         the HTML; the English and the names of the dimensions are authored content, and they
 //         live in CONTENT below because this script is the only source of the migration.
-//   D23 — `version: 2` (from js/scene/schema.js, so the number has one home).
+//   D23 — `version: 2` at the time. The number is fixed here, in this file, and not read from
+//         js/scene/schema.js as before: this script is the record of the migration that produced
+//         the format 2, and the schema has moved on to the format 3 (Fase 3B, D25). Reading it
+//         from there today would write the new version over the old shape.
 //
 // Reads:
 //   index.html    the scene entities (assets, camera, dimensions, portals, artworks)
@@ -34,7 +37,9 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SCENE_VERSION } from '../../js/scene/schema.js';
+
+// The format this migration wrote, frozen: see the note about D23 at the top of this file.
+const MIGRATED_VERSION = 2;
 
 // Content the HTML does not carry: the name of each dimension and the English of each asset
 // description (the Portuguese of the descriptions is read from the `alt` of the <img>). This is
@@ -350,7 +355,7 @@ for (const [id, asset] of assets) {
 }
 
 const cena = {
-  version: SCENE_VERSION,
+  version: MIGRATED_VERSION,
   cameras: {
     player: { position: playerPosition ? playerPosition.map(round) : null, speed: playerSpeed ? round(playerSpeed[1]) : null },
     real: { enabled: realCameraEnabled }
@@ -377,7 +382,7 @@ const usados = new Set([
 const semUso = [...assets.keys()].filter((id) => !usados.has(id));
 const semFicheiro = [...usados].filter((id) => !assets.has(id));
 
-console.log(`scene written (version ${SCENE_VERSION}):`);
+console.log(`scene written (version ${MIGRATED_VERSION}):`);
 console.log(`  dimensions : ${dimensions.length}  (${dimensions.map((d) => d.id + ':' + d.kind).join(', ')})`);
 console.log(`  artworks   : ${artworks.length}`);
 console.log(`  portals    : ${portals.length}  (${portals.map((p) => p.id + ':' + p.dimensionA + '<->' + p.dimensionB).join(', ')})`);

@@ -15,6 +15,7 @@ import {
   on
 } from '../core/index.js';
 import { playerCamera } from './camera.js';
+import { WINDOW_KINDS, ACTION_KINDS, WINDOWS, ACTIONS } from './portal-kinds.js';
 
 const PORTAL_COMPONENT = 'stencil-portal';
 
@@ -31,7 +32,13 @@ const vector = (value) => ({ x: value[0], y: value[1], z: value[2] });
 AFRAME.registerComponent(PORTAL_COMPONENT, {
   schema: {
     id: { type: 'int', default: 0 },
+    // The two axes of the door (D14), as data: what the window shows and what the traversal does.
+    // The kinds and the combinations that are legal live in ./portal-kinds.js; here they only
+    // choose which behaviour runs.
+    windowKind: { type: 'string', default: 'dimension-pair', oneOf: WINDOW_KINDS },
+    actionKind: { type: 'string', default: 'enter-window', oneOf: ACTION_KINDS },
     // The two dimensions this portal links. Bidirectional: in A it shows B and in B it shows A.
+    // Only read when the window is a 'dimension-pair' (D25).
     dimensionA: { type: 'int', default: 0 },
     dimensionB: { type: 'int', default: 1 },
     // The dimension the door belongs to (where it stands). -1 = it shows up in either of the
@@ -96,13 +103,20 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
       });
     });
   },
-  // The dimension this window shows right now (null if the portal has nothing to do with the
-  // dimension the visitor is in, or if it belongs to another dimension).
+  // The dimension this window shows right now, asked of the table (D14): null when the axis shows
+  // nothing, when the door belongs to another dimension, or when the pair has nothing to do with
+  // the dimension the visitor is in.
   shownDimension: function () {
+    const axis = WINDOWS[this.data.windowKind];
+    if (!axis || axis.shows === 'nothing') return null;
     const active = state.activeDimension;
     if (this.data.ownedBy >= 0 && active !== this.data.ownedBy) return null;
-    if (active === this.data.dimensionA) return this.data.dimensionB;
-    if (active === this.data.dimensionB) return this.data.dimensionA;
+    if (axis.shows === 'pair') {
+      if (active === this.data.dimensionA) return this.data.dimensionB;
+      if (active === this.data.dimensionB) return this.data.dimensionA;
+    }
+    // A portrait is a dimension the builder derives in the reserved band (D26) and hands to the
+    // door: it is the block that builds the worlds that passes it in.
     return null;
   },
   buildFrame: function () {
@@ -252,6 +266,11 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     this.zSign = zSign;
     if (!crossed) return;
 
+    const action = ACTIONS[this.data.actionKind];
+    // A door that navigates does not change the active dimension: it leaves the world, and the
+    // block that builds the worlds is what adds that here (Fase 3B, §9).
+    if (action && action.navigates) return;
+
     const active = state.activeDimension;
     setActiveDimension(active === this.data.dimensionA ? this.data.dimensionB : this.data.dimensionA);
   }
@@ -287,22 +306,30 @@ export function startFrameDriver() {
 // ---- the portal as data (Fase 3) ----
 
 // Creates the entity of one portal of the scene data (docs/ROADMAP.md, section 5.4). This is the
-// only place that knows how the data's fields are spelled on the component: `frame {color,
-// thickness}` becomes two fields here, and a field the data does not have is left out so the
-// component's own default applies.
+// only place that knows how the data's fields are spelled on the component: the two axes become
+// `windowKind`/`actionKind` (and, for the pair, the two dimensions), and `frame {color,
+// thickness}` becomes two fields. A field the data does not have is left out so the component's
+// own default applies.
 //
 // The element is built detached and added at the end, so A-Frame initialises the component once
 // with everything in place — the mask and the four bars are built once (law L7).
 export function createPortal(portal, parent) {
+  const windowAxis = portal.window || {};
+  const actionAxis = portal.action || {};
   const settings = {
     id: portal.id,
-    dimensionA: portal.dimensionA,
-    dimensionB: portal.dimensionB,
     ownedBy: portal.ownedBy,
+    windowKind: windowAxis.kind,
+    actionKind: actionAxis.kind,
     width: portal.width,
     height: portal.height,
     box: vector(portal.box)
   };
+  // The pair is the only kind that carries two dimensions of its own (D25).
+  if (windowAxis.kind === 'dimension-pair') {
+    settings.dimensionA = windowAxis.dimensionA;
+    settings.dimensionB = windowAxis.dimensionB;
+  }
   if (portal.boxPosition) settings.boxPosition = vector(portal.boxPosition);
   if (portal.boxRotation) settings.boxRotation = vector(portal.boxRotation);
   if (portal.trigger) settings.trigger = portal.trigger;

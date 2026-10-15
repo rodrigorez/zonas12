@@ -1,5 +1,12 @@
 {
-  "version": 2,
+  "version": 3,
+  "world": {
+    "slug": "gate",
+    "name": {
+      "pt": "Portão",
+      "en": "Gate"
+    }
+  },
   "cameras": {
     "player": {
       "position": [
@@ -328,8 +335,6 @@
   "portals": [
     {
       "id": 0,
-      "dimensionA": 0,
-      "dimensionB": 1,
       "ownedBy": 0,
       "position": [
         -6,
@@ -357,12 +362,18 @@
       "frame": {
         "color": "#ff0000",
         "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "enter-window"
       }
     },
     {
       "id": 1,
-      "dimensionA": 0,
-      "dimensionB": 2,
       "ownedBy": 0,
       "position": [
         6,
@@ -390,12 +401,18 @@
       "frame": {
         "color": "#ff0000",
         "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 2
+      },
+      "action": {
+        "kind": "enter-window"
       }
     },
     {
       "id": 2,
-      "dimensionA": 1,
-      "dimensionB": 0,
       "ownedBy": 1,
       "position": [
         -25,
@@ -423,12 +440,18 @@
       "frame": {
         "color": "#ff0000",
         "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 1,
+        "dimensionB": 0
+      },
+      "action": {
+        "kind": "enter-window"
       }
     },
     {
       "id": 3,
-      "dimensionA": 1,
-      "dimensionB": 2,
       "ownedBy": 1,
       "position": [
         25,
@@ -456,12 +479,18 @@
       "frame": {
         "color": "#ff0000",
         "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 1,
+        "dimensionB": 2
+      },
+      "action": {
+        "kind": "enter-window"
       }
     },
     {
       "id": 4,
-      "dimensionA": 2,
-      "dimensionB": 1,
       "ownedBy": 2,
       "position": [
         -25,
@@ -489,12 +518,18 @@
       "frame": {
         "color": "#ff0000",
         "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 2,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "enter-window"
       }
     },
     {
       "id": 5,
-      "dimensionA": 2,
-      "dimensionB": 1,
       "ownedBy": 2,
       "position": [
         25,
@@ -522,12 +557,18 @@
       "frame": {
         "color": "#ff0000",
         "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 2,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "enter-window"
       }
     },
     {
       "id": 6,
-      "dimensionA": 2,
-      "dimensionB": 3,
       "ownedBy": 2,
       "position": [
         0,
@@ -555,12 +596,18 @@
       "frame": {
         "color": "#ff0000",
         "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 2,
+        "dimensionB": 3
+      },
+      "action": {
+        "kind": "enter-window"
       }
     },
     {
       "id": 7,
-      "dimensionA": 3,
-      "dimensionB": 2,
       "ownedBy": 3,
       "position": [
         0,
@@ -588,6 +635,14 @@
       "frame": {
         "color": "#ff0000",
         "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 3,
+        "dimensionB": 2
+      },
+      "action": {
+        "kind": "enter-window"
       }
     }
   ]

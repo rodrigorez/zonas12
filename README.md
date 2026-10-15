@@ -18,7 +18,7 @@ zonas12/
 │   ├── modules/        dimensão, obra, portal e câmara (Fase 2), com as fábricas da Fase 3
 │   └── scene/          a cena em dados: schema, validação e construtor (Fase 3)
 ├── data/
-│   ├── scene.json          a exposição, no formato v2
+│   ├── scene.json          a exposição, no formato v3
 │   └── scene-example.json  a mesma cena, como fixture (?scene=example)
 ├── i18n/
 │   └── pt.json         textos da interface (5 chaves; nada os lê ainda — Fase 4)
@@ -194,9 +194,11 @@ O **`js/scene/`** é onde a cena em dados vive, e tem só três ficheiros:
 | `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9 e L12. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor vai reutilizar |
 | `scene-builder.js` | O **único** dos três que conhece o A-Frame: cria o `<a-assets>` (e **espera** que os ficheiros carreguem), a câmara, as dimensões, as obras e os portais, a partir do JSON |
 
-A cena está em **`data/scene.json`** (formato **v2**, descrito no roadmap §6): um catálogo
+A cena está em **`data/scene.json`** (formato **v3**, descrito no roadmap §6): um catálogo
 `assets` onde cada caminho aparece **uma vez**, as dimensões e as obras a apontarem para ele pelo
-nome, e o texto de conteúdo por língua. `?scene=example` carrega o `data/scene-example.json`.
+nome, o texto de conteúdo por língua, o mundo a que o ficheiro pertence (`world.slug`) e a porta
+com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensões lá dentro) e
+`action` (o que a travessia faz). `?scene=example` carrega o `data/scene-example.json`.
 
 ### O que está implementado
 
@@ -329,14 +331,17 @@ isso vários portais nunca ficam em desacordo:
 
 #### O portal é a porta
 
-Um portal liga **duas** dimensões (`dimensionA` e `dimensionB`), de forma **bidirecional**:
+Um portal liga **duas** dimensões — o par vive dentro do eixo `window` da porta
+(`"window": { "kind": "dimension-pair", "dimensionA": 0, "dimensionB": 1 }`) —, de forma
+**bidirecional**:
 
 | Onde estás | O quadro mostra |
 | --- | --- |
-| `dimensionA` | `dimensionB` |
-| `dimensionB` | `dimensionA` |
+| `window.dimensionA` | `window.dimensionB` |
+| `window.dimensionB` | `window.dimensionA` |
 
-Atravessar o portal (pela caixa de colisão) muda a **dimensão ativa** para o outro lado.
+Atravessar o portal (pela caixa de colisão) muda a **dimensão ativa** para o outro lado: é o que o
+eixo `action` diz dele, com `enter-window` — "fica na dimensão que a janela mostra".
 
 O `ownedBy` (opcional) diz em que dimensão é que a porta fica. Sem ele, a porta
 aparece em qualquer uma das duas. É isto que permite ter, por exemplo, **7 portas do
@@ -347,11 +352,11 @@ dimensão.
 
 | Cenário | Como se escreve |
 | --- | --- |
-| Dimensão central que dá acesso a todas | Um portal por destino: `dimensionA: 0; dimensionB: N`, todos na dimensão central |
-| 7 portais da dimensão 1 para a 2 | 7 portais `dimensionA: 1; dimensionB: 2; ownedBy: 1` |
-| 7 portais da dimensão 2 para a 1 | 7 portais `dimensionA: 1; dimensionB: 2; ownedBy: 2` |
+| Dimensão central que dá acesso a todas | Um portal por destino: `window.dimensionA: 0; window.dimensionB: N`, todos na dimensão central |
+| 7 portais da dimensão 1 para a 2 | 7 portais `window.dimensionA: 1; window.dimensionB: 2; ownedBy: 1` |
+| 7 portais da dimensão 2 para a 1 | 7 portais `window.dimensionA: 1; window.dimensionB: 2; ownedBy: 2` |
 | **Vários portais no mesmo sítio para o mesmo destino** | N portais iguais com `ownedBy` da dimensão deles (ex.: 2 portais de 2 → 1) |
-| **Uma dimensão com portais para destinos diferentes** | Ex.: `ownedBy: 2` com 2 portais `dimensionB: 1` e 1 portal `dimensionB: 3` |
+| **Uma dimensão com portais para destinos diferentes** | Ex.: `ownedBy: 2` com 2 portais `window.dimensionB: 1` e 1 portal `window.dimensionB: 3` |
 | Atravessar para "qualquer" outra dimensão | Um portal entre as duas; atravessar em qualquer sentido |
 | Vários portais a mostrar dimensões diferentes no mesmo ecrã | Cada **dimensão mostrada** recebe um valor de stencil próprio |
 
@@ -359,13 +364,19 @@ Exemplo — uma central (0) com dois destinos, e conteúdo nas dimensões:
 
 ```json
 {
+  "version": 3,
+  "world": { "slug": "gate", "name": { "pt": "Portão", "en": "Gate" } },
   "dimensions": [
     { "id": 1, "kind": "image", "asset": "cidade-360", "radius": 500 },
     { "id": 2, "kind": "image", "asset": "praia", "radius": 500 }
   ],
   "portals": [
-    { "id": 0, "dimensionA": 0, "dimensionB": 1, "ownedBy": 0, "position": [-10, 0, -12] },
-    { "id": 1, "dimensionA": 0, "dimensionB": 2, "ownedBy": 0, "position": [10, 0, -12] }
+    { "id": 0, "ownedBy": 0, "position": [-10, 0, -12],
+      "window": { "kind": "dimension-pair", "dimensionA": 0, "dimensionB": 1 },
+      "action": { "kind": "enter-window" } },
+    { "id": 1, "ownedBy": 0, "position": [10, 0, -12],
+      "window": { "kind": "dimension-pair", "dimensionA": 0, "dimensionB": 2 },
+      "action": { "kind": "enter-window" } }
   ],
   "artworks": [
     { "id": 0, "dimension": 1, "kind": "image", "asset": "praia",
@@ -421,8 +432,10 @@ escreve-as no JSON, que é o que impede os dois de divergirem:
 | Campo | Significado | Omissão |
 | --- | --- | --- |
 | `id` | ID do portal | (obrigatório) |
-| `dimensionA`, `dimensionB` | As duas dimensões que a porta liga | (obrigatórios) |
+| `window` | O **primeiro eixo** (D14): `kind` — `dimension-pair`, `preview` ou `none` — e, com o par, as duas dimensões que a porta liga (`dimensionA`, `dimensionB`) | (obrigatório) |
+| `action` | O **segundo eixo**: `kind` — `enter-window`, `navigate` ou `none` — e, com `navigate`, o `target` (o mundo de destino) | (obrigatório) |
 | `ownedBy` | Dimensão onde a porta fica (`-1` = qualquer das duas) | (obrigatório) |
+| `arrivalFrom` | O mundo de origem para o qual esta porta é a porta de chegada | (opcional) |
 | `width`, `height` | Tamanho do quadro | (obrigatórios) |
 | `box` | Tamanho X, Y, Z da caixa de colisão | (obrigatório) |
 | `boxPosition` | Centro da caixa (espaço do portal) | `0 8 0` |

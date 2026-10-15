@@ -5,15 +5,17 @@
 // a scene that passes in one of them passes in all three.
 //
 // What it checks:
-//   - the shape, taken from schema.js (fields, types, allowed values, references, unknown keys);
+//   - the shape, taken from schema.js (fields, types, allowed values, references, unknown keys),
+//     including the rules of the two axes of a portal: what each kind of `window` and `action`
+//     requires and what it forbids (D25);
 //   - the laws of docs/ROADMAP.md section 8 that the data alone can prove: L1 (background wider
 //     than the scene), L4 (arrival outside every other box), L5 (at most 255 windows at once),
 //     L9 (every asset exists) and L12 (no absolute paths).
 //
 // What it does not check, on purpose:
 //   - the laws of render (L2, L3, L6, L7, L8): they are properties of the code, not of the data;
-//   - L15 and the world laws (L10, L11, L13, L14, L16, L17, L18): they arrive with the worlds
-//     (Fase 3B), the only phase that can create a derived dimension or a door to another world.
+//   - the laws of the worlds (L10, L11, L13, L14, L15, L16, L17, L18): they arrive with the block
+//     that creates doors to another world and derived dimensions (Fase 3B, §9, block B3).
 //
 // Pure: no DOM, no A-Frame, no three. The only outside information it needs is how to tell
 // whether a file exists (`options.exists`), which only the command line can answer.
@@ -27,9 +29,17 @@ const EYE_HEIGHT = 1.6;
 export function summarise(scene) {
   const windows = new Set();
   for (const portal of scene.portals || []) {
-    const ownedBy = portal.ownedBy;
-    const destino = ownedBy === portal.dimensionA ? portal.dimensionB : portal.dimensionA;
-    windows.add(ownedBy + '->' + destino);
+    const axis = portal.window || {};
+    if (axis.kind === 'dimension-pair') {
+      const ownedBy = portal.ownedBy;
+      const other = ownedBy === axis.dimensionA ? axis.dimensionB : axis.dimensionA;
+      windows.add(ownedBy + '->' + other);
+    } else if (axis.kind === 'preview') {
+      // A portrait becomes a dimension the builder derives (D26): two doors that name the same
+      // portrait with the same radius share it, so they take one stencil value and not two.
+      windows.add('preview:' + axis.asset + '@' + axis.radius);
+    }
+    // `kind: "none"` shows nothing: it takes no stencil value, so it is no window at all.
   }
   return {
     dimensions: (scene.dimensions || []).length,
@@ -207,6 +217,24 @@ function checkNode(holder, node, path, err, warn, context) {
       continue;
     }
     checkValue(value, field, `${path}${name}`, err, warn, context);
+  }
+
+  checkRules(holder, node, path, err);
+}
+
+// What a value of one field requires or forbids in the others — `window` and `action` ask for
+// different fields per kind. The rule is data, written in schema.js next to the fields it
+// constrains, so the reader, the migration and (later) the editor ask the same question.
+function checkRules(holder, node, path, err) {
+  for (const rule of node.rules || []) {
+    const [field, expected] = Object.entries(rule.when)[0];
+    if (holder[field] !== expected) continue;
+    for (const name of rule.require || []) {
+      if (holder[name] === undefined) err(`${path}${name}: required when ${field} is "${expected}"`);
+    }
+    for (const name of rule.forbid || []) {
+      if (holder[name] !== undefined) err(`${path}${name}: not written when ${field} is "${expected}"`);
+    }
   }
 }
 
