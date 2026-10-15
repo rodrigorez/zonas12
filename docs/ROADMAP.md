@@ -1738,6 +1738,10 @@ metas de arquitetura M1–M4 fecharam: nenhuma marca de entidade no `index.html`
 a ler o catálogo `i18n` (**R3**, Fase 4), o editor — que traz o `update`/`list` das fábricas — e os
 mundos.
 
+**Fecho:** publicada no `main` (o GitHub Pages serve o `main`) e **funcional nas três versões
+testadas pelo autor em 2026-10-15** — local, a publicada e no telemóvel. Marcada como **`v0.0.5`**
+(branch no commit do fecho); a anterior é a `v0.0.4`, do fim da Fase 2.
+
 ## Próximo passo: Fase 3B (mundos e portas de mundo)
 
 A **D14** (§11) está decidida desde 2026-10-13 e o que ela obriga está em §9: uma pasta por mundo
