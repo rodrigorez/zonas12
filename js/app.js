@@ -1,19 +1,22 @@
 // --- CORE ---
 // The scene state, the registries and the stencil rules live in js/core/ (decision D1).
-// This file is the application: the bootstrapping and the bridge to the interface. The camera,
-// artwork, dimension and portal modules live in js/modules/ (docs/ROADMAP.md, Fase 2).
+// This file is the application: the bootstrapping and the bridge to the interface.
+//
+// Since Fase 3 the scene comes from data: this file loads data/scene.json, has it checked against
+// the format and the laws, and hands it to the scene builder. The camera, artwork, dimension and
+// portal modules live in js/modules/; the format, its validation and the build live in js/scene/.
 import {
   state,
-  registerContent,
   applyStencilState,
   syncStencilValues,
   setActiveDimension,
   on
 } from './core/index.js';
-import { setupMobileControls, reportCameraError } from './modules/camera.js';
+import { startSession } from './modules/camera.js';
 import { closeArtwork } from './modules/artwork.js';
-import './modules/dimension.js';
 import { startFrameDriver } from './modules/portal.js';
+import { validateScene } from './scene/validation.js';
+import { buildScene } from './scene/scene-builder.js';
 
 // --- DEBUG AND TEST HANDLE ---
 // The console and the regression scripts (docs/ROADMAP.md section 10) drive the scene
@@ -24,14 +27,8 @@ window.portalDebug = {
   setActiveDimension: setActiveDimension,
   applyStencilState: applyStencilState,
   syncStencilValues: syncStencilValues,
-  registerContent: registerContent,
   on: on
 };
-
-// The per-frame driver belongs to the portal module (decision D19): it walks the portal
-// registry and hands the dimensions the windows show to the core, which is the only place that
-// assigns stencil values.
-startFrameDriver();
 
 AFRAME.registerComponent('ar-config', {
   init: function () {
@@ -68,11 +65,53 @@ document.addEventListener('keydown', (event) => {
   });
 });
 
+// --- THE SCENE, FROM DATA ---
+// One name per file: `?scene=example` loads the fixture of D9 (data/scene-example.json). Any
+// other value is a typo, and the exhibition loads with its own scene.
+const DEFAULT_SCENE = 'data/scene.json';
+const SCENE_FILES = { example: 'data/scene-example.json' };
+
+async function loadScene() {
+  const requested = new URLSearchParams(window.location.search).get('scene');
+  let file = DEFAULT_SCENE;
+  if (requested) {
+    if (SCENE_FILES[requested]) file = SCENE_FILES[requested];
+    else console.warn('[scene] there is no scene called "' + requested + '"; loading ' + DEFAULT_SCENE);
+  }
+  const response = await fetch(file);
+  if (!response.ok) throw new Error(file + ': HTTP ' + response.status);
+  return response.json();
+}
+
+async function buildFromData() {
+  const data = await loadScene();
+  const report = validateScene(data);
+
+  // The console is a test (T8): a scene that is fine says nothing at all. What cannot be checked
+  // here — whether the file of an asset exists on disk — is the command line's job
+  // (tools/html-to-scene-json/validate.mjs).
+  if (!report.ok) {
+    report.errors.forEach((error) => console.error('[scene] ' + error));
+    return false;
+  }
+  report.warnings.forEach((warning) => console.warn('[scene] ' + warning));
+
+  // The build is asynchronous because the assets have to be loaded before the components that
+  // use them are created (see scene-builder.js).
+  await buildScene(data);
+  return true;
+}
+
+// The frame driver starts only after the build: until then there is no portal to walk, and the
+// camera the collision asks for does not exist yet either.
+buildFromData()
+  .then((built) => { if (built) startFrameDriver(); })
+  .catch((error) => console.error('[scene] the scene could not be built:', error));
+
 // --- TEMPORARY BRIDGE TO THE INTERFACE ---
-// index.html still calls these from inline attributes (onclick) and from its own inline
-// script. Now that this file is a module, its scope is no longer global, so they have to be
-// reachable from window. The three names are the interface's, so they keep their Portuguese
-// spelling until Fase 4 removes the bridge with the inline script.
+// index.html still calls these two from inline attributes (`onclick`). The names are the
+// interface's, so they keep their Portuguese spelling until Fase 4 takes the inline attributes
+// away. `configurarBotoesMobile` and `tratarErroCamera` left the bridge with the inline script
+// that used to call them: `startSession` (js/modules/camera.js) is what drives both now.
+window.iniciarCena = startSession;
 window.fecharObra = closeArtwork;
-window.configurarBotoesMobile = setupMobileControls;
-window.tratarErroCamera = reportCameraError;

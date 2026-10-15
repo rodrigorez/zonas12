@@ -6,16 +6,39 @@
 // webcam stream behind dimension 0), plus the interface that only makes sense while the
 // webcam is being requested — the loading overlay and the error message.
 //
+// Since Fase 3 the camera comes from the data too: `createPlayerCamera` builds it from
+// `cameras.player` and the module keeps the element, so there is no selector here any more —
+// looking for `a-camera` by name was the second place that knew where the camera lives.
+//
 // Nothing here knows about dimensions, portals, stencil or draw order.
-const PLAYER_SELECTOR = 'a-camera';
 
-// Step of the on-screen D-pad, in metres per frame (data/scene.json, cameras.player.speed).
+// Step of the on-screen D-pad, in metres per frame. It is the fallback: the value comes from the
+// data (cameras.player.speed) and `createPlayerCamera` replaces it. The converter reads this
+// constant to write the JSON, which is what keeps the two from drifting.
 const MOBILE_SPEED = 0.1;
+
+// What the rig is, in code: where it starts and how fast the D-pad walks is data, but the
+// controls themselves (the pointer lock, the keyboard acceleration and the cursor) are the
+// application's, not something a scene author writes.
+const CAMERA_RIG = {
+  lookControls: { pointerLockEnabled: false },
+  wasdControls: { acceleration: 45 },
+  cursor: { color: '#ffffff', opacity: 0.8, objects: '.interactable' }
+};
 
 const held = { forward: false, backward: false, left: false, right: false };
 
+let playerEl = null;
+let mobileSpeed = MOBILE_SPEED;
+let realCameraEnabled = false;
+
+// A-Frame's vec3 in the object form needs { x, y, z }: an array there is read as an object with
+// no axes and falls back to the default, silently (measured in A-Frame 1.8,
+// utils/coordinates.js parse). The data writes vectors as arrays, so the factory translates.
+const vector = (value) => ({ x: value[0], y: value[1], z: value[2] });
+
 function playerElement() {
-  return document.querySelector(PLAYER_SELECTOR);
+  return playerEl;
 }
 
 // The player camera. `position()` is the position of the element and `worldPosition()` the
@@ -47,20 +70,20 @@ function stepMobileMovement() {
     const position = element.object3D.position;
     const angle = element.object3D.rotation.y;
     if (held.forward) {
-      position.x -= Math.sin(angle) * MOBILE_SPEED;
-      position.z -= Math.cos(angle) * MOBILE_SPEED;
+      position.x -= Math.sin(angle) * mobileSpeed;
+      position.z -= Math.cos(angle) * mobileSpeed;
     }
     if (held.backward) {
-      position.x += Math.sin(angle) * MOBILE_SPEED;
-      position.z += Math.cos(angle) * MOBILE_SPEED;
+      position.x += Math.sin(angle) * mobileSpeed;
+      position.z += Math.cos(angle) * mobileSpeed;
     }
     if (held.left) {
-      position.x -= Math.cos(angle) * MOBILE_SPEED;
-      position.z += Math.sin(angle) * MOBILE_SPEED;
+      position.x -= Math.cos(angle) * mobileSpeed;
+      position.z += Math.sin(angle) * mobileSpeed;
     }
     if (held.right) {
-      position.x += Math.cos(angle) * MOBILE_SPEED;
-      position.z -= Math.sin(angle) * MOBILE_SPEED;
+      position.x += Math.cos(angle) * mobileSpeed;
+      position.z -= Math.sin(angle) * mobileSpeed;
     }
   }
   requestAnimationFrame(stepMobileMovement);
@@ -117,4 +140,74 @@ export function reportCameraError(error) {
   message.style.display = 'flex';
   document.body.appendChild(message);
   document.getElementById('btn-iniciar').style.display = 'none';
+}
+
+// ---- the camera as data (Fase 3) ----
+
+// Builds the player rig from `cameras.player` and keeps the element: from here on this module is
+// the one that knows where the camera is, and it no longer looks for it by name (A5, the second
+// half — a selector here and a builder creating the element would be two places again).
+export function createPlayerCamera(player, parent) {
+  const el = document.createElement('a-camera');
+  if (player && player.position) el.setAttribute('position', vector(player.position));
+  el.setAttribute('look-controls', CAMERA_RIG.lookControls);
+  el.setAttribute('wasd-controls', CAMERA_RIG.wasdControls);
+
+  const cursor = document.createElement('a-cursor');
+  Object.entries(CAMERA_RIG.cursor).forEach(([name, value]) => cursor.setAttribute(name, value));
+  el.appendChild(cursor);
+
+  parent.appendChild(el);
+  playerEl = el;
+  if (player && typeof player.speed === 'number' && player.speed > 0) mobileSpeed = player.speed;
+  return el;
+}
+
+// Whether the exhibition stands in the real world (dimension 0 shows the webcam). The data says
+// so — `cameras.real.enabled` — and `startSession` is what acts on it.
+export function useRealCamera(enabled) {
+  realCameraEnabled = enabled === true;
+}
+
+// What the "ATIVAR EXPOSIÇÃO" button does. It was the inline script of index.html until Fase 3,
+// and it lives here because all of it is the camera's business: the webcam, the loading overlay,
+// the error message and the on-screen D-pad.
+export function startSession() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.style.display = 'flex';
+  const start = document.getElementById('btn-iniciar');
+  if (start) start.style.display = 'none';
+
+  if (AFRAME.utils.device.isMobile()) {
+    document.getElementById('controles-mobile').style.display = 'block';
+    setupMobileControls();
+  }
+
+  // Dimension 0 is the real world only when the data says so: with `real.enabled` false the
+  // exhibition is entirely virtual, and asking for the camera would be asking for nothing.
+  if (!realCameraEnabled) {
+    hideLoading();
+    return;
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    reportCameraError(new Error('getUserMedia is not supported'));
+    return;
+  }
+
+  const video = document.getElementById('webcam-video');
+  navigator.mediaDevices
+    .getUserMedia({ video: { width: 1280, height: 720, facingMode: 'environment' } })
+    .then((stream) => {
+      video.srcObject = stream;
+      video.play();
+      // The canvas has to be resized once the stream is running: without this the first frames
+      // are squeezed into the size the page had before the camera started.
+      setTimeout(() => {
+        const scene = document.querySelector('a-scene');
+        if (scene && scene.resize) scene.resize();
+      }, 300);
+      setTimeout(hideLoading, 500);
+    })
+    .catch((error) => reportCameraError(error));
 }
