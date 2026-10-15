@@ -951,9 +951,9 @@ provoca (D10) e cada bloco mede no browser o que fez.
 | # | Bloco | Fecha |
 | --- | --- | --- |
 | **B0** | Linha de base re-medida antes de mexer: T1–T9 e o 0-diferenças (as decisões **D20–D23** estão fechadas em §11) | — |
-| **B1** | `js/scene/schema.js`: a forma do JSON — campos, tipos, enumerações (`image/video/color/camera`, `modal/link/none`, `plane/box`), omissões e o catálogo `assets`. **Puro**: sem DOM e sem `AFRAME` | A6 e o formato do R4 |
-| **B2** | `js/scene/validation.js` (forma e as leis **L1, L4, L5, L9, L12**) e o `validate.mjs` a importá-lo, em vez de contar entidades no HTML | uma só implementação da validação |
-| **B3** | O conversor escreve o **contrato novo** (`assets`, `url` derivado, campos por língua, `version: 2`), ainda a ler o HTML — e a prova: **338 valores, 0 diferenças** | A6 e R4, no dado |
+| **B1** | `js/scene/schema.js`: a forma do JSON — campos, tipos, enumerações (`image/video/color/camera`, `modal/link/none`, `plane/box`), omissões e o catálogo `assets`. **Puro**: sem DOM e sem `AFRAME`; o `node` importa-o e confere que nenhum campo do JSON de hoje ficou por declarar | A6 e o formato do R4 |
+| **B2** | `js/scene/validation.js`: a forma (lida do schema) e as leis **L1, L4, L5, L9, L12**, com **uma avaria injetada por verificação** a provar que falha quando deve | uma só implementação da validação |
+| **B3** | O conversor escreve o **contrato novo** (`assets`, `url` derivado, campos por língua, `version: 2`), ainda a ler o HTML, **e o `validate.mjs` passa a correr o módulo** — as contagens no HTML morrem com o formato v2, e a conferência de fidelidade passa a ser o 0-diferenças do conversor. A prova: **338 valores, 0 diferenças** | A6 e R4, no dado |
 | **B4** | As fábricas nos módulos (`create(data, parent)` / `remove(el)`) e os valores que o JSON já carrega (`frame`, `speed`) a virem do dado. **O HTML ainda governa**: comportamento igual | A6 |
 | **B5** | `js/scene/scene-builder.js` e **o corte**: `<a-scene>` sem entidades, o `app.js` a fazer carregar → validar → construir → driver, e `?scene=example` | A6 — o centro da fase |
 | **B6** | Ferramentas: a **guarda** do conversor (recusa correr e escrever quando o HTML não tem entidades), o validador sobre o schema partilhado, e a pasta da migração com o nome do que ela é | o conversor deixa de poder destruir o JSON |

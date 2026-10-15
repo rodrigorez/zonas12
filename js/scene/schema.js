@@ -46,6 +46,7 @@ export const TRIGGER_KINDS = ['plane', 'box'];
 //   ref       the field is an id of another entity of the scene ('dimensions', 'portals')
 //   id        an id of this kind of entity: unique and inside the range
 //   min/max   bounds for a number or an id
+//   const     the only value the format accepts (validateScene reports it before anything else)
 //   positive  every part has to be greater than zero
 //   default   the value the builder uses when the field is absent
 //
