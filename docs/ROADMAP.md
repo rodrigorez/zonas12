@@ -91,12 +91,22 @@ inteira, a iterar o registo de portais (`js/app.js`), onde já não há nada que
 O comportamento mantém-se igual ao que os 8 ouvintes davam (premir `R` roda todos os portais,
 `D` liga/desliga a caixa de debug de todos). Passou a **1** na carga e **1** depois de 6 ciclos
 de criação/destruição. A4–A7 continuam abertas.
+
+**Fecho de A4, A5 e A7 (2026-10-15, Fase 2).** As três fecharam com os módulos. **A4:** a obra,
+o panorama e o portal ganharam `remove()` e o núcleo um `unregisterContent()`, para que conteúdo
+que sai da cena saia do registo — medido a tirar as 5 obras **e** o panorama da dimensão 1: a
+chave dela desaparece do registo e sobram `[2, 3]`. **A5:** o `a-camera` passou a existir só em
+`js/modules/camera.js`; os outros três sítios pedem a posição (`playerCamera.position()` e
+`worldPosition()`). **A7:** a travessia passou a ser do próprio portal (`detectTraversal()`) e a
+atribuição de valores ficou no núcleo; o que resta do antigo `gestor-dimensoes` é o driver de
+frame, que passou a viver no módulo do portal (decisão **D19**, §11). **O A6 continua aberto**:
+o campo único `asset` é decisão de contrato e vai com a cena a vir de dados (Fase 3).
 | A8 | `config-ar` | `sortObjects`, `autoClearStencil`, `setClearColor` | É configuração de render: tem de ser única e correr antes de tudo |
 
-> **Nota (Fase 1).** As referências de linha desta tabela são da **v0.0.2**, quando a
-> lógica estava toda em `js/main.js`. Depois do passo 1 da Fase 1 esse ficheiro passou a
-> ser `js/app.js` (entrada de módulo) e as linhas deslocaram-se; a Fase 2 leva cada bloco
-> para `js/modules/`.
+> **Nota (Fase 1).** As referências de linha desta tabela são da **v0.0.2**, quando a lógica
+> estava toda em `js/main.js`. Depois do passo 1 da Fase 1 esse ficheiro passou a ser
+> `js/app.js` (entrada de módulo) e as linhas deslocaram-se; na **Fase 2** cada bloco foi para
+> `js/modules/` e os nomes mudaram (D10). A tabela fica como o registo da v0.0.2.
 
 **Leitura destes factos:** o pedido de "4 módulos independentes" é possível, mas **não é
 possível sem um núcleo**. A alternativa (módulos verdadeiramente autónomos) obrigaria a
@@ -344,6 +354,15 @@ O único sítio que conhece a cena toda.
   `registry:changed`.
 - **Não faz:** criar objetos 3D, ler JSON, conhecer o DOM do editor, ler o teclado.
 
+> **Como ficou (2026-10-15, Fase 2).** Os nomes verdadeiros estão em `js/core/index.js`:
+> `state`, `registerContent` / `unregisterContent` (resolve o **A4**), `registerPortal` /
+> `unregisterPortal`, `applyStencilRule` / `applyStencilState` / `syncStencilValues`,
+> `setActiveDimension` e `on` / `off` / `emit`. Dos eventos propostos existem **dois**: o
+> `stencil:changed` (é ele que faz cada janela atualizar-se sozinha, sem o núcleo conhecer
+> portais) e o `dimension:active-changed`; `core:ready`, `portal:traversed` e `registry:changed`
+> **não** existem, porque nada precisou deles. O que a §5.0 promete mantém-se, medido por `grep`:
+> nenhum ficheiro de `js/core/` importa de `js/modules/` e nenhum fala com o `document`.
+
 ### 5.2 Módulo Dimensão
 
 - **Responsabilidade:** uma dimensão = ID + fundo + lista de conteúdo dela.
@@ -380,6 +399,14 @@ O único sítio que conhece a cena toda.
   visíveis ao mesmo tempo; a combinação de `window` com `action` tem de ser uma das legais
   (L18).
 - **Depende de:** núcleo (valor de stencil), câmara (posição do jogador).
+
+> **Como ficou (2026-10-15, Fase 2).** O componente é `stencil-portal` e o schema tem `id`,
+> `dimensionA`, `dimensionB`, `ownedBy`, `width`, `height`, `box`, `boxPosition`, `boxRotation` e
+> `trigger` (`plane` / `box`). O `frame {color, thickness}` e o `motion` **não** são campos do
+> schema: a moldura é construída no código com a cor e a espessura de que o conversor lê o valor
+> para o JSON (Fase 0). Os **dois eixos** (`window` / `action`) são da Fase 3B, como a D14 manda.
+> O **A7** está fechado: a travessia é do portal (`detectTraversal()`) e o que resta do antigo
+> gestor é o driver de frame, que vive neste módulo (decisão **D19**).
 
 #### Os dois eixos do portal (D14)
 
@@ -419,6 +446,12 @@ trocas de `A`/`B`.
 - **API:** `position()`, `setPosition(p)`, `enable()`, `disable()`.
 - **Ganho imediato:** resolve A5 — deixa de haver `document.querySelector('a-camera')`
   espalhado por 3 sítios.
+
+> **Como ficou (2026-10-15, Fase 2).** `js/modules/camera.js` expõe `playerCamera` (com
+> `position()`, `worldPosition()` e `setPosition()`), `setupMobileControls()` e
+> `reportCameraError()`, e é o **único** ficheiro do projeto que conhece o seletor `a-camera`
+> (medido por `grep`). O `enable()` / `disable()` da câmara real **não** existem: o arranque da
+> webcam continua no script inline do `index.html`, que passa a ser do módulo na Fase 4.
 
 ### 5.6 Estrutura-alvo do repositório
 
@@ -747,8 +780,9 @@ portais e `D` continua a ligar/desligar as caixas de todos, que é o que os 8 ou
 
 ### Fase 2 — Os 4 módulos
 
-**Estado: planeada em 2026-10-15 — ainda sem código escrito.** O plano abaixo é o que a fase tem
-de entregar, bloco a bloco; as três decisões que faltam fechar estão em §14 (R5–R7).
+**Estado: concluída em 2026-10-15.** Os quatro módulos existem em `js/modules/`, o `app.js`
+ficou só com o arranque (**78 linhas**) e as três decisões que faltavam fechar foram fechadas no
+mesmo dia (**D19**, §11).
 
 - **Entregável:** `js/modules/dimension.js`, `artwork.js`, `portal.js`, `camera.js`; `js/app.js`
   fica só com o arranque.
@@ -819,6 +853,7 @@ a partir quando o valor seguinte mudar de ficheiro.
 | **B2** | `js/modules/artwork.js`; o núcleo ganhou `unregisterContent()`; os nomes da obra em inglês | 481 → **371**; tirar as 2 obras da dimensão 3 deixa-a com **1** entrada (o panorama) |
 | **B3** | `js/modules/dimension.js`; o panorama ganhou `remove()` e pede a posição à câmara | 371 → **317**; tirar as 5 obras **e** o panorama da dimensão 1 **apaga a chave**; sobra `[2, 3]` |
 | **B4** | `js/modules/portal.js`; a travessia passou para o portal, o driver de frame para o módulo (**D19**) e o `remove()` ficou completo | 317 → **77**; travessias mudam a dimensão; **R** roda e **D** liga a caixa; **T9 com 20 ciclos**: 1 ouvinte `keydown` antes e 1 depois, registo de volta a 8 |
+| **B5** | `js/app.js` só com o arranque e em inglês (`ar-config`); **B6** verificação final das ferramentas | **78** linhas; os **6** nomes antigos a **0**, o `a-camera` só no módulo da câmara, o núcleo sem conhecer módulos e **3** `remove()` |
 
 Dois números que valem para os quatro blocos: o conversor, regenerado, dá **0 diferenças** no
 `data/scene.json` (a garantia da Fase 0), e a varredura de poses dá **T2** e **T3** a passar —
@@ -838,7 +873,7 @@ valores vivem; a Fase 2 só lhes acrescenta o ciclo de **20** portais no T9 (o m
 | M1 | Os 4 módulos existem | `js/modules/` | 4 ficheiros |
 | M2 | `app.js` é só arranque | contagem de linhas | **≤100** (imports, `ar-config`, um ouvinte, o driver e as duas pontes) |
 | M3 | A5 fechado | `grep` de `a-camera` em `js/` | **0** fora de `js/modules/camera.js` (os sítios de hoje estão em §2.1) |
-| M4 | A4 fechado | `remove()` por módulo, mais um ciclo de 1 dimensão + 2 obras + 1 portal | **4** `remove()` (hoje só o portal tem); registos vazios e 0 erros de consola |
+| M4 | A4 fechado | `remove()` nos módulos que criam geometria, mais um ciclo de 1 dimensão + 2 obras + 1 portal | **3** `remove()` (obra, dimensão e portal; a câmara não cria objetos 3D, logo não tem o que remover) e registos vazios, sem erros de consola |
 | M5 | A7 fechado | leitura do driver e do portal | travessia **só** no portal; atribuição de valores **só** no núcleo |
 | M6 | D10 cumprida no que se move | `grep` dos **6** nomes de componente antigos (§5.7) em `js/` e `index.html` | **0** ocorrências |
 | M7 | O núcleo continua ignorante | `grep "modules/" js/core/` | **0** |
@@ -1469,19 +1504,27 @@ apontava para um ficheiro que saiu da raiz e o browser passou a pedir `/favicon.
 consola). Passou a `<link rel="icon" href="data:,">`, que não pede nada — a console voltou a
 0 erros (T8).
 
-### Próximo passo: Fase 2 (os 4 módulos)
+### Fase 2 — concluída em 2026-10-15 (os 4 módulos)
 
-Dividir `js/app.js` em `js/modules/dimension.js`, `artwork.js`, `portal.js` e `camera.js`,
-renomeando ao mover (glossário §5.7) e corrigindo, no mesmo passo, os pontos **A4, A5 e A7**
-de §2.1 (**A2 e A3 foram fechados em 2026-10-15** — ver §2.1). A linha de base de §10 tem de
-continuar a dar os mesmos números, mais o T9 (criar e destruir portais em ciclo: 1 listener de
-teclado e registos limpos) — **já medido em 2026-10-15: 1 ouvinte na carga e 1 depois de 6
-ciclos**.
+`js/app.js` passou de **546 para 78 linhas** e os quatro módulos vivem em `js/modules/`
+(`camera.js`, `artwork.js`, `dimension.js`, `portal.js`), renomeados ao mover (glossário §5.7) e
+com os pontos **A4, A5 e A7** de §2.1 fechados no mesmo passo (**A2 e A3** tinham fechado em
+2026-10-15). A linha de base de §10 continua a dar os mesmos números e o T9 foi medido com **20**
+ciclos de criação/destruição: **1** ouvinte de teclado na carga e **1** no fim, com o registo de
+portais de volta a **8** e nada deixado na cena. O conversor, regenerado, dá **0 diferenças** no
+`data/scene.json`, e a varredura de poses dá **T2** e **T3** a passar.
 
-**O plano da fase está em §9:** o corte do `js/app.js` bloco a bloco, os **8 blocos de execução**
-(B0–B7, com o item A que cada um fecha) e as **metas de sucesso** — o comportamento ancorado em
-§10 e dez metas de arquitetura (M1–M10) medidas por contagem ou por `grep`. As **três decisões**
-que faltam fechar estão em §14 (R5–R7).
+**O plano da fase ficou em §9:** o corte do `js/app.js` bloco a bloco, os **8 blocos de execução**
+(B0–B7, com o item A que cada um fecha), as **metas de sucesso** (o comportamento de §10 e dez
+metas de arquitetura, M1–M10) e a tabela do que cada bloco entregou.
+
+## Próximo passo: Fase 3 (a cena vem de dados)
+
+`js/scene/scene-builder.js` + `schema.js` + `validation.js`, com o `index.html` a passar a ter
+uma `<a-scene>` sem entidades e a cena a ser construída de `data/scene.json` (e
+`data/scene-example.json` como fixture). É a fase que fecha o **A6** (o campo único `asset`) e a
+**R4** (§14): as duas são decisões de contrato do formato dos dados, e tomá-las antes da fase que
+lê os dados é o que evita pagá-las duas vezes.
 
 ---
 

@@ -13,8 +13,9 @@ zonas12/
 ├── css/
 │   └── style.css       estilos da página, HUD, modal e D-pad
 ├── js/
-│   ├── app.js          entrada do módulo: componentes, movimento, carregamento
-│   └── core/           núcleo: estado, registos, stencil, eventos, limites
+│   ├── app.js          arranque: configuração do renderer, atalhos e ponte da interface
+│   ├── core/           núcleo: estado, registos, stencil, eventos, limites
+│   └── modules/        dimensão, obra, portal e câmara (Fase 2)
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos + página de edição)
 ├── assets/
@@ -149,27 +150,40 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.3)
+## Estado atual do código
 
-Marcado pela branch `v0.0.3`. Resumo do que existe hoje: `index.html` (240 linhas),
-`js/app.js` (546 linhas), `js/core/` (7 ficheiros), `css/style.css` (96 linhas),
+A versão publicada é a `v0.0.3` (branch com o mesmo nome); a `v0.0.4` foi criada em
+2026-10-15 e este é o `main` com a **Fase 2** do roadmap concluída. Resumo do que existe
+hoje: `index.html` (240 linhas), `js/app.js` (**78 linhas**), `js/core/` (7 ficheiros,
+207 linhas), `js/modules/` (**4 ficheiros**, 608 linhas), `css/style.css` (96 linhas),
 `assets/images/`, `data/scene.json`, `i18n/pt.json` e as ferramentas em `tools/`.
 
-O `js/app.js` é a **entrada do módulo** (`<script type="module">`). O `js/core/` é o
-**núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as regras de stencil —
-a única parte global, porque o stencil é um recurso de toda a cena. Os 4 módulos
-(dimensão, obra, portal, câmara) são a Fase 2.
+O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
+regras de stencil — a única parte global, porque o stencil é um recurso de toda a cena.
+Os **4 módulos** (Fase 2) vivem em `js/modules/`, e o `js/app.js` ficou só com o arranque
+(a configuração do renderer, os atalhos de teclado, o arranque do driver de frame e a
+ponte temporária para a interface):
+
+| Módulo | O que governa | Entrada |
+| --- | --- | --- |
+| `camera.js` | A câmara-jogador (posição, D-pad, limites) e o erro de câmara; é o **único** ficheiro que sabe encontrar o `a-camera` | `playerCamera`, `setupMobileControls`, `reportCameraError` |
+| `artwork.js` | A obra: o material dimensional, o clique e o modal (foco preso, `inert`, Escape) | componentes `dimensional-material` e `open-artwork`; `closeArtwork` |
+| `dimension.js` | O fundo 360º de uma dimensão (imagem ou vídeo) | componente `dimension-panorama` |
+| `portal.js` | A porta: janela (máscara), moldura, caixa de colisão, travessia e caixa de debug — e o **driver de frame** da cena | componentes `stencil-portal` e `portal-driver`; `startFrameDriver` |
+
+Cada módulo tem o seu `remove()`, para que criar e destruir conteúdo em ciclo (o que o
+editor vai fazer) não deixe registos mortos nem memória agarrada.
 
 ### O que está implementado
 
 | Área | Estado |
 | --- | --- |
-| Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID aparece nos atributos, em `data-dimensao`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
+| Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID aparece nos atributos, em `data-dimension`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
 | Grafo de dimensões | Portais bidirecionais entre duas dimensões, com uma **dimensão ativa** global; a cena tem 4 dimensões e 8 portais |
-| Travessia | Por **colisão com a caixa** do portal (`caixa`, `caixaPosicao`, `caixaRotacao`), no plano do quadro ou na face da caixa (`gatilho`) — nunca por distância |
+| Travessia | Por **colisão com a caixa** do portal (`box`, `boxPosition`, `boxRotation`), no plano do quadro ou na face da caixa (`trigger`) — nunca por distância |
 | Janelas | Uma por portal, com valor de stencil por **dimensão mostrada** (não por portal); portais que mostram o mesmo destino partilham o valor |
-| Fundo 360º | `panorama-dimensao` por dimensão (imagem ou vídeo), segue a câmara; a dimensão 0 é a câmara real (canvas transparente) |
-| Conteúdo | As obras pertencem à dimensão (`material-virtual="dimensao: N"`); o clique só abre na dimensão ativa |
+| Fundo 360º | `dimension-panorama` por dimensão (imagem ou vídeo), segue a câmara; a dimensão 0 é a câmara real (canvas transparente) |
+| Conteúdo | As obras pertencem à dimensão (`dimensional-material="dimension: N"`); o clique só abre na dimensão ativa |
 | Molduras | Barra vermelha à volta do quadro, pertencente à dimensão onde o portal está; o bordo mantém-se fechado mesmo quando cruza a janela de outro portal |
 | Modo debug | Tecla `D` mostra a caixa de colisão (sempre igual à usada na deteção); tecla `R` roda o portal |
 
@@ -189,14 +203,17 @@ a única parte global, porque o stencil é um recurso de toda a cena. Os 4 módu
    `depthTest: false` (o mundo do outro lado da janela não conta com a profundidade dela).
 6. Uma dimensão **sem janela** usa `Never` e não se desenha.
 7. O raio do panorama de uma dimensão tem de ser maior do que a distância a qualquer
-   portal (`raio: 500` no `index.html`).
+   portal (`radius: 500` no `index.html`).
 
 ### Verificado nesta versão (medido no browser)
 
 - **8/8** travessias da cena atual, sem trocas em cadeia ao chegar
-- Moldura: **0** poses com o bordo cortado (de **84**) e **0** falhas no contorno (**11 180**
-  amostras) — pela varredura automática (`tools/regression/pose-sweep.mjs`); antes da correção
-  do stencil eram 110 poses cortadas em 360
+- Moldura: **0** poses com o bordo cortado (de **84**) e **0** falhas no contorno (**15 708**
+  amostras, 420 controlos) — pela varredura automática (`tools/regression/pose-sweep.mjs`);
+  antes da correção do stencil eram 110 poses cortadas em 360. O número de amostras varia com o
+  tamanho da janela; as falhas é que têm de ser zero
+- **1** ouvinte de `keydown` na cena, na carga **e** depois de criar e destruir **20** portais
+  em ciclo, com o registo a voltar às **8** portas e nada deixado na cena (T9)
 - 0 px de moldura dentro da própria janela; moldura de trás escondida pela janela da frente
 - Clique na obra abre só na dimensão ativa
 - Consola sem erros nem avisos
@@ -226,7 +243,7 @@ Dentro de uma sala só se navega pelas dimensões dessa sala.
 | Hoje | Planeado |
 | --- | --- |
 | Uma página, uma cena, quatro dimensões | Uma **pasta por mundo**, com o seu próprio JSON e o seu arranque `index.html` |
-| O portal liga duas dimensões (`dimensaoA`/`dimensaoB`) | O portal passa a ter **dois eixos**: `window` (o que a janela mostra) e `action` (o que a travessia faz) |
+| O portal liga duas dimensões (`dimensionA`/`dimensionB`) | O portal passa a ter **dois eixos**: `window` (o que a janela mostra) e `action` (o que a travessia faz) |
 | A travessia muda a dimensão ativa | A **porta de mundo** mostra um **retrato** do destino (imagem panorâmica, com paralaxe) e a travessia **navega para a URL** e recarrega a página |
 | Técnica do stencil | **Igual dentro de cada sala** — as leis L1–L8 e os testes T1–T8 continuam a valer |
 
@@ -244,11 +261,11 @@ cada um com o seu **ID próprio**, e esse ID aparece em tudo o que lhe pertence:
 
 | Objeto | IDs | Onde aparece o ID |
 | --- | --- | --- |
-| **Dimensão** | `0..511` | `panorama-dimensao="dimensao: 7"`, `material-virtual="dimensao: 7"`, `data-dimensao`, classe `dimensao-7`, nome dos objetos 3D (`dimensao-7-panorama`, `dimensao-7-obra`) |
-| **Portal** | `0..511` | `portal-estencil-dinamico="portalId: 3; ..."`, `data-portal-id`, classe `portal-3`, nome dos objetos 3D (`portal-3-mascara`, `portal-3-moldura-0`, `portal-3-caixa-debug`) |
+| **Dimensão** | `0..511` | `dimension-panorama="dimension: 7"`, `dimensional-material="dimension: 7"`, `data-dimension`, classe `dimension-7`, nome dos objetos 3D (`dimension-7-panorama`, `dimension-7-artwork`) |
+| **Portal** | `0..511` | `stencil-portal="id: 3; ..."`, `data-portal-id`, classe `portal-3`, nome dos objetos 3D (`portal-3-mask`, `portal-3-frame-0`, `portal-3-debug-box`) |
 
 **Cada portal é um módulo independente**: tem as suas duas dimensões, a sua caixa de
-colisão, o seu `gatilho`, a sua caixa de debug e a sua geometria. Não partilha estado
+colisão, o seu `trigger`, a sua caixa de debug e a sua geometria. Não partilha estado
 com os outros portais.
 
 #### O estado: a dimensão ativa
@@ -264,16 +281,16 @@ isso vários portais nunca ficam em desacordo:
 
 #### O portal é a porta
 
-Um portal liga **duas** dimensões (`dimensaoA` e `dimensaoB`), de forma **bidirecional**:
+Um portal liga **duas** dimensões (`dimensionA` e `dimensionB`), de forma **bidirecional**:
 
 | Onde estás | O quadro mostra |
 | --- | --- |
-| `dimensaoA` | `dimensaoB` |
-| `dimensaoB` | `dimensaoA` |
+| `dimensionA` | `dimensionB` |
+| `dimensionB` | `dimensionA` |
 
 Atravessar o portal (pela caixa de colisão) muda a **dimensão ativa** para o outro lado.
 
-O `pertenceA` (opcional) diz em que dimensão é que a porta fica. Sem ele, a porta
+O `ownedBy` (opcional) diz em que dimensão é que a porta fica. Sem ele, a porta
 aparece em qualquer uma das duas. É isto que permite ter, por exemplo, **7 portas do
 lado da dimensão 1 e 7 portas do lado da dimensão 2**: cada grupo só se vê na sua
 dimensão.
@@ -282,24 +299,24 @@ dimensão.
 
 | Cenário | Como se escreve |
 | --- | --- |
-| Dimensão central que dá acesso a todas | Um portal por destino: `dimensaoA: 0; dimensaoB: N`, todos na dimensão central |
-| 7 portais da dimensão 1 para a 2 | 7 portais `dimensaoA: 1; dimensaoB: 2; pertenceA: 1` |
-| 7 portais da dimensão 2 para a 1 | 7 portais `dimensaoA: 1; dimensaoB: 2; pertenceA: 2` |
-| **Vários portais no mesmo sítio para o mesmo destino** | N portais iguais com `pertenceA` da dimensão deles (ex.: 2 portais de 2 → 1) |
-| **Uma dimensão com portais para destinos diferentes** | Ex.: `pertenceA: 2` com 2 portais `dimensaoB: 1` e 1 portal `dimensaoB: 3` |
+| Dimensão central que dá acesso a todas | Um portal por destino: `dimensionA: 0; dimensionB: N`, todos na dimensão central |
+| 7 portais da dimensão 1 para a 2 | 7 portais `dimensionA: 1; dimensionB: 2; ownedBy: 1` |
+| 7 portais da dimensão 2 para a 1 | 7 portais `dimensionA: 1; dimensionB: 2; ownedBy: 2` |
+| **Vários portais no mesmo sítio para o mesmo destino** | N portais iguais com `ownedBy` da dimensão deles (ex.: 2 portais de 2 → 1) |
+| **Uma dimensão com portais para destinos diferentes** | Ex.: `ownedBy: 2` com 2 portais `dimensionB: 1` e 1 portal `dimensionB: 3` |
 | Atravessar para "qualquer" outra dimensão | Um portal entre as duas; atravessar em qualquer sentido |
 | Vários portais a mostrar dimensões diferentes no mesmo ecrã | Cada **dimensão mostrada** recebe um valor de stencil próprio |
 
 Exemplo — uma central (0) com dois destinos, e conteúdo nas dimensões:
 
 ```html
-<a-entity panorama-dimensao="dimensao: 1; src: #cidade-360"></a-entity>
-<a-entity panorama-dimensao="dimensao: 2; src: #praia"></a-entity>
+<a-entity dimension-panorama="dimension: 1; src: #cidade-360"></a-entity>
+<a-entity dimension-panorama="dimension: 2; src: #praia"></a-entity>
 
-<a-entity position="-10 0 -12" portal-estencil-dinamico="portalId: 0; dimensaoA: 0; dimensaoB: 1"></a-entity>
-<a-entity position=" 10 0 -12" portal-estencil-dinamico="portalId: 1; dimensaoA: 0; dimensaoB: 2"></a-entity>
+<a-entity position="-10 0 -12" stencil-portal="id: 0; dimensionA: 0; dimensionB: 1"></a-entity>
+<a-entity position=" 10 0 -12" stencil-portal="id: 1; dimensionA: 0; dimensionB: 2"></a-entity>
 
-<a-box position="0 1.5 -30" material-virtual="dimensao: 1" abrir-modal="url: assets/images/praia.jpg"></a-box>
+<a-box position="0 1.5 -30" dimensional-material="dimension: 1" open-artwork="url: assets/images/praia.jpg"></a-box>
 ```
 
 #### Cena atual (`index.html`)
@@ -315,7 +332,7 @@ a dimensão 1 e um para a dimensão 3 — e a dimensão 3 volta à 2.
 | **2** (praia) | `#praia` + 3 obras | `4 → 1`, `5 → 1` e `6 → 3` — em `x = -25`, `x = 25` e `x = 0`, `z = -80` |
 | **3** (céu 360º) | `#skycloud` + 2 obras | `7 → 2` — em `x = 0`, `z = -120` |
 
-Cada portal tem `pertenceA` igual à sua dimensão, por isso dentro de uma dimensão só se
+Cada portal tem `ownedBy` igual à sua dimensão, por isso dentro de uma dimensão só se
 vêem os portais dela. As travessias são todas bidirecionais (o mesmo portal serve de ida
 e de volta):
 
@@ -341,29 +358,29 @@ caia dentro da caixa de outro portal — sem isso haveria trocas em cadeia ao ch
 
 | Atributo | Significado | Omissão |
 | --- | --- | --- |
-| `portalId` | ID do portal | `0` |
-| `dimensaoA`, `dimensaoB` | As duas dimensões que a porta liga | `0` e `1` |
-| `pertenceA` | Dimensão onde a porta fica (`-1` = qualquer das duas) | `-1` |
+| `id` | ID do portal | `0` |
+| `dimensionA`, `dimensionB` | As duas dimensões que a porta liga | `0` e `1` |
+| `ownedBy` | Dimensão onde a porta fica (`-1` = qualquer das duas) | `-1` |
 | `width`, `height` | Tamanho do quadro | `12`, `16` |
-| `caixa` | Tamanho X, Y, Z da caixa de colisão | `12 16 1` |
-| `caixaPosicao` | Centro da caixa (espaço do portal) | `0 8 0` |
-| `caixaRotacao` | Rotação da caixa, em graus | `0 0 0` |
-| `gatilho` | Onde a travessia dispara: `plano` (plano do quadro) ou `caixa` (face de entrada) | `plano` |
+| `box` | Tamanho X, Y, Z da caixa de colisão | `12 16 1` |
+| `boxPosition` | Centro da caixa (espaço do portal) | `0 8 0` |
+| `boxRotation` | Rotação da caixa, em graus | `0 0 0` |
+| `trigger` | Onde a travessia dispara: `plane` (plano do quadro) ou `box` (face de entrada) | `plane` |
 
 A caixa é a **única** fonte da sua geometria: a caixa de debug usa exatamente os mesmos
-valores (`caixa`, `caixaPosicao`, `caixaRotacao`), pelo que nunca pode divergir.
+valores (`box`, `boxPosition`, `boxRotation`), pelo que nunca pode divergir.
 
-**Porquê `plano` por omissão:** a máscara só escreve o stencil quando está à frente da
+**Porquê `plane` por omissão:** a máscara só escreve o stencil quando está à frente da
 câmara, ou seja, o quadro só é uma janela de um dos lados. A troca tem de acontecer no
 plano do quadro, que é o plano central da caixa — é o único ponto em que a troca não se
-nota. Com `gatilho: caixa` fica-se ~0,55 m com a dimensão errada durante a travessia.
+nota. Com `trigger: box` fica-se ~0,55 m com a dimensão errada durante a travessia.
 
 #### Conteúdo: pertence à dimensão, não ao portal
 
-- `panorama-dimensao="dimensao: 7; src: #imagem"` — o fundo 360º da dimensão 7. O `src`
+- `dimension-panorama="dimension: 7; src: #imagem"` — o fundo 360º da dimensão 7. O `src`
   aceita imagem **ou vídeo**; um vídeo é usado como `THREE.VideoTexture`, por isso anima
   (por exemplo a imagem da câmara: `src: #webcam-video`).
-- `material-virtual="dimensao: 7"` — uma obra que pertence à dimensão 7.
+- `dimensional-material="dimension: 7"` — uma obra que pertence à dimensão 7.
 
 Assim, várias portas que mostram a mesma dimensão mostram **o mesmo mundo** (mesmo
 panorama, mesmas obras).
@@ -387,7 +404,7 @@ panorama, mesmas obras).
   stencil **não é criado por omissão**.
 - `<script type="module" src="js/app.js">`: a entrada é um módulo ES (D1 do roadmap), por
   isso o projeto tem de ser servido por HTTP.
-- `renderer.sortObjects` ativo (`config-ar`, em `js/app.js`): com `false` o three
+- `renderer.sortObjects` ativo (`ar-config`, em `js/app.js`): com `false` o three
   **ignora o `renderOrder`** e desenha pela ordem da árvore — o que só funciona por acaso
   com um portal. Com vários, as máscaras têm de ser desenhadas antes de todo o conteúdo.
   **Quem fixa o valor é o A-Frame** (1.8.0, `src/systems/renderer.js`, na inicialização e
@@ -410,7 +427,7 @@ panorama, mesmas obras).
   janela que mostra essa dimensão.
 - A máscara (`stencilFunc: Always`, `stencilZPass: Replace`) escreve o valor da dimensão
   que a janela mostra.
-- **Cada material segue o papel da sua dimensão** (`aplicarEstadoEstencil`):
+- **Cada material segue o papel da sua dimensão** (`applyStencilState`):
   - **dimensão ativa**: **sem teste de stencil** — quem manda é a profundidade (item
     anterior). Vale para o panorama, as obras, **a moldura do portal e a caixa de debug**.
   - **dimensão vista por uma janela**: `Equal` com o valor dessa janela e
@@ -418,15 +435,16 @@ panorama, mesmas obras).
     máscara não conta para ele).
   - **dimensão sem janela**: `Never`, não desenha.
 - **O raio do panorama de uma dimensão tem de ser maior do que a distância a qualquer
-  portal** (`raio: 500` no `index.html`): o fundo da dimensão ativa tem de estar sempre
+  portal** (`radius: 500` no `index.html`): o fundo da dimensão ativa tem de estar sempre
   atrás do plano das janelas, senão apareceria dentro delas.
-- `gestor-dimensoes` (na cena) é o único que decide: deteta as travessias e atribui os
-  valores de stencil por frame.
+- `portal-driver` (no módulo do portal, ligado à cena no arranque) é o único que decide:
+  percorre os portais a cada frame, cada um deteta a sua própria travessia e o núcleo
+  atribui os valores de stencil.
 
 #### Obras: clique só na dimensão onde estás
 
 O estêncil esconde a obra, mas o raycaster do A-Frame continua a apanhá-la (não vê o
-stencil nem `object3D.visible`). Por isso o `abrir-modal` só abre se a dimensão da obra
+stencil nem `object3D.visible`). Por isso o `open-artwork` só abre se a dimensão da obra
 for a **dimensão ativa**: vê-la pela janela não conta.
 
 ### Recursos Recentes
@@ -438,7 +456,7 @@ for a **dimensão ativa**: vê-la pela janela não conta.
 - **Tracejo por Colisão com a Caixa**: sem debounce, sem cooldown e sem distância;
   calculada no espaço do portal, por isso funciona com portais deslocados, rodados e em
   movimento, e com muitos portais ao mesmo tempo
-- **Portais Pertencem a uma Dimensão**: `pertenceA` separa os portais de cada lado
+- **Portais Pertencem a uma Dimensão**: `ownedBy` separa os portais de cada lado
 - **Conteúdo por Dimensão**: panorama (imagem ou vídeo) e obras pertencem à dimensão, por
   isso várias portas mostram o mesmo mundo
 - **Obras só na Dimensão Ativa**: clicar numa obra doutra dimensão não abre o modal
@@ -479,16 +497,17 @@ for a **dimensão ativa**: vê-la pela janela não conta.
 
 ### Funcionamento do Portal
 
-Tudo é decidido por frame: `gestor-dimensoes` (`js/app.js`) deteta as travessias e o
-núcleo (`js/core/stencil.js`) atribui os valores de stencil e decide o que cada material
-desenha, a partir da colisão com a caixa e de `state.activeDimension`:
+Tudo é decidido por frame: `portal-driver` (`js/modules/portal.js`) percorre os portais para
+que cada um detete a sua própria travessia e o núcleo (`js/core/stencil.js`) atribui os valores
+de stencil e decide o que cada material desenha, a partir da colisão com a caixa e de
+`state.activeDimension`:
 
 - **Onde estás**: o conteúdo da tua dimensão desenha-se em todo o lado **excepto** onde uma
   janela está *à frente* (é a profundidade que decide, não o stencil).
 - **O que a janela mostra**: o conteúdo da dimensão do outro lado desenha dentro do quadro
   (`Equal` com o valor daquela dimensão, sem contar com a profundidade da máscara).
 - **Sem piscas**: a troca acontece no plano central da caixa, exatamente onde a máscara
-  muda de lado, por isso não há frames com a dimensão errada (com `gatilho: caixa` há,
+  muda de lado, por isso não há frames com a dimensão errada (com `trigger: box` há,
   ver acima).
 - **Vários portais**: cada janela que mostra uma dimensão diferente recebe um valor de
   stencil próprio, por isso portais com destinos diferentes coexistem no mesmo ecrã.
@@ -497,12 +516,12 @@ desenha, a partir da colisão com a caixa e de `state.activeDimension`:
 
 Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caixa de colisão do portal:
 
-- A caixa de debug aparece como um wireframe azul semi-transparente (nome `portal-<id>-caixa-debug`)
-- Tem sempre as mesmas dimensões X, Y e Z, posição e rotação que a caixa de colisão (`caixa`, `caixaPosicao` e `caixaRotacao`)
+- A caixa de debug aparece como um wireframe azul semi-transparente (nome `portal-<id>-debug-box`)
+- Tem sempre as mesmas dimensões X, Y e Z, posição e rotação que a caixa de colisão (`box`, `boxPosition` e `boxRotation`)
 - Serve para ver exatamente onde a travessia dispara (é uma caixa por portal)
 - Como o resto da geometria do portal, a caixa de debug é tapada pelas janelas que lhe
   ficam à frente, pela profundidade (não tem teste de stencil próprio)
-- A consola regista apenas as mudanças relevantes (`[portal] Dimensao ativa: 2`)
+- A consola só avisa se um ID de portal estiver fora do intervalo (`[portal] ID … out of range …`)
 
 ## Tecnologias Utilizadas
 
