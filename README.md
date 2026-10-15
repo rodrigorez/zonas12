@@ -290,6 +290,16 @@ atravessam o *slug* do destino, um parâmetro opcional `?from=<slug>` e a imagem
 O formato dos dados, as leis novas (L9–L18), os testes (T10–T12) e a fase de execução
 (**Fase 3B**) estão em [docs/ROADMAP.md](docs/ROADMAP.md).
 
+**O plano está registado (2026-10-15) — nada implementado.** A divisão decidida (**D24**) são
+**quatro mundos**: o portão na raiz (`gate`, com a câmara/AR) e as salas `cidade`, `praia` e
+`ceu`, uma dimensão cada, com as **8 portas de hoje** a passarem a navegar. O formato passa a
+**v3** (**D25**), com os dois eixos na própria porta (`window {kind, dimensionA, dimensionB,
+asset, radius}` e `action {kind, target}`); o retrato é uma **dimensão derivada** na banda
+reservada da L15 (**D26**); os assets dividem-se por tipo, com os retratos em
+`assets/previews/` (**D27**); e o slug de cada mundo sai do próprio caminho, o que deixa os
+**4 arranques byte-idênticos** (**D28**). O corte ficheiro a ficheiro, os **11 blocos** (B0–B10)
+e as metas medidas com o instrumento de cada uma estão na §9 do roadmap.
+
 ## Funcionalidades Principais
 
 ### 1. Dimensões e Portais (arquitetura modular)
