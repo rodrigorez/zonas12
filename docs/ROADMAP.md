@@ -4,6 +4,21 @@
 > secção [11](#11-decisões) com data. Nada de código foi implementado: este documento é o
 > guia de desenvolvimento, e o `README.md` descreve o que **já** existe.
 >
+> **Atualização (2026-10-15):** fecharam-se a **Fase 2** (os 4 módulos) e a **Fase 3**
+> (a cena vem de dados), que foi planeada e executada no mesmo dia. A Fase 3 tem decisões
+> próprias — **D20** (o catálogo de assets), **D21** (o texto por língua), **D22** (os dois eixos
+> do portal ficam na 3B) e **D23** (`version: 2` e `?scene=`) —, o plano com os 9 blocos e as
+> medições em §9 e o fecho em §13. O resultado: o `index.html` perdeu as entidades de cena
+> (**240 → 82 linhas**), a cena vive em `data/scene.json` (formato v2, validado por
+> `js/scene/validation.js`), e o estado foi publicado e testado pelo autor nas **três versões**
+> (local, endereço publicado e telemóvel) e marcado como **`v0.0.5`** (ramo `v0.0.5`).
+> O próximo passo é a **Fase 3B** (§13).
+>
+> **Atualização (2026-10-15, documentação):** esta revisão alinha o documento com o código depois
+> do fecho da Fase 3 — §5.5 e §5.6 com o «como ficou», §7 com o `url` do D20, §8 com as leis que o
+> validador verifica hoje, §10 com as lições de método, §13 com os caminhos novos das ferramentas,
+> e §14 com as pendências **R8** e **R9**.
+>
 > **Atualização (2026-10-13):** a decisão **D14 — mundos e portas de mundo** foi fechada e
 > registada em §11, com as leis novas L9–L18 (§8), os testes T10–T12 (§10) e a **Fase 3B**
 > (§9). É planeamento: nada dela está implementado.
@@ -473,9 +488,17 @@ trocas de `A`/`B`.
 
 > **Como ficou (2026-10-15, Fase 2).** `js/modules/camera.js` expõe `playerCamera` (com
 > `position()`, `worldPosition()` e `setPosition()`), `setupMobileControls()` e
-> `reportCameraError()`, e é o **único** ficheiro do projeto que conhece o seletor `a-camera`
-> (medido por `grep`). O `enable()` / `disable()` da câmara real **não** existem: o arranque da
-> webcam continua no script inline do `index.html`, que passa a ser do módulo na Fase 4.
+> `reportCameraError()`, e é o **único** ficheiro do projeto que sabe onde a câmara está
+> (medido por `grep`). O `enable()` / `disable()` da câmara real **não** existem.
+
+> **Como ficou (2026-10-15, Fase 3).** A câmara passou a vir do dado: `createPlayerCamera(player,
+> parent)` constrói o `a-camera` (com o `a-cursor` filho) a partir de `cameras.player` e **entrega
+> o elemento ao módulo**, por onde o seletor saiu — era a segunda metade do A5, porque um sítio a
+> criar a câmara e outro a procurá-la seriam outra vez dois sítios a saber onde ela está. O passo
+> do D-pad vem de `cameras.player.speed`, com a constante do módulo como omissão (é essa que o
+> conversor lê, e é o que impede os dois de divergirem). E o `startSession()` é o que era o script
+> inline do `index.html`: webcam, D-pad, indicador de carregamento e erro de câmara — e só pede a
+> webcam quando `cameras.real.enabled` diz que sim (antes o campo existia no JSON e ninguém o lia).
 
 ### 5.6 Estrutura-alvo do repositório
 
@@ -499,10 +522,19 @@ zonas12/
 │   └── worlds/              um ficheiro por mundo + gate.json — D14 (Fase 3B)
 ├── i18n/                    pt.json (+ en.json quando houver tradução)
 ├── assets/{panoramas,artworks,video}/
-├── tools/                   conversor HTML→JSON, processamento de assets
+├── tools/                   ferramentas
+│   ├── scene/               validador dos ficheiros de cena
+│   ├── migration/           o conversor HTML→JSON da Fase 0, com guarda
+│   └── regression/          varredura de poses T2/T3 (corre na consola do browser)
 └── .harness/                fora do repositório (está no .gitignore)
     └── skills/              harness de agents/skills — índice em .agent/skills_index.md (§3)
 ```
+
+> **Onde isto está (2026-10-15, fim da Fase 3).** Existem: `index.html` (sem entidades de cena),
+> `css/style.css`, `js/{app.js, core/, modules/, scene/}`, `data/{scene.json, scene-example.json}`,
+> `i18n/pt.json`, `assets/images/` e `tools/{scene, migration, regression}`. **Por fazer:** o
+> `editor.html` e o `js/editor.js` (Fase 4), o `en.json` (quando houver tradução), a pasta por
+> mundo e o `data/worlds/` (Fase 3B) e a divisão de `assets/` por tipo (D7, Fase 3B).
 
 Nota de nomenclatura: as pastas de **código** são em inglês (D10), e os ficheiros de dados
 também: `data/scene.json` é a exposição e `data/scene-example.json` é a cena de exemplo
@@ -714,7 +746,7 @@ O que a **Fase 3B** acrescenta ao modelo (nada disto existe ainda):
 | --- | --- | --- | --- | --- |
 | **Mundo** *(D14)* | criar sala: slug, nome por língua, pasta e arranque | etiqueta da porta, retrato, raio do retrato | lista de salas derivada das portas do portão; detetar sala inalcançável e porta para mundo inexistente | bloquear se outra sala apontar para ela (ou remover as portas em cascata, com confirmação) |
 | **Dimensão** | ID + tipo de fundo + asset + raio | tipo/asset/raio; ver/editar conteúdo | vista geral com contagem de obras e portais; avisar se o raio é pequeno | bloquear se houver portais/obras a apontar para ela (ou apagar em cascata, com confirmação) |
-| **Obra** | escolher dimensão, asset, posição/rotação/tamanho, interação | todos os campos | lista por dimensão; detetar asset em falta; detetar `url` vazia com `interacao: modal` | individual e em lote por dimensão |
+| **Obra** | escolher dimensão, asset, posição/rotação/tamanho, interação | todos os campos | lista por dimensão; detetar asset em falta; detetar `url` fora do sítio (é só para `interaction: link` — com `modal` o endereço vem do catálogo, D20) | individual e em lote por dimensão |
 | **Portal** | `window` + `action`, onde pertence, tamanho, caixa, gatilho | todos os campos, incluindo caixa e moldura | **validar** a combinação legal (§5.4), o destino fora de outras caixas, o valor de stencil; pré-visualizar a travessia | individual; se for o último portal de uma dimensão, avisar |
 | **Câmara** | — (é única) | posição inicial, altura, velocidade, webcam on/off | mostrar posição atual; botão "usar a posição atual como inicial" | — (não aplicável) |
 
@@ -752,9 +784,16 @@ O editor deve impedi-las **antes** de exportar.
 
 As leis **L1–L8** vêm de defeitos medidos. As leis **L9–L18** vêm da D14 (planeamento):
 L9 e L10 foram propostas pela D7 e ficam aqui registadas; L11–L18 nascem dos mundos e das
-portas de mundo. **Nenhuma delas está implementada no validador do editor** (Fase 4) — do que
-existe hoje, o `validate.mjs` verifica **L1, L4 e L5** (§13) e a **L8** passou a valer no
-código em 2026-10-15 (§2.1).
+portas de mundo.
+
+**O que está verificado ao fim da Fase 3.** O `js/scene/validation.js` — o mesmo módulo que a
+consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e
+que o editor (Fase 4) vai reutilizar — verifica a forma do formato e as leis **L1, L4, L5, L9 e
+L12**, cada uma com uma **avaria injetada** que prova que ela falha quando deve (**17 de 17**, §9).
+As leis **L2, L3, L6, L7 e L8** são de render (são propriedades do código, não do dado): a **L8**
+passou a valer no código em 2026-10-15 (§2.1). A **L10** (higiene do nome do ficheiro de asset) e
+as leis dos mundos — **L11, L13, L14, L15, L16, L17 e L18** — entram com a **Fase 3B**, que é a
+fase que cria portas de mundo, retratos e dimensões derivadas.
 
 A **L6** foi reescrita em 2026-10-14 (**D16**): passou a enunciar o **invariante a validar**, e
 não a ação — medido na fonte do A-Frame 1.8.0, é o framework que fixa `sortObjects = true` na
@@ -935,7 +974,7 @@ continuam abertas: não são desta fase.
 | Sítio | Porque não pode ficar para trás |
 | --- | --- |
 | `tools/regression/pose-sweep.mjs` | Cria o rig com os atributos antigos (`portalId`, `dimensaoA`, `dimensaoB`, `pertenceA`, `caixa`, `caixaPosicao`) e encontra os objetos por `-mascara` e `-moldura-N`. É o **único** instrumento automático que existe (§10) |
-| `tools/html-to-scene-json/convert.mjs` e `validate.mjs` | Fazem *parsing* do `index.html` pelos quatro nomes de atributos; sem eles o validador conta 0 obras e 0 portais — e mente. O `convert.mjs` vai mais longe: lê do **código** os valores que lá vivem (caixa, gatilho, moldura, velocidade), por isso um valor que mude de ficheiro tem de ser seguido |
+| `tools/migration/convert.mjs` e `tools/scene/validate.mjs` *(em 2026-10-15 eram `tools/html-to-scene-json/`; renomeados na B6 — §9)* | Fazem *parsing* do `index.html` pelos quatro nomes de atributos; sem eles o validador conta 0 obras e 0 portais — e mente. O `convert.mjs` vai mais longe: lê do **código** os valores que lá vivem (caixa, gatilho, moldura, velocidade), por isso um valor que mude de ficheiro tem de ser seguido. Depois da Fase 3 ele tem uma **guarda**: se o `index.html` não tiver entidades, recusa correr em vez de escrever um JSON vazio |
 | `window.portalAR` / `window.portalDebug` | É a alça da consola e dos scripts de regressão: **não** se renomeia nesta fase |
 | Ponte de interface (`window.fecharObra`, `configurarBotoesMobile`, `tratarErroCamera`) | O `index.html` chama-as por atributos inline; ficam até à Fase 4 |
 | Ordem de desenho, máscara, profundidade e `sortObjects` | São as leis L2, L3 e L6: a fase **move** código, não muda regras |
@@ -1240,6 +1279,29 @@ Nas duas avarias os **controlos continuaram a 0** — o que falhou foi mesmo a m
 moldura de trás tapada pela janela da frente é o T5, não uma falha); não mede o **conteúdo** das
 janelas (T4 e T5); e exige um browser com **aceleração de GPU** — em render por software
 (SwiftShader) o `requestAnimationFrame` afoga-se e a varredura não termina.
+
+**Lição de método (Fase 3).** Três coisas que a medição de 2026-10-15 ensinou, e que valem para
+qualquer instrumento deste projeto:
+
+- **A cache do browser faz medir código antigo sem dar sinal nenhum.** O `js/core/index.js` que o
+  browser tinha guardado era de uma versão anterior: a página **nem o pedia ao servidor** — o
+  ficheiro no disco e o que o servidor serve estavam certos —, e o grafo de módulos caía com
+  «does not provide an export named `unregisterContent`». Resolve-se com a cache desligada
+  (CDP `Network.setCacheDisabled`) ou com uma recarga sem cache, mas a lição é outra: **um erro
+  de consola em código que já não existe no disco é um sintoma de cache**, não um defeito para
+  caçar no código.
+- **Medir com a câmara a andar dá números que parecem bons.** Numa sessão em que o D-pad ficou
+  premido, a varredura deu **84 de 84** poses com o bordo cortado com os **controlos limpos** — que
+  é exactamente o que se espera quando os dois renders comparados são o **mesmo** (a câmara mexe-se
+  entre eles: a diferença vem do movimento, não da moldura). Numa recarga limpa, os mesmos 84 dão
+  **0**. A varredura exige página sem interação e câmara parada; e a Fase 6 deve detetá-lo e
+  **recusar** o resultado, em vez de o reportar como falha da cena.
+- **Uma medição por diferença precisa de um controlo positivo.** O T5 deu **0 px** à primeira
+  tentativa com a porta de trás do **mesmo tamanho** da da frente: ela fica toda tapada pela
+  máscara da frente, e um zero desses não prova nada. Com a porta de trás maior, há **6 768 px**
+  de moldura desenhada onde ela **não** está tapada e **0** dentro da janela — só aí o zero vale.
+  É a mesma regra do T4 (presença/ausência), aplicada à oclusão: **todo o teste que conte «zero»
+  precisa de um caso em que o número devesse ser diferente de zero.**
 
 ---
 
@@ -1690,9 +1752,9 @@ disco.
 | 2 | Testes de regressão (§10) aceites como critério de aceitação | ✅ |
 | 3 | Variante da D12 confirmada (**A**) e `?lang=` para a língua | ✅ |
 | 4 | Nome dos ficheiros de dados decidido (D13) | ✅ |
-| 5 | `i18n/pt.json` com as 6 chaves que já existem na interface | ✅ |
-| 6 | Conversor `tools/html-to-scene-json/convert.mjs` | ✅ |
-| 7 | Validador `tools/html-to-scene-json/validate.mjs` (contagens, integridade, L1, L4, L5) | ✅ |
+| 5 | `i18n/pt.json` com as **5** chaves que já existiam na interface (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`) | ✅ |
+| 6 | Conversor `tools/html-to-scene-json/convert.mjs` *(hoje `tools/migration/convert.mjs`)* | ✅ |
+| 7 | Validador `tools/html-to-scene-json/validate.mjs` (contagens, integridade, L1, L4, L5) *(hoje `tools/scene/validate.mjs`, sobre o módulo partilhado: forma + L1, L4, L5, L9, L12 — §8)* | ✅ |
 | 8 | `data/scene.json` + `data/scene-example.json` gerados | ✅ |
 | 9 | Linha de base medida e registada (§10) | ✅ |
 
@@ -1756,7 +1818,8 @@ mundo é escrever um ficheiro — era exactamente o que faltava para a fase vale
 
 O que fica em aberto depois de a documentação ser alinhada com o código. Cada linha tem o
 motivo e o que a fecha. **R5–R7 nasceram do plano da Fase 2 (§9) e foram fechadas no mesmo dia**
-(decisão **D19**, §11).
+(decisão **D19**, §11). **R8 e R9 nasceram da revisão de documentação a seguir ao fecho da
+Fase 3** — são as duas coisas que a Fase 3 deixou construídas mas **não exercitadas**.
 
 **R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
 apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o
@@ -1785,5 +1848,7 @@ só chega à interface na **Fase 4**, e é o editor o primeiro sítio que o lê.
 
 | # | Pendência | Porque fica | O que a fecha |
 | --- | --- | --- | --- |
-| R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`) e o §13 diz «as 6 chaves»; as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Acertar a contagem no §13 e juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` |
+| R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves em `strings` (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`); as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` (a contagem no §13 foi corrigida em 2026-10-15) |
 | R4 | **Feita em 2026-10-15** (decisão **D21**, §11) | O formato por língua estava documentado (§5.7 e §6) e **não instanciado**: as dimensões não tinham nome, as obras não tinham título e nenhum campo do JSON era por língua — nem o conversor nem o validador mencionavam idioma | O `{ pt, en }` entrou no esquema, no conversor e no validador e ficou **instanciado**: 4 nomes de dimensão e 6 descrições de asset (B3, §9). As **10 obras** ficam sem `title` — é opcional, e quem o lê é o editor (Fase 4) |
+| R8 | **O `remove()` do construtor de cena nunca correu** | `buildScene()` devolve um `remove()` que tira as portas, as obras, as dimensões, os assets e a câmara — e **nada o chama**: o `js/app.js` faz `await buildScene(data)` e deita fora o resultado (medido por `grep`, é a única chamada). Com ele ficam por exercitar as três funções `remove…` dos módulos e os `remove()` dos componentes que desregistam conteúdo do núcleo. O editor (Fase 4) vai ser o primeiro sítio a trocar de cena. É o mesmo tipo de risco que a **A4** teve até a Fase 2 o fechar: código de limpeza que ninguém exercita apodrece sem se notar | A Fase 4 (troca de cena no editor) ou um teste que construa e remova uma cena e confirme que o documento e os registos do núcleo ficam como estavam |
+| R9 | **O esquema declara mais do que a cena constrói** | Quatro coisas **validam** e não são construídas: `kind: "model"` e `"text"` numa obra (o `createArtwork()` ignora o `kind` e faz sempre uma `a-box` com a textura do `asset` — não há geometria de modelo nem texto 3D), `kind: "color"` numa dimensão (o `createDimension()` nunca passa o `color` ao componente — o ficheiro não menciona a palavra, medido por `grep`; o validador só avisa quando a cor **falta**, com «the background will be black») e `interaction: "link"` (o `addressToOpen()` devolve o endereço, mas o `open-artwork` mostra-o no **iframe do modal**, não navega). Medido: quatro variantes da cena da exposição, uma por campo, passam **todas** com 0 erros e 0 avisos — quem escrever um destes campos à mão vê o validador aceitar e a cena não mudar como esperava | Ou a Fase 4 os implementa (e o editor passa a oferecê-los), ou o esquema e o validador passam a **avisar** que esses valores ainda não são construídos — a categoria «aviso» já existe no validador e é onde isto encaixa (é a mesma que avisa da dimensão de cor sem cor) |

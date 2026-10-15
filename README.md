@@ -20,6 +20,8 @@ zonas12/
 ├── data/
 │   ├── scene.json          a exposição, no formato v2
 │   └── scene-example.json  a mesma cena, como fixture (?scene=example)
+├── i18n/
+│   └── pt.json         textos da interface (5 chaves; nada os lê ainda — Fase 4)
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos + página de edição)
 ├── assets/
@@ -44,9 +46,11 @@ zonas12/
 ### 1. Estrutura de Pastas
 
 - A raiz tem só o que é preciso para o projeto funcionar: `index.html`, `css/`, `js/`,
-  `assets/`, `README.md` e `.gitignore`.
+  `data/`, `i18n/`, `assets/`, `README.md` e `.gitignore`.
 - Documentação de planeamento (roadmap, decisões) fica em `docs/`; ferramentas de
-  construção (ex.: processamento de assets) em `tools/`.
+  construção (o validador da cena, o conversor e a varredura de regressão) em `tools/`.
+- A cena da exposição vive em `data/scene.json`; o `index.html` não tem entidades de cena.
+  Os textos da interface ficam em `i18n/` (hoje só o `pt.json`).
 - Todos os assets (imagens, vídeos) ficam em `assets/images/`.
 - Código JavaScript em arquivos separados dentro de `js/`.
 - Código CSS em arquivos separados dentro de `css/`.
@@ -257,6 +261,11 @@ Medido a 2026-10-15, com a cena **construída de dados** — é a verificação 
 - O cursor do A-Frame não leva teste de stencil (é elemento de interface).
 - A dimensão 0 não tem conteúdo 3D: dentro das janelas que a mostram vê-se a imagem real
   da câmara (o canvas é transparente).
+- **O formato aceita mais do que a cena constrói.** Obras de `kind: "model"` ou `"text"` e fundos
+  de dimensão `kind: "color"` **passam a validação** mas ainda não são construídos (uma obra sai
+  sempre como painel com a textura do `asset`), e `interaction: "link"` abre o endereço **dentro
+  do modal** em vez de navegar. São campos que existem para o editor (Fase 4) — pendência **R9**
+  do roadmap.
 
 ## Mundos e portas de mundo — planeado, não implementado
 
@@ -495,6 +504,17 @@ for a **dimensão ativa**: vê-la pela janela não conta.
 
 ### Recursos Recentes
 
+- **A Cena Vem de Dados** (Fase 3): a exposição (dimensões, obras, portais, câmara) vive em
+  `data/scene.json`, não em entidades escritas à mão no `index.html` — que passou de 240 para
+  **82 linhas** e deixou de ter cena nenhuma dentro
+- **Catálogo de Assets**: cada caminho de ficheiro aparece **uma vez**, no catálogo `assets`, e
+  as dimensões e as obras apontam para ele pelo nome (o modal deriva daí o seu endereço)
+- **Texto por Língua no Dado**: os nomes das dimensões e as descrições dos assets são
+  `{ "pt": "…", "en": "…" }` — acrescentar uma língua é acrescentar um campo
+- **Validação da Cena**: o mesmo módulo (`js/scene/validation.js`) corre na consola ao arrancar,
+  na linha de comando (`node tools/scene/validate.mjs`) e vai correr no editor (Fase 4)
+- **`?scene=example`**: carrega o `data/scene-example.json`, para experimentar sem tocar na cena
+  da exposição
 - **Grafo de Dimensões**: portais bidirecionais entre duas dimensões (qualquer par), com
   uma dimensão ativa global — permite a central que dá acesso a todas
 - **IDs em Tudo**: cada dimensão e cada portal tem um ID — no dado e, na cena construída, nos
@@ -587,6 +607,10 @@ Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caix
 2. Clique no botão "ATIVAR EXPOSIÇÃO"
 3. Permita o acesso à câmera quando solicitado (é a dimensão 0, a realidade)
 4. Explore o ambiente utilizando o mouse (desktop) ou o D-pad (mobile)
+
+Quem quiser experimentar sem mexer na cena da exposição pode abrir
+`http://127.0.0.1:8123/index.html?scene=example`: carrega o `data/scene-example.json` (a mesma
+cena, como ficheiro de ensaio).
 
 ### 2. Personalizar Conteúdo
 
