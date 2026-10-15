@@ -6,6 +6,20 @@
 // (dimensaoA -> dimensionA, caixa -> box, pertenceA -> ownedBy). The script does the
 // conversion once, repeatably, and tools/html-to-scene-json/validate.mjs checks it.
 //
+// Fase 3 turned this file from "the tool that writes the scene" into "the record of one
+// migration": the scene now comes from the data, and index.html loses its entities (block B5).
+// From then on this script cannot reproduce the scene any more, and a guard (block B6) refuses
+// to write when the HTML has no entities.
+//
+// The format it writes is version 2 — what changed from version 1, and why:
+//   D20 — one `assets` catalogue. A dimension and an artwork carry only `asset`, and the URL the
+//         modal opens is derived from the catalogue, so the same file is named once instead of
+//         twice (that duplication was open point A6).
+//   D21 — content text is a map by language. The Portuguese of an asset description is read from
+//         the HTML; the English and the names of the dimensions are authored content, and they
+//         live in CONTENT below because this script is the only source of the migration.
+//   D23 — `version: 2` (from js/scene/schema.js, so the number has one home).
+//
 // Reads:
 //   index.html    the scene entities (assets, camera, dimensions, portals, artworks)
 //   js/           values that still live in the code (box, trigger, frame, speed): the entry
@@ -19,6 +33,33 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SCENE_VERSION } from '../../js/scene/schema.js';
+
+// Content the HTML does not carry: the name of each dimension and the English of each asset
+// description (the Portuguese of the descriptions is read from the `alt` of the <img>). This is
+// the migration's own record (D21); from Fase 4 on, the text is written in the editor.
+const CONTENT = {
+  dimensionNames: {
+    0: { pt: 'Realidade', en: 'Reality' },
+    1: { pt: 'Cidade 360º', en: 'City 360º' },
+    2: { pt: 'Praia', en: 'Beach' },
+    3: { pt: 'Céu 360º', en: 'Sky 360º' }
+  },
+  assetEnglish: {
+    'cidade-360': '360º panorama of dimension 1 (city)',
+    praia: '360º panorama of dimension 2 (beach)',
+    skycloud: '360º panorama of dimension 3 (sky)',
+    galeriaFoto1: 'Photograph used as an artwork in dimensions 1 and 2',
+    galeriaFoto2: 'Photograph of the Eiffel Tower used as an artwork in dimensions 1 and 2',
+    video: 'Video used as an artwork in dimension 1'
+  },
+  // Texto que o HTML nao tem: o <a-assets> nao da alt ao video, e os dois alt das fotografias
+  // sao o mesmo texto — e o autor distinguiu-os ao confirmar o texto (D21).
+  assetPortuguese: {
+    video: 'Vídeo usado como obra na dimensão 1',
+    galeriaFoto2: 'Fotografia da Torre Eiffel usada como obra nas dimensões 1 e 2'
+  }
+};
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
@@ -106,13 +147,24 @@ function tags(source) {
 
 // ---------------------------------------------------------------- assets
 
-const assets = new Map();   // id -> { path, type }
+// A descricao por lingua (D21): o portugues vem do `alt` do HTML, o ingles da tabela do
+// conteudo. Devolve `undefined` quando nao ha texto nenhum, para o campo ficar ausente do JSON
+// em vez de aparecer vazio.
+function text(portuguese, english) {
+  const map = {};
+  if (portuguese) map.pt = portuguese;
+  if (english) map.en = english;
+  return Object.keys(map).length ? map : undefined;
+}
+
+const assets = new Map();   // id -> { path, type, description }
 for (const tag of tags(html)) {
   const id = attr(tag, 'id');
   const src = attr(tag, 'src');
   if (!id || !src) continue;
-  if (tag.startsWith('<img')) assets.set(id, { path: src, type: 'image' });
-  else if (tag.startsWith('<video') && id !== 'webcam-video') assets.set(id, { path: src, type: 'video' });
+  const description = attr(tag, 'alt');
+  if (tag.startsWith('<img')) assets.set(id, { path: src, type: 'image', description });
+  else if (tag.startsWith('<video') && id !== 'webcam-video') assets.set(id, { path: src, type: 'video', description });
 }
 
 const assetType = (id) => (assets.get(id) || {}).type || null;
@@ -150,7 +202,14 @@ for (const tag of tags(html)) {
     const asset = (attr(tag, 'src') || '').replace('#', '');
     const own = attrVec3(tag, 'position') || [0, 0, 0];
     const off = offsetAtual();
-    const url = (attr(tag, 'open-artwork') || '').trim();
+    // O URL que o modal abre. Com o catalogo (D20) ele deriva do `asset`, e por isso nao entra
+    // no JSON — mas o script confere que os dois coincidem, porque era essa a duplicacao (A6)
+    // que a Fase 3 veio tirar: se divergirem, a conversao nao e fiel.
+    const url = (attr(tag, 'open-artwork') || '').replace(/^url:\s*/, '').trim();
+    const derived = (assets.get(asset) || {}).path;
+    if (url && derived && url !== derived) {
+      warn(`artwork ${artworks.length}: the modal opens "${url}" but asset "${asset}" is "${derived}" (A6)`);
+    }
     const size = [
       round(attr(tag, 'width') ?? 1),
       round(attr(tag, 'height') ?? 1),
@@ -164,8 +223,9 @@ for (const tag of tags(html)) {
       position: [round(off[0] + own[0]), round(off[1] + own[1]), round(off[2] + own[2])],
       rotation: (attrVec3(tag, 'rotation') || [0, 0, 0]).map(round),
       size,
-      interaction: url ? 'modal' : 'none',
-      url: url ? url.replace(/^url:\s*/, '') : null
+      // `interaction: modal` e o suficiente: o URL vem do catalogo (D20). `url` fica reservado a
+      // `interaction: link`, uma ligacao externa que a cena de hoje nao tem.
+      interaction: url ? 'modal' : 'none'
     });
     continue;
   }
@@ -181,6 +241,7 @@ for (const tag of tags(html)) {
         id: round(c.dimension),
         kind: assetType(asset) || 'image',
         asset,
+        name: CONTENT.dimensionNames[round(c.dimension)],
         radius: round(c.radius)
       });
       continue;
@@ -243,7 +304,10 @@ for (const portal of portals) {
 const ids = new Set(dimensions.map((d) => d.id));
 for (const portal of portals) {
   for (const id of [portal.dimensionA, portal.dimensionB]) {
-    if (!ids.has(id)) { ids.add(id); dimensions.push({ id, kind: 'camera' }); }
+    if (!ids.has(id)) {
+      ids.add(id);
+      dimensions.push({ id, kind: 'camera', name: CONTENT.dimensionNames[id] });
+    }
   }
 }
 
@@ -252,12 +316,24 @@ portals.sort((a, b) => a.id - b.id);
 
 // ---------------------------------------------------------------- saida
 
+// O catalogo de assets (D20): a unica casa de um caminho. A ordem e a do HTML, para o diff da
+// conversao ser estavel.
+const catalogue = {};
+for (const [id, asset] of assets) {
+  catalogue[id] = {
+    path: asset.path,
+    type: asset.type,
+    alt: text(CONTENT.assetPortuguese[id] || asset.description, CONTENT.assetEnglish[id])
+  };
+}
+
 const cena = {
-  version: 1,
+  version: SCENE_VERSION,
   cameras: {
     player: { position: playerPosition ? playerPosition.map(round) : null, speed: playerSpeed ? round(playerSpeed[1]) : null },
     real: { enabled: realCameraEnabled }
   },
+  assets: catalogue,
   dimensions,
   artworks,
   portals
@@ -279,11 +355,13 @@ const usados = new Set([
 const semUso = [...assets.keys()].filter((id) => !usados.has(id));
 const semFicheiro = [...usados].filter((id) => !assets.has(id));
 
-console.log('scene written:');
+console.log(`scene written (version ${SCENE_VERSION}):`);
 console.log(`  dimensions : ${dimensions.length}  (${dimensions.map((d) => d.id + ':' + d.kind).join(', ')})`);
 console.log(`  artworks   : ${artworks.length}`);
 console.log(`  portals    : ${portals.length}  (${portals.map((p) => p.id + ':' + p.dimensionA + '<->' + p.dimensionB).join(', ')})`);
 console.log(`  assets     : ${assets.size}  (unused: ${semUso.length ? semUso.join(', ') : 'none'})`);
+console.log(`  catalogue  : ${Object.keys(catalogue).length} paths, ` +
+  `${Object.values(catalogue).filter((asset) => asset.alt).length} with a description (D20)`);
 console.log(`  files      : data/scene.json, data/scene-example.json`);
 
 if (semFicheiro.length) console.error(`ERROR: asset ids used but not declared: ${semFicheiro.join(', ')}`);

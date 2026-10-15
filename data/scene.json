@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "cameras": {
     "player": {
       "position": [
@@ -13,27 +13,93 @@
       "enabled": true
     }
   },
+  "assets": {
+    "cidade-360": {
+      "path": "assets/images/forest.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da dimensão 1 (cidade)",
+        "en": "360º panorama of dimension 1 (city)"
+      }
+    },
+    "galeriaFoto1": {
+      "path": "assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Fotografia usada como obra nas dimensões 1 e 2",
+        "en": "Photograph used as an artwork in dimensions 1 and 2"
+      }
+    },
+    "galeriaFoto2": {
+      "path": "assets/images/eiffel.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Fotografia da Torre Eiffel usada como obra nas dimensões 1 e 2",
+        "en": "Photograph of the Eiffel Tower used as an artwork in dimensions 1 and 2"
+      }
+    },
+    "praia": {
+      "path": "assets/images/praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da dimensão 2 (praia)",
+        "en": "360º panorama of dimension 2 (beach)"
+      }
+    },
+    "skycloud": {
+      "path": "assets/images/skycloud.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da dimensão 3 (céu)",
+        "en": "360º panorama of dimension 3 (sky)"
+      }
+    },
+    "video": {
+      "path": "assets/images/compequicolor1024vr.mp4",
+      "type": "video",
+      "alt": {
+        "pt": "Vídeo usado como obra na dimensão 1",
+        "en": "Video used as an artwork in dimension 1"
+      }
+    }
+  },
   "dimensions": [
     {
       "id": 0,
-      "kind": "camera"
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
     },
     {
       "id": 1,
       "kind": "image",
       "asset": "cidade-360",
+      "name": {
+        "pt": "Cidade 360º",
+        "en": "City 360º"
+      },
       "radius": 500
     },
     {
       "id": 2,
       "kind": "image",
       "asset": "praia",
+      "name": {
+        "pt": "Praia",
+        "en": "Beach"
+      },
       "radius": 500
     },
     {
       "id": 3,
       "kind": "image",
       "asset": "skycloud",
+      "name": {
+        "pt": "Céu 360º",
+        "en": "Sky 360º"
+      },
       "radius": 500
     }
   ],
@@ -58,8 +124,7 @@
         3,
         0.1
       ],
-      "interaction": "modal",
-      "url": "assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg"
+      "interaction": "modal"
     },
     {
       "id": 1,
@@ -81,8 +146,7 @@
         3,
         0.1
       ],
-      "interaction": "modal",
-      "url": "assets/images/eiffel.jpg"
+      "interaction": "modal"
     },
     {
       "id": 2,
@@ -104,8 +168,7 @@
         3,
         0.1
       ],
-      "interaction": "modal",
-      "url": "assets/images/compequicolor1024vr.mp4"
+      "interaction": "modal"
     },
     {
       "id": 3,
@@ -127,8 +190,7 @@
         3,
         0.1
       ],
-      "interaction": "modal",
-      "url": "assets/images/praia.jpg"
+      "interaction": "modal"
     },
     {
       "id": 4,
@@ -150,8 +212,7 @@
         3,
         0.1
       ],
-      "interaction": "modal",
-      "url": "assets/images/skycloud.jpg"
+      "interaction": "modal"
     },
     {
       "id": 5,
@@ -173,8 +234,7 @@
         3,
         0.1
       ],
-      "interaction": "modal",
-      "url": "assets/images/skycloud.jpg"
+      "interaction": "modal"
     },
     {
       "id": 6,
@@ -196,8 +256,7 @@
         3,
         0.1
       ],
-      "interaction": "modal",
-      "url": "assets/images/eiffel.jpg"
+      "interaction": "modal"
     },
     {
       "id": 7,
@@ -219,8 +278,7 @@
         3,
         0.1
       ],
-      "interaction": "modal",
-      "url": "assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg"
+      "interaction": "modal"
     },
     {
       "id": 8,
@@ -242,8 +300,7 @@
         3,
         0.1
       ],
-      "interaction": "modal",
-      "url": "assets/images/praia.jpg"
+      "interaction": "modal"
     },
     {
       "id": 9,
@@ -265,8 +322,7 @@
         3,
         0.1
       ],
-      "interaction": "modal",
-      "url": "assets/images/forest.jpg"
+      "interaction": "modal"
     }
   ],
   "portals": [
