@@ -746,16 +746,95 @@ portais e `D` continua a ligar/desligar as caixas de todos, que é o que os 8 ou
   conhecer `document.querySelector('a-camera')`.
 
 ### Fase 2 — Os 4 módulos
+
+**Estado: planeada em 2026-10-15 — ainda sem código escrito.** O plano abaixo é o que a fase tem
+de entregar, bloco a bloco; as três decisões que faltam fechar estão em §14 (R5–R7).
+
 - **Entregável:** `js/modules/dimension.js`, `artwork.js`, `portal.js`, `camera.js`; `js/app.js`
-  fica só com o arranque (`config-ar`).
+  fica só com o arranque.
 - **Correções incluídas:** A4 (`remove` em todos os módulos), A5 (câmara centralizada),
-  A7 (travessia no portal, valores no núcleo). (**A2/A3 já fechados em 2026-10-15** — §2.1.)
+  A7 (travessia no portal, valores no núcleo). (**A2/A3 já fechados em 2026-10-15** — §2.1.) O
+  **A6** não é desta fase: o campo único `asset` (§5.3) é decisão de contrato e vai com a cena a
+  vir de dados (Fase 3).
 - **Verificação:** regressão completa + **teste novo**: criar e destruir 20 portais em
   ciclo e confirmar que os listeners voltam a 1 e `estado.portais` fica vazio. O T9 já foi
   medido em 2026-10-15 (6 ciclos: **1** ouvinte na carga e **1** no fim, e os portais criados
   não deixam registo).
 - **Risco:** regressão de render (é a área mais sensível). Mitigação: uma fase só para
   mover código, sem mudar regras.
+
+#### O corte do `js/app.js`, bloco a bloco
+
+Medido a 2026-10-15, **antes** de mexer. As linhas são um instantâneo de planeamento: depois do
+corte deixam de valer — a mesma nota que a §2.1 faz para as referências da v0.0.2.
+
+| Linhas | O que é | Destino |
+| --- | --- | --- |
+| 1–14 | import do núcleo | `app.js` (fica) |
+| 16–72 | modal da obra: Escape, `inert`, foco preso, ouvinte do iframe | `modules/artwork.js` |
+| 74–87 | ponte `window.portalAR` / `window.portalDebug` | `app.js` (fica — é a alça dos testes, §10) |
+| 91–110 | `gestor-dimensoes` (**A7**) | `modules/portal.js`, como driver de frame |
+| 112–131 | `config-ar` → `ar-config` | `app.js` (fica: é o arranque) |
+| 133–137 | `cursor-listener` | `modules/artwork.js` |
+| 139–161 | `abrir-modal` → `open-artwork` | `modules/artwork.js` |
+| 163–184 | `material-virtual` → `dimensional-material` (**A4**) | `modules/artwork.js` |
+| 186–239 | `panorama-dimensao` → `dimension-panorama` (**A4**, **A5**) | `modules/dimension.js` |
+| 241–454 | `portal-estencil-dinamico` → `stencil-portal` (**A5**, **A7**) | `modules/portal.js` |
+| 456–469 | ouvinte único de teclado (`R` / `D`) | `app.js` (fica) |
+| 471–514 | movimento mobile e D-pad (**A5**) | `modules/camera.js` |
+| 515–537 | loading e erro de câmara | `modules/camera.js` |
+| 539–546 | ponte temporária para a interface (`onclick` inline) | `app.js` (fica até à Fase 4) |
+
+#### Blocos de execução
+
+Um bloco por commit — a regra da Fase 1 mantém-se: um componente por commit, para os diffs serem
+revistos um a um.
+
+| # | Bloco | Fecha |
+| --- | --- | --- |
+| **B0** | Preparação: fechar §14/R5–R7, branch a partir do estado atual, re-medir a linha de base | — |
+| **B1** | `js/modules/camera.js` — `playerCamera`, `realCamera`, D-pad, loading e erro de câmara. Passa a ser o **único** ficheiro que conhece `a-camera` | A5 |
+| **B2** | `js/modules/artwork.js` — `dimensional-material` **com `remove()`**, `open-artwork`, o modal e o `cursor-listener` | A4 |
+| **B3** | `js/modules/dimension.js` — `dimension-panorama` **com `remove()`**; `followCamera` pede a posição à câmara | A4 |
+| **B4** | `js/modules/portal.js` — `stencil-portal`: schema renomeado (`ownedBy`, `box`, `boxPosition`, `trigger`, `frame`), travessia **dentro** do portal, `remove()` completo e os nomes dos objetos 3D em inglês | A4, A7 |
+| **B5** | `js/app.js` magro: só o arranque (`ar-config`, o ouvinte único, o driver de frame e as duas pontes). Alvo: **≤100 linhas** | — |
+| **B6** | Ferramentas e HTML alinhados com os nomes novos (tabela abaixo) | — |
+| **B7** | Documentação: README §*Estado atual do código*, §2.1 e §13 deste roadmap | — |
+
+#### Metas de sucesso
+
+**(a) Comportamento — nenhum número pode mudar.** Os nove testes são os de §10, e é lá que os
+valores vivem; a Fase 2 só lhes acrescenta o ciclo de **20** portais no T9 (o medido em
+2026-10-15 foi de 6). Se algum número mexer, é bug — não é tolerância.
+
+**(b) Arquitetura — metas novas, todas mensuráveis.**
+
+| # | Meta | Como se mede | Alvo |
+| --- | --- | --- | --- |
+| M1 | Os 4 módulos existem | `js/modules/` | 4 ficheiros |
+| M2 | `app.js` é só arranque | contagem de linhas | **≤100** (imports, `ar-config`, um ouvinte, o driver e as duas pontes) |
+| M3 | A5 fechado | `grep` de `a-camera` em `js/` | **0** fora de `js/modules/camera.js` (os sítios de hoje estão em §2.1) |
+| M4 | A4 fechado | `remove()` por módulo, mais um ciclo de 1 dimensão + 2 obras + 1 portal | **4** `remove()` (hoje só o portal tem); registos vazios e 0 erros de consola |
+| M5 | A7 fechado | leitura do driver e do portal | travessia **só** no portal; atribuição de valores **só** no núcleo |
+| M6 | D10 cumprida no que se move | `grep` dos **6** nomes de componente antigos (§5.7) em `js/` e `index.html` | **0** ocorrências |
+| M7 | O núcleo continua ignorante | `grep "modules/" js/core/` | **0** |
+| M8 | Consola em inglês | leitura | 0 mensagens em português em `console.*` |
+| M9 | Ferramentas verdes | `node tools/html-to-scene-json/validate.mjs` | exit **0**, 0 erros, e a conversão campo a campo continua com **0** diferenças (§13) |
+| M10 | O instrumento continua vivo | `runPoseSweep()`, mais as duas avarias injetadas | os números de §10; as avarias falham como falhavam |
+
+**(c) Documentação.** O README §*Estado atual do código* (contagens, nomes e a tabela dos 4
+módulos) e o §13 deste roadmap passam a apontar a **Fase 3**. As pendências **R3** e **R4** (§14)
+continuam abertas: não são desta fase.
+
+#### O que se move com o renomeio (acoplamentos)
+
+| Sítio | Porque não pode ficar para trás |
+| --- | --- |
+| `tools/regression/pose-sweep.mjs` | Cria o rig com os atributos antigos (`portalId`, `dimensaoA`, `dimensaoB`, `pertenceA`, `caixa`, `caixaPosicao`) e encontra os objetos por `-mascara` e `-moldura-N`. É o **único** instrumento automático que existe (§10) |
+| `tools/html-to-scene-json/convert.mjs` e `validate.mjs` | Fazem *parsing* do `index.html` pelos quatro nomes de atributos; sem eles o validador conta 0 obras e 0 portais — e mente |
+| `window.portalAR` / `window.portalDebug` | É a alça da consola e dos scripts de regressão: **não** se renomeia nesta fase |
+| Ponte de interface (`window.fecharObra`, `configurarBotoesMobile`, `tratarErroCamera`) | O `index.html` chama-as por atributos inline; ficam até à Fase 4 |
+| Ordem de desenho, máscara, profundidade e `sortObjects` | São as leis L2, L3 e L6: a fase **move** código, não muda regras |
 
 ### Fase 3 — A cena vem de dados
 - **Entregável:** `js/scene/scene-builder.js` + `schema.js` + `validation.js`; o
@@ -1373,12 +1452,18 @@ continuar a dar os mesmos números, mais o T9 (criar e destruir portais em ciclo
 teclado e registos limpos) — **já medido em 2026-10-15: 1 ouvinte na carga e 1 depois de 6
 ciclos**.
 
+**O plano da fase está em §9:** o corte do `js/app.js` bloco a bloco, os **8 blocos de execução**
+(B0–B7, com o item A que cada um fecha) e as **metas de sucesso** — o comportamento ancorado em
+§10 e dez metas de arquitetura (M1–M10) medidas por contagem ou por `grep`. As **três decisões**
+que faltam fechar estão em §14 (R5–R7).
+
 ---
 
 ## 14. Pendências registadas (2026-10-15)
 
 O que fica em aberto depois de a documentação ser alinhada com o código. Cada linha tem o
-motivo e o que a fecha.
+motivo e o que a fecha. **R5–R7 nascem do plano da Fase 2 (§9)** e são decisões a fechar antes
+de B2 e de B4.
 
 **R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
 apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o
@@ -1395,3 +1480,6 @@ instrumento **falha quando deve** (3 212 e 10 072 amostras em falta, nas duas).
 | --- | --- | --- | --- |
 | R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`) e o §13 diz «as 6 chaves»; as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Acertar a contagem no §13 e juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` |
 | R4 | **O texto de conteúdo por língua nunca chegou aos dados** | O entregável 4 da Fase 0 diz que `data/scene-example.json` inclui «o formato do texto de conteúdo por língua» e a D12-A diz `title: { "pt": …, "en": … }` — mas `data/scene.json` tem `dimensions: {id, kind}` e `artworks: {id, dimension, kind, asset, position, rotation, size, interaction, url}`, sem nenhum campo por língua, e nem o `convert.mjs` nem o `validate.mjs` mencionam idioma. A cena atual não tem texto (as dimensões não têm nome e as obras não têm título), logo o formato está **documentado** (§5.7 e §6) mas não **instanciado** | Levar os campos por língua ao esquema, ao conversor e ao validador — é decisão de contrato, a tomar antes da Fase 3, a fase em que a cena passa a vir dos dados |
+| R5 | **Quem corre o `syncStencilValues()` por frame depois do A7** | O `gestor-dimensoes` faz hoje as duas coisas que o A7 separa: deteta as travessias **e** agrega as dimensões mostradas. Tirar-lhe a travessia deixa em aberto quem percorre os portais a cada frame — e o núcleo não pode ser esse alguém (não conhece portais, §5.0) | Confirmar a recomendação — **o módulo do portal expõe o driver de frame e o `app.js` chama-o no arranque** — e registá-la em §11, antes de B4 |
+| R6 | **Onde vivem o modal da obra e o `cursor-listener`** | O plano da Fase 2 não fixa esta fronteira: os dois estão ligados à obra (§5.3), mas o modal é DOM e o `cursor-listener` só marca o que é clicável; a §5.0 diz o que o núcleo **não** faz, não onde isto fica | Confirmar a recomendação (**os dois em `js/modules/artwork.js`**), antes de B2 |
+| R7 | **Os `data-dimensao`, `data-portal-id` e a classe `interactable` também passam a inglês?** | São código, logo caem na D10, mas são *hooks* que o `css/style.css` usa: renomeá-los obriga a mexer no CSS no mesmo commit | Confirmar antes de B2/B4 — recomendação: **sim** (deixá-los em português é dívida de nomenclatura) |
