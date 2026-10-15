@@ -8,6 +8,13 @@
 import { state, registerContent, unregisterContent } from '../core/index.js';
 
 const ARTWORK_COMPONENT = 'dimensional-material';
+const OPENING_COMPONENT = 'open-artwork';
+
+// A-Frame's vec3 in the object form of setAttribute needs { x, y, z }: an array there is read as
+// an object with no axes and falls back to the default, silently (measured in A-Frame 1.8,
+// utils/coordinates.js parse). The data writes vectors as arrays, so the factory translates —
+// and this is the only place in this module that knows the difference.
+const vector = (value) => ({ x: value[0], y: value[1], z: value[2] });
 
 // --- The modal (the overlay window) ---
 // The modal is a dialog: when it opens the focus goes into it and the rest of the page becomes
@@ -88,7 +95,7 @@ AFRAME.registerComponent('cursor-listener', {
   }
 });
 
-AFRAME.registerComponent('open-artwork', {
+AFRAME.registerComponent(OPENING_COMPONENT, {
   schema: { url: { type: 'string' } },
   init: function () {
     this.el.addEventListener('click', () => {
@@ -106,7 +113,7 @@ AFRAME.registerComponent('open-artwork', {
   }
 });
 
-AFRAME.registerComponent('dimensional-material', {
+AFRAME.registerComponent(ARTWORK_COMPONENT, {
   schema: { dimension: { type: 'int', default: 0 } },
   init: function () {
     this.el.setAttribute('data-dimension', this.data.dimension);
@@ -136,3 +143,34 @@ AFRAME.registerComponent('dimensional-material', {
     });
   }
 });
+
+// ---- the artwork as data (Fase 3) ----
+
+// Creates the entity of one artwork of the scene data. The `artwork` it receives is the data with
+// the address to open already resolved, when there is one: with `interaction: 'modal'` the
+// address comes from the assets catalogue (D20, so the file is named once) and the builder is the
+// one that knows the catalogue.
+//
+// A subtlety of the two names: `asset` is the id of the entry in `<a-assets>` — the catalogue id
+// the builder gives the <img>/<video> — and it becomes the `#id` selector the material loads.
+export function createArtwork(artwork, parent) {
+  const el = document.createElement('a-box');
+  el.setAttribute('class', 'interactable');
+  el.setAttribute('src', '#' + artwork.asset);
+  el.setAttribute('width', artwork.size[0]);
+  el.setAttribute('height', artwork.size[1]);
+  el.setAttribute('depth', artwork.size[2]);
+  el.setAttribute('position', vector(artwork.position));
+  if (artwork.rotation) el.setAttribute('rotation', vector(artwork.rotation));
+  el.setAttribute(ARTWORK_COMPONENT, { dimension: artwork.dimension });
+  if (artwork.url) {
+    el.setAttribute(OPENING_COMPONENT, { url: artwork.url });
+  }
+  parent.appendChild(el);
+  return el;
+}
+
+// Removing the entity is enough: the component's remove() above takes the registry entry with it.
+export function removeArtwork(el) {
+  if (el) el.remove();
+}

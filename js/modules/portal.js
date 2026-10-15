@@ -16,11 +16,19 @@ import {
 } from '../core/index.js';
 import { playerCamera } from './camera.js';
 
+const PORTAL_COMPONENT = 'stencil-portal';
+
 // Reused vectors: the driver and the collision run every frame and must not allocate.
 const _worldPoint = new THREE.Vector3();
 const _boxPoint = new THREE.Vector3();
 
-AFRAME.registerComponent('stencil-portal', {
+// A-Frame's vec3 in the object form of setAttribute needs { x, y, z }: an array there is read as
+// an object with no axes and falls back to the default, silently (measured in A-Frame 1.8,
+// utils/coordinates.js parse). The data writes vectors as arrays, so the factories below
+// translate — and this is the only place that knows the difference.
+const vector = (value) => ({ x: value[0], y: value[1], z: value[2] });
+
+AFRAME.registerComponent(PORTAL_COMPONENT, {
   schema: {
     id: { type: 'int', default: 0 },
     // The two dimensions this portal links. Bidirectional: in A it shows B and in B it shows A.
@@ -39,7 +47,13 @@ AFRAME.registerComponent('stencil-portal', {
     boxRotation: { type: 'vec3', default: { x: 0.0, y: 0.0, z: 0.0 } },
     // Where the traversal is detected, always inside the box: 'plane' on the plane of the
     // frame (the change is not noticed) or 'box' on the entry face.
-    trigger: { type: 'string', default: 'plane', oneOf: ['plane', 'box'] }
+    trigger: { type: 'string', default: 'plane', oneOf: ['plane', 'box'] },
+    // The frame is geometry of this component, but its colour and thickness are data (Fase 3).
+    // The defaults are exactly what the code used to write by hand, so a scene written by hand
+    // (the HTML, before the builder) keeps looking the same — and the converter reads them from
+    // here, which is what keeps the two from drifting.
+    frameColor: { type: 'string', default: '#ff0000' },
+    frameThickness: { type: 'number', default: 0.3 }
   },
   init: function () {
     let id = this.data.id;
@@ -116,8 +130,8 @@ AFRAME.registerComponent('stencil-portal', {
     // The frame is geometry of the dimension the portal stands in. It takes no stencil test:
     // depth is what decides whether it stays in front of or behind the content of a window (the
     // mask of the windows writes depth on their plane).
-    const frameMaterial = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
-    const thickness = 0.3;
+    const frameMaterial = new THREE.MeshBasicMaterial({ color: this.data.frameColor });
+    const thickness = this.data.frameThickness;
     const halfWidth = w / 2;
     const halfHeight = h / 2;
     const bars = [
@@ -268,4 +282,45 @@ AFRAME.registerComponent('portal-driver', {
 export function startFrameDriver() {
   const scene = document.querySelector('a-scene');
   if (scene) scene.setAttribute('portal-driver', '');
+}
+
+// ---- the portal as data (Fase 3) ----
+
+// Creates the entity of one portal of the scene data (docs/ROADMAP.md, section 5.4). This is the
+// only place that knows how the data's fields are spelled on the component: `frame {color,
+// thickness}` becomes two fields here, and a field the data does not have is left out so the
+// component's own default applies.
+//
+// The element is built detached and added at the end, so A-Frame initialises the component once
+// with everything in place — the mask and the four bars are built once (law L7).
+export function createPortal(portal, parent) {
+  const settings = {
+    id: portal.id,
+    dimensionA: portal.dimensionA,
+    dimensionB: portal.dimensionB,
+    ownedBy: portal.ownedBy,
+    width: portal.width,
+    height: portal.height,
+    box: vector(portal.box)
+  };
+  if (portal.boxPosition) settings.boxPosition = vector(portal.boxPosition);
+  if (portal.boxRotation) settings.boxRotation = vector(portal.boxRotation);
+  if (portal.trigger) settings.trigger = portal.trigger;
+  if (portal.frame) {
+    if (portal.frame.color) settings.frameColor = portal.frame.color;
+    if (typeof portal.frame.thickness === 'number') settings.frameThickness = portal.frame.thickness;
+  }
+
+  const el = document.createElement('a-entity');
+  el.setAttribute('position', vector(portal.position));
+  if (portal.rotation) el.setAttribute('rotation', vector(portal.rotation));
+  el.setAttribute(PORTAL_COMPONENT, settings);
+  parent.appendChild(el);
+  return el;
+}
+
+// Removing the entity is enough: the component's remove() above disposes the geometry, the
+// materials and the registry entry.
+export function removePortal(el) {
+  if (el) el.remove();
 }

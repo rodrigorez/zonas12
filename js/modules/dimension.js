@@ -8,7 +8,9 @@
 import { state, registerContent, unregisterContent } from '../core/index.js';
 import { playerCamera } from './camera.js';
 
-AFRAME.registerComponent('dimension-panorama', {
+const DIMENSION_COMPONENT = 'dimension-panorama';
+
+AFRAME.registerComponent(DIMENSION_COMPONENT, {
   schema: {
     dimension: { type: 'int', default: 0 },
     src: { type: 'selector' },
@@ -77,3 +79,32 @@ AFRAME.registerComponent('dimension-panorama', {
     }
   }
 });
+
+// ---- the dimension as data (Fase 3) ----
+
+// Creates the entity of one dimension of the scene data. A dimension of kind `camera` is the
+// real world behind dimension 0: it has no 360º background and therefore no entity — the webcam
+// is the background.
+//
+// The element is built detached and only then added to the scene: A-Frame initialises the
+// component once, with the attributes already in place, and the sphere is built once (the trap
+// law L7 describes).
+export function createDimension(dimension, parent) {
+  if (!dimension || dimension.kind === 'camera') return null;
+
+  const settings = { dimension: dimension.id };
+  if (dimension.asset) settings.src = '#' + dimension.asset;
+  if (typeof dimension.radius === 'number') settings.radius = dimension.radius;
+  if (typeof dimension.followCamera === 'boolean') settings.followCamera = dimension.followCamera;
+
+  const el = document.createElement('a-entity');
+  el.setAttribute(DIMENSION_COMPONENT, settings);
+  parent.appendChild(el);
+  return el;
+}
+
+// Removing the entity is enough: the component's remove() above takes the registry entry and the
+// GPU memory with it.
+export function removeDimension(el) {
+  if (el) el.remove();
+}

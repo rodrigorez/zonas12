@@ -279,8 +279,12 @@ const schemaBoxRot = fromCode(
   /boxRotation:\s*\{\s*type:\s*'vec3',\s*default:\s*\{\s*x:\s*([\d.]+),\s*y:\s*([\d.]+),\s*z:\s*([\d.]+)\s*\}/,
   'portal box rotation (boxRotation)');
 const schemaTrigger = fromCode(/trigger:\s*\{\s*type:\s*'string',\s*default:\s*'([^']+)'/, 'portal trigger (trigger)');
-const frameColour = fromCode(/const frameMaterial = new THREE\.MeshBasicMaterial\(\{\s*color:\s*0x([0-9A-Fa-f]{6})/, 'frame colour');
-const frameThickness = fromCode(/const thickness = ([\d.]+);/, 'frame thickness');
+const schemaFrameColour = fromCode(
+  /frameColor:\s*\{\s*type:\s*'string',\s*default:\s*'(#[0-9A-Fa-f]{6})'/,
+  'frame colour (frameColor)');
+const schemaFrameThickness = fromCode(
+  /frameThickness:\s*\{\s*type:\s*'number',\s*default:\s*([\d.]+)/,
+  'frame thickness (frameThickness)');
 const playerSpeed = fromCode(/const MOBILE_SPEED = ([\d.]+);/, 'player speed (MOBILE_SPEED)');
 
 const vec = (m) => (m ? [round(m[1]), round(m[2]), round(m[3])] : null);
@@ -294,8 +298,8 @@ for (const portal of portals) {
   portal.boxRotation = vec(schemaBoxRot);
   portal.trigger = trigger;
   portal.frame = {
-    color: frameColour ? '#' + frameColour[1].toLowerCase() : null,
-    thickness: frameThickness ? round(frameThickness[1]) : null
+    color: schemaFrameColour ? schemaFrameColour[1].toLowerCase() : null,
+    thickness: schemaFrameThickness ? round(schemaFrameThickness[1]) : null
   };
 }
 
