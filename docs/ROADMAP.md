@@ -975,6 +975,29 @@ provoca (D10) e cada bloco mede no browser o que fez.
 `i18n` (**R3**: Fase 4) · o editor (`update`/`list` das fábricas, Fase 4) · os mundos e a recarga
 (Fase 3B).
 
+**Feito até agora (2026-10-15):**
+
+| Bloco | O que ficou feito | Medido no browser |
+| --- | --- | --- |
+| **B0** | Linha de base re-medida **antes** de mexer em código (as decisões de contrato já estavam fechadas — **D20–D23**, §11) | T1 **8/8** e T7 **8/8** (uma travessia por portal, sem cadeia) · T2 **0** de **84** poses · T3 **0** falhas em **21 758** amostras e **420** controlos (0 falhas), com o buffer a **1921×847** · T4 alfa **255** dentro da janela e **0** fora dela · T5 **0** px de moldura de trás dentro da janela da frente, com **6 767** px de controlo **fora** dela (a medição não é vazia) · T6 abre **só** na dimensão ativa · T8 **0** erros, **0** avisos e **0** pedidos falhados · T9 **1** ouvinte `keydown` na carga e **1** depois de **20** ciclos, com o registo de volta a **8** · `validate.mjs` OK (4 / 10 / 8, **7** janelas) e o conversor regenerado dá **0** diferenças |
+
+**Duas armadilhas de medição, encontradas no B0** (valem para o B7):
+
+1. **O browser tinha o `js/core/index.js` velho em cache** — a página nem o pedia ao servidor e o
+   grafo de módulos caía com «does not provide an export named `unregisterContent`». O ficheiro
+   no disco e o que o servidor serve estavam certos. Resolve-se desligando a cache
+   (`Network.setCacheDisabled`) ou com uma recarga sem cache — sem isso, uma medição pode estar a
+   ler **código antigo** sem dar sinal.
+2. **A câmara a mexer-se durante a varredura de poses.** Numa sessão em que o botão «ATIVAR
+   EXPOSIÇÃO» foi premido e o «avançar» do D-pad ficou preso, a câmara andou **0,1 m por frame**
+   (o passo do D-pad) durante toda a medição: a T2 deu **84/84** poses com o bordo cortado e a T3
+   **19 323** amostras falhadas — números sem valor nenhum, porque a câmara se move entre os dois
+   renders de cada pose. Os **controlos ficaram limpos** (0 falhas), que é justamente o que se
+   espera quando os dois renders são o mesmo. A varredura de poses exige **página sem interação e
+   câmara parada**; numa recarga limpa, os mesmos 84 poses dão **0** cortadas. *(Melhoria para a
+   Fase 6: a varredura podia detetar que a câmara se mexeu e recusar o resultado, em vez de o
+   reportar como falha.)*
+
 #### Metas de sucesso
 
 **(a) Comportamento — nenhum número pode mudar.** Os nove testes são os de §10, e é lá que os
