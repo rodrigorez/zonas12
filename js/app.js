@@ -1,6 +1,8 @@
 // --- CORE ---
 // The scene state, the registries and the stencil rules live in js/core/ (decision D1).
-// This file is the application: the A-Frame components, the movement and the interface.
+// This file is the application: the A-Frame components and the bootstrapping. The camera
+// module already lives in js/modules/; the dimension, artwork and portal modules follow
+// (docs/ROADMAP.md, Fase 2).
 import {
   state,
   MAX_PORTALS,
@@ -12,6 +14,7 @@ import {
   setActiveDimension,
   on
 } from './core/index.js';
+import { setupMobileControls, reportCameraError } from './modules/camera.js';
 
 // --- LÓGICA DO MODAL (JANELA SOBREPOSTA) ---
 // O modal é um diálogo: ao abrir, o foco entra nele e o resto da página fica `inert` (fora do
@@ -468,79 +471,11 @@ document.addEventListener('keydown', (evento) => {
   });
 });
 
-// --- LÓGICA DE MOVIMENTAÇÃO MOBILE ---
-let estadosMovimento = { frente: false, tras: false, esq: false, dir: false };
-const VELOCIDADE = 0.1;
-
-function atualizarMovimentoMobile() {
-  let cam = document.querySelector('a-camera');
-  if (cam) {
-    let angle = cam.object3D.rotation.y;
-    if (estadosMovimento.frente) {
-      cam.object3D.position.x -= Math.sin(angle) * VELOCIDADE;
-      cam.object3D.position.z -= Math.cos(angle) * VELOCIDADE;
-    }
-    if (estadosMovimento.tras) {
-      cam.object3D.position.x += Math.sin(angle) * VELOCIDADE;
-      cam.object3D.position.z += Math.cos(angle) * VELOCIDADE;
-    }
-    if (estadosMovimento.esq) {
-      cam.object3D.position.x -= Math.cos(angle) * VELOCIDADE;
-      cam.object3D.position.z += Math.sin(angle) * VELOCIDADE;
-    }
-    if (estadosMovimento.dir) {
-      cam.object3D.position.x += Math.cos(angle) * VELOCIDADE;
-      cam.object3D.position.z -= Math.sin(angle) * VELOCIDADE;
-    }
-  }
-  requestAnimationFrame(atualizarMovimentoMobile);
-}
-
-function configurarBotoesMobile() {
-  const associarBotao = (id, direcao) => {
-    let btn = document.getElementById(id);
-    btn.addEventListener('touchstart', (e) => { e.preventDefault(); estadosMovimento[direcao] = true; });
-    btn.addEventListener('touchend', (e) => { e.preventDefault(); estadosMovimento[direcao] = false; });
-    btn.addEventListener('mousedown', (e) => { estadosMovimento[direcao] = true; });
-    btn.addEventListener('mouseup', (e) => { estadosMovimento[direcao] = false; });
-    btn.addEventListener('mouseleave', (e) => { estadosMovimento[direcao] = false; });
-  };
-  associarBotao('btn-frente', 'frente');
-  associarBotao('btn-tras', 'tras');
-  associarBotao('btn-esq', 'esq');
-  associarBotao('btn-dir', 'dir');
-  atualizarMovimentoMobile();
-}
-
-function esconderLoading() {
-  const loadingOverlay = document.getElementById('loading-overlay');
-  if (loadingOverlay) {
-    loadingOverlay.style.display = 'none';
-  }
-}
-
-function tratarErroCamera(error) {
-  console.error('Erro ao acessar a câmera:', error);
-  esconderLoading();
-  // Um aviso por vez: esta função pode correr mais de uma vez (permissão recusada e, mais
-  // tarde, um erro a meio) e sem isto os avisos acumulavam-se no ecrã.
-  const anterior = document.getElementById('erro-camera');
-  if (anterior) anterior.remove();
-  const errorMsg = document.createElement('div');
-  errorMsg.className = 'loading-overlay';
-  errorMsg.id = 'erro-camera';
-  errorMsg.setAttribute('role', 'alert');
-  errorMsg.innerHTML = 'Não foi possível acessar a câmera. Por favor, verifique as permissões.';
-  errorMsg.style.display = 'flex';
-  document.body.appendChild(errorMsg);
-  document.getElementById('btn-iniciar').style.display = 'none';
-}
-
 // --- TEMPORARY BRIDGE TO THE INTERFACE ---
 // index.html still calls these from inline attributes (onclick) and from its own inline
 // script. Now that this file is a module, its scope is no longer global, so they have to be
 // reachable from window. Removed in Fase 4, when the interface becomes a module with its
 // own listeners.
 window.fecharObra = fecharObra;
-window.configurarBotoesMobile = configurarBotoesMobile;
-window.tratarErroCamera = tratarErroCamera;
+window.configurarBotoesMobile = setupMobileControls;
+window.tratarErroCamera = reportCameraError;

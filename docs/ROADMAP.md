@@ -801,6 +801,14 @@ revistos um a um.
 | **B6** | Ferramentas e HTML alinhados com os nomes novos (tabela abaixo) | — |
 | **B7** | Documentação: README §*Estado atual do código*, §2.1 e §13 deste roadmap | — |
 
+**Feito até agora (2026-10-15):** B0 a meio — a linha de base estática está verde
+(`validate.mjs`: 4 dimensões, 10 obras, 8 portais) e as três decisões de §14 continuam **por
+fechar**. **B1** feito: `js/modules/camera.js` criado; o `app.js` deixou de conhecer o
+`a-camera` (faltam os **2** sítios que são do panorama, em B3, e do portal, em B4) e perdeu 71
+linhas (546 → 481). Verificado com a cena a correr: cena carregada, **8** portais, **3**
+panoramas e a consola sem erros; o erro de câmara e o D-pad (4,2 m em 250 ms, o passo de 0,1 m
+por frame) testados pela ponte da interface, que continua a valer.
+
 #### Metas de sucesso
 
 **(a) Comportamento — nenhum número pode mudar.** Os nove testes são os de §10, e é lá que os
