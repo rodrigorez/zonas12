@@ -374,6 +374,13 @@ O único sítio que conhece a cena toda.
   da janela — regra medida na v0.0.2); vídeo obriga a `VideoTexture`.
 - **Depende de:** núcleo; câmara (se `followCamera`).
 
+> **Como ficou (2026-10-15, Fase 3).** `createDimension(dimension, parent)` e
+> `removeDimension(el)` existem; `update` e `list` **não** — quem os vai precisar é o editor
+> (Fase 4), e até lá seriam código sem quem o chame. O campo do dado é `asset`, um **nome do
+> catálogo** (D20), e é o construtor de cena que cria o `<img>`/`<video>` correspondente e lhe dá
+> esse id, para o `src: "#id"` do componente resolver. Uma dimensão de `kind: "camera"` **não tem
+> entidade**: o fundo dela é a webcam atrás do canvas.
+
 ### 5.3 Módulo Obra
 
 - **Responsabilidade:** item de conteúdo de uma dimensão, opcionalmente clicável.
@@ -385,6 +392,13 @@ O único sítio que conhece a cena toda.
   modal). O modelo deve ter **um** campo `asset`; o resto deriva. Consequência: migrar as
   **10 obras** atuais.
 - **Regras:** clique só na dimensão ativa (já implementado); ver pela janela não conta.
+
+> **Como ficou (2026-10-15, Fase 3).** `createArtwork(artwork, parent)` e `removeArtwork(el)`. O
+> `asset` do dado é um nome do catálogo e o módulo transforma-o no seletor `#id` do material; com
+> `interaction: "modal"` **não há** `url` nenhum no dado — o endereço deriva do catálogo (D20, o
+> fecho do **A6**) e chega à fábrica já resolvido, porque quem conhece o catálogo é o construtor de
+> cena. `url` só existe para `interaction: "link"`. O `title` por língua (D21) é lido pelo editor
+> (Fase 4): nenhuma fábrica o usa ainda.
 
 ### 5.4 Módulo Portal
 
@@ -409,6 +423,14 @@ O único sítio que conhece a cena toda.
 > §11, que alinha a §6 e a §11 com esta nota).
 > O **A7** está fechado: a travessia é do portal (`detectTraversal()`) e o que resta do antigo
 > gestor é o driver de frame, que vive neste módulo (decisão **D19**).
+
+> **Como ficou (2026-10-15, Fase 3).** A moldura passou a ser **dado**: `frameColor` e
+> `frameThickness` são campos do schema, com as omissões que o código tinha escritas à mão
+> (vermelho, 0,3) — e é de lá que o conversor os lê, o que impede os dois de divergirem. Existem
+> `createPortal(portal, parent)` e `removePortal(el)`: as fábricas constroem a entidade
+> **desacoplada** e só depois a anexam, para o `init` correr uma vez e a máscara e as quatro
+> barras serem construídas uma só vez (é a lei **L7** à escala da cena — medido: **5** filhos no
+> grupo).
 
 #### Os dois eixos do portal (D14)
 
@@ -587,37 +609,54 @@ desde que as 6 regras acima estejam cumpridas.
 
 ---
 
-## 6. Modelo de dados da cena (proposta)
+## 6. Modelo de dados da cena — implementado (formato v2)
+
+> **Estado: implementado em 2026-10-15** (Fase 3). Isto deixou de ser proposta: é o formato que o
+> `js/scene/schema.js` descreve, que o `js/scene/validation.js` verifica e que o
+> `js/scene/scene-builder.js` constrói. As decisões que o levaram até aqui — o catálogo de assets
+> (**D20**), o texto por língua (**D21**) e a versão (**D23**) — estão na §11. O protótipo da
+> Fase 0 tinha o `url` do modal em cada obra e nenhum catálogo; é essa a diferença que o v2 veio
+> tirar.
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "cameras": {
-    "player": { "position": [0, 1.6, 0], "speed": 0.1, "height": 1.6 },
+    "player": { "position": [0, 1.6, 0], "speed": 0.1 },
     "real": { "enabled": true }
   },
+  "assets": {
+    "cidade-360": { "path": "assets/images/forest.jpg", "type": "image",
+                    "alt": { "pt": "Panorama 360º da dimensão 1 (cidade)", "en": "360º panorama of dimension 1 (city)" } }
+  },
   "dimensions": [
-    { "id": 0, "kind": "camera", "radius": 500 },
-    { "id": 1, "kind": "image", "asset": "cidade-360", "radius": 500 }
+    { "id": 0, "kind": "camera", "name": { "pt": "Realidade", "en": "Reality" } },
+    { "id": 1, "kind": "image", "asset": "cidade-360", "radius": 500,
+      "name": { "pt": "Cidade 360º", "en": "City 360º" } }
   ],
   "artworks": [
-    { "id": 0, "dimension": 1, "asset": "galeriaFoto1",
-      "position": [-44, 1.5, 5], "rotation": [0, 15, 0], "size": [4, 3],
-      "interaction": "modal", "title": { "pt": "Aurora", "en": "Aurora" } }
+    { "id": 0, "dimension": 1, "kind": "image", "asset": "galeriaFoto1",
+      "position": [-44, 1.5, -55], "rotation": [0, 15, 0], "size": [4, 3, 0.1],
+      "interaction": "modal" }
   ],
   "portals": [
-    { "id": 0, "ownedBy": 0,
+    { "id": 0, "dimensionA": 0, "dimensionB": 1, "ownedBy": 0,
       "position": [-6, 0, -8], "width": 8, "height": 10,
       "box": [12, 16, 1], "boxPosition": [0, 8, 0], "trigger": "plane",
-      "window": { "kind": "dimension-pair", "dimensions": [0, 1] },
-      "action": { "kind": "enter-window" } }
+      "frame": { "color": "#ff0000", "thickness": 0.3 } }
   ]
 }
 ```
 
-**Causa/consequência:** passar a dados obriga a que o `index.html` deixe de ter entidades
-escritas à mão (Fase 3) e que o editor saiba escrever este formato. O ganho é que criar uma
-dimensão deixa de ser "copiar 6 blocos de HTML e não falhar nenhum atributo".
+**O que o dado não carrega, e porquê:** o campo `url` de uma obra existe **só** para
+`interaction: "link"` (uma ligação externa, que não é um asset); com `interaction: "modal"` o
+endereço **deriva** do catálogo (D20), e o validador recusa os dois campos juntos. O `title` de
+uma obra é opcional: é texto de conteúdo, e quem o lê é o editor (Fase 4).
+
+**Causa/consequência:** passar a dados obrigou a que o `index.html` deixasse de ter entidades (foi
+a Fase 3) e que o editor saiba escrever este formato (é a Fase 4). O ganho: criar uma dimensão
+deixou de ser «copiar 6 blocos de HTML e não falhar nenhum atributo» — é acrescentar uma entrada à
+lista.
 
 **Nota (D10 + D9):** as chaves são em inglês (é código); os **valores** que aparecem ao
 utilizador (títulos de obras, nomes de dimensões) ficam em português. O `"id"` do asset
@@ -903,10 +942,12 @@ continuam abertas: não são desta fase.
 
 ### Fase 3 — A cena vem de dados
 
-**Plano registado em 2026-10-15**, medido ao disco antes de mexer em código. As decisões de
-contrato que a fase exigia estão fechadas: **D20** (o campo único `asset`, §5.3), **D21** (o texto
-por língua, que fecha o **R4**) e **D23** (a versão do formato e o `?scene=`); a **D22** alinhou os
-dois eixos do portal com a Fase 3B. **Nada implementado.**
+**Estado: concluída em 2026-10-15.** O plano foi registado **antes** de mexer em código e é o que
+está abaixo (o corte, os blocos e as metas); as decisões de contrato que a fase exigia foram
+fechadas na mesma altura: **D20** (o campo único `asset`, §5.3), **D21** (o texto por língua, que
+fecha o **R4**, §14) e **D23** (a versão do formato e o `?scene=`); a **D22** alinhou os dois eixos
+do portal com a Fase 3B. O que cada bloco entregou e mediu está na tabela «Feito até agora», no fim
+desta secção.
 
 - **Entregável:** `js/scene/scene-builder.js` + `schema.js` + `validation.js`; o
   `index.html` passa a ter `<a-scene>` sem entidades e a cena é construída de
@@ -977,9 +1018,17 @@ provoca (D10) e cada bloco mede no browser o que fez.
 
 **Feito até agora (2026-10-15):**
 
-| Bloco | O que ficou feito | Medido no browser |
+| Bloco | O que ficou feito | Medido |
 | --- | --- | --- |
 | **B0** | Linha de base re-medida **antes** de mexer em código (as decisões de contrato já estavam fechadas — **D20–D23**, §11) | T1 **8/8** e T7 **8/8** (uma travessia por portal, sem cadeia) · T2 **0** de **84** poses · T3 **0** falhas em **21 758** amostras e **420** controlos (0 falhas), com o buffer a **1921×847** · T4 alfa **255** dentro da janela e **0** fora dela · T5 **0** px de moldura de trás dentro da janela da frente, com **6 767** px de controlo **fora** dela (a medição não é vazia) · T6 abre **só** na dimensão ativa · T8 **0** erros, **0** avisos e **0** pedidos falhados · T9 **1** ouvinte `keydown` na carga e **1** depois de **20** ciclos, com o registo de volta a **8** · `validate.mjs` OK (4 / 10 / 8, **7** janelas) e o conversor regenerado dá **0** diferenças |
+| **B1** | `js/scene/schema.js`: a forma do formato v2 (campos, tipos, enumerações, referências, omissões e o catálogo `assets`), com os limites de id vindos do núcleo. **Puro** | **174** linhas; o `node` importa-o (exit **0**); **0** campos do JSON de hoje por declarar; **0** referências ao DOM, ao A-Frame ou ao `three` |
+| **B2** | `js/scene/validation.js`: a forma (lida do schema) e as leis **L1, L4, L5, L9, L12**, com o relatório a dizer o que não pôde verificar e as medidas da cena | O cenário real em v2: **0** erros, **0** avisos, **7** janelas distintas. **17 de 17** avarias injetadas detetadas (uma por verificação: versão desconhecida, `url` numa obra de modal, id repetida, 256 janelas, campo trocado, texto escrito como string, …) |
+| **B3** | O JSON passa ao formato v2 — catálogo `assets`, `url` do modal derivado, texto por língua, `version: 2` — e o `validate.mjs` passa a correr o módulo partilhado (as contagens no HTML morrem com o v2) | **190** valores comparados campo a campo com o JSON v1: **0** diferenças não previstas (as mudanças são as decididas: versão, +6 caminhos, +4 nomes, −10 urls); os **10** URLs das obras conferidos contra o catálogo; `validate.mjs` OK nos **2** ficheiros (4 / 10 / 8 / 6 assets, 7 janelas) |
+| **B4** | As fábricas nos módulos (`createDimension`/`createArtwork`/`createPortal` + os `remove`) e a moldura do portal como dado (`frameColor`, `frameThickness`) | Criar e destruir 1 dimensão + 2 obras + 1 portal pelo dado: esfera de raio **500** do dado, **3** entradas na dimensão nova, `open-artwork` **só** na obra de modal, portal com **5** filhos no grupo (1 máscara + 4 barras: o `init` correu **uma vez**), moldura **00ff00** de **0,5**; a remover: registo de volta a **8** portais e **[1,2,3]**, **0** sondas na cena, janelas de volta a `[[1,1],[2,2]]`. T2/T3 a passar (0 cortadas, 0 falhas em **21 758**), consola **0/0**, e o conversor regenerado com **0** alterações (os valores da moldura não se moveram) |
+| **B5** | `js/scene/scene-builder.js` e **o corte**: o `index.html` perde as entidades (**240 → 82** linhas, saem **164**) e o script inline; o `app.js` carrega → valida → constrói → arranca o driver; `?scene=example` carrega o fixture; o `camera.js` passa a ter o elemento e ganha o `startSession` | A cena toda vinda do dado: T1 **8/8**, T7 **8/8**, T2 **0** de **84**, T3 **0** falhas em **21 752** amostras e **420** controlos, T4 **255** dentro / **0** fora, T5 **0** px dentro da janela da frente com **6 768** px de controlo fora, T6 abre só na ativa, T8 **0/0/0**, T9 **20** ciclos pelos módulos com **1** ouvinte `keydown` antes e **1** depois (**10 → 10** ouvintes no `document`), D-pad **4,2 m** em 250 ms com a velocidade vinda do dado. `?scene=example` dá a mesma cena. **M1** nenhuma marca de entidade no HTML · **M2** **82** linhas · **M3** só o `scene-builder` conhece o DOM/A-Frame · **M4** o núcleo continua a importar só a si |
+| **B6** | As ferramentas com o nome do que são: `tools/scene/` (validador) e `tools/migration/` (conversor, o registo da migração), e a **guarda** do conversor | Sem entidades no HTML o conversor **recusa** (exit **1**) e não escreve (`data/` intacto). Com o HTML de B4 (8 portais, 10 obras) a guarda **abre** e o conversor escreve o **mesmo** JSON v2: **0** alterações em `data/` — a mesma prova de fidelidade, repetida a partir de uma revisão do git |
+| **B7** | Verificação final da fase, de ponta a ponta, numa sessão limpa | T1 **8/8**, T7 **8/8**, T2 **0** de **84** poses, T3 **0** falhas em **21 752** amostras e **420** controlos (0), T4 **255/0**, T5 **0** dentro com **6 768** de controlo fora, T6 só na dimensão ativa, T8 **0** erros, **0** avisos e **0** pedidos falhados, T9 **20** ciclos com **1** ouvinte `keydown` (**10 → 10** no `document`), D-pad **4,2 m** em 250 ms, e `?scene=example` com os mesmos números |
+| **B8** | Documentação: README (§Estrutura, §Estado atual, §Cena atual, §Personalizar Conteúdo, §Como Usar, §Melhorias) e roadmap (§2.1, §5.2–5.4, §6, §9, §13) | — |
 
 **Duas armadilhas de medição, encontradas no B0** (valem para o B7):
 
@@ -1666,19 +1715,36 @@ portais de volta a **8** e nada deixado na cena. O conversor, regenerado, dá **
 (B0–B7, com o item A que cada um fecha), as **metas de sucesso** (o comportamento de §10 e dez
 metas de arquitetura, M1–M10) e a tabela do que cada bloco entregou.
 
-## Próximo passo: Fase 3 (a cena vem de dados)
+### Fase 3 — concluída em 2026-10-15 (a cena vem de dados)
 
-`js/scene/scene-builder.js` + `schema.js` + `validation.js`, com o `index.html` a passar a ter
-uma `<a-scene>` sem entidades e a cena a ser construída de `data/scene.json` (e
-`data/scene-example.json` como fixture). É a fase que fecha o **A6** (o campo único `asset`) e a
-**R4** (§14): as duas são decisões de contrato do formato dos dados, e tomá-las antes da fase que
-lê os dados é o que evita pagá-las duas vezes.
+A cena deixou de estar escrita à mão no `index.html` (**240 → 82 linhas**) e passa a ser construída
+de **`data/scene.json`**, no formato **v2**: o catálogo de assets da **D20**, o texto por língua da
+**D21** e a versão da **D23** (o detalhe está na tabela da §11). O `js/scene/` tem os três
+ficheiros que a fase prometia — `schema.js` (a forma), `validation.js` (a forma e as leis **L1,
+L4, L5, L9, L12**, com 17 de 17 avarias injetadas detetadas) e `scene-builder.js` (o único que
+conhece o A-Frame) — e o **A6** e o **R4** fecharam **no dado**, com a prova da migração:
+**190 valores comparados com o JSON antigo, 0 diferenças não previstas**.
 
-**O plano da fase está em §9** — medido ao disco a 2026-10-15: o corte do `index.html` linha a
-linha, os **9 blocos** (B0–B8), as metas de comportamento (os números de §10, que não podem
-mexer) e as **8** metas de arquitetura (M1–M8). As decisões de contrato estão fechadas no mesmo
-dia — **D20** (o catálogo de assets), **D21** (o texto por língua), **D22** (os dois eixos do
-portal ficam na 3B) e **D23** (`version: 2` e o `?scene=`).
+Duas coisas ficaram melhores do que a fase prometia: o **conversor da Fase 0 deixa de poder
+correr** (guarda, `tools/migration/`: sem entidades no HTML recusa-se e não escreve — antes,
+correr-lo escrevia uma cena vazia por cima da boa) e o **validador passou a ser um só módulo**,
+importado pelo browser, pela linha de comando (`tools/scene/`) e, na Fase 4, pelo editor.
+
+Os nove testes de §10 continuam com os mesmos números, medidos no B7 de ponta a ponta (§9), e as
+metas de arquitetura M1–M4 fecharam: nenhuma marca de entidade no `index.html`, 82 linhas, o
+`AFRAME` só no construtor e o núcleo a importar só a si próprio.
+
+**O que a fase não fez, de propósito:** os dois eixos do portal (ficam na 3B, **D22**), a interface
+a ler o catálogo `i18n` (**R3**, Fase 4), o editor — que traz o `update`/`list` das fábricas — e os
+mundos.
+
+## Próximo passo: Fase 3B (mundos e portas de mundo)
+
+A **D14** (§11) está decidida desde 2026-10-13 e o que ela obriga está em §9: uma pasta por mundo
+com o seu arranque, `data/worlds/` com um ficheiro por mundo, o portal com os **dois eixos**
+(`window`/`action`, com as tabelas `WINDOW_KINDS`/`ACTION_KINDS` no módulo), a chegada com o
+`?from`, e as leis **L11–L18** a entrarem no validador. Agora que a cena vem de dados, criar um
+mundo é escrever um ficheiro — era exactamente o que faltava para a fase valer a pena.
 
 ---
 
@@ -1716,4 +1782,4 @@ só chega à interface na **Fase 4**, e é o editor o primeiro sítio que o lê.
 | # | Pendência | Porque fica | O que a fecha |
 | --- | --- | --- | --- |
 | R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`) e o §13 diz «as 6 chaves»; as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Acertar a contagem no §13 e juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` |
-| R4 | **O texto de conteúdo por língua nunca chegou aos dados** | O entregável 4 da Fase 0 diz que `data/scene-example.json` inclui «o formato do texto de conteúdo por língua» e a D12-A diz `title: { "pt": …, "en": … }` — mas `data/scene.json` tem `dimensions: {id, kind}` e `artworks: {id, dimension, kind, asset, position, rotation, size, interaction, url}`, sem nenhum campo por língua, e nem o `convert.mjs` nem o `validate.mjs` mencionam idioma. A cena atual não tem texto (as dimensões não têm nome e as obras não têm título), logo o formato está **documentado** (§5.7 e §6) mas não **instanciado** | Levar os campos por língua ao esquema, ao conversor e ao validador — é decisão de contrato, a tomar antes da Fase 3, a fase em que a cena passa a vir dos dados |
+| R4 | **Feita em 2026-10-15** (decisão **D21**, §11) | O formato por língua estava documentado (§5.7 e §6) e **não instanciado**: as dimensões não tinham nome, as obras não tinham título e nenhum campo do JSON era por língua — nem o conversor nem o validador mencionavam idioma | O `{ pt, en }` entrou no esquema, no conversor e no validador e ficou **instanciado**: 4 nomes de dimensão e 6 descrições de asset (B3, §9). As **10 obras** ficam sem `title` — é opcional, e quem o lê é o editor (Fase 4) |

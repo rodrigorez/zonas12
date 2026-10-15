@@ -8,14 +8,18 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 
 ````markdown
 zonas12/
-├── index.html          ponto de entrada: a cena A-Frame
+├── index.html          ponto de entrada: a página (a cena vem de data/scene.json)
 ├── README.md           documentação principal (fica sempre na raiz)
 ├── css/
 │   └── style.css       estilos da página, HUD, modal e D-pad
 ├── js/
-│   ├── app.js          arranque: configuração do renderer, atalhos e ponte da interface
+│   ├── app.js          arranque: carrega e valida a cena, constrói, e a ponte da interface
 │   ├── core/           núcleo: estado, registos, stencil, eventos, limites
-│   └── modules/        dimensão, obra, portal e câmara (Fase 2)
+│   ├── modules/        dimensão, obra, portal e câmara (Fase 2), com as fábricas da Fase 3
+│   └── scene/          a cena em dados: schema, validação e construtor (Fase 3)
+├── data/
+│   ├── scene.json          a exposição, no formato v2
+│   └── scene-example.json  a mesma cena, como fixture (?scene=example)
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos + página de edição)
 ├── assets/
@@ -151,42 +155,53 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.4)
+## Estado atual do código (depois da Fase 3)
 
-Marcado pela branch `v0.0.4` e **publicado** em <https://rodrigorez.github.io/zonas12/> (o GitHub
-Pages serve o `main`). É o estado depois da **Fase 2** do roadmap (os 4 módulos), testado pelo
-autor em 2026-10-15 — local e no endereço publicado. A versão anterior é a `v0.0.3`, marcada pela
-branch com o mesmo nome. Resumo do que existe hoje: `index.html` (240 linhas),
-`js/app.js` (**78 linhas**), `js/core/` (7 ficheiros, 207 linhas), `js/modules/`
-(**4 ficheiros**, 608 linhas), `css/style.css` (96 linhas), `assets/images/`,
-`data/scene.json`, `i18n/pt.json` e as ferramentas em `tools/`.
+O que está **publicado** é a `v0.0.4` — o estado depois da Fase 2, marcado pela branch com o mesmo
+nome e testado pelo autor em 2026-10-15. Este código é o estado **depois da Fase 3** (a cena vem
+de dados), ainda por marcar e publicar. Resumo do que existe hoje: `index.html` (**82 linhas**),
+`js/app.js` (**117**), `js/core/` (7 ficheiros, **207**), `js/modules/` (4 ficheiros, **825**),
+`js/scene/` (**3 ficheiros**, 628), `css/style.css` (96), `data/scene.json` (a cena, **594
+linhas**), `data/scene-example.json` (o fixture), `i18n/pt.json` e as ferramentas em `tools/`.
 
 O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
 regras de stencil — a única parte global, porque o stencil é um recurso de toda a cena.
-Os **4 módulos** (Fase 2) vivem em `js/modules/`, e o `js/app.js` ficou só com o arranque
-(a configuração do renderer, os atalhos de teclado, o arranque do driver de frame e a
-ponte temporária para a interface):
+Os **4 módulos** (Fase 2) vivem em `js/modules/`, e o `js/app.js` ficou com o arranque
+(carrega e valida a cena, constrói, arranca o driver, e a ponte temporária para a interface):
 
 | Módulo | O que governa | Entrada |
 | --- | --- | --- |
-| `camera.js` | A câmara-jogador (posição, D-pad, limites) e o erro de câmara; é o **único** ficheiro que sabe encontrar o `a-camera` | `playerCamera`, `setupMobileControls`, `reportCameraError` |
-| `artwork.js` | A obra: o material dimensional, o clique e o modal (foco preso, `inert`, Escape) | componentes `dimensional-material` e `open-artwork`; `closeArtwork` |
-| `dimension.js` | O fundo 360º de uma dimensão (imagem ou vídeo) | componente `dimension-panorama` |
-| `portal.js` | A porta: janela (máscara), moldura, caixa de colisão, travessia e caixa de debug — e o **driver de frame** da cena | componentes `stencil-portal` e `portal-driver`; `startFrameDriver` |
+| `camera.js` | A câmara-jogador (posição, D-pad, limites) e o erro de câmara; é o **único** ficheiro que sabe onde a câmara está — desde a Fase 3 recebe-a do construtor de cena, em vez de a procurar pelo nome | `playerCamera`, `createPlayerCamera`, `startSession`, `setupMobileControls`, `reportCameraError` |
+| `artwork.js` | A obra: o material dimensional, o clique e o modal (foco preso, `inert`, Escape) | componentes `dimensional-material` e `open-artwork`; `createArtwork`/`removeArtwork`; `closeArtwork` |
+| `dimension.js` | O fundo 360º de uma dimensão (imagem ou vídeo) | componente `dimension-panorama`; `createDimension`/`removeDimension` |
+| `portal.js` | A porta: janela (máscara), moldura, caixa de colisão, travessia e caixa de debug — e o **driver de frame** da cena | componentes `stencil-portal` e `portal-driver`; `createPortal`/`removePortal`; `startFrameDriver` |
 
 Cada módulo tem o seu `remove()`, para que criar e destruir conteúdo em ciclo (o que o
-editor vai fazer) não deixe registos mortos nem memória agarrada.
+editor vai fazer) não deixe registos mortos nem memória agarrada — e desde a Fase 3 cada
+módulo tem também a sua **fábrica**, que constrói uma entidade a partir do dado.
+
+O **`js/scene/`** é onde a cena em dados vive, e tem só três ficheiros:
+
+| Ficheiro | O que é |
+| --- | --- |
+| `schema.js` | A **forma do formato**: campos, tipos, enumerações, omissões e o catálogo de assets. Puro — não conhece o DOM nem o A-Frame |
+| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9 e L12. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor vai reutilizar |
+| `scene-builder.js` | O **único** dos três que conhece o A-Frame: cria o `<a-assets>` (e **espera** que os ficheiros carreguem), a câmara, as dimensões, as obras e os portais, a partir do JSON |
+
+A cena está em **`data/scene.json`** (formato **v2**, descrito no roadmap §6): um catálogo
+`assets` onde cada caminho aparece **uma vez**, as dimensões e as obras a apontarem para ele pelo
+nome, e o texto de conteúdo por língua. `?scene=example` carrega o `data/scene-example.json`.
 
 ### O que está implementado
 
 | Área | Estado |
 | --- | --- |
-| Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID aparece nos atributos, em `data-dimension`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
+| Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID está no dado (`"id"`) e, na cena construída, em `data-dimension`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
 | Grafo de dimensões | Portais bidirecionais entre duas dimensões, com uma **dimensão ativa** global; a cena tem 4 dimensões e 8 portais |
 | Travessia | Por **colisão com a caixa** do portal (`box`, `boxPosition`, `boxRotation`), no plano do quadro ou na face da caixa (`trigger`) — nunca por distância |
 | Janelas | Uma por portal, com valor de stencil por **dimensão mostrada** (não por portal); portais que mostram o mesmo destino partilham o valor |
 | Fundo 360º | `dimension-panorama` por dimensão (imagem ou vídeo), segue a câmara; a dimensão 0 é a câmara real (canvas transparente) |
-| Conteúdo | As obras pertencem à dimensão (`dimensional-material="dimension: N"`); o clique só abre na dimensão ativa |
+| Conteúdo | As obras pertencem à dimensão (o campo `dimension` de cada obra, no JSON); o clique só abre na dimensão ativa |
 | Molduras | Barra vermelha à volta do quadro, pertencente à dimensão onde o portal está; o bordo mantém-se fechado mesmo quando cruza a janela de outro portal |
 | Modo debug | Tecla `D` mostra a caixa de colisão (sempre igual à usada na deteção); tecla `R` roda o portal |
 
@@ -206,21 +221,29 @@ editor vai fazer) não deixe registos mortos nem memória agarrada.
    `depthTest: false` (o mundo do outro lado da janela não conta com a profundidade dela).
 6. Uma dimensão **sem janela** usa `Never` e não se desenha.
 7. O raio do panorama de uma dimensão tem de ser maior do que a distância a qualquer
-   portal (`radius: 500` no `index.html`).
+   portal (`radius: 500` em `data/scene.json`); sem isso o fundo aparece dentro da janela.
 
 ### Verificado nesta versão (medido no browser)
 
+Medido a 2026-10-15, com a cena **construída de dados** — é a verificação final da Fase 3 (o B7 de
+§9 do roadmap):
+
 - **8/8** travessias — medidas a andar, passo de 0,1 m: cada portal faz **uma só** travessia, para
   a dimensão certa, sem ping-pong (cobre o T1 e o T7)
-- Moldura: **0** poses com o bordo cortado (de **84**) e **0** falhas no contorno (**15 708**
+- Moldura: **0** poses com o bordo cortado (de **84**) e **0** falhas no contorno (**21 752**
   amostras, 420 controlos) — pela varredura automática (`tools/regression/pose-sweep.mjs`);
   antes da correção do stencil eram 110 poses cortadas em 360. O número de amostras varia com o
   tamanho da janela; as falhas é que têm de ser zero
-- **1** ouvinte de `keydown` na cena, na carga **e** depois de criar e destruir **20** portais
-  em ciclo, com o registo a voltar às **8** portas e nada deixado na cena (T9)
-- 0 px de moldura dentro da própria janela; moldura de trás escondida pela janela da frente
-- Clique na obra abre só na dimensão ativa
-- Consola sem erros nem avisos
+- **1** ouvinte de `keydown` na cena, na carga **e** depois de criar e destruir **20** portais em
+  ciclo (pelas fábricas dos módulos), com o registo a voltar às **8** portas e **10** ouvintes no
+  `document` antes e **10** depois (T9)
+- Janela do hub: alfa **255** dentro e **0** fora dela (T4) · **0** px de moldura de trás dentro da
+  janela da frente, com **6 768** px de controlo **fora** dela (T5, medido por diferença e com
+  margem — é o controlo que prova que a medição não é vazia)
+- Clique na obra abre só na dimensão ativa (T6)
+- O D-pad anda **4,2 m** em 250 ms, com a velocidade vinda do dado (`cameras.player.speed`)
+- Consola sem erros, sem avisos e sem pedidos falhados (T8)
+- `?scene=example` carrega o fixture e dá a mesma cena e os mesmos números
 
 ### Limitações e decisões assumidas
 
@@ -265,8 +288,8 @@ cada um com o seu **ID próprio**, e esse ID aparece em tudo o que lhe pertence:
 
 | Objeto | IDs | Onde aparece o ID |
 | --- | --- | --- |
-| **Dimensão** | `0..511` | `dimension-panorama="dimension: 7"`, `dimensional-material="dimension: 7"`, `data-dimension`, classe `dimension-7`, nome dos objetos 3D (`dimension-7-panorama`, `dimension-7-artwork`) |
-| **Portal** | `0..511` | `stencil-portal="id: 3; ..."`, `data-portal-id`, classe `portal-3`, nome dos objetos 3D (`portal-3-mask`, `portal-3-frame-0`, `portal-3-debug-box`) |
+| **Dimensão** | `0..511` | No dado (`"id": 7`) e, na cena construída, em `dimension: 7` (componente), `data-dimension`, classe `dimension-7` e nome dos objetos 3D (`dimension-7-panorama`, `dimension-7-artwork`) |
+| **Portal** | `0..511` | No dado (`"id": 3`) e, na cena construída, em `id: 3` (componente), `data-portal-id`, classe `portal-3` e nome dos objetos 3D (`portal-3-mask`, `portal-3-frame-0`, `portal-3-debug-box`) |
 
 **Cada portal é um módulo independente**: tem as suas duas dimensões, a sua caixa de
 colisão, o seu `trigger`, a sua caixa de debug e a sua geometria. Não partilha estado
@@ -313,19 +336,29 @@ dimensão.
 
 Exemplo — uma central (0) com dois destinos, e conteúdo nas dimensões:
 
-```html
-<a-entity dimension-panorama="dimension: 1; src: #cidade-360"></a-entity>
-<a-entity dimension-panorama="dimension: 2; src: #praia"></a-entity>
-
-<a-entity position="-10 0 -12" stencil-portal="id: 0; dimensionA: 0; dimensionB: 1"></a-entity>
-<a-entity position=" 10 0 -12" stencil-portal="id: 1; dimensionA: 0; dimensionB: 2"></a-entity>
-
-<a-box position="0 1.5 -30" dimensional-material="dimension: 1" open-artwork="url: assets/images/praia.jpg"></a-box>
+```json
+{
+  "dimensions": [
+    { "id": 1, "kind": "image", "asset": "cidade-360", "radius": 500 },
+    { "id": 2, "kind": "image", "asset": "praia", "radius": 500 }
+  ],
+  "portals": [
+    { "id": 0, "dimensionA": 0, "dimensionB": 1, "ownedBy": 0, "position": [-10, 0, -12] },
+    { "id": 1, "dimensionA": 0, "dimensionB": 2, "ownedBy": 0, "position": [10, 0, -12] }
+  ],
+  "artworks": [
+    { "id": 0, "dimension": 1, "kind": "image", "asset": "praia",
+      "position": [0, 1.5, -30], "size": [4, 3, 0.1], "interaction": "modal" }
+  ]
+}
 ```
 
-#### Cena atual (`index.html`)
+Os outros campos (`width`, `height`, `box`, `boxPosition`, `trigger`, `frame`) têm omissões — o
+roadmap §6 tem o formato completo e `js/scene/schema.js` é a descrição que manda.
 
-O `index.html` monta **4 dimensões**. As dimensões 0, 1 e 2 formam um grafo completo (2
+#### Cena atual (`data/scene.json`)
+
+O `data/scene.json` monta **4 dimensões**. As dimensões 0, 1 e 2 formam um grafo completo (2
 portais cada uma, um para cada uma das outras); a **dimensão 2 tem 3 portais** — dois para
 a dimensão 1 e um para a dimensão 3 — e a dimensão 3 volta à 2.
 
@@ -360,16 +393,22 @@ caia dentro da caixa de outro portal — sem isso haveria trocas em cadeia ao ch
 
 #### Atributos do portal
 
-| Atributo | Significado | Omissão |
+Estes são os **campos do dado** (`portals[]` em `data/scene.json`) e as suas omissões — que são,
+ao mesmo tempo, as do componente (`js/modules/portal.js`); o conversor lê as do componente e
+escreve-as no JSON, que é o que impede os dois de divergirem:
+
+| Campo | Significado | Omissão |
 | --- | --- | --- |
-| `id` | ID do portal | `0` |
-| `dimensionA`, `dimensionB` | As duas dimensões que a porta liga | `0` e `1` |
-| `ownedBy` | Dimensão onde a porta fica (`-1` = qualquer das duas) | `-1` |
-| `width`, `height` | Tamanho do quadro | `12`, `16` |
-| `box` | Tamanho X, Y, Z da caixa de colisão | `12 16 1` |
+| `id` | ID do portal | (obrigatório) |
+| `dimensionA`, `dimensionB` | As duas dimensões que a porta liga | (obrigatórios) |
+| `ownedBy` | Dimensão onde a porta fica (`-1` = qualquer das duas) | (obrigatório) |
+| `width`, `height` | Tamanho do quadro | (obrigatórios) |
+| `box` | Tamanho X, Y, Z da caixa de colisão | (obrigatório) |
 | `boxPosition` | Centro da caixa (espaço do portal) | `0 8 0` |
 | `boxRotation` | Rotação da caixa, em graus | `0 0 0` |
 | `trigger` | Onde a travessia dispara: `plane` (plano do quadro) ou `box` (face de entrada) | `plane` |
+| `frame` | `color` e `thickness` da moldura | `#ff0000`, `0.3` |
+| `position`, `rotation` | Onde a porta está e para onde olha | `0 0 0` |
 
 A caixa é a **única** fonte da sua geometria: a caixa de debug usa exatamente os mesmos
 valores (`box`, `boxPosition`, `boxRotation`), pelo que nunca pode divergir.
@@ -381,10 +420,11 @@ nota. Com `trigger: box` fica-se ~0,55 m com a dimensão errada durante a traves
 
 #### Conteúdo: pertence à dimensão, não ao portal
 
-- `dimension-panorama="dimension: 7; src: #imagem"` — o fundo 360º da dimensão 7. O `src`
-  aceita imagem **ou vídeo**; um vídeo é usado como `THREE.VideoTexture`, por isso anima
-  (por exemplo a imagem da câmara: `src: #webcam-video`).
-- `dimensional-material="dimension: 7"` — uma obra que pertence à dimensão 7.
+- Uma **dimensão** tem o seu fundo 360º: `kind` (`image`, `video`, `color` ou `camera`), `asset` (o
+  nome no catálogo) e `radius`. O fundo de `kind: "video"` anima (`THREE.VideoTexture`), e
+  `kind: "camera"` não tem entidade nenhuma: é a imagem real da câmara.
+- Uma **obra** pertence a uma dimensão pelo campo `dimension` — é ela que decide o clique, e o
+  `js/modules/artwork.js` é quem o consulta.
 
 Assim, várias portas que mostram a mesma dimensão mostram **o mesmo mundo** (mesmo
 panorama, mesmas obras).
@@ -439,7 +479,7 @@ panorama, mesmas obras).
     máscara não conta para ele).
   - **dimensão sem janela**: `Never`, não desenha.
 - **O raio do panorama de uma dimensão tem de ser maior do que a distância a qualquer
-  portal** (`radius: 500` no `index.html`): o fundo da dimensão ativa tem de estar sempre
+  portal** (`radius: 500` em `data/scene.json`): o fundo da dimensão ativa tem de estar sempre
   atrás do plano das janelas, senão apareceria dentro delas.
 - `portal-driver` (no módulo do portal, ligado à cena no arranque) é o único que decide:
   percorre os portais a cada frame, cada um deteta a sua própria travessia e o núcleo
@@ -455,8 +495,8 @@ for a **dimensão ativa**: vê-la pela janela não conta.
 
 - **Grafo de Dimensões**: portais bidirecionais entre duas dimensões (qualquer par), com
   uma dimensão ativa global — permite a central que dá acesso a todas
-- **IDs em Tudo**: cada dimensão e cada portal tem um ID que aparece nos atributos,
-  classes, `data-*` e nomes dos objetos 3D
+- **IDs em Tudo**: cada dimensão e cada portal tem um ID — no dado e, na cena construída, nos
+  atributos, classes, `data-*` e nomes dos objetos 3D
 - **Tracejo por Colisão com a Caixa**: sem debounce, sem cooldown e sem distância;
   calculada no espaço do portal, por isso funciona com portais deslocados, rodados e em
   movimento, e com muitos portais ao mesmo tempo
@@ -549,8 +589,11 @@ Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caix
 ### 2. Personalizar Conteúdo
 
 - Modifique as imagens e vídeos na pasta `assets/`
-- Atualize as referências nos arquivos HTML
-- Adicione novas "obras" utilizando componentes A-Frame
+- Atualize os caminhos no **catálogo `assets`** de `data/scene.json` — cada caminho aparece lá
+  **uma vez**, e as dimensões e as obras apontam para ele pelo nome (D20)
+- Acrescente dimensões, obras e portais às listas do mesmo ficheiro (o roadmap §6 tem o formato, e
+  `js/scene/schema.js` é a descrição que manda)
+- Valide antes de publicar: `node tools/scene/validate.mjs`
 
 ### 3. Correr a varredura de regressão (T2 e T3)
 
@@ -573,10 +616,12 @@ Para confirmar que o instrumento consegue mesmo falhar, há duas avarias injetad
 
 ## Melhorias Planejadas
 
+- **A página de edição** (Fase 4 do roadmap): inserir, alterar e excluir por módulo, com validação,
+  pré-visualização e importar/exportar — usando os **mesmos** módulos e o mesmo esquema
+- **Mundos com endereço próprio e portas de mundo** (Fase 3B): um ficheiro por sala, e a porta de
+  mundo a navegar com um retrato do destino
 - Portais com movimento e rotação animados, definidos na cena
 - Mais conteúdo por dimensão (vídeo 360º como fundo, por exemplo)
-- Um gestor de portais que crie as janelas a partir de uma descrição da cena (uma lista de
-  dimensões e portais), em vez de entidades escritas à mão no `index.html`
 - Automatizar as restantes medições de §10 do roadmap — a moldura (T2 e T3) já é automática
   (`tools/regression/pose-sweep.mjs`); as travessias (T1, T7), o clique (T6) e as janelas
   (T4, T5) continuam a ser medidos à mão no browser
