@@ -855,10 +855,12 @@ a partir quando o valor seguinte mudar de ficheiro.
 | **B4** | `js/modules/portal.js`; a travessia passou para o portal, o driver de frame para o módulo (**D19**) e o `remove()` ficou completo | 317 → **77**; travessias mudam a dimensão; **R** roda e **D** liga a caixa; **T9 com 20 ciclos**: 1 ouvinte `keydown` antes e 1 depois, registo de volta a 8 |
 | **B5** | `js/app.js` só com o arranque e em inglês (`ar-config`); **B6** verificação final das ferramentas | **78** linhas; os **6** nomes antigos a **0**, o `a-camera` só no módulo da câmara, o núcleo sem conhecer módulos e **3** `remove()` |
 
-Dois números que valem para os quatro blocos: o conversor, regenerado, dá **0 diferenças** no
-`data/scene.json` (a garantia da Fase 0), e a varredura de poses dá **T2** e **T3** a passar —
-**0** de **84** poses com bordo cortado e **0** falhas em **15 712** amostras (o número de
-amostras varia com o tamanho da janela; o que não varia são as falhas, que são zero).
+Três números que valem para toda a fase: o conversor, regenerado, dá **0 diferenças** no
+`data/scene.json` (a garantia da Fase 0); a varredura de poses dá **T2** e **T3** a passar —
+**0** de **84** poses com bordo cortado e **0** falhas em **15 708** amostras (o número de
+amostras varia com o tamanho da janela; o que não varia são as falhas, que são zero); e o **T1**
+foi medido a andar, passo de 0,1 m, pelos **8** portais: **8/8** com **uma só** travessia cada e
+sem ping-pong — que é também o **T7**.
 
 #### Metas de sucesso
 

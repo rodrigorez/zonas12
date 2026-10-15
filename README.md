@@ -207,7 +207,8 @@ editor vai fazer) não deixe registos mortos nem memória agarrada.
 
 ### Verificado nesta versão (medido no browser)
 
-- **8/8** travessias da cena atual, sem trocas em cadeia ao chegar
+- **8/8** travessias — medidas a andar, passo de 0,1 m: cada portal faz **uma só** travessia, para
+  a dimensão certa, sem ping-pong (cobre o T1 e o T7)
 - Moldura: **0** poses com o bordo cortado (de **84**) e **0** falhas no contorno (**15 708**
   amostras, 420 controlos) — pela varredura automática (`tools/regression/pose-sweep.mjs`);
   antes da correção do stencil eram 110 poses cortadas em 360. O número de amostras varia com o
