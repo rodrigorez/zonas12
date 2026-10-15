@@ -28,10 +28,10 @@ const contar = (regexp) => (html.match(regexp) || []).length;
 // ---------------------------------------------------------------- contagens
 
 // 1 obra = 1 elemento com dimensional-material; 1 portal = 1 componente; 1 dimensao com
-// fundo = 1 entidade panorama-dimensao.
+// fundo = 1 entidade dimension-panorama.
 const nObras = contar(/dimensional-material="/g);
 const nPortais = contar(/portal-estencil-dinamico="/g);
-const nPanoramas = contar(/panorama-dimensao="/g);
+const nPanoramas = contar(/dimension-panorama="/g);
 const nUrls = contar(/open-artwork="/g);
 
 if (nObras !== cena.artworks.length) err(`artworks: HTML has ${nObras}, JSON has ${cena.artworks.length}`);

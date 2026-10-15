@@ -810,21 +810,19 @@ a partir quando o valor seguinte mudar de ficheiro.
 | **B6** | Verificação final das ferramentas e do HTML (cada bloco já leva o seu renomeio — ver acima) | — |
 | **B7** | Documentação: README §*Estado atual do código*, §2.1 e §13 deste roadmap | — |
 
-**Feito até agora (2026-10-15):** **B0** fechada — linha de base estática verde (`validate.mjs`:
-4 dimensões, 10 obras, 8 portais) e as três decisões de §14 fechadas no mesmo dia (**D19**).
-**B1** feito: `js/modules/camera.js` criado; o `app.js` deixou de conhecer o `a-camera` (faltam os
-**2** sítios que são do panorama, em B3, e do portal, em B4) e perdeu 71 linhas (546 → 481).
-Verificado com a cena a correr: cena carregada, **8** portais, **3** panoramas e a consola sem
-erros; o erro de câmara e o D-pad (4,2 m em 250 ms, o passo de 0,1 m por frame) testados pela
-ponte da interface, que continua a valer. **B2** feito: `js/modules/artwork.js` criado (obra,
-modal, `cursor-listener`), o núcleo ganhou `unregisterContent()` e o `app.js` perdeu o modal e
-mais dois componentes (481 → 371 linhas). A metade da **A4** que é das obras está fechada: das
-**10** obras, tirar 2 da dimensão 3 deixou o registo dessa dimensão em **1** entrada (o panorama,
-cujo `remove()` é a B3). O `data-dimension`, a classe `dimension-N` e o nome
-`dimension-N-artwork` substituíram os nomes em português; o modal abre só na dimensão ativa e
-fecha pela ponte. E o conversor, depois de regenerado, dá **0 diferenças** no `data/scene.json`
-(161 campos), com o T2 e o T3 pela varredura: **0** de **84** poses com bordo cortado e **0**
-falhas em **15 712** amostras.
+**Feito até agora (2026-10-15):**
+
+| Bloco | O que ficou feito | Medido no browser |
+| --- | --- | --- |
+| **B0** | Linha de base estática verde e as três decisões de §14 fechadas (**D19**) | `validate.mjs` OK: 4 dimensões, 10 obras, 8 portais |
+| **B1** | `js/modules/camera.js`; o `app.js` deixou de conhecer o `a-camera` (faltam os 2 sítios de B3/B4) | 546 → **481** linhas; D-pad anda **4,2 m** em 250 ms (o passo de 0,1 m por frame) |
+| **B2** | `js/modules/artwork.js`; o núcleo ganhou `unregisterContent()`; os nomes da obra em inglês | 481 → **371**; tirar as 2 obras da dimensão 3 deixa-a com **1** entrada (o panorama) |
+| **B3** | `js/modules/dimension.js`; o panorama ganhou `remove()` e pede a posição à câmara | 371 → **317**; tirar as 5 obras **e** o panorama da dimensão 1 **apaga a chave**; sobra `[2, 3]` |
+
+Dois números que valem para os quatro blocos: o conversor, regenerado, dá **0 diferenças** no
+`data/scene.json` (a garantia da Fase 0), e a varredura de poses dá **T2** e **T3** a passar —
+**0** de **84** poses com bordo cortado e **0** falhas em **15 712** amostras (o número de
+amostras varia com o tamanho da janela; o que não varia são as falhas, que são zero).
 
 #### Metas de sucesso
 

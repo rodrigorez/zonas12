@@ -16,6 +16,7 @@ import {
 } from './core/index.js';
 import { setupMobileControls, reportCameraError } from './modules/camera.js';
 import { closeArtwork } from './modules/artwork.js';
+import './modules/dimension.js';
 
 // --- DEBUG AND TEST HANDLE ---
 // The console and the regression scripts (docs/ROADMAP.md section 10) drive the scene
@@ -73,61 +74,6 @@ AFRAME.registerComponent('config-ar', {
     renderer.sortObjects = true;
     // O stencil é limpo a 0 em cada frame; 0 significa "nenhuma janela aqui".
     renderer.autoClearStencil = true;
-  }
-});
-
-// --- PANORAMA 360º DE UMA DIMENSÃO ---
-AFRAME.registerComponent('panorama-dimensao', {
-  schema: {
-    dimensao: { type: 'int', default: 0 },
-    src: { type: 'selector' },
-    raio: { default: 100 },
-    seguirCamera: { type: 'boolean', default: true }
-  },
-  // O A-Frame chama `update` logo após o `init` (e sempre que o atributo muda),
-  // por isso criar aqui evita construir a esfera duas vezes.
-  update: function () { this.criar(); },
-  criar: function () {
-    let fonte = this.data.src;
-    if (!fonte) return;
-    this.el.setAttribute('data-dimensao', this.data.dimensao);
-    this.el.classList.add('dimensao-' + this.data.dimensao);
-
-    let antigo = this.el.getObject3D('panorama');
-    if (antigo) { this.el.removeObject3D('panorama'); antigo.geometry.dispose(); }
-
-    // Vídeo (por exemplo a webcam) tem de usar VideoTexture: uma Texture simples
-    // ficaria com o primeiro frame congelado.
-    let ehVideo = fonte.tagName === 'VIDEO';
-    let textura = ehVideo ? new THREE.VideoTexture(fonte) : new THREE.Texture(fonte);
-    textura.minFilter = THREE.LinearFilter;
-    textura.generateMipmaps = false;
-    if (ehVideo) {
-      if (fonte.readyState >= 2) textura.needsUpdate = true;
-      else fonte.addEventListener('loadeddata', () => { textura.needsUpdate = true; });
-    } else if (fonte.complete) {
-      textura.needsUpdate = true;
-    } else {
-      fonte.onload = () => { textura.needsUpdate = true; };
-    }
-
-    let ordem = state.drawOrder;
-    this.material = new THREE.MeshBasicMaterial({
-      map: textura, side: THREE.BackSide, depthWrite: false,
-      stencilWrite: true, stencilWriteMask: 0xFF, stencilFuncMask: 0xFF
-    });
-    let esfera = new THREE.Mesh(new THREE.SphereGeometry(this.data.raio, 64, 64), this.material);
-    esfera.name = 'dimensao-' + this.data.dimensao + '-panorama';
-    esfera.renderOrder = ordem.panorama;
-    esfera.frustumCulled = false;
-    this.el.setObject3D('panorama', esfera);
-    registerContent(this.data.dimensao, esfera, 'panorama');
-  },
-  tick: function () {
-    let esfera = this.el.getObject3D('panorama');
-    if (!esfera || !this.data.seguirCamera) return;
-    let camara = document.querySelector('a-camera');
-    if (camara) esfera.position.copy(camara.object3D.position);
   }
 });
 

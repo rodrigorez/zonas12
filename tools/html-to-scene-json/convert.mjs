@@ -74,7 +74,7 @@ function fromCode(regexp, label) {
 }
 
 // A-Frame attribute list -> { chave: valor }. Usado nos atributos compostos,
-// por exemplo: "dimensao: 1; src: #cidade-360; raio: 500;"
+// por exemplo: "dimension: 1; src: #cidade-360; radius: 500;"
 function componentes(text) {
   const out = {};
   if (!text) return out;
@@ -171,17 +171,17 @@ for (const tag of tags(html)) {
   }
 
   if (tag.startsWith('<a-entity')) {
-    const panorama = attr(tag, 'panorama-dimensao');
+    const panorama = attr(tag, 'dimension-panorama');
     const portal = attr(tag, 'portal-estencil-dinamico');
 
     if (panorama !== null) {
       const c = componentes(panorama);
       const asset = (c.src || '').replace('#', '');
       dimensions.push({
-        id: round(c.dimensao),
+        id: round(c.dimension),
         kind: assetType(asset) || 'image',
         asset,
-        radius: round(c.raio)
+        radius: round(c.radius)
       });
       continue;
     }
