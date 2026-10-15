@@ -809,6 +809,9 @@ existe para resolver. Fica **antes** da Fase 4 para o editor já nascer com sele
 
 ### Fase 6 — Testes e limpeza
 - **Entregável:** os testes de §10 automatizados (o mesmo script que já usamos no browser).
+  **Parcialmente feito em 2026-10-15:** o T2 e o T3 (a moldura) estão automatizados em
+  `tools/regression/pose-sweep.mjs`, com prova de que o instrumento falha quando deve (§10). Ficam
+  por automatizar o T1 e o T7 (travessias), o T6 (clique) e o T4 e o T5 (conteúdo das janelas).
 - **Limpeza de skills — feita em 2026-10-13** (§3, D15). Apagados: o esqueleto Cline (88 pastas,
   0 ficheiros), as 3 falsas "junções" de descoberta e o `__pycache__`. Mantidos de propósito: os
   **5 repos `.git`** dos vendors (**funcionais** — o `sync-all-vendors.ps1` faz `git pull`
@@ -856,6 +859,11 @@ fase se compara.
 | T8 | Consola | 0 erros, 0 avisos, 0 pedidos falhados |
 | — | Conversão HTML→JSON (validação campo a campo) | **161 campos** comparados, **0 diferenças** |
 
+**Nota (2026-10-15).** Os valores de T2 e T3 desta tabela vêm de uma medição **manual**, e a
+mesma medição foi repetida com números diferentes (69, 70 e 236 poses, conforme o documento).
+Desde 2026-10-15 há para eles um instrumento repetível — ver «A varredura de poses (T2 e T3)»
+abaixo.
+
 **Lição de método (Fase 1).** Duas destas medições eram frágeis e foram corrigidas:
 
 - **T4** comparava a **cor exata** de um panorama fotográfico — que muda com o texel
@@ -868,6 +876,50 @@ fase se compara.
 
 Regra para a automação (Fase 6): medir **presença/ausência** ou **diferença entre dois
 estados**, nunca valores absolutos de cor, e dar margem às fronteiras geométricas.
+
+### A varredura de poses (T2 e T3) — automatizada em 2026-10-15
+
+O T2 e o T3 eram os dois únicos testes desta secção **sem instrumento**: foram medidos à mão três
+vezes, com três números diferentes — **69** poses aqui, **70** na verificação da Fase 1 (§9) e
+**236** no `README.md` — e nenhum deles se podia repetir. Passaram a ter um instrumento:
+`tools/regression/pose-sweep.mjs`, que corre na consola do browser. A Fase 6 já definia a
+automação como «o mesmo script que já usamos no browser», e é o que faz sentido num projeto sem
+build e sem dependências (D1).
+
+**Como mede.** Põe a câmara longe da cena (x = 200) e move um portal isolado à frente dela, em
+**84 poses** (4 distâncias × 7 ângulos × 3 alturas). Em cada pose desenha a cena **duas vezes** —
+com as quatro barras da moldura visíveis e escondidas — e a diferença entre os dois renders dá os
+pixéis da própria moldura: **presença, não cor**, como manda a lição de método acima. A linha
+central de cada barra é projetada e amostrada a cada 3 px: uma amostra falha quando a moldura
+está ausente onde teria de estar visível (é o T3). Uma pose falha se tiver ao menos uma amostra
+em falta (é o T2). Pontos dentro da abertura são amostrados como **controlo**: se virem
+diferença, os dois renders diferem por outra razão e o resultado é **inválido** — não é «passa».
+
+**O que mede, hoje** (2026-10-15):
+
+| Medição | Valor |
+| --- | --- |
+| Poses avaliadas | **84 de 84** (0 não avaliáveis) |
+| Poses com bordo cortado (T2) | **0** |
+| Falhas de contorno (T3) | **0** em **11 180** amostras |
+| Controlos | **420**, 0 falhas (método válido) |
+| Duração | ~1,0 s |
+| Efeitos na cena | nenhum: 8 portais, câmara e dimensão repostas, nenhum rig deixado |
+
+**A prova de que o instrumento consegue falhar** (duas avarias injetadas de propósito):
+
+| Avaria | Poses com bordo cortado | Amostras falhadas |
+| --- | --- | --- |
+| `fault: 'bar'` (uma barra nunca desenhada) | **84 de 84** | **3 212** de 11 180, concentradas na barra afetada (`moldura-0`: 3 212 de 3 312) |
+| `fault: 'stencil'` (o defeito da lei L3) | **84 de 84** | **10 072** de 11 180, nas quatro barras |
+
+Nas duas avarias os **controlos continuaram a 0** — o que falhou foi mesmo a moldura.
+
+**Limites do instrumento** (escritos para não serem esquecidos): mede a moldura de um portal
+**isolado**, não as oito da cena — assim não há oclusão legítima a confundir-se com defeito (a
+moldura de trás tapada pela janela da frente é o T5, não uma falha); não mede o **conteúdo** das
+janelas (T4 e T5); e exige um browser com **aceleração de GPU** — em render por software
+(SwiftShader) o `requestAnimationFrame` afoga-se e a varredura não termina.
 
 ---
 
@@ -1333,8 +1385,13 @@ apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» d
 «Correções incluídas» da Fase 2 (§9), e o «Próximo passo» (§13). Passaram a apontar o estado
 real.
 
+**R2 — fechado em 2026-10-15.** O T2 e o T3 não tinham instrumento, e a mesma medição andava por
+três números (69, 70 e 236 poses, conforme o documento). Passaram a ter uma varredura automática
+e repetível — `tools/regression/pose-sweep.mjs`, descrita em §10 — com **0** poses com bordo
+cortado e **0** falhas em 11 180 amostras, e com duas avarias injetadas que provam que o
+instrumento **falha quando deve** (3 212 e 10 072 amostras em falta, nas duas).
+
 | # | Pendência | Porque fica | O que a fecha |
 | --- | --- | --- | --- |
-| R2 | **T2 e T3 não têm forma de ser repetidos** | São os dois únicos testes de §10 sem instrumento: a verificação da Fase 1 cita «0 cortes de bordo em **70** poses» e §10 registou «0 poses em **69** testadas» — dois números para a mesma medição, que ninguém consegue reconfirmar | Automatizar a varredura de poses (projetar o retângulo da moldura por pose e medir por alfa/diferença, como o T4 e o T5 passaram a ser medidos) ou mantê-la manual até à Fase 6, que a §10 já prevê para a automação |
 | R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`) e o §13 diz «as 6 chaves»; as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Acertar a contagem no §13 e juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` |
 | R4 | **O texto de conteúdo por língua nunca chegou aos dados** | O entregável 4 da Fase 0 diz que `data/scene-example.json` inclui «o formato do texto de conteúdo por língua» e a D12-A diz `title: { "pt": …, "en": … }` — mas `data/scene.json` tem `dimensions: {id, kind}` e `artworks: {id, dimension, kind, asset, position, rotation, size, interaction, url}`, sem nenhum campo por língua, e nem o `convert.mjs` nem o `validate.mjs` mencionam idioma. A cena atual não tem texto (as dimensões não têm nome e as obras não têm título), logo o formato está **documentado** (§5.7 e §6) mas não **instanciado** | Levar os campos por língua ao esquema, ao conversor e ao validador — é decisão de contrato, a tomar antes da Fase 3, a fase em que a cena passa a vir dos dados |

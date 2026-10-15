@@ -19,6 +19,9 @@ zonas12/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos + página de edição)
 ├── assets/
 │   └── images/         panoramas 360º, fotos e vídeo usados na cena
+├── tools/
+│   ├── html-to-scene-json/  conversor e validador da cena em JSON (Fase 0)
+│   └── regression/          varredura de poses T2/T3 (corre na consola do browser)
 ├── .harness/           fora do repositório (está no .gitignore)
 │   ├── dev/            ferramentas retiradas da raiz (não são precisas para o app)
 │   │   ├── package.json, package-lock.json   dependências npm (A-Frame vem do CDN)
@@ -191,8 +194,9 @@ a única parte global, porque o stencil é um recurso de toda a cena. Os 4 módu
 ### Verificado nesta versão (medido no browser)
 
 - **8/8** travessias da cena atual, sem trocas em cadeia ao chegar
-- **0** poses (de 236) com o bordo da moldura cortado (era 110 antes da correção)
-- Contorno da moldura fecha: 0 falhas de bordo em 8 poses (hub e dimensões 1, 2 e 3)
+- Moldura: **0** poses com o bordo cortado (de **84**) e **0** falhas no contorno (**11 180**
+  amostras) — pela varredura automática (`tools/regression/pose-sweep.mjs`); antes da correção
+  do stencil eram 110 poses cortadas em 360
 - 0 px de moldura dentro da própria janela; moldura de trás escondida pela janela da frente
 - Clique na obra abre só na dimensão ativa
 - Consola sem erros nem avisos
@@ -525,13 +529,34 @@ Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caix
 - Atualize as referências nos arquivos HTML
 - Adicione novas "obras" utilizando componentes A-Frame
 
+### 3. Correr a varredura de regressão (T2 e T3)
+
+Com a cena aberta e carregada, cole na consola do browser:
+
+```js
+(await import('/tools/regression/pose-sweep.mjs')).runPoseSweep()
+```
+
+Passa por **84 poses** em frente de um portal isolado e responde a duas perguntas: alguma pose
+mostra o **bordo da moldura cortado** (T2) e o **contorno da moldura fecha**, amostra a amostra
+(T3)? Cada pose é medida por **diferença** entre dois renders (moldura visível e escondida), e
+pontos dentro da abertura servem de **controlo**: se o controlo acusar diferença, o resultado é
+inválido (avisou que os dois renders diferem por outra razão). Leva cerca de 1 segundo e devolve
+`verdict.T2`, `verdict.T3` e `verdict.method`.
+
+Para confirmar que o instrumento consegue mesmo falhar, há duas avarias injetadas de propósito:
+`runPoseSweep({ fault: 'bar' })` (uma barra da moldura nunca é desenhada) e
+`runPoseSweep({ fault: 'stencil' })` (o defeito da lei L3, a moldura levando teste de stencil).
+
 ## Melhorias Planejadas
 
 - Portais com movimento e rotação animados, definidos na cena
 - Mais conteúdo por dimensão (vídeo 360º como fundo, por exemplo)
 - Um gestor de portais que crie as janelas a partir de uma descrição da cena (uma lista de
   dimensões e portais), em vez de entidades escritas à mão no `index.html`
-- Testes automáticos das travessias e das janelas (o que hoje é medido à mão no browser)
+- Automatizar as restantes medições de §10 do roadmap — a moldura (T2 e T3) já é automática
+  (`tools/regression/pose-sweep.mjs`); as travessias (T1, T7), o clique (T6) e as janelas
+  (T4, T5) continuam a ser medidos à mão no browser
 
 ## Requisitos do Sistema
 
