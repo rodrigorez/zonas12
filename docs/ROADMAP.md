@@ -336,7 +336,8 @@ O único sítio que conhece a cena toda.
 
 - **Estado:** `activeDimension`, registos por tipo (`dimensions`, `artworks`, `portals`,
   `cameras`), `stencilValues` (dimensão → valor), `drawOrder`.
-- **Funções:** `register(kind, item)`, `unregister(kind, item)` (resolve A3/A4),
+- **Funções:** `register(kind, item)`, `unregister(kind, item)` (resolve **A4**; o **A3** ficou
+  resolvido por um só ouvinte de teclado, em `js/app.js` — §2.1),
   `applyStencilState()` (o único sítio que toca em `stencilFunc/ref`, `depthTest/Write` e
   `renderOrder`), `setActiveDimension(id)` (única porta de entrada).
 - **Eventos:** `core:ready`, `dimension:active-changed`, `portal:traversed`,
@@ -661,7 +662,7 @@ O editor deve impedi-las **antes** de exportar.
 | L5 | ≤255 dimensões distintas visíveis ao mesmo tempo | Aviso na consola e janelas sem efeito (o valor de stencil não existe) |
 | L6 | `stencil: true` na cena **e** `sortObjects` ativo no renderer — é ele que faz valer o `renderOrder` | O three **ignora** o `renderOrder` e desenha pela ordem da árvore: tudo o que está organizado por ordem (máscara → panorama → obra → moldura) quebra |
 | L7 | Panorama/obra criados só no `update` (A-Frame chama `init` **e** `update`) | O objeto é criado duas vezes (aconteceu com o panorama) |
-| L8 | Um só `keydown` para toda a cena | Hoje há um por portal: `R` roda todos, `D` liga a debug em todos (A2) |
+| L8 | Um só `keydown` para toda a cena | Com um ouvinte por portal, cada portal criado e destruído deixa um ouvinte morto (A3): acumula e mantém o portal removido vivo. **Fechado em 2026-10-15** — passou a haver um só ouvinte, a iterar o registo (§2.1) |
 | L9 | Todo o `asset` do JSON existe em disco (inclui o retrato de cada porta de mundo) | Imagem que não aparece (proposta pela D7, registada aqui) |
 | L10 | O nome do ficheiro segue `assets/<tipo>/d<N>-<nome>.<ext>` (aviso, não erro) | A pasta deixa de ser pesquisável (proposta pela D7, registada aqui) |
 | L11 | A porta de mundo tem `target` de um mundo que existe | Porta que navega para o vazio |
@@ -675,7 +676,9 @@ O editor deve impedi-las **antes** de exportar.
 
 As leis **L1–L8** vêm de defeitos medidos. As leis **L9–L18** vêm da D14 (planeamento):
 L9 e L10 foram propostas pela D7 e ficam aqui registadas; L11–L18 nascem dos mundos e das
-portas de mundo. **Nenhuma delas está implementada.**
+portas de mundo. **Nenhuma delas está implementada no validador do editor** (Fase 4) — do que
+existe hoje, o `validate.mjs` verifica **L1, L4 e L5** (§13) e a **L8** passou a valer no
+código em 2026-10-15 (§2.1).
 
 A **L6** foi reescrita em 2026-10-14 (**D16**): passou a enunciar o **invariante a validar**, e
 não a ação — medido na fonte do A-Frame 1.8.0, é o framework que fixa `sortObjects = true` na
@@ -726,9 +729,12 @@ correr: os mesmos números da linha de base (8/8 travessias, 0 cortes de bordo e
 poses, alfa 0/255/0 no hub, contribuição da moldura de trás 0 px, clique só na dimensão
 ativa, 0 erros de consola).
 
-**Ficou por fazer (Fase 2), de propósito:** A2/A3 (um único `keydown` para a cena toda, e
-removê-lo no `remove`), A4 (`remove` no panorama e nas obras) e A7 (a travessia passa para
-o portal). São correções de comportamento, e a Fase 1 não muda comportamento.
+**Ficou por fazer (Fase 2), de propósito:** A4 (`remove` no panorama e nas obras) e A7 (a
+travessia passa para o portal). São correções de comportamento, e a Fase 1 não muda
+comportamento. **A2/A3 saíram daqui em 2026-10-15**, fora do plano: foram fechados porque o T9
+(§10) os mede e o comportamento observado não mudou — premir `R` continua a rodar todos os
+portais e `D` continua a ligar/desligar as caixas de todos, que é o que os 8 ouvintes já davam
+(ver §2.1).
 - **Entregável:** `js/core/` com estado, registos, `applyStencilState()`,
   `setActiveDimension()` e eventos. O arranque (`js/app.js`) passa a chamar o núcleo.
 - **D10 aplica-se aqui:** o código que se move é **renomeado ao mover** (glossário da Fase 0)
@@ -742,10 +748,12 @@ o portal). São correções de comportamento, e a Fase 1 não muda comportamento
 ### Fase 2 — Os 4 módulos
 - **Entregável:** `js/modules/dimension.js`, `artwork.js`, `portal.js`, `camera.js`; `js/app.js`
   fica só com o arranque (`config-ar`).
-- **Correções incluídas:** A2/A3 (um único `keydown`), A4 (`remove` em todos os módulos),
-  A5 (câmara centralizada), A7 (travessia no portal, valores no núcleo).
+- **Correções incluídas:** A4 (`remove` em todos os módulos), A5 (câmara centralizada),
+  A7 (travessia no portal, valores no núcleo). (**A2/A3 já fechados em 2026-10-15** — §2.1.)
 - **Verificação:** regressão completa + **teste novo**: criar e destruir 20 portais em
-  ciclo e confirmar que os listeners voltam a 1 e `estado.portais` fica vazio.
+  ciclo e confirmar que os listeners voltam a 1 e `estado.portais` fica vazio. O T9 já foi
+  medido em 2026-10-15 (6 ciclos: **1** ouvinte na carga e **1** no fim, e os portais criados
+  não deixam registo).
 - **Risco:** regressão de render (é a área mais sensível). Mitigação: uma fase só para
   mover código, sem mudar regras.
 
@@ -921,7 +929,7 @@ entrada, com a câmara/AR, e tem uma porta para cada sala. Cada sala tem o seu e
 | **Isolamento garantido por construção** | Cada carregamento traz só o JSON do seu mundo: o outro nunca existe em memória |
 | **O núcleo não muda** | O singleton de `state` continua a valer: cada recarga é uma instância nova. A **D11 não é reaberta** |
 | **O limite dos 255 valores de stencil passa a ser por mundo** | Era a única limitação física (L5) |
-| **O `remove` dos módulos (A3/A4) não é crítico para mundos** | Ao atravessar uma porta de mundo, a página morre inteira |
+| **O `remove` dos módulos (**A4**) não é crítico para mundos** | Ao atravessar uma porta de mundo, a página morre inteira (o **A3** foi fechado em 2026-10-15 — §2.1) |
 
 #### O retrato da porta de mundo (o que substitui a janela ao vivo)
 
@@ -1307,6 +1315,26 @@ consola). Passou a `<link rel="icon" href="data:,">`, que não pede nada — a c
 ### Próximo passo: Fase 2 (os 4 módulos)
 
 Dividir `js/app.js` em `js/modules/dimension.js`, `artwork.js`, `portal.js` e `camera.js`,
-renomeando ao mover (glossário §5.7) e corrigindo, no mesmo passo, os pontos A2, A3, A4,
-A5 e A7 de §2.1. A linha de base de §10 tem de continuar a dar os mesmos números, mais o
-T9 (criar e destruir portais em ciclo: 1 listener de teclado e registos limpos).
+renomeando ao mover (glossário §5.7) e corrigindo, no mesmo passo, os pontos **A4, A5 e A7**
+de §2.1 (**A2 e A3 foram fechados em 2026-10-15** — ver §2.1). A linha de base de §10 tem de
+continuar a dar os mesmos números, mais o T9 (criar e destruir portais em ciclo: 1 listener de
+teclado e registos limpos) — **já medido em 2026-10-15: 1 ouvinte na carga e 1 depois de 6
+ciclos**.
+
+---
+
+## 14. Pendências registadas (2026-10-15)
+
+O que fica em aberto depois de a documentação ser alinhada com o código. Cada linha tem o
+motivo e o que a fecha.
+
+**R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
+apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o
+«Correções incluídas» da Fase 2 (§9), e o «Próximo passo» (§13). Passaram a apontar o estado
+real.
+
+| # | Pendência | Porque fica | O que a fecha |
+| --- | --- | --- | --- |
+| R2 | **T2 e T3 não têm forma de ser repetidos** | São os dois únicos testes de §10 sem instrumento: a verificação da Fase 1 cita «0 cortes de bordo em **70** poses» e §10 registou «0 poses em **69** testadas» — dois números para a mesma medição, que ninguém consegue reconfirmar | Automatizar a varredura de poses (projetar o retângulo da moldura por pose e medir por alfa/diferença, como o T4 e o T5 passaram a ser medidos) ou mantê-la manual até à Fase 6, que a §10 já prevê para a automação |
+| R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`) e o §13 diz «as 6 chaves»; as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Acertar a contagem no §13 e juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` |
+| R4 | **O texto de conteúdo por língua nunca chegou aos dados** | O entregável 4 da Fase 0 diz que `data/scene-example.json` inclui «o formato do texto de conteúdo por língua» e a D12-A diz `title: { "pt": …, "en": … }` — mas `data/scene.json` tem `dimensions: {id, kind}` e `artworks: {id, dimension, kind, asset, position, rotation, size, interaction, url}`, sem nenhum campo por língua, e nem o `convert.mjs` nem o `validate.mjs` mencionam idioma. A cena atual não tem texto (as dimensões não têm nome e as obras não têm título), logo o formato está **documentado** (§5.7 e §6) mas não **instanciado** | Levar os campos por língua ao esquema, ao conversor e ao validador — é decisão de contrato, a tomar antes da Fase 3, a fase em que a cena passa a vir dos dados |
