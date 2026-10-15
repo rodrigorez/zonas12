@@ -50,8 +50,8 @@ const DEFAULTS = {
   fault: null
 };
 
-const BAR_NAME = /-moldura-\d+$/;
-const MASK_NAME = /-mascara$/;
+const BAR_NAME = /-frame-\d+$/;
+const MASK_NAME = /-mask$/;
 
 function nextFrame() {
   return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -96,14 +96,14 @@ export async function runPoseSweep(options = {}) {
   // The collision box is parked far away on purpose: the sweep must not traverse the portal,
   // and the box plays no part in how the frame is drawn.
   rig.setAttribute(
-    'portal-estencil-dinamico',
-    `portalId: ${RIG.portalId}; dimensaoA: 0; dimensaoB: 1; pertenceA: 0; ` +
-      `width: ${RIG.width}; height: ${RIG.height}; caixa: 0.1 0.1 0.1; caixaPosicao: 0 1000 0`
+    'stencil-portal',
+    `id: ${RIG.portalId}; dimensionA: 0; dimensionB: 1; ownedBy: 0; ` +
+      `width: ${RIG.width}; height: ${RIG.height}; box: 0.1 0.1 0.1; boxPosition: 0 1000 0`
   );
   sceneEl.appendChild(rig);
   await nextFrame();
 
-  const portal = rig.components['portal-estencil-dinamico'];
+  const portal = rig.components['stencil-portal'];
   if (!portal) {
     rig.remove();
     throw new Error('pose-sweep: the rig portal did not initialise');
@@ -204,7 +204,7 @@ export async function runPoseSweep(options = {}) {
       // shows. Outside the window the stencil is 0, so the whole frame is discarded: this is the
       // defect of law L3 (a stencil test on active-dimension geometry), which is what T2 and T3
       // exist to catch.
-      const shown = state.stencilValues.get(portal.data.dimensaoB);
+      const shown = state.stencilValues.get(portal.data.dimensionB);
       if (shown === undefined) {
         throw new Error('pose-sweep: the core did not assign a stencil value to dimension ' + portal.data.dimensaoB);
       }

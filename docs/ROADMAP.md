@@ -818,6 +818,7 @@ a partir quando o valor seguinte mudar de ficheiro.
 | **B1** | `js/modules/camera.js`; o `app.js` deixou de conhecer o `a-camera` (faltam os 2 sítios de B3/B4) | 546 → **481** linhas; D-pad anda **4,2 m** em 250 ms (o passo de 0,1 m por frame) |
 | **B2** | `js/modules/artwork.js`; o núcleo ganhou `unregisterContent()`; os nomes da obra em inglês | 481 → **371**; tirar as 2 obras da dimensão 3 deixa-a com **1** entrada (o panorama) |
 | **B3** | `js/modules/dimension.js`; o panorama ganhou `remove()` e pede a posição à câmara | 371 → **317**; tirar as 5 obras **e** o panorama da dimensão 1 **apaga a chave**; sobra `[2, 3]` |
+| **B4** | `js/modules/portal.js`; a travessia passou para o portal, o driver de frame para o módulo (**D19**) e o `remove()` ficou completo | 317 → **77**; travessias mudam a dimensão; **R** roda e **D** liga a caixa; **T9 com 20 ciclos**: 1 ouvinte `keydown` antes e 1 depois, registo de volta a 8 |
 
 Dois números que valem para os quatro blocos: o conversor, regenerado, dá **0 diferenças** no
 `data/scene.json` (a garantia da Fase 0), e a varredura de poses dá **T2** e **T3** a passar —

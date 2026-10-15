@@ -30,7 +30,7 @@ const contar = (regexp) => (html.match(regexp) || []).length;
 // 1 obra = 1 elemento com dimensional-material; 1 portal = 1 componente; 1 dimensao com
 // fundo = 1 entidade dimension-panorama.
 const nObras = contar(/dimensional-material="/g);
-const nPortais = contar(/portal-estencil-dinamico="/g);
+const nPortais = contar(/stencil-portal="/g);
 const nPanoramas = contar(/dimension-panorama="/g);
 const nUrls = contar(/open-artwork="/g);
 

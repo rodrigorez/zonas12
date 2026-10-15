@@ -68,7 +68,7 @@
     <!-- Cena A-Frame -->
     <div id="container-3d">
       <!-- renderer: o stencil é obrigatório para o portal (buffer de stencil) -->
-      <a-scene config-ar gestor-dimensoes renderer="alpha: true; antialias: true; stencil: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable">
+      <a-scene config-ar renderer="alpha: true; antialias: true; stencil: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable">
         
         <!-- alt nos pré-carregamentos: o <a-assets> não é desenhado, mas o HTML é lido. -->
         <a-assets>
@@ -99,22 +99,22 @@
              a dimensão 3 tem 1 portal de volta para a 2. -->
 
         <!-- Portais da dimensão 0 (realidade / hub) -->
-        <a-entity position="-6 0 -8" portal-estencil-dinamico="portalId: 0; dimensaoA: 0; dimensaoB: 1; pertenceA: 0; width: 8; height: 10;"></a-entity>
-        <a-entity position=" 6 0 -8" portal-estencil-dinamico="portalId: 1; dimensaoA: 0; dimensaoB: 2; pertenceA: 0; width: 8; height: 10;"></a-entity>
+        <a-entity position="-6 0 -8" stencil-portal="id: 0; dimensionA: 0; dimensionB: 1; ownedBy: 0; width: 8; height: 10;"></a-entity>
+        <a-entity position=" 6 0 -8" stencil-portal="id: 1; dimensionA: 0; dimensionB: 2; ownedBy: 0; width: 8; height: 10;"></a-entity>
 
         <!-- Portais da dimensão 1 (cidade 360º) -->
-        <a-entity position="-25 0 -45" portal-estencil-dinamico="portalId: 2; dimensaoA: 1; dimensaoB: 0; pertenceA: 1; width: 10; height: 12;"></a-entity>
-        <a-entity position=" 25 0 -45" portal-estencil-dinamico="portalId: 3; dimensaoA: 1; dimensaoB: 2; pertenceA: 1; width: 10; height: 12;"></a-entity>
+        <a-entity position="-25 0 -45" stencil-portal="id: 2; dimensionA: 1; dimensionB: 0; ownedBy: 1; width: 10; height: 12;"></a-entity>
+        <a-entity position=" 25 0 -45" stencil-portal="id: 3; dimensionA: 1; dimensionB: 2; ownedBy: 1; width: 10; height: 12;"></a-entity>
 
         <!-- Portais da dimensão 2 (praia): 3 portais em fila — 2 para a dimensão 1 e
              1 para a dimensão 3. Os dois que vão para a dimensão 1 mostram a mesma
              dimensão, logo partilham o mesmo valor de stencil. -->
-        <a-entity position="-25 0 -80" portal-estencil-dinamico="portalId: 4; dimensaoA: 2; dimensaoB: 1; pertenceA: 2; width: 10; height: 12;"></a-entity>
-        <a-entity position="  0 0 -80" portal-estencil-dinamico="portalId: 6; dimensaoA: 2; dimensaoB: 3; pertenceA: 2; width: 10; height: 12;"></a-entity>
-        <a-entity position=" 25 0 -80" portal-estencil-dinamico="portalId: 5; dimensaoA: 2; dimensaoB: 1; pertenceA: 2; width: 10; height: 12;"></a-entity>
+        <a-entity position="-25 0 -80" stencil-portal="id: 4; dimensionA: 2; dimensionB: 1; ownedBy: 2; width: 10; height: 12;"></a-entity>
+        <a-entity position="  0 0 -80" stencil-portal="id: 6; dimensionA: 2; dimensionB: 3; ownedBy: 2; width: 10; height: 12;"></a-entity>
+        <a-entity position=" 25 0 -80" stencil-portal="id: 5; dimensionA: 2; dimensionB: 1; ownedBy: 2; width: 10; height: 12;"></a-entity>
 
         <!-- Portais da dimensão 3 (céu 360º) -->
-        <a-entity position="0 0 -120" portal-estencil-dinamico="portalId: 7; dimensaoA: 3; dimensaoB: 2; pertenceA: 3; width: 10; height: 12;"></a-entity>
+        <a-entity position="0 0 -120" stencil-portal="id: 7; dimensionA: 3; dimensionB: 2; ownedBy: 3; width: 10; height: 12;"></a-entity>
 
         <!-- Obras da dimensão 1 (cidade 360º), em Z = -60 -->
         <a-entity position="0 0 -60">

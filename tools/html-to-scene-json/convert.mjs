@@ -172,7 +172,7 @@ for (const tag of tags(html)) {
 
   if (tag.startsWith('<a-entity')) {
     const panorama = attr(tag, 'dimension-panorama');
-    const portal = attr(tag, 'portal-estencil-dinamico');
+    const portal = attr(tag, 'stencil-portal');
 
     if (panorama !== null) {
       const c = componentes(panorama);
@@ -190,10 +190,10 @@ for (const tag of tags(html)) {
       const c = componentes(portal);
       const pos = attrVec3(tag, 'position') || [0, 0, 0];
       portals.push({
-        id: round(c.portalId),
-        dimensionA: round(c.dimensaoA),
-        dimensionB: round(c.dimensaoB),
-        ownedBy: round(c.pertenceA ?? -1),
+        id: round(c.id),
+        dimensionA: round(c.dimensionA),
+        dimensionB: round(c.dimensionB),
+        ownedBy: round(c.ownedBy ?? -1),
         position: pos.map(round),
         width: round(c.width),
         height: round(c.height)
@@ -208,35 +208,33 @@ for (const tag of tags(html)) {
 
 // ------------------------------------------------- valores que vivem no codigo
 
-const schemaCaixa = fromCode(
-  /caixa:\s*\{\s*type:\s*'vec3',\s*default:\s*\{\s*x:\s*([\d.]+),\s*y:\s*([\d.]+),\s*z:\s*([\d.]+)\s*\}/,
-  'portal box size (caixa)');
-const schemaCaixaPos = fromCode(
-  /caixaPosicao:\s*\{\s*type:\s*'vec3',\s*default:\s*\{\s*x:\s*([\d.]+),\s*y:\s*([\d.]+),\s*z:\s*([\d.]+)\s*\}/,
-  'portal box position (caixaPosicao)');
-const schemaCaixaRot = fromCode(
-  /caixaRotacao:\s*\{\s*type:\s*'vec3',\s*default:\s*\{\s*x:\s*([\d.]+),\s*y:\s*([\d.]+),\s*z:\s*([\d.]+)\s*\}/,
-  'portal box rotation (caixaRotacao)');
-const schemaGatilho = fromCode(/gatilho:\s*\{\s*type:\s*'string',\s*default:\s*'([^']+)'/, 'portal trigger (gatilho)');
-const corMoldura = fromCode(/let moldura = new THREE\.MeshBasicMaterial\(\{\s*color:\s*0x([0-9A-Fa-f]{6})/, 'frame colour');
-const espMoldura = fromCode(/let esp = ([\d.]+);/, 'frame thickness');
-const velocidade = fromCode(/const MOBILE_SPEED = ([\d.]+);/, 'player speed (MOBILE_SPEED)');
+const schemaBox = fromCode(
+  /box:\s*\{\s*type:\s*'vec3',\s*default:\s*\{\s*x:\s*([\d.]+),\s*y:\s*([\d.]+),\s*z:\s*([\d.]+)\s*\}/,
+  'portal box size (box)');
+const schemaBoxPos = fromCode(
+  /boxPosition:\s*\{\s*type:\s*'vec3',\s*default:\s*\{\s*x:\s*([\d.]+),\s*y:\s*([\d.]+),\s*z:\s*([\d.]+)\s*\}/,
+  'portal box position (boxPosition)');
+const schemaBoxRot = fromCode(
+  /boxRotation:\s*\{\s*type:\s*'vec3',\s*default:\s*\{\s*x:\s*([\d.]+),\s*y:\s*([\d.]+),\s*z:\s*([\d.]+)\s*\}/,
+  'portal box rotation (boxRotation)');
+const schemaTrigger = fromCode(/trigger:\s*\{\s*type:\s*'string',\s*default:\s*'([^']+)'/, 'portal trigger (trigger)');
+const frameColour = fromCode(/const frameMaterial = new THREE\.MeshBasicMaterial\(\{\s*color:\s*0x([0-9A-Fa-f]{6})/, 'frame colour');
+const frameThickness = fromCode(/const thickness = ([\d.]+);/, 'frame thickness');
+const playerSpeed = fromCode(/const MOBILE_SPEED = ([\d.]+);/, 'player speed (MOBILE_SPEED)');
 
 const vec = (m) => (m ? [round(m[1]), round(m[2]), round(m[3])] : null);
 
-// O codigo usa 'plano'/'caixa'; o JSON usa 'plane'/'box' (D10).
-const gatilho = schemaGatilho
-  ? ({ plano: 'plane', caixa: 'box' }[schemaGatilho[1]] || schemaGatilho[1])
-  : null;
+// Code and JSON use the same words now (D10): the schema default is already 'plane' or 'box'.
+const trigger = schemaTrigger ? schemaTrigger[1] : null;
 
 for (const portal of portals) {
-  portal.box = vec(schemaCaixa);
-  portal.boxPosition = vec(schemaCaixaPos);
-  portal.boxRotation = vec(schemaCaixaRot);
-  portal.trigger = gatilho;
+  portal.box = vec(schemaBox);
+  portal.boxPosition = vec(schemaBoxPos);
+  portal.boxRotation = vec(schemaBoxRot);
+  portal.trigger = trigger;
   portal.frame = {
-    color: corMoldura ? '#' + corMoldura[1].toLowerCase() : null,
-    thickness: espMoldura ? round(espMoldura[1]) : null
+    color: frameColour ? '#' + frameColour[1].toLowerCase() : null,
+    thickness: frameThickness ? round(frameThickness[1]) : null
   };
 }
 
@@ -257,7 +255,7 @@ portals.sort((a, b) => a.id - b.id);
 const cena = {
   version: 1,
   cameras: {
-    player: { position: playerPosition ? playerPosition.map(round) : null, speed: velocidade ? round(velocidade[1]) : null },
+    player: { position: playerPosition ? playerPosition.map(round) : null, speed: playerSpeed ? round(playerSpeed[1]) : null },
     real: { enabled: realCameraEnabled }
   },
   dimensions,
