@@ -99,8 +99,9 @@ chave dela desaparece do registo e sobram `[2, 3]`. **A5:** o `a-camera` passou 
 `js/modules/camera.js`; os outros três sítios pedem a posição (`playerCamera.position()` e
 `worldPosition()`). **A7:** a travessia passou a ser do próprio portal (`detectTraversal()`) e a
 atribuição de valores ficou no núcleo; o que resta do antigo `gestor-dimensoes` é o driver de
-frame, que passou a viver no módulo do portal (decisão **D19**, §11). **O A6 continua aberto**:
-o campo único `asset` é decisão de contrato e vai com a cena a vir de dados (Fase 3).
+frame, que passou a viver no módulo do portal (decisão **D19**, §11). **O A6 tem decisão tomada**
+— o **D20** (§11, 2026-10-15) fecha o campo único `asset` num **catálogo de assets** — e fecha no
+dado nos blocos B3 e B4 da Fase 3.
 | A8 | `config-ar` | `sortObjects`, `autoClearStencil`, `setClearColor` | É configuração de render: tem de ser única e correr antes de tudo |
 
 > **Nota (Fase 1).** As referências de linha desta tabela são da **v0.0.2**, quando a lógica
@@ -404,7 +405,8 @@ O único sítio que conhece a cena toda.
 > `dimensionA`, `dimensionB`, `ownedBy`, `width`, `height`, `box`, `boxPosition`, `boxRotation` e
 > `trigger` (`plane` / `box`). O `frame {color, thickness}` e o `motion` **não** são campos do
 > schema: a moldura é construída no código com a cor e a espessura de que o conversor lê o valor
-> para o JSON (Fase 0). Os **dois eixos** (`window` / `action`) são da Fase 3B, como a D14 manda.
+> para o JSON (Fase 0). Os **dois eixos** (`window` / `action`) são da Fase 3B (decisão **D22**,
+> §11, que alinha a §6 e a §11 com esta nota).
 > O **A7** está fechado: a travessia é do portal (`detectTraversal()`) e o que resta do antigo
 > gestor é o driver de frame, que vive neste módulo (decisão **D19**).
 
@@ -633,13 +635,15 @@ reescrever os 8 portais e as 10 obras com os nomes novos de atributos
 mecânico mas **com risco de troca de campo**: por isso a conversão tem de ser feita por um
 script que lê o `index.html` e escreve o JSON, e não à mão.
 
-### Nota (D14) — o que os mundos acrescentam ao modelo
+### Nota (D14, emendada pela D22) — o que os mundos acrescentam ao modelo
 
-O **formato do portal** já muda agora, antes da Fase 3, para os **dois eixos** (§5.4):
-`window` (o que a janela mostra) e `action` (o que a travessia faz). Os 8 portais atuais
-migram para `dimension-pair` + `enter-window` — **sem mudança de comportamento**, por script,
-confirmada pelo validador (**0 diferenças**, como na Fase 0). A ordem do par não interessa
-nesta combinação, logo a migração não pode trocar `A` por `B`.
+O **formato do portal** — os **dois eixos** da §5.4 (`window` e `action`) — migra na **Fase 3B**,
+não antes dela: a Fase 3 tem uma obrigação só, a cena passar a vir de dados **sem mudança de
+comportamento**, e mudar o formato do portal no mesmo passo duplicaria o diff sem comprar nada
+(é a nota de §5.4, de 2026-10-15, que manda — **D22**). Quando migrar, os 8 portais passam a
+`dimension-pair` + `enter-window` — **sem mudança de comportamento**, por script, confirmada pelo
+validador (**0 diferenças**, como na Fase 0). A ordem do par não interessa nesta combinação, logo
+a migração não pode trocar `A` por `B`.
 
 O que a **Fase 3B** acrescenta ao modelo (nada disto existe ainda):
 
@@ -898,6 +902,12 @@ continuam abertas: não são desta fase.
 | Ordem de desenho, máscara, profundidade e `sortObjects` | São as leis L2, L3 e L6: a fase **move** código, não muda regras |
 
 ### Fase 3 — A cena vem de dados
+
+**Plano registado em 2026-10-15**, medido ao disco antes de mexer em código. As decisões de
+contrato que a fase exigia estão fechadas: **D20** (o campo único `asset`, §5.3), **D21** (o texto
+por língua, que fecha o **R4**) e **D23** (a versão do formato e o `?scene=`); a **D22** alinhou os
+dois eixos do portal com a Fase 3B. **Nada implementado.**
+
 - **Entregável:** `js/scene/scene-builder.js` + `schema.js` + `validation.js`; o
   `index.html` passa a ter `<a-scene>` sem entidades e a cena é construída de
   `data/scene.json` (com `data/scene-example.json` como fixture/testes).
@@ -905,6 +915,104 @@ continuam abertas: não são desta fase.
   a conversão campo a campo do JSON confere com os valores que o HTML tinha.
 - **Risco:** perder um atributo na conversão. Mitigação: o script da Fase 0 é a fonte da
   conversão e a comparação é automática, não visual.
+
+#### O que existe hoje (medido a 2026-10-15, antes de mexer)
+
+| Item | Valor real |
+| --- | --- |
+| `index.html` | **240 linhas**: 14 `<a-entity>` (8 portais + 3 dimensões + 3 grupos de obras), 10 `<a-box>`, 1 `<a-camera>`, 5 `<img>` + 1 `<video>` de asset |
+| `data/scene.json` | **538 linhas** e **338 valores**; 4 dimensões, 10 obras, 8 portais, 6 assets |
+| `js/` | `app.js` **78** linhas; o núcleo **207** (7 ficheiros); os 4 módulos **608** |
+| Ferramentas | `convert.mjs` **294** linhas e `validate.mjs` **142** — e as duas leem o `index.html` |
+| **Quem lê o JSON** | **Ninguém**: `grep` por `scene.json` ou `fetch(` em `js/` dá **zero**. O dado existe, é validado, e a cena ignora-o — é isto que a fase muda |
+| Linha de base | `validate.mjs` OK (4 / 10 / 8, **7** janelas distintas) e o conversor regenerado dá `git status` limpo (**0 diferenças**) |
+| Acoplamentos que fecham | **A6** (o mesmo ficheiro em `asset` e em `url`, nas 10 obras), **R4** (o formato por língua documentado e não instanciado) e os valores que vivem no código (`box`, `boxPosition`, `boxRotation`, `trigger`, `frame`, `MOBILE_SPEED`) — o conversor lê-os do `js/` por regex, e a fase **inverte** a direção |
+
+#### O corte do `index.html`, bloco a bloco
+
+O `<a-scene>` está na linha **71** e fecha na **194**: o corpo são as linhas **72–193** (**122
+linhas**) e o script inline as **197–238** (**42**). Saem **164 linhas** e ficam **76**.
+
+| Linhas | O que é | Destino |
+| --- | --- | --- |
+| 74–81 | `<a-assets>`: 5 `<img>` e 1 `<video>` | O catálogo `assets` do JSON (D20); o `scene-builder` enche o `<a-assets>`, que fica vazio no HTML |
+| 84–86 | `<a-camera>` e `<a-cursor>` | `cameras.player` no JSON → fábrica em `camera.js`. **A câmara passa a ser entregue ao módulo, que deixa de ter seletor** |
+| 93–95 | 3 `dimension-panorama` | `dimensions[]` → `dimension.js` |
+| 102–117 | 8 `stencil-portal` | `portals[]` → `portal.js`. A moldura e a caixa passam a vir do dado (`frame` entra no schema do componente) |
+| 120–192 | 10 obras em 3 grupos (`z = -60 / -95 / -115`) | `artworks[]` em coordenadas do mundo (o conversor já soma o deslocamento do grupo) → `artwork.js` |
+| 197–238 | `iniciarCena`: webcam, D-pad, loading e erro de câmara | `camera.js`, como `startSession()`, **honrando `cameras.real.enabled`** — hoje o campo existe no JSON e ninguém o lê. A ponte `window.iniciarCena` **fica** (é da Fase 4) |
+| 71 e 194 | `<a-scene ar-config renderer=… cursor=… raycaster=…>` | **Fica**: é o arranque |
+
+#### Blocos de execução
+
+Um bloco por commit — a regra das fases anteriores mantém-se: o renomeio vai no commit que o
+provoca (D10) e cada bloco mede no browser o que fez.
+
+| # | Bloco | Fecha |
+| --- | --- | --- |
+| **B0** | Linha de base re-medida antes de mexer: T1–T9 e o 0-diferenças (as decisões **D20–D23** estão fechadas em §11) | — |
+| **B1** | `js/scene/schema.js`: a forma do JSON — campos, tipos, enumerações (`image/video/color/camera`, `modal/link/none`, `plane/box`), omissões e o catálogo `assets`. **Puro**: sem DOM e sem `AFRAME` | A6 e o formato do R4 |
+| **B2** | `js/scene/validation.js` (forma e as leis **L1, L4, L5, L9, L12**) e o `validate.mjs` a importá-lo, em vez de contar entidades no HTML | uma só implementação da validação |
+| **B3** | O conversor escreve o **contrato novo** (`assets`, `url` derivado, campos por língua, `version: 2`), ainda a ler o HTML — e a prova: **338 valores, 0 diferenças** | A6 e R4, no dado |
+| **B4** | As fábricas nos módulos (`create(data, parent)` / `remove(el)`) e os valores que o JSON já carrega (`frame`, `speed`) a virem do dado. **O HTML ainda governa**: comportamento igual | A6 |
+| **B5** | `js/scene/scene-builder.js` e **o corte**: `<a-scene>` sem entidades, o `app.js` a fazer carregar → validar → construir → driver, e `?scene=example` | A6 — o centro da fase |
+| **B6** | Ferramentas: a **guarda** do conversor (recusa correr e escrever quando o HTML não tem entidades), o validador sobre o schema partilhado, e a pasta da migração com o nome do que ela é | o conversor deixa de poder destruir o JSON |
+| **B7** | Verificação final no browser: T1–T9, consola, varredura de poses (T2/T3) e o ciclo de 20 portais | — |
+| **B8** | Documentação: README (§Estrutura, §Estado atual, §Cena atual, §Atributos do portal, §Personalizar Conteúdo, §Melhorias) e roadmap (§9, §13, §14, §2.1, §5.2–5.4, §6) | — |
+
+**Duas regras que o B5 traz, e que não são estilo:**
+
+1. **Construir desacoplado, anexar depois.** A entidade nasce fora da cena, com os atributos todos
+   postos, e só no fim é anexada — é a lei **L7** à escala da cena: com o `setAttribute` depois do
+   `appendChild`, o `init` **e** o `update` correm e o objeto é construído a dobrar.
+2. **A câmara é entregue, não procurada.** O construtor cria o `<a-camera>` e entrega-o ao
+   `camera.js`, que deixa de ter seletor: enquanto houver um `querySelector('a-camera')` no
+   módulo **e** o construtor a criar, há outra vez dois sítios que sabem onde a câmara está
+   (o **A5**, outra vez).
+
+**O que a fase não faz** (e é de propósito): os dois eixos do portal e as tabelas
+`WINDOW_KINDS`/`ACTION_KINDS` (**D22**: Fase 3B) · a interface a usar `t('…')` e o catálogo
+`i18n` (**R3**: Fase 4) · o editor (`update`/`list` das fábricas, Fase 4) · os mundos e a recarga
+(Fase 3B).
+
+#### Metas de sucesso
+
+**(a) Comportamento — nenhum número pode mudar.** Os nove testes são os de §10, e é lá que os
+valores vivem.
+
+| # | Teste | Alvo |
+| --- | --- | --- |
+| T1 + T7 | Travessias dos 8 portais, a andar com passo de 0,1 m | **8/8**, uma só travessia cada, sem ping-pong |
+| T2 | Bordo da moldura, varredura de poses | **0** poses com bordo cortado (de **84**) |
+| T3 | Contorno da moldura | **0** falhas (~**15 708** amostras) |
+| T4 + T5 | Janela do hub e portal de trás | Alfa **0 fora / 255 dentro**; **0 px** da moldura de trás dentro da janela da frente |
+| T6 | Clique na obra | Abre **só** na dimensão ativa |
+| T8 | Consola | **0** erros e **0** avisos |
+| T9 | 20 ciclos de criação/destruição | **1** ouvinte de `keydown` na carga e **1** no fim, com o registo de volta a **8** portais |
+| — | D-pad, com o `speed` vindo do dado | **4,2 m** em 250 ms (o valor medido na Fase 2: o dado não pode mexer o número) |
+
+**(b) Arquitetura — metas novas, todas mensuráveis.**
+
+| # | Meta | Como se mede | Alvo |
+| --- | --- | --- | --- |
+| M1 | O `index.html` perdeu a cena | `grep` no HTML de `stencil-portal=`, `dimension-panorama=`, `dimensional-material=`, `<a-box`, `open-artwork=`, `<a-camera` e `<img>`/`<video>` de asset | **0** em cada |
+| M2 | O `index.html` é a página, não a cena | contagem de linhas | **76** medido hoje (alvo **≤ 90**) |
+| M3 | `js/scene/` existe e não sabe desenhar | 3 ficheiros, e `AFRAME` só no `scene-builder.js` | **3** ficheiros, **1** com `AFRAME` |
+| M4 | O núcleo continua a não conhecer nada | `grep` dos imports de `js/core/` | **0** para `modules/`, `scene/`, DOM e JSON |
+| M5 | As leis verificadas | a lista do validador e **uma avaria injetada por lei** (falha quando deve, como a varredura de poses provou para o T2 e o T3) | **L1, L4, L5, L9, L12** e a forma |
+| M6 | Uma só implementação da validação | o `validate.mjs` a importar `js/scene/validation.js` | **0** leis duplicadas |
+| M7 | O conversor não pode destruir dados | correr depois do corte, sobre um `index.html` sem entidades | sai **1** e não escreve |
+| M8 | A prova da migração fica repetível | `git diff <B3> -- data/scene.json` | vazio |
+
+#### Riscos
+
+| Risco | Porquê | O que o fecha |
+| --- | --- | --- |
+| O `<a-assets>` construído tarde | O `fetch` do JSON é assíncrono, e o `a-scene` pode já ter disparado o `loaded` quando as entidades aparecem | Medir as **6** texturas e a consola no B5; o `dimension.js` já trata o `onload` tardio (é o caminho do `<img>` que ainda não carregou) |
+| O flip ser um commit grande | O B5 troca a cena do HTML pelo dado de uma vez | O B3 dá a prova da fidelidade (**0 diferenças**) **antes** e o B4 deixa o HTML a governar até lá; o B5 é de leitura mecânica (só deleções no HTML) |
+| Os valores do código passarem a dado | As omissões do schema têm de bater com o que o conversor lê do `js/` | O B3 e o B4 partilham a mesma leitura: se uma omissão divergir, a prova do 0-diferenças quebra |
+| O validador deixar de contar no HTML | Passa a validar o JSON, e o `validate.mjs` perde a conferência de contagens | A conferência de fidelidade passa a ser o 0-diferenças do conversor (B3) e o `git diff` do B3 (M8) |
+| A ordem de arranque | O driver de frame e a validação passam a correr depois do `fetch` | Medir T8 e T9 no B5; o driver só passa a ter portais para percorrer depois do construtor |
 
 ### Fase 3B — Mundos e portas de mundo (D14)
 
@@ -1098,8 +1206,11 @@ janelas (T4 e T5); e exige um browser com **aceleração de GPU** — em render 
 | D16 | A origem da garantia de ordenação (lei **L6**) | **FECHADA** (2026-10-14) | **A lei passa a enunciar o invariante, não a ação.** Medido na fonte do A-Frame 1.8.0 (`src/systems/renderer.js`): `sortObjects` **não** é propriedade do schema e o sistema do `renderer` fixa `renderer.sortObjects = true` e `setOpaqueSort(sortFrontToBack)` na inicialização, «seja qual for a configuração» — logo a garantia é **do framework**, e a linha de `js/app.js` é uma **confirmação** que fica (documenta a intenção e protege contra uma versão que mude a omissão), com o comentário corrigido para citar a medição. `stencil` **é** propriedade do schema (omissão `false`) e continua a ser responsabilidade do projeto. **Custo aceite:** enquanto a omissão não mudar, a linha é redundante — e um leitor pode julgá-la indispensável |
 | D17 | Quarta passe de validação (frontmatter dos agents) | **FECHADA** (2026-10-14) | **O `validate_skills_index.ps1` ganha uma quarta passe, `agent → disco`:** lê o `skills:` do *frontmatter* de cada `agents/*.md` e confere cada token contra `skills/{token}/SKILL.md`. **Motivo escrito:** as passes 1–3 olham todas para dentro do índice e, por construção, **não podem** ver um agent a citar uma skill inexistente — foi assim que passou o `refactoring-patterns` do `code-archaeologist` (§14.4 do `HARNESS_LOG.md`), apanhado por auditoria manual e não pelo validador. **Custo aceite:** a regra deixa de ser "três passes" e passa a **quatro** em três ficheiros (este, o `README.md` e o `skills_index.md`) — a repetição que a D15 quis evitar é paga em três linhas |
 | D18 | O que fica na quarentena (`.agent/garbage/`) | **FECHADA** (2026-10-14) | **Mantém-se como referência: não se adapta nem se apaga.** Motivo escrito: o `.harness/` **não tem histórico Git**, logo o que se apagar aqui não se recupera (política do §2 do `HARNESS_LOG.md`), e os 6 ficheiros que lá estão têm todos estatuto explícito no `garbage/README.md` — os **originais** do que foi adaptado por cópia (`project_sync.py`, de onde nasceu `.agent/scripts/project_sync.py`), os originais dos workflows adaptados (`update-3d`, `update-layout`), o que **não** foi adaptado por não ter alvo neste projeto (`update-audio`: não há áudio) e o que foi retirado por apontar para outro harness (`update-symlinks.ps1`). **Custo aceite:** 6 ficheiros mortos que a passe 2 do índice continua a contar (`Quarentena`=6) e que nada carrega |
-
 | D19 | As três fronteiras que a Fase 2 tinha em aberto (R5–R7) | **FECHADA** (2026-10-15) | **(1) O driver de frame vive no módulo do portal.** Depois do A7 o `gestor-dimensoes` deixa de existir: é o módulo do portal que percorre `state.portals`, pede a posição do jogador à câmara e passa as dimensões mostradas ao núcleo (`syncStencilValues`) — o núcleo não conhece portais (§5.0) e o `app.js` fica só com o arranque. **(2) O modal da obra e o `cursor-listener` vivem em `js/modules/artwork.js`:** os dois são da obra (§5.3) e o modal é DOM desta aplicação, não do editor (§5.0). **(3) Os *hooks* em português passam a inglês** — `data-dimensao` → `data-dimension`, `dimension-<id>` na classe e `dimension-<id>-<papel>` no nome do objeto 3D: são código e caem na D10. Medido ao disco ao fechar a decisão: o `css/style.css` **não** usa nenhum deles (usa os ids `#modal-obra` e `#btn-frente`), logo o renomeio não arrasta CSS. **Custo aceite:** o README §*Estado atual do código* diz que o ID «aparece nos atributos, em `data-dimensao` …» e passa a ter de ser acertado |
+| D20 | O campo único `asset` (**A6**, §5.3) | **FECHADA** (2026-10-15) | **Um catálogo `assets` no JSON, `id → { path, type, alt }`.** A dimensão e a obra guardam só o `asset`; o `url` do modal **deriva** do catálogo e o campo `url` fica reservado a `interaction: link` (ligação externa, que não é um asset). O construtor de cena cria o `<a-assets>` a partir do catálogo, o que **mantém a linha de textura que já existe** (elemento `<img>`/`<video>` mais o `#id`) em vez de a trocar por carregamento por URL — o vídeo obrigaria a refazer a `VideoTexture`. **Custo aceite:** o formato muda e a versão do JSON sobe (D23) |
+| D21 | O texto de conteúdo por língua (**R4**, §5.7) | **FECHADA** (2026-10-15) | **O formato da variante A (`{ "pt": …, "en": … }`) entra no esquema, no conversor e no validador, e fica instanciado:** as **4** dimensões ganham `name` e o catálogo de assets ganha `alt` por língua (o da `galeriaFoto2` passa a distinguir-se do da `galeriaFoto1` e o do vídeo é novo — o `<a-assets>` não tinha nenhum). As **10** obras ficam sem `title`: o campo é **opcional** no esquema, pronto para o editor (Fase 4), que é o primeiro sítio que lê texto de conteúdo. **Custo aceite:** 10 pares de texto escritos antes de existir quem os mostre |
+| D22 | Em que fase entram os dois eixos do portal | **FECHADA** (2026-10-15) | **Fase 3B.** A §6 e a §11 diziam «agora, antes da Fase 3»; a nota de §5.4 (2026-10-15) e a lista de entregáveis de §9 dizem 3B — fica a nota mais recente. A Fase 3 mantém `dimensionA`/`dimensionB`/`ownedBy` no JSON e a 3B migra o formato por script (**0 diferenças**), que era o risco de troca de `A` por `B` assinalado na §6. **Custo aceite:** o formato do portal fica com uma migração a mais por fazer, e o conversor da Fase 3 não a faz |
+| D23 | A versão do formato e como se escolhe a cena | **FECHADA** (2026-10-15) | **`version: 2`** (o catálogo e o texto por língua mudam o formato) e o validador **recusa versões desconhecidas**: sem isso, um JSON do formato antigo passa a ser lido como se fosse novo, em silêncio. O construtor de cena aceita **`?scene=example`** para carregar o `data/scene-example.json`: sem porta de entrada, o fixture da D9 era uma cópia morta. **Custo aceite:** um parâmetro a mais na URL, com um só valor legal |
 
 > **Emenda da L6 (2026-10-14) — decisão D16.** A lei L6 enunciava a **ação**
 > (`renderer.sortObjects = true`) como se fosse ela a criar a garantia. Medido na fonte do
@@ -1169,16 +1280,17 @@ no núcleo. A matriz de combinações legais está na §5.4; o componente consul
 pontos (`shownDimension`, `onTraverse`, `validate`), e a `validate` é a que o editor reutiliza
 na Fase 4. Acrescentar um uso passa a ser acrescentar uma entrada.
 
-#### Duas migrações, e só uma agora
+#### Duas migrações
 
 | Migração | Quando | Muda comportamento? |
 | --- | --- | --- |
-| **De formato** — os 8 portais passam a `window`/`action` | **agora** (por script) | **Não** — todos ficam `dimension-pair` + `enter-window` |
+| **De formato** — os 8 portais passam a `window`/`action` | **Fase 3B** (por script) — emendado pela **D22** | **Não** — todos ficam `dimension-pair` + `enter-window` |
 | **De sentido** — cidade/praia/céu viram mundos e algumas portas viram `navigate` | **Fase 3B** | **Sim** — é aí que entram a recarga, o `?from` e a chegada |
 
-A migração de formato é feita pelo conversor e confirmada pelo validador (**0 diferenças**,
-como na Fase 0). Nota de segurança: em `dimension-pair` + `enter-window` a **ordem do par não
-interessa**, logo a migração não pode trocar `A` por `B` — que era o risco assinalado na §6.
+A migração de formato é feita na **Fase 3B**, pelo conversor, e confirmada pelo validador
+(**0 diferenças**, como na Fase 0). Nota de segurança: em `dimension-pair` + `enter-window` a
+**ordem do par não interessa**, logo a migração não pode trocar `A` por `B` — que era o risco
+assinalado na §6.
 
 #### O que a D14 obriga a acrescentar às ferramentas
 
@@ -1447,6 +1559,11 @@ alteram comportamento.
 | D16 | Origem da garantia de ordenação (lei L6) | A lei enuncia o invariante (`stencil: true` + `sortObjects` ativo), não a ação: quem fixa `sortObjects = true` é o A-Frame 1.8.0 (medido na fonte); a linha de `js/app.js` fica como confirmação |
 | D17 | Quarta passe de validação | O validador do índice passa a conferir o `skills:` de cada agent contra o disco (`agent → disco`) — a direção que as outras três passes não tomavam |
 | D18 | Quarentena do harness | Mantém-se como referência (os originais do que foi adaptado, o que não tem alvo e o que foi retirado) — apagar perderia-os, porque o `.harness/` não tem Git |
+| D19 | As fronteiras da Fase 2 (R5–R7) | O driver de frame vive no módulo do portal, o modal da obra e o `cursor-listener` na obra, e os *hooks* de HTML passam a inglês |
+| D20 | O campo único `asset` (A6) | Um **catálogo `assets`** no JSON (`id → path, type, alt`): a dimensão e a obra guardam só o `asset` e o `url` do modal deriva dele; o campo `url` fica para `interaction: link` |
+| D21 | Texto de conteúdo por língua (R4) | `{ pt, en }` no esquema, no conversor e no validador, **já instanciado**: 4 nomes de dimensão e 6 descrições de asset; as 10 obras ficam sem `title` (opcional, para a Fase 4) |
+| D22 | Em que fase entram os dois eixos do portal | **Fase 3B** (a nota de §5.4 prevalece sobre a §6 e a §11); a Fase 3 mantém `dimensionA`/`dimensionB`/`ownedBy` no JSON |
+| D23 | Versão do formato e escolha da cena | `version: 2`, com o validador a recusar versões desconhecidas; `?scene=example` para carregar o fixture da D9 |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -1478,6 +1595,12 @@ com o `node`. Registo e medições em `HARNESS_LOG.md`.
 sem histórico Git dentro do `.harness/`, apagar é irreversível, e cada um dos 6 ficheiros já tem
 estatuto declarado no `garbage/README.md`. Fecha o último ponto que a Fase 6 tinha deixado em
 aberto — a Fase 6 passa a ter só os testes de §10 por fazer.
+
+**D20 a D23 fechadas em 2026-10-15** — o contrato da **Fase 3** (plano em §9, registado no mesmo
+dia): o **catálogo de assets** (fecho do **A6**), o **texto de conteúdo por língua** (fecho do
+**R4**), os **dois eixos do portal** na Fase 3B e o **`version: 2`** com o **`?scene=example`**.
+O detalhe de cada uma está na tabela de §11; o A6 e o R4 fecham no dado nos blocos B3 e B4.
+Nada implementado.
 
 ### O que fica decidido, em uma frase
 
@@ -1528,6 +1651,12 @@ uma `<a-scene>` sem entidades e a cena a ser construída de `data/scene.json` (e
 **R4** (§14): as duas são decisões de contrato do formato dos dados, e tomá-las antes da fase que
 lê os dados é o que evita pagá-las duas vezes.
 
+**O plano da fase está em §9** — medido ao disco a 2026-10-15: o corte do `index.html` linha a
+linha, os **9 blocos** (B0–B8), as metas de comportamento (os números de §10, que não podem
+mexer) e as **8** metas de arquitetura (M1–M8). As decisões de contrato estão fechadas no mesmo
+dia — **D20** (o catálogo de assets), **D21** (o texto por língua), **D22** (os dois eixos do
+portal ficam na 3B) e **D23** (`version: 2` e o `?scene=`).
+
 ---
 
 ## 14. Pendências registadas (2026-10-15)
@@ -1554,6 +1683,12 @@ inglês. Fechadas **antes** de B2 e de B4, como o plano exigia. Ao medi-las ao d
 que a premissa de uma delas estava errada: o `css/style.css` **não** usa `data-dimensao` nem a
 classe `interactable` — usa os ids `#modal-obra` e `#btn-frente` —, logo o renomeio não arrasta
 CSS nenhum.
+
+**R4 — decidido em 2026-10-15** (decisão **D21**, §11): o formato por língua entra no esquema, no
+conversor e no validador e fica **instanciado** — as 4 dimensões ganham `name` e o catálogo de
+assets ganha `alt` por língua. O que ele ainda não tem é quem o **mostre**: o texto de conteúdo
+só chega à interface na **Fase 4**, e é o editor o primeiro sítio que o lê. O **R3** (o catálogo
+`i18n`) continua aberto, e é da mesma fase.
 
 | # | Pendência | Porque fica | O que a fecha |
 | --- | --- | --- | --- |
