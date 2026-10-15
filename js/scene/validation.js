@@ -10,18 +10,26 @@
 //     requires and what it forbids (D25);
 //   - the laws of docs/ROADMAP.md section 8 that the data alone can prove: L1 (background wider
 //     than the scene), L4 (arrival outside every other box), L5 (at most 255 windows at once),
-//     L9 (every asset exists) and L12 (no absolute paths).
+//     L9 (every asset exists), L11 (a door that navigates names a world that exists), L12 (no
+//     absolute paths), L13 (a portrait is a picture, never a live world), L15 (the reserved band
+//     of ids), L16 and L17 (the arrival point, and one arrival door per origin) and L18 (the two
+//     axes combine legally).
 //
 // What it does not check, on purpose:
 //   - the laws of render (L2, L3, L6, L7, L8): they are properties of the code, not of the data;
-//   - the laws of the worlds (L10, L11, L13, L14, L15, L16, L17, L18): they arrive with the block
-//     that creates doors to another world and derived dimensions (Fase 3B, §9, block B3).
+//   - L10 and L14 (the name and the 2:1 shape of an asset): both are read from the files
+//     themselves — a name that is already in the folders of the D7 rule, and the pixels of an
+//     image —, and both arrive with the block that rearranges and normalises the assets (Fase 3B,
+//     §9, block B5). A law and the data that satisfies it land in the same block: the exhibition's
+//     console is a test, and it counts warnings (T8).
 //
 // Pure: no DOM, no A-Frame, no three. The only outside information it needs is how to tell
 // whether a file exists (`options.exists`), which only the command line can answer.
 
 import { SCENE, SCENE_VERSION, LANGUAGES } from './schema.js';
-import { MAX_WINDOWS } from '../core/index.js';
+import { MAX_WINDOWS, MAX_DIMENSIONS, DERIVED_DIMENSION_BASE } from '../core/index.js';
+import { isLegalCombination } from '../modules/portal-kinds.js';
+import { arrivalPoint } from './arrival.js';
 
 const EYE_HEIGHT = 1.6;
 
@@ -106,6 +114,12 @@ export function validateScene(scene, options = {}) {
     if (dimension.kind === 'color' && !dimension.color) {
       warn(`${where}: kind "color" without a colour — the background will be black`);
     }
+    // ---- L15: the band of ids that belongs to the derived dimensions ----
+    if (Number.isInteger(dimension.id) && dimension.id >= DERIVED_DIMENSION_BASE) {
+      err(`${where}: the declared id ${dimension.id} is inside the band reserved for the derived ` +
+        `dimensions (${DERIVED_DIMENSION_BASE}…${MAX_DIMENSIONS - 1}) — law L15 (it is activated by ` +
+        `mistake and the camera ends up inside a portrait)`);
+    }
   }
 
   // ---- L1: the background has to be wider than the scene ----
@@ -156,6 +170,72 @@ export function validateScene(scene, options = {}) {
     }
   }
 
+  // ---- L11, L13 and L18: what the two axes of a door may say ----
+  for (const portal of scene.portals || []) {
+    const windowAxis = portal.window || {};
+    const actionAxis = portal.action || {};
+    const where = `portals[${portal.id}]`;
+
+    // L18: the combination of the two axes has to be one of the legal ones (section 5.4).
+    if (windowAxis.kind && actionAxis.kind && !isLegalCombination(windowAxis.kind, actionAxis.kind)) {
+      err(`${where}: window "${windowAxis.kind}" with action "${actionAxis.kind}" is not a legal ` +
+        `combination — law L18 (the portrait would lie, or the visitor would walk into the portrait)`);
+    }
+
+    // L11: a door that navigates names a world that exists. Which worlds exist is a question only
+    // the command line can answer (each one is a file of its own), so without that answer the
+    // check is reported as not verified instead of passed.
+    if (actionAxis.kind === 'navigate' && typeof actionAxis.target === 'string') {
+      if (typeof options.worldExists !== 'function') {
+        skipped.push(`${where}: the world "${actionAxis.target}" was not checked (no way to list the worlds)`);
+      } else if (options.worldExists(actionAxis.target) === false) {
+        err(`${where}: the world "${actionAxis.target}" does not exist — law L11 (a door that navigates to nowhere)`);
+      }
+    }
+
+    // L13: the portrait of a door is a picture, never the destination loaded live — the page of
+    // one world never reads the file of another (D14).
+    if (windowAxis.kind === 'preview' && windowAxis.asset) {
+      const portrait = assets[windowAxis.asset];
+      if (portrait && portrait.type !== 'image') {
+        err(`${where}: the portrait "${windowAxis.asset}" is a ${portrait.type} — law L13 (the ` +
+          `destination is never loaded live)`);
+      }
+    }
+  }
+
+  // ---- L17: at most one arrival door per world of origin ----
+  const arrivalDoors = new Map();
+  for (const portal of scene.portals || []) {
+    if (typeof portal.arrivalFrom !== 'string') continue;
+    const previous = arrivalDoors.get(portal.arrivalFrom);
+    if (previous !== undefined) {
+      err(`portals[${portal.id}]: it is the arrival door of "${portal.arrivalFrom}", and so is ` +
+        `portals[${previous}] — law L17 (one per origin, or the visitor appears somewhere arbitrary)`);
+      continue;
+    }
+    arrivalDoors.set(portal.arrivalFrom, portal.id);
+  }
+
+  // ---- L16: the arrival is behind the door and away from every box ----
+  // The point is the one the builder will place the camera on (js/scene/arrival.js, one home for
+  // the geometry), so what is proved here is what happens on the screen.
+  const camera = scene.cameras && scene.cameras.player ? scene.cameras.player : {};
+  const eyeHeight = Array.isArray(camera.position) && typeof camera.position[1] === 'number'
+    ? camera.position[1]
+    : EYE_HEIGHT;
+  for (const portal of portals) {
+    if (typeof portal.arrivalFrom !== 'string') continue;
+    const arrival = arrivalPoint(portal, eyeHeight).position;
+    for (const other of portals) {
+      if (!insideBox(arrival, other)) continue;
+      const where = other === portal ? 'the door itself' : `portals[${other.id}]`;
+      err(`portals[${portal.id}]: arriving from "${portal.arrivalFrom}" lands inside the box of ` +
+        `${where} — law L16 (the first step forward crosses it again: chain crossings)`);
+      break;
+    }
+  }
+
   // ---- L5: how many different dimensions a window can show at once ----
   const summary = summarise(scene);
   if (summary.distinctWindows > MAX_WINDOWS) {
@@ -164,6 +244,34 @@ export function validateScene(scene, options = {}) {
   }
 
   return { ok: errors.length === 0, errors, warnings, skipped, summary };
+}
+
+// Which worlds nobody can reach from the entry one (the gate), walking the doors that navigate.
+//
+// Pure, and separate from validateScene because it needs the whole set of files at once: only the
+// command line has them (the exhibition loads one world and never sees the others, which is the
+// point of D14).
+export function unreachableWorlds(scenes, entrySlug) {
+  const doors = new Map();
+  for (const scene of scenes) {
+    const from = scene.world && scene.world.slug;
+    doors.set(from, (scene.portals || [])
+      .filter((portal) => (portal.action || {}).kind === 'navigate' && typeof portal.action.target === 'string')
+      .map((portal) => portal.action.target));
+  }
+  const reachable = new Set([entrySlug]);
+  const queue = [entrySlug];
+  while (queue.length > 0) {
+    for (const target of doors.get(queue.shift()) || []) {
+      if (!reachable.has(target)) {
+        reachable.add(target);
+        queue.push(target);
+      }
+    }
+  }
+  return scenes
+    .map((scene) => scene.world && scene.world.slug)
+    .filter((slug) => slug && !reachable.has(slug));
 }
 
 // The arrival point of a "from" portal, in the space of another portal's box. Position and

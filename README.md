@@ -28,7 +28,9 @@ zonas12/
 │   └── images/         panoramas 360º, fotos e vídeo usados na cena
 ├── tools/
 │   ├── scene/               validador dos ficheiros de cena (corre a mesma validação que o browser)
-│   ├── migration/           o conversor HTML→JSON da Fase 0, com guarda: é o registo da migração
+│   │                        e o instrumento das leis (avarias injetadas, uma por lei)
+│   ├── migration/           o conversor HTML→JSON da Fase 0 e a migração para o formato v3, ambos
+│   │                        com guarda: são o registo das migrações
 │   └── regression/          varredura de poses T2/T3 (corre na consola do browser)
 ├── .harness/           fora do repositório (está no .gitignore)
 │   ├── dev/            ferramentas retiradas da raiz (não são precisas para o app)
@@ -161,13 +163,18 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 
 ## Estado atual do código (v0.0.5)
 
+> ⚠️ **A Fase 3B está a decorrer no `main`** (plano em [docs/ROADMAP.md](docs/ROADMAP.md), §9): o
+> formato dos dados passou a **v3** (o `world` e os dois eixos da porta) e o validador ganhou as
+> leis dos mundos. Os números, a verificação e o marco abaixo são os da **v0.0.5** — o fecho da
+> fase (a `v0.0.6`) é o bloco B10, e é ele que acerta esta secção.
+
 Marcado pela branch `v0.0.5` e **publicado** em <https://rodrigorez.github.io/zonas12/> (o GitHub
 Pages serve o `main`). É o estado depois da **Fase 3** do roadmap (a cena vem de dados), testado
 pelo autor em 2026-10-15 nas **três** versões — local, a publicada e no telemóvel. A versão
 anterior é a `v0.0.4` (o estado da Fase 2), marcada pela branch com o mesmo nome. Resumo do que
 existe hoje: `index.html` (**82 linhas**),
-`js/app.js` (**117**), `js/core/` (7 ficheiros, **207**), `js/modules/` (4 ficheiros, **825**),
-`js/scene/` (**3 ficheiros**, 628), `css/style.css` (96), `data/scene.json` (a cena, **594
+`js/app.js` (**118**), `js/core/` (7 ficheiros, **219**), `js/modules/` (5 ficheiros, **908**),
+`js/scene/` (**4 ficheiros**, 864), `css/style.css` (96), `data/scene.json` (a cena, **650
 linhas**), `data/scene-example.json` (o fixture), `i18n/pt.json` e as ferramentas em `tools/`.
 
 O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
@@ -190,8 +197,9 @@ O **`js/scene/`** é onde a cena em dados vive, e tem só três ficheiros:
 
 | Ficheiro | O que é |
 | --- | --- |
-| `schema.js` | A **forma do formato**: campos, tipos, enumerações, omissões e o catálogo de assets. Puro — não conhece o DOM nem o A-Frame |
-| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9 e L12. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor vai reutilizar |
+| `schema.js` | A **forma do formato** (v3): campos, tipos, enumerações, as regras dos dois eixos da porta e o catálogo de assets. Puro — não conhece o DOM nem o A-Frame |
+| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L11, L12, L13, L15, L16, L17 e L18 (a L10 e a L14 chegam com o bloco dos assets). É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor vai reutilizar |
+| `arrival.js` | Onde o visitante aparece ao chegar de outro mundo (**L16**): puro e partilhado, para o construtor e o validador não discordarem da geometria |
 | `scene-builder.js` | O **único** dos três que conhece o A-Frame: cria o `<a-assets>` (e **espera** que os ficheiros carreguem), a câmara, as dimensões, as obras e os portais, a partir do JSON |
 
 A cena está em **`data/scene.json`** (formato **v3**, descrito no roadmap §6): um catálogo

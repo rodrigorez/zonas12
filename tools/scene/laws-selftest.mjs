@@ -1,0 +1,196 @@
+#!/usr/bin/env node
+// One injected fault per law and per rule of the shape, to prove that the validator fails when it
+// should.
+//
+// Why: an instrument that cannot fail proves nothing. The pose sweep has `fault: 'bar'` and
+// `fault: 'stencil'` for exactly this reason (tools/regression/pose-sweep.mjs); here each case
+// takes the scene as it is, injects one defect, and checks not only that the report is not ok but
+// that the message about that law is the one that came out — a validator that fails for the wrong
+// reason is a validator nobody can trust.
+//
+// The answers the command line gives the validator are stubbed, so a case can lie about the disk
+// on purpose: `exists`, `imageSize` and `worldExists`.
+//
+// Usage: node tools/scene/laws-selftest.mjs
+
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { validateScene, unreachableWorlds } from '../../js/scene/validation.js';
+
+const here = dirname(fileURLToPath(import.meta.url));
+const root = resolve(here, '..', '..');
+const scene = JSON.parse(readFileSync(join(root, 'data', 'scene.json'), 'utf8'));
+
+// What the command line answers by default: the files are where the paths say, and every panorama
+// has the standard shape (the shapes themselves are checked by the layout of the disk, in B8).
+const options = {
+  exists: (assetPath) => existsSync(join(root, assetPath)),
+  imageSize: () => ({ width: 2048, height: 1024 })
+};
+
+// One door that navigates, for the cases that need one: legal on its own (window `none` with
+// action `navigate`).
+const navigatingDoor = (overrides) => Object.assign({
+  id: 30, ownedBy: 0, position: [0, 0, -400], width: 4, height: 5,
+  box: [4, 5, 1], window: { kind: 'none' }, action: { kind: 'navigate', target: 'ceu' }
+}, overrides);
+
+// A scene that is the same as the exhibition but with 256 different windows: the stencil has 8
+// bits, so the 256th has no value to write (law L5).
+function withTooManyWindows(copy) {
+  copy.dimensions = [{ id: 0, kind: 'camera' }];
+  copy.portals = [];
+  for (let i = 1; i <= 256; i++) {
+    copy.dimensions.push({ id: i, kind: 'image', asset: 'praia', radius: 500 });
+    copy.portals.push({
+      id: i - 1, ownedBy: 0, position: [0, 0, -400], width: 4, height: 5, box: [4, 5, 1],
+      window: { kind: 'dimension-pair', dimensionA: 0, dimensionB: i },
+      action: { kind: 'enter-window' }
+    });
+  }
+  return copy;
+}
+
+const cases = [
+  {
+    law: 'the shape',
+    what: 'an unknown field',
+    expect: 'unknown field',
+    inject: (copy) => { copy.dimensions[0].colour = '#ffffff'; }
+  },
+  {
+    law: 'the shape',
+    what: 'a required field left out',
+    expect: 'cameras.real: required',
+    inject: (copy) => { delete copy.cameras.real; }
+  },
+  {
+    law: 'the shape',
+    what: 'a version this reader does not know',
+    expect: 'this reader reads',
+    inject: (copy) => { copy.version = 2; }
+  },
+  {
+    law: 'the shape',
+    what: 'a field the kind of the axis does not take',
+    expect: 'not written when kind is "dimension-pair"',
+    inject: (copy) => { copy.portals[0].window.radius = 10; }
+  },
+  {
+    law: 'L1',
+    what: 'a background radius smaller than the scene',
+    expect: 'law L1',
+    inject: (copy) => { copy.dimensions[1].radius = 10; }
+  },
+  {
+    law: 'L4',
+    what: 'a door standing inside another door',
+    expect: 'law L4',
+    inject: (copy) => { copy.portals[1].position = [...copy.portals[0].position]; }
+  },
+  {
+    law: 'L5',
+    what: 'the 256th distinct window',
+    expect: 'law L5',
+    inject: withTooManyWindows
+  },
+  {
+    law: 'L9',
+    what: 'an asset that is not on the disk',
+    expect: 'law L9',
+    options: { exists: () => false },
+    inject: () => {}
+  },
+  {
+    law: 'L11',
+    what: 'a door that navigates to a world that does not exist',
+    expect: 'law L11',
+    options: { worldExists: () => false },
+    inject: (copy) => { copy.portals.push(navigatingDoor({})); }
+  },
+  {
+    law: 'L12',
+    what: 'an absolute path in the data',
+    expect: 'law L12',
+    inject: (copy) => { copy.assets.praia.path = '/srv/zonas/praia.jpg'; }
+  },
+  {
+    law: 'L13',
+    what: 'a portrait that is not a picture',
+    expect: 'law L13',
+    inject: (copy) => {
+      copy.portals.push(navigatingDoor({
+        window: { kind: 'preview', asset: 'video', radius: 120 }
+      }));
+    }
+  },
+  {
+    law: 'L15',
+    what: 'a declared id inside the reserved band',
+    expect: 'law L15',
+    inject: (copy) => { copy.dimensions[1].id = 448; }
+  },
+  {
+    law: 'L16',
+    what: 'a box the arrival point falls inside',
+    expect: 'law L16',
+    inject: (copy) => { copy.portals[0].arrivalFrom = 'ceu'; copy.portals[0].boxRotation = [0, 90, 0]; }
+  },
+  {
+    law: 'L17',
+    what: 'two arrival doors for the same world of origin',
+    expect: 'law L17',
+    inject: (copy) => { copy.portals[0].arrivalFrom = 'ceu'; copy.portals[2].arrivalFrom = 'ceu'; }
+  },
+  {
+    law: 'L18',
+    what: 'a window that shows this world with an action that leaves it',
+    expect: 'law L18',
+    inject: (copy) => { copy.portals[0].action = { kind: 'navigate', target: 'ceu' }; }
+  }
+];
+
+let detected = 0;
+const rows = [];
+
+for (const testCase of cases) {
+  const copy = JSON.parse(JSON.stringify(scene));
+  testCase.inject(copy);
+
+  const report = validateScene(copy, Object.assign({}, options, testCase.options));
+  const messages = report.errors.concat(report.warnings);
+  const found = messages.some((message) => message.includes(testCase.expect));
+  const level = testCase.level === 'warning' ? report.ok : !report.ok;
+  const ok = found && level;
+  if (ok) detected++;
+
+  rows.push({
+    law: testCase.law,
+    what: testCase.what,
+    ok,
+    message: (messages.find((message) => message.includes(testCase.expect)) || report.errors[0] ||
+      report.warnings[0] || 'nothing was reported')
+  });
+}
+
+// The control: with nothing injected, the validator has to say nothing.
+const clean = validateScene(JSON.parse(JSON.stringify(scene)), options);
+const control = { errors: clean.errors.length, warnings: clean.warnings.length, ok: clean.ok };
+
+// And the graph: a world nobody can reach is a world nobody visits.
+const orphan = JSON.parse(JSON.stringify(scene));
+orphan.world = { slug: 'orfao', name: { pt: 'Órfão', en: 'Orphan' } };
+const reachable = unreachableWorlds([scene, orphan], 'gate');
+
+console.table(rows.map((row) => ({ law: row.law, 'injected fault': row.what, detected: row.ok ? 'yes' : 'NO', message: row.message.slice(0, 96) })));
+console.log(`laws and shape: ${detected} of ${cases.length} faults detected`);
+console.log(`control (nothing injected): ${control.ok ? 'clean' : 'FAILED'} — ` +
+  `${control.errors} errors, ${control.warnings} warnings`);
+console.log(`world graph: an unreachable world is ${reachable.length === 1 && reachable[0] === 'orfao' ? 'detected' : 'NOT detected'}`);
+
+const failed = detected !== cases.length || !control.ok || reachable.length !== 1;
+if (failed) {
+  console.error('the validator did not fail where it should');
+  process.exit(1);
+}

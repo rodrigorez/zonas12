@@ -96,7 +96,7 @@ export const SCENE = {
       },
       // Whether the exhibition shows the real world behind dimension 0 (the webcam). It is
       // required on purpose: the page asks for the camera only when the data says so.
-      real: { type: 'object', fields: { enabled: { type: 'boolean', required: true } } }
+      real: { type: 'object', required: true, fields: { enabled: { type: 'boolean', required: true } } }
     }
   },
 

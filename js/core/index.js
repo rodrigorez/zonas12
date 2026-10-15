@@ -3,7 +3,7 @@
 //
 // Dependency direction (docs/ROADMAP.md, section 5.0): modules -> core, never the other way.
 // Nothing here touches the DOM, the keyboard, JSON or the A-Frame components.
-export { MAX_DIMENSIONS, MAX_PORTALS, MAX_WINDOWS } from './limits.js';
+export { MAX_DIMENSIONS, MAX_PORTALS, MAX_WINDOWS, DERIVED_DIMENSION_BASE } from './limits.js';
 export { state } from './state.js';
 export { on, off, emit } from './events.js';
 export { applyStencilRule, applyStencilState, syncStencilValues } from './stencil.js';

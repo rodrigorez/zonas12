@@ -1269,9 +1269,9 @@ fez.
 | **B0** | O plano e as decisões **D24–D28** registados (§9, §11, §6, §8, §13) — **documentação, sem código** | — |
 | **B1** | Linha de base re-medida **antes** de mexer: T1–T9, a varredura de poses, a consola, o `validate.mjs` e as 265 chaves do JSON | — |
 | **B2** | **O formato passa a v3, ponta a ponta**: `schema.js` v3 (o `world`, os dois eixos, a obrigatoriedade condicional e os ids declarados até 447), a tabela pura dos eixos (`js/modules/portal-kinds.js`), o migrador por script (`tools/migration/scene-v3.mjs`, com a comparação campo a campo) e o dado migrado, **mais** a fábrica e o componente a lerem o eixo | D22 e D25, no dado |
-| **B3** | As **leis dos mundos** no validador — L10, L11, L13, L14 (com o leitor de pixels da linha de comando), L15, L16, L17 e L18 —, **uma avaria injetada por lei**, e o esqueleto do grafo de mundos | As leis dos mundos, no dado |
+| **B3** | As **leis dos mundos** que o dado de hoje já satisfaz — L11, L13, L15, L16, L17 e L18 —, mais as regras da forma, o cálculo da chegada (`js/scene/arrival.js`) e o grafo de mundos (`unreachableWorlds`), tudo com **uma avaria injetada por lei** no instrumento novo (`tools/scene/laws-selftest.mjs`) | As leis dos mundos, no dado |
 | **B4** | As **duas tabelas** no módulo do portal e `createPortal` a lê-las, com o caminho do par inalterado | Os dois eixos |
-| **B5** | D7 e L14: `assets/{panoramas,artworks,video,previews}`, os panoramas normalizados a **2048×1024** e os retratos gerados | L14 e L9 |
+| **B5** | D7, **L10 e L14**: os assets mudam para `assets/{panoramas,artworks,video,previews}` (com `git mv`), os panoramas normalizados a **2048×1024** e os retratos gerados, mais o leitor de pixels da linha de comando | L10, L14 e L9 |
 | **B6** | **A separação em mundos**: `data/worlds/*.json`, as dimensões renumeradas por mundo, `cameras.real.enabled` só no portão, as portas a `navigate` com `?from`, a **chegada** (L16) e as dimensões derivadas | D24 e D26 |
 | **B7** | As **pastas de mundo** (4 arranques byte-idênticos, `<base href="../">`), o slug por `document.baseURI` (D28) e a navegação por porta | O endereço por sala |
 | **B8** | Ferramentas: o migrador com guarda, o **grafo de mundos** no validador, a normalização e os retratos, e o verificador «os 4 arranques são iguais» e «o nome da pasta é o `world.slug`» | As ferramentas da D14 |
@@ -1287,9 +1287,31 @@ a ponta** — esquema, tabela dos eixos, migrador, dado e a fábrica a ler o eix
 mundos** passaram a B3. O resultado do B1 continua a ser a linha de base: o B2 prova-se por
 **0 diferenças** na migração e pelos **mesmos números do B1** no browser.
 
+**Segunda emenda, pela mesma razão (2026-10-15, ao fechar o B3).** O plano dava a L10 e a L14 ao B3
+e o instrumento provou outra coisa: as duas **falham no dado de hoje** — a L14 porque `forest.jpg`
+(9923×2614) e `skycloud.jpg` (960×240) não são 2:1, a L10 porque os seis ficheiros ainda vivem em
+`assets/images/`. Como o **T8 conta avisos** e a consola da exposição é um teste, uma lei que o dado
+não satisfaz deixa a fase vermelha. Passam as duas para o **B5**, que é o bloco que mexe nos
+ficheiros — e que é onde entra o leitor de pixels. **A regra que fica: uma lei e o dado que a
+satisfaz entram no mesmo bloco.** O B3 entregou as leis que o dado já cumpre (L11, L13, L15, L16,
+L17 e L18) e o instrumento que prova que elas falham quando devem (15 de 15).
+
 **Feito até agora (2026-10-15):** **B0** — plano e decisões registados (§9, §11, §6, §8, §13), commit
 `4c13673`, só documentação; **B1** — linha de base re-medida **antes** de mexer em código, com os
-números abaixo; **B2** — o formato v3 ponta a ponta, com a prova na tabela seguinte.
+números abaixo; **B2** — o formato v3 ponta a ponta; **B3** — as leis dos mundos no validador e o
+instrumento que as prova.
+
+#### O que o B3 entregou e mediu (2026-10-15)
+
+| Item | Medição |
+| --- | --- |
+| O instrumento (`tools/scene/laws-selftest.mjs`) | **15 de 15** avarias detetadas: 4 da forma (campo desconhecido, campo obrigatório em falta, versão desconhecida, campo que o eixo não leva) e as leis **L1, L4, L5, L9, L11, L12, L13, L15, L16, L17 e L18** |
+| O controlo | com nada injetado, o validador **não diz nada** (0 erros, **0 avisos**) — o instrumento não inventa |
+| O grafo de mundos | um mundo que ninguém alcança a partir do portão é **detetado** (função pura `unreachableWorlds`) |
+| As leis que o dado não cumpre ainda | **L10** (os 6 ficheiros em `assets/images/`) e **L14** (`forest` 9923×2614, `skycloud` 960×240) — movidas para o B5, com o motivo escrito acima |
+| Um defeito encontrado ao escrever o caso | o `cameras.real` dizia «obrigatório por propósito» no comentário e **não** no esquema: corrigido (`required: true`), e é o caso 2 do instrumento |
+| `validate.mjs` | **OK** nos dois ficheiros, sem avisos, exit 0 |
+| O browser | T1/T7 **8 de 8** e T8 **0 erros, 0 avisos, 0 pedidos falhados** — iguais ao B1 |
 
 #### O que o B2 entregou e mediu (2026-10-15)
 

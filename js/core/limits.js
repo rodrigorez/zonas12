@@ -5,3 +5,8 @@
 export const MAX_DIMENSIONS = 512;
 export const MAX_PORTALS = 512;
 export const MAX_WINDOWS = 255;
+
+// The band of ids a declared dimension may NOT use (law L15): the builder derives a dimension per
+// portrait, in this band, and hands its id to the door (D26). A declared id inside it would end up
+// activated by mistake — the camera inside a portrait.
+export const DERIVED_DIMENSION_BASE = 448;
