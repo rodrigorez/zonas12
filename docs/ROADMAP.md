@@ -80,6 +80,17 @@ independentes. São factos verificados por leitura do ficheiro.
 | A5 | `js/main.js:290, 480, 521` | `document.querySelector('a-camera')` em 3 sítios | O panorama, a travessia e o movimento mobile **conhecem o seletor** da câmara; trocar a câmara obriga a mexer em 3 módulos |
 | A6 | `index.html` obras | `src="#skycloud"` (id do asset) **e** `abrir-modal="url: assets/images/skycloud.jpg"` (caminho) | O mesmo recurso está escrito duas vezes; um editor tem de manter os dois em sincronia |
 | A7 | `gestor-dimensoes.tick()` | Deteta travessias **e** atribui valores de stencil | Duas responsabilidades no mesmo sítio; a travessia é do portal, a atribuição é do núcleo |
+
+**Fecho de A2 e A3 (2026-10-15).** As duas eram o mesmo defeito: o ouvinte de teclado nascia
+dentro do `init` de **cada** portal e nunca era removido. Medido no browser, com portais a serem
+criados e destruídos em ciclo (`DOMDebugger.getEventListeners` sobre o `document`): **8**
+ouvintes de `keydown` na carga (um por portal), **13** depois de criar e destruir 5 portais e
+**14** depois do rig de sobreposição do T5 — um ouvinte morto por cada portal criado, a manter
+vivo o portal removido. A correção é o desenho que o T9 pedia: **um** ouvinte para a cena
+inteira, a iterar o registo de portais (`js/app.js`), onde já não há nada que se possa acumular.
+O comportamento mantém-se igual ao que os 8 ouvintes davam (premir `R` roda todos os portais,
+`D` liga/desliga a caixa de debug de todos). Passou a **1** na carga e **1** depois de 6 ciclos
+de criação/destruição. A4–A7 continuam abertas.
 | A8 | `config-ar` | `sortObjects`, `autoClearStencil`, `setClearColor` | É configuração de render: tem de ser única e correr antes de tudo |
 
 > **Nota (Fase 1).** As referências de linha desta tabela são da **v0.0.2**, quando a

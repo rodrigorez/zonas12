@@ -54,6 +54,23 @@ function fecharObra() {
   document.removeEventListener('keydown', aoTeclarNoModal);
 }
 
+// As teclas do modal têm de valer também dentro da obra embutida. Ao clicar lá dentro, o foco
+// passa para o documento do frame e mais nenhum evento de teclado chega ao documento de fora:
+// o Escape deixava de fechar e o Tab deixava de estar preso ao diálogo. Nas obras da mesma
+// origem dá para ouvir o documento do frame (o ouvinte é o mesmo, e usa sempre o `document` de
+// fora); nas de outra origem não há acesso — aí resta o botão "Voltar para a Galeria", que não
+// depende do teclado.
+document.getElementById('iframe-obra').addEventListener('load', function () {
+  try {
+    let documentoDoFrame = this.contentDocument;
+    if (!documentoDoFrame) return;
+    documentoDoFrame.removeEventListener('keydown', aoTeclarNoModal);
+    documentoDoFrame.addEventListener('keydown', aoTeclarNoModal);
+  } catch (erro) {
+    // Obra de outra origem: sem acesso ao documento do frame.
+  }
+});
+
 // --- DEBUG AND TEST HANDLE ---
 // The console and the regression scripts (docs/ROADMAP.md section 10) drive the scene
 // through this. The application itself does not use it.
@@ -267,11 +284,6 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     this.configurarCaixa();
     this.criarQuadro();
 
-    document.addEventListener('keydown', (evento) => {
-      if (evento.key === 'r' || evento.key === 'R') this.portalGroup.rotation.y += Math.PI;
-      if (evento.key === 'd' || evento.key === 'D') this.toggleDebugMode();
-    });
-
     registerPortal(this);
     // The core does not know about portals: it announces the stencil changed and every
     // window refreshes itself.
@@ -441,6 +453,19 @@ AFRAME.registerComponent('portal-estencil-dinamico', {
     let ativa = state.activeDimension;
     setActiveDimension(ativa === this.data.dimensaoA ? this.data.dimensaoB : this.data.dimensaoA);
   }
+});
+
+// Atalhos de teclado de desenvolvimento: um ouvinte só para a cena inteira, a iterar o
+// registo dos portais. Registar um ouvinte por portal (como antes) deixava um ouvinte morto
+// por cada portal criado e destruído — e o portal removido ficava vivo na closure, sem poder
+// ser recolhido. Criar e destruir portais em ciclo é o teste T9 (docs/ROADMAP.md secção 10).
+document.addEventListener('keydown', (evento) => {
+  let tecla = evento.key.toLowerCase();
+  if (tecla !== 'r' && tecla !== 'd') return;
+  state.portals.slice().forEach(function (portal) {
+    if (tecla === 'r') portal.portalGroup.rotation.y += Math.PI;
+    else portal.toggleDebugMode();
+  });
 });
 
 // --- LÓGICA DE MOVIMENTAÇÃO MOBILE ---
