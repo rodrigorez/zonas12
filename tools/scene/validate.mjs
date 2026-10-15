@@ -11,7 +11,7 @@
 // conversão foi provada pelo conversor, campo a campo, contra o último JSON do formato anterior
 // (190 valores, 0 diferenças não previstas) — a partir daí o JSON é a verdade.
 //
-// Uso: node tools/html-to-scene-json/validate.mjs [ficheiro...]
+// Uso: node tools/scene/validate.mjs [ficheiro...]
 //      (por omissão: data/scene.json e data/scene-example.json)
 
 import { existsSync, readFileSync } from 'node:fs';

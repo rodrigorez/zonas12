@@ -4,12 +4,13 @@
 //
 // Why a script: converting 8 portals and 10 artworks by hand invited swapped fields
 // (dimensaoA -> dimensionA, caixa -> box, pertenceA -> ownedBy). The script does the
-// conversion once, repeatably, and tools/html-to-scene-json/validate.mjs checks it.
+// conversion once, repeatably, and tools/scene/validate.mjs checks it.
 //
 // Fase 3 turned this file from "the tool that writes the scene" into "the record of one
-// migration": the scene now comes from the data, and index.html loses its entities (block B5).
-// From then on this script cannot reproduce the scene any more, and a guard (block B6) refuses
-// to write when the HTML has no entities.
+// migration": the scene comes from the data and index.html no longer has the entities (block B5
+// took them out), so this script cannot reproduce the scene any more. The guard below refuses to
+// run at all in that case, and the JSON the migration produced is in git (commit ecf82c7) — it is
+// the source of truth from then on.
 //
 // The format it writes is version 2 — what changed from version 1, and why:
 //   D20 — one `assets` catalogue. A dimension and an artwork carry only `asset`, and the URL the
@@ -28,7 +29,7 @@
 //   data/scene.json           the exhibition scene
 //   data/scene-example.json   the same scene, kept as example/fixture (D9)
 //
-// Usage: node tools/html-to-scene-json/convert.mjs
+// Usage: node tools/migration/convert.mjs
 
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -68,6 +69,23 @@ const warnings = [];
 const warn = (message) => warnings.push(message);
 
 const html = readFileSync(join(root, 'index.html'), 'utf8');
+
+// ---- the guard ----
+// The scene comes from the data since Fase 3 and index.html no longer has the entities: this
+// script cannot reproduce it any more, and running it would write an empty JSON over the good one.
+// So it refuses, before reading anything else — the tool stopping is the honest behaviour, and the
+// JSON that came out of the migration is in git (commit ecf82c7). To change the scene from here
+// on: edit data/scene.json (or use the editor, Fase 4) and check it with tools/scene/validate.mjs.
+const sceneEntities =
+  (html.match(/stencil-portal="/g) || []).length +
+  (html.match(/dimensional-material="/g) || []).length +
+  (html.match(/dimension-panorama="/g) || []).length;
+if (sceneEntities === 0) {
+  console.error('convert.mjs: index.html has no scene entities (stencil-portal, dimensional-material,');
+  console.error('dimension-panorama). The scene comes from the data: edit data/scene.json and check it with');
+  console.error('`node tools/scene/validate.mjs`. Nothing was written.');
+  process.exit(1);
+}
 
 // The entry point and every module, in a stable order. The values read below from the code
 // (box, trigger, frame, player speed) left the entry point in Fase 2.

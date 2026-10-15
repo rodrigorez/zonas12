@@ -1,7 +1,7 @@
 // The laws of the scene, checked against the data instead of against a running scene.
 //
 // Why here and not in the builder: the same report has to reach the console of the exhibition,
-// the command line (tools/html-to-scene-json/validate.mjs) and, later, the editor. Written once,
+// the command line (tools/scene/validate.mjs) and, later, the editor. Written once,
 // a scene that passes in one of them passes in all three.
 //
 // What it checks:

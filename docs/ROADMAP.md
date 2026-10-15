@@ -884,7 +884,7 @@ valores vivem; a Fase 2 só lhes acrescenta o ciclo de **20** portais no T9 (o m
 | M6 | D10 cumprida no que se move | `grep` dos **6** nomes de componente antigos (§5.7) em `js/` e `index.html` | **0** ocorrências |
 | M7 | O núcleo continua ignorante | `grep "modules/" js/core/` | **0** |
 | M8 | Consola em inglês | leitura | 0 mensagens em português em `console.*` |
-| M9 | Ferramentas verdes | `node tools/html-to-scene-json/validate.mjs` | exit **0**, 0 erros, e a conversão campo a campo continua com **0** diferenças (§13) |
+| M9 | Ferramentas verdes | `node tools/scene/validate.mjs` | exit **0**, 0 erros, e a conversão campo a campo continua com **0** diferenças (§13) |
 | M10 | O instrumento continua vivo | `runPoseSweep()`, mais as duas avarias injetadas | os números de §10; as avarias falham como falhavam |
 
 **(c) Documentação.** O README §*Estado atual do código* (contagens, nomes e a tabela dos 4

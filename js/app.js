@@ -89,7 +89,7 @@ async function buildFromData() {
 
   // The console is a test (T8): a scene that is fine says nothing at all. What cannot be checked
   // here — whether the file of an asset exists on disk — is the command line's job
-  // (tools/html-to-scene-json/validate.mjs).
+  // (tools/scene/validate.mjs).
   if (!report.ok) {
     report.errors.forEach((error) => console.error('[scene] ' + error));
     return false;

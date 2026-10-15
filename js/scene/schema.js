@@ -2,8 +2,8 @@
 //
 // Why a description instead of code that reads it: four different readers need to agree on the
 // format — the scene builder (js/scene/scene-builder.js), the validator (js/scene/validation.js,
-// which is also what tools/html-to-scene-json/validate.mjs runs), the converter that writes the
-// file (tools/html-to-scene-json/convert.mjs) and, later, the editor (Fase 4). Written once, they
+// which is also what tools/scene/validate.mjs runs), the converter that writes the
+// file (tools/migration/convert.mjs) and, later, the editor (Fase 4). Written once, they
 // cannot drift apart.
 //
 // Because of that this file has to stay pure: no DOM, no A-Frame, no three. It holds data only.

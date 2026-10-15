@@ -21,7 +21,8 @@ zonas12/
 ├── assets/
 │   └── images/         panoramas 360º, fotos e vídeo usados na cena
 ├── tools/
-│   ├── html-to-scene-json/  conversor e validador da cena em JSON (Fase 0)
+│   ├── scene/               validador dos ficheiros de cena (corre a mesma validação que o browser)
+│   ├── migration/           o conversor HTML→JSON da Fase 0, com guarda: é o registo da migração
 │   └── regression/          varredura de poses T2/T3 (corre na consola do browser)
 ├── .harness/           fora do repositório (está no .gitignore)
 │   ├── dev/            ferramentas retiradas da raiz (não são precisas para o app)
