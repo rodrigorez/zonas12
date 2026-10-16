@@ -16,7 +16,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateScene, unreachableWorlds } from '../../js/scene/validation.js';
+import { validateScene, unreachableWorlds, missingArrivals } from '../../js/scene/validation.js';
+import { checkArranques } from './arranques.mjs';
 import {
   WINDOW_KINDS,
   ACTION_KINDS,
@@ -217,6 +218,26 @@ const orphan = JSON.parse(JSON.stringify(scene));
 orphan.world = { slug: 'orfao', name: { pt: 'Órfão', en: 'Orphan' } };
 const reachable = unreachableWorlds([scene, orphan], scene.world.slug);
 
+// And the arrivals (law L19): a door to a world that says nothing about where the visitor comes from
+// lands them wherever the camera says. The exhibition answers every one of its doors — the beach did
+// not, until the B7 walked it and the D29 fixed it — so the case is made both ways: the whole
+// exhibition, and a world the doors point at with every `arrivalFrom` stripped.
+const exhibition = ['gate', 'cidade', 'praia', 'ceu']
+  .map((slug) => JSON.parse(readFileSync(join(root, 'data', 'worlds', slug + '.json'), 'utf8')));
+const answered = missingArrivals(exhibition);
+
+// The fault is the one the B7 found, put back: the beach's door 5 stripped of `arrivalFrom`, which
+// is what left the visitor from the gate landing wherever the camera says (D29).
+const withGap = exhibition.map((copy) => JSON.parse(JSON.stringify(copy)));
+withGap.find((copy) => copy.world.slug === 'praia').portals
+  .forEach((portal) => { if (portal.id === 5) delete portal.arrivalFrom; });
+const gaps = missingArrivals(withGap);
+const arrivals = {
+  answered: answered.length,
+  gaps: gaps.map((gap) => `${gap.from} -> ${gap.to}`),
+  doors: gaps.length === 1 ? gaps[0].portals : []
+};
+
 // The tables of the two axes (section 5.4): what each kind means, which combinations are legal and
 // where the address of a world lives. Pure, so it is checked here and not in the browser.
 const legalCombinations = [
@@ -262,11 +283,50 @@ console.log(`laws and shape: ${detected} of ${cases.length} faults detected`);
 console.log(`control (nothing injected): ${control.ok ? 'clean' : 'FAILED'} — ` +
   `${control.errors} errors, ${control.warnings} warnings`);
 console.log(`world graph: an unreachable world is ${reachable.length === 1 && reachable[0] === 'orfao' ? 'detected' : 'NOT detected'}`);
+const arrivalsAsExpected = arrivals.answered === 0 && arrivals.gaps.length === 1 &&
+  arrivals.gaps[0] === 'gate -> praia' && arrivals.doors.length === 1 && arrivals.doors[0] === 1;
+console.log(`arrivals (L19): the exhibition answers every door (${arrivals.answered} gaps), and a door ` +
+  `with no arrival at the destination is ${arrivalsAsExpected ? 'detected' : 'NOT detected'}` +
+  (arrivals.gaps.length ? ` (${arrivals.gaps.join(', ')}, doors ${arrivals.doors.join(', ')})` : ''));
+
+// The arranques (D28): one file per world, and the four the same outside the `<base>` line. Here the
+// disk is a map in memory, so a case can lie about it on purpose — which is the only way to know
+// that a room with no arranque, or a room whose arranque kept the root's `<base>`, would be caught.
+const arranqueFiles = {};
+for (const relative of ['index.html', 'cidade/index.html', 'praia/index.html', 'ceu/index.html']) {
+  arranqueFiles[relative] = readFileSync(join(root, relative), 'utf8');
+}
+const arranqueSlugs = ['gate', 'cidade', 'praia', 'ceu'];
+const withFiles = (changes) => (relative) => (relative in changes ? changes[relative] : arranqueFiles[relative]);
+const arranqueCases = [
+  ['the exhibition as it is', withFiles({}), 0],
+  ['a room with no arranque at all', withFiles({ 'praia/index.html': null }), 'praia/index.html is not there'],
+  ['a room whose arranque kept the root\'s <base>',
+    withFiles({ 'praia/index.html': arranqueFiles['index.html'] }), 'needs href="../"'],
+  ['a room whose arranque has no <base>',
+    withFiles({ 'praia/index.html': arranqueFiles['praia/index.html'].replace(/^.*<base.*$/m, '') }), 'has no <base>'],
+  ['an arranque that diverged by one word',
+    withFiles({ 'cidade/index.html': arranqueFiles['cidade/index.html'].replace('<title>', '<title> ') }),
+    'is not the same file as index.html']
+];
+const arranqueChecks = arranqueCases.map(([what, read, expected]) => {
+  const report = checkArranques(arranqueSlugs, { entry: 'gate', read: read });
+  const message = report.errors[0] || '';
+  const ok = expected === 0
+    ? report.errors.length === 0 && report.checked.length === 4
+    : report.errors.length === 1 && message.includes(expected);
+  return { what: what, ok: ok, message: message || 'nothing was reported' };
+});
+const arranquesPassed = arranqueChecks.filter((entry) => entry.ok).length;
+console.log(`arranques (D28): ${arranquesPassed} of ${arranqueChecks.length} cases behave as they should`);
+for (const entry of arranqueChecks.filter((entry) => !entry.ok)) {
+  console.error(`  failed: ${entry.what} — ${entry.message}`);
+}
 console.log(`tables of the two axes: ${tablesPassed} of ${tableChecks.length} checks pass`);
 for (const entry of tableChecks.filter((entry) => !entry.ok)) console.error(`  failed: ${entry.what}`);
 
 const failed = detected !== cases.length || !control.ok || reachable.length !== 1 ||
-  tablesPassed !== tableChecks.length;
+  !arrivalsAsExpected || arranquesPassed !== arranqueChecks.length || tablesPassed !== tableChecks.length;
 if (failed) {
   console.error('the validator did not fail where it should');
   process.exit(1);

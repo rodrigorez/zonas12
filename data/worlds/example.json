@@ -366,6 +366,37 @@
         "target": "praia"
       },
       "arrivalFrom": "praia"
+    },
+    {
+      "id": 3,
+      "ownedBy": 0,
+      "position": [
+        -25,
+        0,
+        -45
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "trigger": "plane",
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-praia",
+        "radius": 120
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "praia"
+      }
     }
   ]
 }

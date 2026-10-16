@@ -238,6 +238,23 @@ function fixtureWorld(scene) {
       window: { kind: 'preview', asset: 'retrato-praia', radius: PORTRAIT_RADIUS },
       action: { kind: 'navigate', target: 'praia' },
       arrivalFrom: 'praia'
+    },
+    // A second door with the **same** portrait, and the reason the fixture keeps it: two doors that
+    // show the same picture share one derived dimension — 1 texture, 1 stencil value, 1 drawing
+    // (D26). The exhibition used to prove it by accident, with the two duplicated portals of the
+    // beach, and the D29 turned one of them into the way back to the gate; the fixture is where
+    // that mechanism is exercised on purpose from now on.
+    {
+      id: 3,
+      ownedBy: 0,
+      position: [-25, 0, -45],
+      width: 10,
+      height: 12,
+      box: [12, 16, 1],
+      boxPosition: [0, 8, 0],
+      trigger: 'plane',
+      window: { kind: 'preview', asset: 'retrato-praia', radius: PORTRAIT_RADIUS },
+      action: { kind: 'navigate', target: 'praia' }
     }
   ];
   const assets = assetsFor(scene, [1, 3], artworks, doors);

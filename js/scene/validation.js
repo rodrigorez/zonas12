@@ -15,6 +15,9 @@
 //     picture, never a live world), L14 (the 2:1 shape of a panorama, and its size — a warning only
 //     above the standard), L15 (the reserved band of ids), L16 and L17 (the arrival point, and one
 //     arrival door per origin) and L18 (the two axes combine legally).
+//   - the graph of the worlds, when the caller has all of them: the rooms nobody can reach
+//     (`unreachableWorlds`) and the doors whose destination says nothing about where the visitor
+//     comes from (`missingArrivals`, law L19).
 //
 // What it does not check, on purpose:
 //   - the laws of render (L2, L3, L6, L7, L8): they are properties of the code, not of the data.
@@ -315,6 +318,42 @@ export function unreachableWorlds(scenes, entrySlug) {
   return scenes
     .map((scene) => scene.world && scene.world.slug)
     .filter((slug) => slug && !reachable.has(slug));
+}
+
+// The doors whose destination does not say where the visitor came from (law L19): a door from A to
+// B, and no door of B declaring `arrivalFrom: A`. The visitor still arrives — the runtime puts them
+// where the camera says, and warns about it right there (js/scene/scene-builder.js) — but the
+// arrival is a place nobody chose, and the way back is wherever it happens to be.
+//
+// The runtime warning and this check are the same fact seen from two sides, and this one is the
+// side that can be asked *before* somebody walks the door: the beach stayed without a way back to
+// the gate since the scene was written, and only the B7 walk found it (D29, docs/ROADMAP.md §9).
+//
+// One entry per pair — `{ from, to, portals }`, with every door that makes the pair — and none for
+// a destination with no file of its own: a door to a world that does not exist is L11's business.
+// Same shape as unreachableWorlds, and for the same reason: the exhibition loads one world and
+// never sees the others (D14), so only the command line can ask this.
+export function missingArrivals(scenes) {
+  const arrivals = new Map();
+  for (const scene of scenes) {
+    arrivals.set(scene.world && scene.world.slug, new Set((scene.portals || [])
+      .filter((portal) => typeof portal.arrivalFrom === 'string')
+      .map((portal) => portal.arrivalFrom)));
+  }
+
+  const gaps = new Map();
+  for (const scene of scenes) {
+    const from = scene.world && scene.world.slug;
+    for (const portal of scene.portals || []) {
+      const action = portal.action || {};
+      if (action.kind !== 'navigate' || typeof action.target !== 'string') continue;
+      if (!arrivals.has(action.target) || arrivals.get(action.target).has(from)) continue;
+      const key = from + ' -> ' + action.target;
+      if (!gaps.has(key)) gaps.set(key, { from: from, to: action.target, portals: [] });
+      gaps.get(key).portals.push(portal.id);
+    }
+  }
+  return [...gaps.values()];
 }
 
 // The arrival point of a "from" portal, in the space of another portal's box. Position and

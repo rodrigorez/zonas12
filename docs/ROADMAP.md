@@ -846,21 +846,27 @@ O editor deve impedi-las **antes** de exportar.
 | L16 | A chegada fica atrás da porta, afastada mais do que meia profundidade da caixa + margem | Andar em frente ao aparecer dispara travessia (troca em cadeia) |
 | L17 | No máximo **uma** porta de chegada por origem, em cada mundo | O visitante aparece num sítio arbitrário |
 | L18 | A combinação `window` × `action` é uma das legais (§5.4) | O retrato mente (leva a outro mundo) ou entra-se no retrato |
+| L19 | Toda a porta que navega tem, no destino, uma porta que se declara a chegada dessa origem | O visitante chega onde a câmara diz — um sítio que ninguém escolheu — e o regresso fica onde calhar (foi assim que a praia ficou sem caminho para o portão até o B7 o medir: D29) |
 
 As leis **L1–L8** vêm de defeitos medidos. As leis **L9–L18** vêm da D14 (planeamento):
 L9 e L10 foram propostas pela D7 e ficam aqui registadas; L11–L18 nascem dos mundos e das
-portas de mundo.
+portas de mundo. A **L19** nasce de um defeito **medido** — a primeira porta que o B7 atravessou
+(§9) — e é a última a entrar: fecha o que os mundos deixaram em aberto.
 
-**O que está verificado hoje (fim do B5 da Fase 3B).** O `js/scene/validation.js` — o mesmo módulo
+**O que está verificado hoje (fim do B8 da Fase 3B).** O `js/scene/validation.js` — o mesmo módulo
 que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de
 comando e que o editor (Fase 4) vai reutilizar — verifica a forma do formato e as leis **L1, L4, L5,
 L9, L10, L11, L12, L13, L14, L15, L16, L17 e L18**, cada uma com uma **avaria injetada** que prova
-que ela falha quando deve: **17 de 17** no instrumento `tools/scene/laws-selftest.mjs` (§9). As leis
+que ela falha quando deve: **17 de 17** no instrumento `tools/scene/laws-selftest.mjs` (§9). A
+**L19** é do **grafo** (como a pergunta da alcançabilidade) e não da forma de um ficheiro: precisa do
+conjunto todo, e é o `missingArrivals` que a responde — a mesma função que a exposição não pode
+correr (D14: cada mundo carrega um ficheiro e nunca vê os outros), razão pela qual o aviso que ela dá
+também existe no **runtime**, onde é o visitante que o dispara ao aterrar. As leis
 **L2, L3, L6, L7 e L8** são de render (são propriedades do código, não do dado): a **L8** passou a
 valer no código em 2026-10-15 (§2.1). As leis dos mundos entraram na **Fase 3B** — **L11, L13, L15,
-L16, L17 e L18** no bloco B3 e **L10 e L14** no B5: as duas que se leem dos **ficheiros** (um nome,
-os pixels de uma imagem) ficaram à espera do bloco que mexeu nos ficheiros, pela regra que o B2
-estabeleceu — **uma lei e o dado que a satisfaz entram no mesmo bloco**. A **L14** e a **L9** são
+L16, L17 e L18** no bloco B3, **L10 e L14** no B5 e a **L19** no B8: as que se leem dos **ficheiros**
+(um nome, os pixels de uma imagem) ficaram à espera do bloco que mexeu nos ficheiros, pela regra que
+o B2 estabeleceu — **uma lei e o dado que a satisfaz entram no mesmo bloco**. A **L14** e a **L9** são
 medíveis **só na linha de comando** (a forma de uma imagem, a existência de um ficheiro): o browser
 reporta-as como «não verificadas», pelo mesmo caminho que o `options.exists` abriu.
 
@@ -1276,9 +1282,9 @@ porque nenhuma sala tem duas dimensões (o fixture, abaixo, é quem mantém a ja
 | `js/modules/portal.js` (327) | `shownDimension` no par | + `WINDOW_KINDS`/`ACTION_KINDS` (com `shownDimension`, `onTraverse`, `validate`), a matriz da L18 e o `navigate` (**uma só** navegação) |
 | `js/modules/dimension.js` (111) | `radius`, `followCamera` | + `position` opcional, para a esfera do retrato nascer na porta **antes** de ser anexada (lei L7) |
 | `js/app.js` (118) | `?scene=` | + o slug do mundo (D28) e o `data/worlds/<slug>.json` |
-| `index.html` (82) | raiz | a raiz passa a ser o **portão**, e há **4 cópias byte-idênticas** (raiz, `cidade/`, `praia/`, `ceu/`) |
+| `index.html` (82) | raiz | a raiz passa a ser o **portão**, e há **4 arranques** (raiz, `cidade/`, `praia/`, `ceu/`), o mesmo ficheiro fora da linha do `<base>` |
 | `data/` | 2 ficheiros iguais | `data/worlds/{gate,cidade,praia,ceu}.json` + `example.json` |
-| `tools/` | validate, convert, pose-sweep | + o migrador de formato (0 diferenças) e de sentido, + a normalização dos panoramas e a geração dos retratos, + o grafo de mundos no `validate.mjs` |
+| `tools/` | validate, convert, pose-sweep | + o migrador de formato (0 diferenças) e de sentido, + a normalização dos panoramas e a geração dos retratos, + o grafo de mundos e os arranques no `validate.mjs` (e o `tools/scene/arranques.mjs` que ele usa) |
 
 **Armadilha medida no `<base href="../">`:** com a base em `../`, um `?from=…` relativo resolve
 para a **raiz** (uma sala navegaria para o portão). Toda a navegação e todo o caminho de dados
@@ -1327,7 +1333,38 @@ números abaixo; **B2** — o formato v3 ponta a ponta; **B3** — as leis dos m
 instrumento que as prova; **B4** — as duas tabelas com o comportamento de cada eixo; **B5** — os
 assets divididos por tipo, normalizados e com os retratos gerados; **B6** — a separação em mundos,
 com a chegada atrás da porta; **B7** — cada sala com endereço próprio, e o regresso da praia
-fechado (D29).
+fechado (D29); **B8** — as ferramentas: a **L19** no validador e o verificador dos **arranques**.
+
+#### O que o B8 entregou e mediu (2026-10-16)
+
+**A L19, a lei que o B7 pediu.** A caminhada do B7 apanhou uma porta da praia sem porta de chegada
+no destino (D29) e o aviso veio do **runtime** — o visitante a aterrar. A lei passa a responder o
+mesmo **antes** de alguém atravessar: `missingArrivals(scenes)` em `js/scene/validation.js`, com a
+mesma forma do `unreachableWorlds` (puro, e separado do `validateScene` porque só a linha de comando
+tem o conjunto todo — D14). As portas do **fixture** ficam de fora: ele não faz parte do grafo
+(ninguém chega a ele por uma porta) e existe para exercitar mecanismos.
+
+**Os arranques, num módulo próprio.** `tools/scene/arranques.mjs` — com a leitura do disco a entrar
+por parâmetro, como o `exists` e o `imageSize` do validador — exige três coisas a cada mundo: que o
+arranque exista na pasta do slug, que o `<base>` aponte para a raiz da publicação (ao número de
+níveis certo) e que os quatro sejam iguais **fora** dessa linha. O `validate.mjs` é só quem lhe dá o
+disco.
+
+| Item | Medição |
+| --- | --- |
+| `validate.mjs` | os **5** mundos OK e as três linhas novas: `world graph: 4 rooms (+1 fixture), all reachable from gate`, `arrivals: every door has a door saying it is the arrival (L19)` e `arranques: 4 world(s) with an arranque, the same file outside the <base> line` (exit 0) |
+| O instrumento das leis | **17 de 17** avarias detetadas, controlo limpo, grafo detetado, **L19** com o defeito do B7 reposto a ser detetado (`gate -> praia`, porta 1) e a exposição com **0** buracos, e as tabelas **20 de 20** |
+| O verificador dos arranques | **5 de 5** casos: o controlo (os quatro como estão) e quatro defeitos — uma sala sem arranque, uma sala cujo arranque ficou com o `<base>` da raiz, um arranque sem `<base>` e um arranque com uma palavra mudada |
+| O fixture volta a exercitar a D26 | **uma** dimensão derivada (`448`) para **duas** portas de retrato (a 1 e a 3): 1 textura, 1 valor de stencil, 1 desenho; T1/T7 **1 + 1** travessias; T8 **0/0/0**; a porta nova navega **uma** vez (`/praia/?from=example`) |
+| A reprodutibilidade | o migrador corrido outra vez: `1 file changed, 31 insertions(+)` — só a porta nova do fixture, mais nada nos cinco ficheiros |
+
+**A D29 tinha custado cobertura e o fixture devolveu-a.** As duas portas duplicadas da praia eram,
+no dado, a prova de que o valor de stencil pertence à **dimensão mostrada** e não à porta — e a D29
+trocou uma delas pelo regresso ao portão. O fixture ganha uma **quarta** porta com o mesmo retrato
+da primeira, e a partilha passa a ser exercitada de propósito (é o que o fixture existe para fazer).
+**Nota:** quem sair do fixture pela porta nova aterra na praia **com um aviso** — `?from=example` não
+é uma origem conhecida e o runtime diz o que faz (o visitante fica onde a câmara diz). É o
+comportamento certo para um mundo de ensaio, e a L19 não o esconde: ela **não olha** para o fixture.
 
 #### O que o B7 entregou e mediu (2026-10-16)
 

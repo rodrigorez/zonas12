@@ -37,8 +37,9 @@ zonas12/
 │   ├── video/          o vídeo usado como obra
 │   └── previews/       os retratos das portas de mundo (um por mundo de destino — D27)
 ├── tools/
-│   ├── scene/               validador dos ficheiros de cena (corre a mesma validação que o browser)
-│   │                        e o instrumento das leis (avarias injetadas, uma por lei)
+│   ├── scene/               validador dos ficheiros de cena (corre a mesma validação que o browser,
+│   │                        mais o grafo dos mundos e os arranques), o instrumento das leis
+│   │                        (avarias injetadas, uma por lei) e o verificador dos arranques (D28)
 │   ├── migration/           o conversor HTML→JSON da Fase 0 e a migração para o formato v3, ambos
 │   │                        com guarda: são o registo das migrações
 │   ├── assets/              normalização das imagens (2:1 e teto de 2048 px — lei L14)
@@ -220,7 +221,7 @@ O **`js/scene/`** é onde a cena em dados vive, e tem só três ficheiros:
 | Ficheiro | O que é |
 | --- | --- |
 | `schema.js` | A **forma do formato** (v3): campos, tipos, enumerações, as regras dos dois eixos da porta e o catálogo de assets. Puro — não conhece o DOM nem o A-Frame |
-| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L10, L11, L12, L13, L14, L15, L16, L17 e L18. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor vai reutilizar |
+| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L10, L11, L12, L13, L14, L15, L16, L17, L18 e L19 (esta última sobre o **grafo** dos mundos, com o `missingArrivals`). É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor vai reutilizar |
 | `arrival.js` | Onde o visitante aparece ao chegar de outro mundo (**L16**): puro e partilhado, para o construtor e o validador não discordarem da geometria |
 | `scene-builder.js` | O **único** dos três que conhece o A-Frame: cria o `<a-assets>` (e **espera** que os ficheiros carreguem), a câmara, as dimensões, as obras e os portais, a partir do JSON |
 
@@ -319,22 +320,27 @@ porta para cada sala. Dentro de uma sala só se navega pelas dimensões dessa sa
 
 Como o isolamento é por endereço, **nada do outro mundo é lido** pela página de origem: só
 atravessam o *slug* do destino (na própria porta) e um parâmetro opcional `?from=<slug>`, que é o
-que faz o visitante aparecer **atrás da porta inversa** — com o regresso a um passo. O formato dos
-dados, as leis (L9–L18), os testes (T10–T12) e o estado de cada bloco estão em
+que faz o visitante aparecer **atrás da porta inversa** — com o regresso a um passo.
+`node tools/scene/validate.mjs` confere isso tudo do lado do dado: as leis dos mundos, o **grafo**
+(todas as salas alcançáveis a partir do portão e **L19** — toda a porta tem uma chegada no destino,
+que é o defeito que a praia teve até ao B7), e os quatro **arranques** (a pasta é o slug, o `<base>`
+aponta para a raiz e os quatro são o mesmo ficheiro fora dessa linha — D28). O formato dos dados, as
+leis (L9–L19), os testes (T10–T12) e o estado de cada bloco estão em
 [docs/ROADMAP.md](docs/ROADMAP.md).
 
-**O que falta na fase:** o validador com o grafo de mundos na linha de comando e o verificador dos
-arranques (B8), a verificação final no browser (B9) e a documentação com o marco (B10).
+**O que falta na fase:** a verificação final no browser (B9) e a documentação com o marco (B10).
 
 **A divisão decidida (D24)** são **quatro mundos**: o portão na raiz (`gate`, com a câmara/AR) e as
 salas `cidade`, `praia` e `ceu`, uma dimensão cada, com as **8 portas de hoje** a passarem a
-navegar — sete com retrato e a da cidade para o portão sem janela (não há imagem do portão, e um
-retrato emprestado mentiria). O formato **v3** (**D25**) tem os dois eixos na própria porta
+navegar — seis com retrato e as duas que voltam para o portão sem janela (não há imagem do portão, e
+um retrato emprestado mentiria). O formato **v3** (**D25**) tem os dois eixos na própria porta
 (`window {kind, dimensionA, dimensionB, asset, radius}` e `action {kind, target}`); o retrato é uma
-**dimensão derivada** na banda reservada da L15 (**D26**), o que faz duas portas para o mesmo mundo
-partilharem 1 textura e 1 valor de stencil; os assets estão divididos por tipo, com os retratos em
-`assets/previews/` (**D27**); e o slug de cada mundo sai do próprio caminho, o que deixará os
-**4 arranques byte-idênticos** (**D28**). A tabela de correspondência da migração, os **11 blocos**
+**dimensão derivada** na banda reservada da L15 (**D26**) — duas portas que mostrem o mesmo retrato
+partilham 1 textura e 1 valor de stencil, e é o **fixture** que o exercita, com duas portas de
+retrato; os assets estão divididos por tipo, com os retratos em `assets/previews/` (**D27**); e o
+slug de cada mundo sai do próprio caminho, com os **4 arranques iguais fora da linha do `<base>`**
+(**D28**, emendada no B7). A praia, que trazia duas portas iguais para a cidade, ficou com uma e
+ganhou o regresso ao portão (**D29**). A tabela de correspondência da migração, os **11 blocos**
 (B0–B10) e as metas medidas com o instrumento de cada uma estão na §9 do roadmap.
 
 ## Funcionalidades Principais
@@ -451,7 +457,8 @@ não havia porta nenhuma para declarar a chegada. O `git diff` do migrador emend
 (1 ficheiro, só a porta 5), e está registado na §9 do roadmap. **Consequência assumida:** deixou de
 haver, no dado da exposição, duas portas a mostrar o mesmo retrato — a partilha da dimensão
 derivada (D26: 1 textura, 1 valor de stencil, 1 desenho) continua a valer no código, mas deixou de
-estar **exercitada**; o **fixture** passa a exercitá-la no B8.
+estar **exercitada**; o **fixture** passou a exercitá-la no B8 (uma quarta porta, com o mesmo
+retrato da primeira).
 
 Todas as salas têm **regresso directo** ao portão — `cidade → gate` (porta 2) e `praia → gate`
 (porta 5) — e cada porta é **bidirecional**: atravessar no sentido contrário é a mesma porta. A que
@@ -679,7 +686,7 @@ da raiz (o `<base>` é que muda), e atravessar uma porta de mundo navega para a 
 
 Quem quiser experimentar sem mexer na exposição pode forçar um mundo com `?scene=`
 (`http://127.0.0.1:8123/?scene=example`): carrega o `data/worlds/example.json`, o mundo de ensaio
-com duas dimensões e uma porta de cada tipo — `?scene=cidade`, `?scene=praia` e `?scene=ceu` também
+com duas dimensões e **duas portas de cada tipo** (o par de dimensões ao vivo, atravessável, e o retrato que navega) — `?scene=cidade`, `?scene=praia` e `?scene=ceu` também
 funcionam. E `&from=<mundo>` diz de que mundo se vem, o que faz o visitante aparecer atrás da porta
 de chegada: `/praia/?from=cidade`.
 

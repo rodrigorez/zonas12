@@ -19,7 +19,8 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateScene, unreachableWorlds } from '../../js/scene/validation.js';
+import { validateScene, unreachableWorlds, missingArrivals } from '../../js/scene/validation.js';
+import { checkArranques } from './arranques.mjs';
 import { ENTRY_WORLD } from '../../js/modules/portal-kinds.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -124,6 +125,38 @@ if (worlds.size > 1) {
     (worlds.size > rooms.length ? ` (+${worlds.size - rooms.length} fixture)` : '') +
     (unreachable.length ? ', unreachable: ' + unreachable.join(', ') : `, all reachable from ${ENTRY_WORLD}`));
   if (unreachable.length) failed++;
+
+  // L19: uma porta que navega tem, no destino, uma porta que se declara a chegada dessa origem. O
+  // aviso é o mesmo que a exposição dá ao aterrar; aqui é dito antes de alguém a atravessar. As
+  // portas do fixture ficam de fora: ele não faz parte do grafo (ninguém chega a ele por uma porta)
+  // e existe para exercitar os mecanismos — o que ele navega chega a uma sala com `?from=example`,
+  // onde o comportamento é o do runtime. Um aviso, e não um erro, porque o visitante chega: só não
+  // chega ao sítio escolhido por ninguém.
+  const gaps = missingArrivals(rooms);
+  console.log('arrivals: ' + (gaps.length === 0
+    ? `every door has a door saying it is the arrival (L19)`
+    : `${gaps.length} door(s) without an arrival to land behind (L19)`));
+  for (const gap of gaps) {
+    console.log(`  warning: ${gap.from} -> ${gap.to}: portals[${gap.portals.join(', ')}] and no door of ` +
+      `"${gap.to}" says it is the arrival from "${gap.from}" — the visitor starts where the camera says`);
+  }
+}
+
+// ---- os arranques (D28) ----
+//
+// O trabalho todo vive em tools/scene/arranques.mjs: aqui só se diz onde está o disco. Só a linha de
+// comando pode perguntar isto — a página não sabe que ficheiros existem ao lado dela. O fixture
+// fica de fora: é um ficheiro de ensaio, abre-se com `?scene=example` e não tem endereço.
+if (worlds.size > 0) {
+  const slugs = [...worlds.keys()].filter((slug) => !FIXTURES.includes(slug));
+  const report = checkArranques(slugs, {
+    entry: ENTRY_WORLD,
+    read: (relative) => (existsSync(resolve(root, relative)) ? readFileSync(resolve(root, relative), 'utf8') : null)
+  });
+  console.log(`arranques: ${report.checked.length} world(s) with an arranque` +
+    (report.errors.length ? '' : ', the same file outside the <base> line'));
+  for (const error of report.errors) console.error(`  error: ${error}`);
+  if (report.errors.length) failed++;
 }
 
 if (failed) {
