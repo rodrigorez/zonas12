@@ -1404,7 +1404,7 @@ fechada.
 | O que a fase mudou no README | §Estado (marca **v0.0.6** e os números), §Estrutura (as pastas dos mundos), §Como usar (os endereços), §O que está implementado (duas linhas novas: mundos e portas de mundo) e §Verificado nesta versão (a bateria do B9) |
 | O que a fase mudou no roadmap | o cabeçalho (fase fechada), §6 (o exemplo e o `<base>`), §8 (a **L19**), §9 (os 11 blocos), §10 (o método do T12), §11 (**D24–D29**) e §13–§14 (o resumo e as pendências novas) |
 | O que fica aberto, escrito | **R10** (o retrato do portão), **R11** (a orientação da chegada no céu) e **R12** (o T5 por re-medir) — os três em §14, cada um com o motivo e o que o fecha |
-| O marco | a branch **`v0.0.6`** sobre o commit do B10 (a `v0.0.5` fica como estava); a publicação é empurrar o `main`, e quem testa nas três versões é o autor |
+| O marco | a branch **`v0.0.6`** cobre a fase **e a sua verificação** — o B10 e a bateria dos doze testes que veio depois (é o último commit da fase, `c3c6577`); a `v0.0.5` fica como estava. Publicar é empurrar o `main`, e quem testa nas três versões é o autor |
 
 #### O que o B9 entregou e mediu (2026-10-16)
 
