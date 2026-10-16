@@ -1333,7 +1333,44 @@ números abaixo; **B2** — o formato v3 ponta a ponta; **B3** — as leis dos m
 instrumento que as prova; **B4** — as duas tabelas com o comportamento de cada eixo; **B5** — os
 assets divididos por tipo, normalizados e com os retratos gerados; **B6** — a separação em mundos,
 com a chegada atrás da porta; **B7** — cada sala com endereço próprio, e o regresso da praia
-fechado (D29); **B8** — as ferramentas: a **L19** no validador e o verificador dos **arranques**.
+fechado (D29); **B8** — as ferramentas: a **L19** no validador e o verificador dos **arranques**;
+**B9** — a verificação final no browser, numa bateria só.
+
+#### O que o B9 entregou e mediu (2026-10-16)
+
+**A bateria toda, com a cache desligada** (a armadilha da Fase 3: medir com uma versão antiga em
+cache é medir o código que já não existe), nas **5** páginas — as 4 salas e o fixture — e a partir
+do **dado**: as chegadas são calculadas com o `arrivalPoint` que o construtor usa, e não com números
+escritos à mão.
+
+| Item | Medição |
+| --- | --- |
+| **T8** e **T9** em cada mundo | **0** erros, **0** avisos e **0** pedidos falhados nas cinco páginas, e **1** ouvinte de `keydown` no `document` em cada (4 no `window`, do A-Frame) |
+| **T10** (o retrato), nas **8** portas de retrato | tingir a dimensão derivada muda os pixels **dentro** da janela (verde 157…241) e **nada** fora dela (0, em dois controlos) — em todos os mundos; no **portão**, onde o fundo é a câmara, o alfa é **255 dentro** e **0 fora** (a métrica do **T4**) |
+| **T11** (a chegada), nas **8** arestas do grafo | o visitante aparece **exactamente** no ponto calculado a partir do dado (câmara = esperado, nas 8); **0** navegações a andar 3 m para dentro da sala; **1** navegação a voltar, com a URL de volta ao mundo de origem e `?from=<destino>` |
+| **T2/T3** (varredura de poses) | no fixture, que é o mundo com duas dimensões: **84** poses (84 avaliadas, 0 não avaliáveis), **15 714** amostras, **0** falhas, **420** controlos a **0**, método válido, 1 034 ms, e a dimensão ativa não mudou |
+| O instrumento da varredura | as duas avarias injectadas continuam a ser detectadas: `bar` → 18 de 18 poses com moldura cortada e **1 315** amostras falhadas; `stencil` → **4 567** de 4 568 |
+| **T12** (o retrato na moldura) | **16** poses (as 8 portas a 12 m e a 30 m): a mancha do retrato tingido ficou **dentro** do rectângulo esperado em **16 de 16**, com **0** pontos fora |
+| O ciclo portão → sala → portão | as duas voltas do portão (para a cidade e para a praia) fecham com **1** navegação por porta — e a da praia é a que a **D29** abriu |
+| O telemóvel | a **390×844**: o botão de entrada responde, o D-pad fica visível (`flex/visible`), 0 erros/0 avisos/0 pedidos falhados, e a **câmara real é o fundo** da dimensão 0 — a captura mostra a sala em que se está, com a porta do portão emoldurada a vermelho |
+| **A olho** (uma captura por sala) | a cidade mostra a porta **sem janela** (a do portão) ao lado do retrato da praia; a praia mostra os **dois retratos** (cidade e céu) a ladear a porta **sem janela** que a D29 abriu; o céu mostra o retrato da praia. As três salas lêem-se |
+
+**O que a bateria apanhou (e uma lição sobre o próprio instrumento):**
+
+1. **Ao chegar, o visitante fica virado no sentido em que vinha** — o −Z da porta —, e isso é o que
+   faz do regresso **um passo** (o mecanismo que o T11 mede). Medido o que se vê: na cidade, **1**
+   das 5 obras fica à frente; na praia, **1** de 3; no céu, **0** de 2. O céu já tinha esta
+   característica antes da fase (nota do B6) e é o único onde **nenhuma** obra fica à frente de quem
+   chega — fica como **item do autor**: se preferir aterrar virado para a sala, é uma linha (a
+   orientação da chegada), e é uma decisão dele, não da fase.
+2. **A minha primeira caminhada media a travessia, não a entrada.** Pus o visitante a andar na
+   direcção do centro da sala em vez da direcção em que ele fica virado, e o resultado foi **1**
+   navegação em todas as arestas — que é a resposta **certa** para uma travessia (e provou, de
+   passagem, que cada travessia navega uma só vez). O instrumento é que estava a perguntar outra
+   coisa; corrigida a direcção, dá **0** a entrar e **1** a voltar. Vale como lembrete: medir a
+   coisa certa é metade do trabalho.
+3. **O T5 não foi re-medido**, e por uma razão: precisa do rig de **dois** portais e a ordem de
+   desenho não mudou na 3B (`drawOrder` e `stencil` são os mesmos). Fica com os números da v0.0.5.
 
 #### O que o B8 entregou e mediu (2026-10-16)
 

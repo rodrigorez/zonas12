@@ -185,9 +185,10 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 
 > ⚠️ **A Fase 3B está a decorrer no `main`** (plano em [docs/ROADMAP.md](docs/ROADMAP.md), §9): o
 > formato dos dados passou a **v3** (o `world` e os dois eixos da porta), o validador ganhou as leis
-> dos mundos e cada mundo passou a ter **endereço** (`/cidade/`, `/praia/`, `/ceu/`). Os números, a
-> verificação e o marco abaixo são os da **v0.0.5** — o fecho da fase (a `v0.0.6`) é o bloco B10, e
-> é ele que acerta esta secção.
+> dos mundos e a **L19**, cada mundo passou a ter **endereço** (`/cidade/`, `/praia/`, `/ceu/`) e a
+> verificação final no browser (bloco B9) passou. Falta o fecho da fase — a documentação e o marco
+> **v0.0.6** no bloco B10, que é quem acerta esta secção: os números, a verificação e o marco abaixo
+> são ainda os da **v0.0.5**.
 
 Marcado pela branch `v0.0.5` e **publicado** em <https://rodrigorez.github.io/zonas12/> (o GitHub
 Pages serve o `main`). É o estado depois da **Fase 3** do roadmap (a cena vem de dados), testado
@@ -328,7 +329,7 @@ aponta para a raiz e os quatro são o mesmo ficheiro fora dessa linha — D28). 
 leis (L9–L19), os testes (T10–T12) e o estado de cada bloco estão em
 [docs/ROADMAP.md](docs/ROADMAP.md).
 
-**O que falta na fase:** a verificação final no browser (B9) e a documentação com o marco (B10).
+**O que falta na fase:** a documentação com o marco (**B10**).
 
 **A divisão decidida (D24)** são **quatro mundos**: o portão na raiz (`gate`, com a câmara/AR) e as
 salas `cidade`, `praia` e `ceu`, uma dimensão cada, com as **8 portas de hoje** a passarem a
