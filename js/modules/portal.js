@@ -15,9 +15,24 @@ import {
   on
 } from '../core/index.js';
 import { playerCamera } from './camera.js';
-import { WINDOW_KINDS, ACTION_KINDS, WINDOWS, ACTIONS } from './portal-kinds.js';
+import {
+  WINDOW_KINDS,
+  ACTION_KINDS,
+  WINDOWS,
+  ACTIONS,
+  worldHref
+} from './portal-kinds.js';
 
 const PORTAL_COMPONENT = 'stencil-portal';
+
+// The world this page serves (D24). A door that navigates writes it into `?from`, and the world on
+// the other side uses it to pick the door the visitor appears behind. The builder hands it over
+// (the module never reads the data) — the same shape as `useRealCamera` in the camera module.
+let worldSlug = null;
+
+export function setWorld(slug) {
+  worldSlug = typeof slug === 'string' ? slug : null;
+}
 
 // Reused vectors: the driver and the collision run every frame and must not allocate.
 const _worldPoint = new THREE.Vector3();
@@ -41,6 +56,11 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     // Only read when the window is a 'dimension-pair' (D25).
     dimensionA: { type: 'int', default: 0 },
     dimensionB: { type: 'int', default: 1 },
+    // The dimension the builder derived for the portrait of this door (D26), in the reserved band
+    // of the ids. -1 = the door has no portrait to show.
+    previewDimension: { type: 'int', default: -1 },
+    // Only read when the action is 'navigate': the slug of the world on the other side (D14).
+    target: { type: 'string', default: '' },
     // The dimension the door belongs to (where it stands). -1 = it shows up in either of the
     // two. This is what allows, for example, 7 doors on the side of dimension 1 and 7 doors on
     // the side of dimension 2 without them seeing each other.
@@ -80,6 +100,7 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     this.zSign = 1;
     this.insideBox = false;
     this.traversalStarted = false;
+    this.navigating = false;
 
     this.configureBox();
     this.buildFrame();
@@ -114,10 +135,10 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     if (axis.shows === 'pair') {
       if (active === this.data.dimensionA) return this.data.dimensionB;
       if (active === this.data.dimensionB) return this.data.dimensionA;
+      return null;
     }
-    // A portrait is a dimension the builder derives in the reserved band (D26) and hands to the
-    // door: it is the block that builds the worlds that passes it in.
-    return null;
+    // A portrait: the dimension the builder derived (D26) and handed to this door.
+    return this.data.previewDimension >= 0 ? this.data.previewDimension : null;
   },
   buildFrame: function () {
     const w = this.data.width;
@@ -164,10 +185,20 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
       this.portalGroup.add(bar);
     });
   },
-  // Tells the mask which value to write (the one of the dimension the window shows).
+  // Whether the door stands in the dimension the visitor is in. It is what decides that it exists
+  // (that it collides) and it does not depend on what the window shows: a door with no window still
+  // takes the visitor somewhere — `none` + `navigate` is a legal combination (section 5.4).
+  standsHere: function () {
+    return this.data.ownedBy < 0 || this.data.ownedBy === state.activeDimension;
+  },
+  // Tells the mask which value to write (the one of the dimension the window shows). The mask is the
+  // window itself, so with nothing to show there is no mask: it writes depth as well, and a mask
+  // left there without a window would hide what is behind the door showing nothing in exchange.
   refreshWindow: function () {
+    this.portalGroup.visible = this.standsHere();
+
     const dimension = this.shownDimension();
-    this.portalGroup.visible = dimension !== null;
+    this.maskMesh.visible = dimension !== null;
     if (dimension === null) { this.maskMat.stencilWrite = false; return; }
     const value = state.stencilValues.get(dimension);
     if (value === undefined) {
@@ -266,13 +297,29 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     this.zSign = zSign;
     if (!crossed) return;
 
-    const action = ACTIONS[this.data.actionKind];
-    // A door that navigates does not change the active dimension: it leaves the world, and the
-    // block that builds the worlds is what adds that here (Fase 3B, §9).
-    if (action && action.navigates) return;
+    this.onTraverse();
+  },
+  // What crossing this door does, asked of the table (D14): adding a use is adding an entry there,
+  // not a case here.
+  onTraverse: function () {
+    const action = ACTIONS[this.data.actionKind] || ACTIONS['enter-window'];
+    if (action.navigates) { this.navigate(); return; }
+    if (!action.enters) return;
 
     const active = state.activeDimension;
     setActiveDimension(active === this.data.dimensionA ? this.data.dimensionB : this.data.dimensionA);
+  },
+  // The world door: this page goes away and the other one arrives (D14). One navigation and only
+  // one — the frame driver keeps running until the new document takes over, and a second call would
+  // fight with the first.
+  navigate: function () {
+    if (this.navigating) return;
+    this.navigating = true;
+    const url = new URL(worldHref(this.data.target, document.baseURI));
+    // The only thing that crosses the boundary, besides the address, is the slug of this world: the
+    // destination uses it to choose which door the visitor appears behind (law L17).
+    if (worldSlug) url.searchParams.set('from', worldSlug);
+    window.location.assign(url.href);
   }
 });
 
@@ -313,7 +360,7 @@ export function startFrameDriver() {
 //
 // The element is built detached and added at the end, so A-Frame initialises the component once
 // with everything in place — the mask and the four bars are built once (law L7).
-export function createPortal(portal, parent) {
+export function createPortal(portal, parent, derived = {}) {
   const windowAxis = portal.window || {};
   const actionAxis = portal.action || {};
   const settings = {
@@ -330,6 +377,10 @@ export function createPortal(portal, parent) {
     settings.dimensionA = windowAxis.dimensionA;
     settings.dimensionB = windowAxis.dimensionB;
   }
+  // What the door's own data does not carry: the portrait's dimension is derived by the builder
+  // (D26), and the destination is only read when the action navigates.
+  if (typeof derived.previewDimension === 'number') settings.previewDimension = derived.previewDimension;
+  if (actionAxis.kind === 'navigate' && typeof actionAxis.target === 'string') settings.target = actionAxis.target;
   if (portal.boxPosition) settings.boxPosition = vector(portal.boxPosition);
   if (portal.boxRotation) settings.boxRotation = vector(portal.boxRotation);
   if (portal.trigger) settings.trigger = portal.trigger;

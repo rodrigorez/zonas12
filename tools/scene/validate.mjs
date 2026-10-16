@@ -20,13 +20,13 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateScene, unreachableWorlds } from '../../js/scene/validation.js';
+import { ENTRY_WORLD } from '../../js/modules/portal-kinds.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
 
-// O mundo de entrada é o portão, que é a página da raiz (D24). É dele que se parte para saber se
-// alguma sala ficou sem caminho.
-const ENTRY_WORLD = 'gate';
+// O mundo de entrada é o portão (D24), e é dele que se parte para saber se alguma sala ficou sem
+// caminho. O nome vem da tabela dos eixos, que é onde ele já vive para a porta de mundo navegar.
 
 // Um caminho absoluto já é erro de L12; não vale a pena perguntar ao disco por ele.
 const exists = (assetPath) => (/^([a-zA-Z]:[\\/]|[\\/])/.test(assetPath) ? undefined : existsSync(join(root, assetPath)));

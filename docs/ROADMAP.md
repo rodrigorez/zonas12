@@ -455,13 +455,25 @@ O único sítio que conhece a cena toda.
 > barras serem construídas uma só vez (é a lei **L7** à escala da cena — medido: **5** filhos no
 > grupo).
 
-> **Como vai ficar (2026-10-15, Fase 3B — decidido na D25, nada implementado).** Os **dois eixos**
-> passam a ser a forma do dado: `window {kind, dimensionA, dimensionB, asset, radius}` e
-> `action {kind, target}`, com o `arrivalFrom` no portal — dentro do formato **v3** (§6). O par só
-> é obrigatório com `dimension-pair` e o `target` só com `navigate`: o esquema ganha
-> **obrigatoriedade condicional**. As tabelas `WINDOW_KINDS` e `ACTION_KINDS` vivem neste módulo,
-> com a matriz da tabela acima dentro da `validate` de cada entrada — a mesma que o editor
-> (Fase 4) reutiliza. O plano está na §9.
+> **Como ficou (2026-10-15, Fase 3B, bloco B4).** Os **dois eixos** são a forma do dado e as tabelas
+> existem: `js/modules/portal-kinds.js` tem os nomes, o que cada entrada significa (`shows`,
+> `enters`, `navigates`), a **matriz** das combinações legais, `validateDoor()` — a validação que o
+> editor vai reutilizar — e `worldHref()`, o endereço de um mundo a partir de `document.baseURI`
+> (D28). O **componente consulta a tabela em dois pontos** (`shownDimension` e `onTraverse`), e a
+> `validate` é a tabela que o **validador de dados** corre (L18) — as três coisas de §5.4, com a
+> validação do lado de quem lê o dado e não do lado de quem desenha.
+>
+> **Porque o ficheiro é separado do `portal.js`** (uma nota, porque a D14 dizia «no módulo do
+> portal»): o mesmo validador corre em `node` (`tools/scene/validate.mjs`) e **não pode** importar
+> `portal.js`, que regista um componente A-Frame ao ser importado. A tabela ficou pura, ao lado do
+> módulo, e o módulo acrescenta-lhe o comportamento. A matriz tem **um só dono**: o módulo lê-a para
+> a porta se validar e o validador lê-a para a lei L18, e é isso que impede os dois de discordarem.
+>
+> **O que o bloco descobriu:** a travessia estava presa à **visibilidade da janela**, o que fazia de
+> `window: none` + `action: navigate` — legal pela matriz — uma porta que ninguém conseguia
+> atravessar. Passou a depender de a porta **estar** onde o visitante está, e a máscara passou a
+> esconder-se quando a janela não mostra nada (escreve profundidade, e sem janela tapava o que está
+> atrás sem dar nada em troca).
 
 #### Os dois eixos do portal (D14)
 
@@ -1299,7 +1311,18 @@ L17 e L18) e o instrumento que prova que elas falham quando devem (15 de 15).
 **Feito até agora (2026-10-15):** **B0** — plano e decisões registados (§9, §11, §6, §8, §13), commit
 `4c13673`, só documentação; **B1** — linha de base re-medida **antes** de mexer em código, com os
 números abaixo; **B2** — o formato v3 ponta a ponta; **B3** — as leis dos mundos no validador e o
-instrumento que as prova.
+instrumento que as prova; **B4** — as duas tabelas com o comportamento de cada eixo.
+
+#### O que o B4 entregou e mediu (2026-10-15)
+
+| Item | Medição |
+| --- | --- |
+| A tabela consultada a correr | `shownDimension` responde pela tabela (`shows`) e `onTraverse` também (`enters`/`navigates`): o par continua a ser o único caminho da cena e dá **8/8** travessias, T4 o **mesmo pixel** (155,164,160,255 dentro, 0 fora), T9 **0** delta de ouvintes, a varredura **0/84** poses com **0** falhas em **15 714** amostras, T8 **0/0/0** — tudo igual ao B1 |
+| O **retrato** (`window: preview`) | uma porta com retrato mostra a dimensão derivada que o construtor lhe entregar: `shownDimension()` = **448**, valor de stencil **3** (1 e 2 são das dimensões vivas), esfera registada como conteúdo, grupo visível |
+| A **porta de mundo** (`action: navigate`) | atravessar chama `navigate()` **uma só vez**, para o endereço resolvido do destino (`http://127.0.0.1:8123/` para o portão), e **não** muda a dimensão ativa |
+| Os endereços | `worldHref('gate', base)` = a raiz; `worldHref('praia', base)` = `…/praia/` — 20 de 20 verificações das tabelas no instrumento, incluindo a matriz completa (5 combinações legais de 9) |
+| Um defeito que o instrumento apanhou | a travessia estava presa à **visibilidade da janela**, e uma porta `window: none` + `action: navigate` (legal pela matriz) nunca podia ser atravessada. Passou a depender de a porta **estar** onde o visitante está (`standsHere()`), e a máscara passou a esconder-se quando a janela não mostra nada — ela também escreve profundidade, e sem janela tapava o que está atrás da porta sem dar nada em troca |
+| Um erro meu, apanhado pela mesma via | uma chaveta a mais no `portal.js` (o `app.js` deixou de arrancar, sem uma única mensagem visível no resumo do browser): `node --check` de cada módulo passou a ser o primeiro passo antes de medir |
 
 #### O que o B3 entregou e mediu (2026-10-15)
 

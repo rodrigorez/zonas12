@@ -28,7 +28,7 @@
 
 import { SCENE, SCENE_VERSION, LANGUAGES } from './schema.js';
 import { MAX_WINDOWS, MAX_DIMENSIONS, DERIVED_DIMENSION_BASE } from '../core/index.js';
-import { isLegalCombination } from '../modules/portal-kinds.js';
+import { validateDoor } from '../modules/portal-kinds.js';
 import { arrivalPoint } from './arrival.js';
 
 const EYE_HEIGHT = 1.6;
@@ -176,10 +176,10 @@ export function validateScene(scene, options = {}) {
     const actionAxis = portal.action || {};
     const where = `portals[${portal.id}]`;
 
-    // L18: the combination of the two axes has to be one of the legal ones (section 5.4).
-    if (windowAxis.kind && actionAxis.kind && !isLegalCombination(windowAxis.kind, actionAxis.kind)) {
-      err(`${where}: window "${windowAxis.kind}" with action "${actionAxis.kind}" is not a legal ` +
-        `combination — law L18 (the portrait would lie, or the visitor would walk into the portrait)`);
+    // L18, and whatever else the table asks of a door (section 5.4): the same list the editor
+    // (Fase 4) shows to whoever writes a door, so the two cannot disagree.
+    for (const problem of validateDoor(portal)) {
+      err(`${where}: ${problem.message} — ${problem.law}`);
     }
 
     // L11: a door that navigates names a world that exists. Which worlds exist is a question only

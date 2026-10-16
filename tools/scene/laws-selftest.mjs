@@ -17,6 +17,15 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateScene, unreachableWorlds } from '../../js/scene/validation.js';
+import {
+  WINDOW_KINDS,
+  ACTION_KINDS,
+  WINDOWS,
+  ACTIONS,
+  isLegalCombination,
+  validateDoor,
+  worldHref
+} from '../../js/modules/portal-kinds.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
@@ -183,13 +192,56 @@ const orphan = JSON.parse(JSON.stringify(scene));
 orphan.world = { slug: 'orfao', name: { pt: 'Órfão', en: 'Orphan' } };
 const reachable = unreachableWorlds([scene, orphan], 'gate');
 
+// The tables of the two axes (section 5.4): what each kind means, which combinations are legal and
+// where the address of a world lives. Pure, so it is checked here and not in the browser.
+const legalCombinations = [
+  ['dimension-pair', 'enter-window'],
+  ['dimension-pair', 'none'],
+  ['preview', 'navigate'],
+  ['preview', 'none'],
+  ['none', 'navigate']
+];
+const tableChecks = [];
+const check = (what, ok) => tableChecks.push({ what, ok });
+
+for (const kind of WINDOW_KINDS) {
+  check(`the window kind "${kind}" has an entry in the table`,
+    !!WINDOWS[kind] && typeof WINDOWS[kind].shows === 'string');
+}
+for (const kind of ACTION_KINDS) {
+  const entry = ACTIONS[kind];
+  check(`the action kind "${kind}" says whether it enters and whether it navigates`,
+    !!entry && typeof entry.enters === 'boolean' && typeof entry.navigates === 'boolean');
+}
+for (const windowKind of WINDOW_KINDS) {
+  for (const actionKind of ACTION_KINDS) {
+    const expected = legalCombinations.some((pair) => pair[0] === windowKind && pair[1] === actionKind);
+    check(`${windowKind} + ${actionKind} is ${expected ? 'legal' : 'illegal'}`,
+      isLegalCombination(windowKind, actionKind) === expected);
+  }
+}
+const base = 'http://example.test/zonas12/';
+check('the address of the gate is the root of the deployment (D24)', worldHref('gate', base) === base);
+check('the address of a room is its own folder (D28)', worldHref('praia', base) === base + 'praia/');
+check('a pair that links a dimension to itself is refused',
+  validateDoor({ window: { kind: 'dimension-pair', dimensionA: 1, dimensionB: 1 }, action: { kind: 'enter-window' } }).length === 1);
+check('a door that is fine has nothing to report',
+  validateDoor({ window: { kind: 'dimension-pair', dimensionA: 0, dimensionB: 1 }, action: { kind: 'enter-window' } }).length === 0);
+check('a portrait that the visitor would walk into is refused (L18)',
+  validateDoor({ window: { kind: 'preview', asset: 'retrato', radius: 100 }, action: { kind: 'enter-window' } }).length === 1);
+
+const tablesPassed = tableChecks.filter((entry) => entry.ok).length;
+
 console.table(rows.map((row) => ({ law: row.law, 'injected fault': row.what, detected: row.ok ? 'yes' : 'NO', message: row.message.slice(0, 96) })));
 console.log(`laws and shape: ${detected} of ${cases.length} faults detected`);
 console.log(`control (nothing injected): ${control.ok ? 'clean' : 'FAILED'} — ` +
   `${control.errors} errors, ${control.warnings} warnings`);
 console.log(`world graph: an unreachable world is ${reachable.length === 1 && reachable[0] === 'orfao' ? 'detected' : 'NOT detected'}`);
+console.log(`tables of the two axes: ${tablesPassed} of ${tableChecks.length} checks pass`);
+for (const entry of tableChecks.filter((entry) => !entry.ok)) console.error(`  failed: ${entry.what}`);
 
-const failed = detected !== cases.length || !control.ok || reachable.length !== 1;
+const failed = detected !== cases.length || !control.ok || reachable.length !== 1 ||
+  tablesPassed !== tableChecks.length;
 if (failed) {
   console.error('the validator did not fail where it should');
   process.exit(1);

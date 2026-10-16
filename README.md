@@ -173,7 +173,7 @@ Pages serve o `main`). É o estado depois da **Fase 3** do roadmap (a cena vem d
 pelo autor em 2026-10-15 nas **três** versões — local, a publicada e no telemóvel. A versão
 anterior é a `v0.0.4` (o estado da Fase 2), marcada pela branch com o mesmo nome. Resumo do que
 existe hoje: `index.html` (**82 linhas**),
-`js/app.js` (**118**), `js/core/` (7 ficheiros, **219**), `js/modules/` (5 ficheiros, **908**),
+`js/app.js` (**118**), `js/core/` (7 ficheiros, **219**), `js/modules/` (5 ficheiros, **1000**),
 `js/scene/` (**4 ficheiros**, 864), `css/style.css` (96), `data/scene.json` (a cena, **650
 linhas**), `data/scene-example.json` (o fixture), `i18n/pt.json` e as ferramentas em `tools/`.
 
@@ -187,7 +187,8 @@ Os **4 módulos** (Fase 2) vivem em `js/modules/`, e o `js/app.js` ficou com o a
 | `camera.js` | A câmara-jogador (posição, D-pad, limites) e o erro de câmara; é o **único** ficheiro que sabe onde a câmara está — desde a Fase 3 recebe-a do construtor de cena, em vez de a procurar pelo nome | `playerCamera`, `createPlayerCamera`, `startSession`, `setupMobileControls`, `reportCameraError` |
 | `artwork.js` | A obra: o material dimensional, o clique e o modal (foco preso, `inert`, Escape) | componentes `dimensional-material` e `open-artwork`; `createArtwork`/`removeArtwork`; `closeArtwork` |
 | `dimension.js` | O fundo 360º de uma dimensão (imagem ou vídeo) | componente `dimension-panorama`; `createDimension`/`removeDimension` |
-| `portal.js` | A porta: janela (máscara), moldura, caixa de colisão, travessia e caixa de debug — e o **driver de frame** da cena | componentes `stencil-portal` e `portal-driver`; `createPortal`/`removePortal`; `startFrameDriver` |
+| `portal.js` | A porta: janela (máscara), moldura, caixa de colisão, travessia e caixa de debug — e o **driver de frame** da cena. Desde o B4 da Fase 3B a travessia e a janela são decididas pelos **dois eixos** (`window`/`action`) |
+| `portal-kinds.js` | A **tabela dos dois eixos**, pura: o que cada `window` mostra e o que cada `action` faz, a matriz das combinações legais, a validação de uma porta e o endereço de um mundo. Corre também em `node` (é ela que o validador lê) | componentes `stencil-portal` e `portal-driver`; `createPortal`/`removePortal`; `startFrameDriver` |
 
 Cada módulo tem o seu `remove()`, para que criar e destruir conteúdo em ciclo (o que o
 editor vai fazer) não deixe registos mortos nem memória agarrada — e desde a Fase 3 cada
