@@ -14,6 +14,14 @@
 > (local, endereço publicado e telemóvel) e marcado como **`v0.0.5`** (ramo `v0.0.5`).
 > O próximo passo é a **Fase 3B** (§13).
 >
+> **Atualização (2026-10-16, Fase 3B — a decorrer):** a fase está a ser executada **bloco a
+> bloco**, um commit por bloco, e cada bloco é dado por **medido** (browser e linha de comando) e
+> nunca por estimativa: **B0–B7 feitos** — o plano e a tabela de blocos na §9, as decisões
+> **D24–D29** em §11 e «o que o Bn entregou e mediu» logo a seguir à tabela. As **duas emendas ao
+> plano** (a migração dentro do B2 e as leis com o seu dado, no B5) estão registadas nessa secção.
+> Falta o **B8** (ferramentas), o **B9** (verificação final no browser) e o **B10** (documentação e
+> o marco `v0.0.6`).
+>
 > **Atualização (2026-10-15, Fase 3B — plano):** a fase seguinte foi planeada **antes** de mexer
 > em código e o contrato que a D14 não fixava ficou fechado: **D24** (quatro mundos, uma dimensão
 > cada, com as 8 portas de hoje a `navigate`), **D25** (o formato **v3** e os dois eixos dentro do
@@ -1290,8 +1298,8 @@ fez.
 | **B4** | As **duas tabelas** no módulo do portal e `createPortal` a lê-las, com o caminho do par inalterado | Os dois eixos |
 | **B5** | D7, **L10 e L14**: os assets mudam para `assets/{panoramas,artworks,video,previews}` (com `git mv`), os panoramas normalizados por **corte ao centro, sem ampliar** (`forest` → 2048×1024, `skycloud` → 480×240), as obras limitadas a 2048 px no lado maior, os retratos gerados e o leitor de pixels da linha de comando | L10, L14 e L9 |
 | **B6** | **A separação em mundos**: `data/worlds/*.json`, as dimensões renumeradas por mundo, `cameras.real.enabled` só no portão, as portas a `navigate` com `?from`, a **chegada** (L16) e as dimensões derivadas | D24 e D26 |
-| **B7** | As **pastas de mundo** (4 arranques byte-idênticos, `<base href="../">`), o slug por `document.baseURI` (D28) e a navegação por porta | O endereço por sala |
-| **B8** | Ferramentas: o migrador com guarda, o **grafo de mundos** no validador, a normalização e os retratos, e o verificador «os 4 arranques são iguais» e «o nome da pasta é o `world.slug`» | As ferramentas da D14 |
+| **B7** | As **pastas de mundo** (4 arranques idênticos **fora da linha do `<base>`**, que nas salas é `href="../"`), o slug por `document.baseURI` (D28) e a navegação por porta | O endereço por sala |
+| **B8** | Ferramentas: o migrador com guarda, o **grafo de mundos** no validador, a normalização e os retratos, e o verificador «os 4 arranques são iguais fora do `<base>`» e «o nome da pasta é o `world.slug`» — **mais** o fixture a exercitar a partilha da dimensão derivada, que a D29 deixou sem exercício (§9, nota do B7) | As ferramentas da D14 |
 | **B9** | Verificação final no browser: T1 por sala, T10–T12, T4/T5/T8 **em cada mundo**, o ciclo portão→sala→portão e o telemóvel | — |
 | **B10** | Documentação (README §Estrutura, §Estado, §Cena atual, §Atributos do portal, §Como usar, §Melhorias; roadmap §5.6, §6, §7, §9, §13, §14) e o marco **v0.0.6** | — |
 
@@ -1313,12 +1321,54 @@ ficheiros — e que é onde entra o leitor de pixels. **A regra que fica: uma le
 satisfaz entram no mesmo bloco.** O B3 entregou as leis que o dado já cumpre (L11, L13, L15, L16,
 L17 e L18) e o instrumento que prova que elas falham quando devem (15 de 15).
 
-**Feito até agora (2026-10-15):** **B0** — plano e decisões registados (§9, §11, §6, §8, §13), commit
+**Feito até agora (2026-10-16):** **B0** — plano e decisões registados (§9, §11, §6, §8, §13), commit
 `4c13673`, só documentação; **B1** — linha de base re-medida **antes** de mexer em código, com os
 números abaixo; **B2** — o formato v3 ponta a ponta; **B3** — as leis dos mundos no validador e o
 instrumento que as prova; **B4** — as duas tabelas com o comportamento de cada eixo; **B5** — os
 assets divididos por tipo, normalizados e com os retratos gerados; **B6** — a separação em mundos,
-com a chegada atrás da porta.
+com a chegada atrás da porta; **B7** — cada sala com endereço próprio, e o regresso da praia
+fechado (D29).
+
+#### O que o B7 entregou e mediu (2026-10-16)
+
+**Os quatro arranques.** A raiz ganhou `<base href="./">` e as salas são **o mesmo ficheiro** com
+`href="../"`. O mundo passa a sair do **caminho** e não do parâmetro (D28): `worldFromPath()` lê o
+que sobra de `location.pathname` depois do caminho de `document.baseURI` — vazio na raiz, `cidade/`
+na pasta da cidade — e o `?scene=<slug>` continua a poder forçar um mundo, para os testes.
+
+| Item | Medição |
+| --- | --- |
+| As quatro entradas | `/` abre o `gate`, `/cidade/` a `cidade`, `/praia/` a `praia` e `/ceu/` o `ceu` — **0** erros, **0** avisos e **0** pedidos falhados em cada, e **1** ouvinte de `keydown` no `document` em todas as quatro (4 no `window`, do A-Frame, igual nas quatro) |
+| Os arranques são o mesmo ficheiro | os **3** das salas têm **um só hash** entre si, e contra a raiz o `git diff --no-index --stat` dá **1 linha mudada**: só o valor do `<base>` |
+| A D14 medida na rede | cada página lê **um** ficheiro de mundo — `gate.json`, `cidade.json`, `praia.json`, `ceu.json`, um por página, e **nenhum** outro dado. A praia busca as **6** imagens do seu catálogo, com os tamanhos certos (1024, 480, 1226, 2048 na obra e os retratos 2048 e 480) |
+| O percurso das portas | **7** travessias encadeadas — portão → cidade → portão → praia → céu → praia → cidade → portão — com **1** navegação por porta, sem ping-pong, e 0 erros/0 avisos/0 pedidos falhados em todas |
+| O regresso da praia (D29) | portão, porta 1 → `/praia/?from=gate` com o visitante em **(25, 1,6, −81)**, atrás da porta 5 — que passou a ser a porta de volta; atravessá-la → `/?from=praia` com o visitante em **(6, 1,6, −9)**, atrás da porta 1 do portão. O ciclo portão → praia → portão são **duas** navegações |
+| `validate.mjs` e o selftest | **5** mundos OK e o grafo «4 rooms (+1 fixture), all reachable from gate» (exit 0); **17 de 17** avarias detetadas, controlo limpo (0 erros, 0 avisos), grafo e tabelas a passar |
+| O handle de testes | o `portalDebug` passou a dizer **que mundo** a página carregou (`portalDebug.world`): sem isso, «que mundo está aberto» só se media pela impressão digital das portas |
+
+**O que este bloco apanhou, e o que se decidiu por causa disso:**
+
+1. **A praia não tinha regresso ao portão — e foi o instrumento que o disse.** Ao chegar do
+   portão, o aviso `no door of this world says it is the arrival from "gate"` apareceu no T8: a
+   praia não tinha porta nenhuma a declarar-se a chegada porque **não tinha porta para o portão**.
+   A origem estava na cena anterior: os portais **4 e 5 eram a mesma porta duas vezes**
+   (`ownedBy: 2`, par `2/1`, lado a lado em ±25). Enquanto eram duas dimensões do mesmo ficheiro
+   isso era redundância; com um mundo por dimensão passou a ser **falta de saída**. Decisão do
+   autor (**D29**, §11): a porta 5 passa a ser o regresso ao portão, com `window: none` como a da
+   cidade (ainda não há imagem do portão). **A prova é do migrador emendado, não da mão:** reposta
+   a cena única e corrido outra vez, os **5** ficheiros saem iguais aos que estão em disco **excepto
+   a porta 5** — `1 file changed, 4 insertions(+), 5 deletions(-)`.
+2. **O `<base>` da D28 não se podia escrever como estava planeado.** «4 arranques byte-idênticos»
+   só é verdade com o mesmo `href`, e os caminhos relativos das salas precisam de `../`: com `./`
+   numa sala, o `?from=` e o `data/worlds/` resolviam para a raiz. Fica **emendada** (nota em §11):
+   os quatro são o **mesmo ficheiro fora dessa linha**, e é isso que o verificador do B8 vai exigir.
+3. **A D29 tirou cobertura sem querer, e isso fica escrito.** A prova de que o valor de stencil
+   pertence à **dimensão mostrada** e não à porta — duas portas, um retrato, 1 textura, 1 valor, 1
+   desenho (D26) — era feita, no dado, pelas **duas** portas duplicadas da praia. Com a 5 a passar a
+   porta sem janela, o dado da exposição deixa de ter duas portas a mostrar o mesmo retrato: a
+   capacidade continua no código e nas leis, mas deixa de estar **exercitada**. O **fixture** passa
+   a exercitá-la no **B8** (é o que ele existe para fazer), e a linha do B8 na tabela leva esta
+   emenda.
 
 #### O que o B6 entregou e mediu (2026-10-15)
 
@@ -1326,7 +1376,8 @@ com a chegada atrás da porta.
 substitui o «0 diferenças» (uma mudança de sentido não se prova assim): 4 dimensões → 4 mundos,
 10 obras → 10 obras, e as **8 portas** com o destino certo — `preview` + `navigate` em sete e
 `window: none` na porta da cidade para o portão (a decisão do autor: sem retrato até haver imagem).
-O grafo não mudou: a praia continua sem porta para o portão, e todos os mundos são alcançáveis.
+O grafo não mudou: a praia continuava sem porta para o portão — **corrigido no B7, com a D29**,
+quando essa ausência passou a ter consequência medida — e todos os mundos são alcançáveis.
 
 | Item | Medição |
 | --- | --- |
@@ -1464,7 +1515,7 @@ dimensão → dimensão do mundo, obra → obra) mais os testes: T10 (o retrato)
 
 | Risco | Gravidade | Probabilidade | Mitigação |
 | --- | --- | --- | --- |
-| **Quatro `index.html` a divergir** | Média | Alta se forem editados à mão | São **byte-idênticos** por construção (D28) e o B8 traz o verificador que o exige |
+| **Quatro `index.html` a divergir** | Média | Alta se forem editados à mão | São **o mesmo ficheiro** por construção, fora da linha do `<base>` (D28, emendada no B7) e o B8 traz o verificador que o exige |
 | **O retrato a envelhecer** (a sala mudou e o retrato não) | Média | Média | O passo de geração nas ferramentas (B8) e a L11 (porta sem retrato falha a validação) |
 | **A recarga a quebrar a imersão** | Média | Certa (é a D14) | A chegada atrás da porta, que deixa o regresso a um passo; o passo seguinte é a Fase 5 |
 | **Perder a janela ao vivo na exposição** | Baixa (é a D24) | Certa | O fixture passa a ser o mundo de 2 dimensões (B6) e uma sala com 2 dimensões passa a ser conteúdo barato na Fase 4 |
@@ -1676,7 +1727,16 @@ qualquer instrumento deste projeto:
 | D25 | Forma da porta no formato v3 | **FECHADA** (2026-10-15) | `version: 3`, e o par muda **para dentro do eixo**: `window {kind, dimensionA, dimensionB, asset, radius}` + `action {kind, target}` + `arrivalFrom` no portal, com **obrigatoriedade condicional** (o par só com `dimension-pair`, o `target` só com `navigate`) e os ids declarados limitados a **0…447** (L15). O `action.from` do exemplo da §6 sai: o `?from` que a porta escreve é o **slug do mundo de origem**, que o código já tem. **Custo aceite:** um leitor v2 deixa de ler o ficheiro — é a regra da D23 |
 | D26 | Como o retrato existe na cena | **FECHADA** (2026-10-15) | **Dimensão derivada** (G2-b): o construtor cria uma por par único (`asset`, `radius`), com id na banda **448…511** (L15), `followCamera: false`, a esfera centrada **na porta** (sem isso não há paralaxe) e o yaw vindo da rotação dela. Duas portas para o mesmo mundo, com o mesmo raio, partilham-na — 1 textura, 1 valor de stencil, 1 desenho, que é o que os portais 4 e 5 já provam hoje. O retrato é um **nome do catálogo**, nunca um caminho (D20), ao contrário do exemplo da §6 |
 | D27 | Divisão dos assets (D7) e nome dos retratos | **FECHADA** (2026-10-15) — **emendada ao fechar o B5** | `assets/{panoramas,artworks,video,previews}` (a divisão por tipo da D7, feita com `git mv`) e `<mundo>-d<N>-<nome>` no nome dos ficheiros. **Emenda:** os retratos são **um por mundo de destino** (`assets/previews/<destino>.jpg`) e não um por par origem→destino, porque a partilha da **D26** («duas portas para o mesmo mundo partilham 1 textura, 1 valor, 1 desenho») só acontece se as portas nomearem **o mesmo asset** — com o nome por par seriam **7** ficheiros e **7** texturas para **4** imagens. O formato continua a deixar uma porta nomear o seu próprio retrato, quando for uma escolha do autor |
-| D28 | Como cada mundo se identifica | **FECHADA** (2026-10-15) | O **slug sai do caminho**: o que sobra de `location.pathname` depois de `document.baseURI` (raiz = `gate`). Assim os **4 arranques são byte-idênticos** — 1 ficheiro copiado 4 vezes — e a verificação das ferramentas exige que o nome da pasta e o `world.slug` do JSON coincidam. **Custo aceite:** o nome da pasta *é* o slug, logo é implícito — e é exactamente por isso que passa a ser verificado |
+| D28 | Como cada mundo se identifica | **FECHADA** (2026-10-15) — **emendada ao fechar o B7** | O **slug sai do caminho**: o que sobra de `location.pathname` depois de `document.baseURI` (raiz = `gate`). Assim os **4 arranques são o mesmo ficheiro copiado 4 vezes** — 1 fonte, não 4 — e a verificação das ferramentas exige que o nome da pasta e o `world.slug` do JSON coincidam. **Emenda:** idênticos **fora da linha do `<base>`** (a raiz leva `href="./"`, as salas `href="../"`), porque sem ela os caminhos relativos de uma sala resolvem para a raiz. **Custo aceite:** o nome da pasta *é* o slug, logo é implícito — e é exactamente por isso que passa a ser verificado |
+| D29 | A porta que faltava na praia | **FECHADA** (2026-10-16) | A porta **5 da praia** passa a ser o **regresso ao portão**: `window: none` + `action: navigate` com `target: gate` e `arrivalFrom: gate`, espelhando a porta 2 da cidade. **Motivo escrito:** na cena de onde a 3B nasceu os portais **4 e 5 eram a mesma porta duas vezes** (`ownedBy: 2`, par `2/1`); enquanto eram duas dimensões do mesmo ficheiro era redundância, mas com **um mundo por dimensão** passou a ser **falta de saída** — a praia não tinha porta para o portão e, ao chegar de lá, nenhuma porta podia dizer que era a chegada, logo o visitante aparecia onde a câmara dizia e o aviso do T8 disparava. **Medido:** o aviso apareceu na primeira ronda de portas do B7 (`praia?from=gate`), e a correção prova-se pelo **migrador emendado** — reposta a cena única e corrido outra vez, os 5 ficheiros saem iguais aos que estão em disco excepto a porta 5 (`1 file changed, 4 insertions(+), 5 deletions(-)`). **Custo aceite:** a praia perde a simetria esquerda/direita das duas portas para a cidade (fica uma); ganha o regresso directo ao portão, que era o que faltava |
+
+> **Emenda da D28 (2026-10-16) — ao fechar o B7.** A decisão dizia «4 arranques
+> **byte-idênticos**, 1 ficheiro copiado 4 vezes», e a execução mostrou que a linha do `<base>`
+> não pode ser a mesma: a raiz precisa de `href="./"` e as salas de `href="../"`, senão o
+> `?from=<mundo>` e o `data/worlds/<slug>.json` de uma sala resolvem **para a raiz** — a sala
+> abria, mas a navegação e o dado vinham do mundo errado. Fica: os quatro são **o mesmo ficheiro
+> fora dessa linha**, e a verificação do B8 exige que sejam iguais fora dela (mais o nome da pasta
+> igual ao `world.slug`).
 
 > **Emenda da L6 (2026-10-14) — decisão D16.** A lei L6 enunciava a **ação**
 > (`renderer.sortObjects = true`) como se fosse ela a criar a garantia. Medido na fonte do
@@ -2033,8 +2093,9 @@ alteram comportamento.
 | D24 | A divisão da cena de hoje em mundos | **Quatro mundos, uma dimensão cada**: `gate` na raiz (câmara/AR), `cidade`, `praia` e `céu`, com as **8 portas de hoje** a `navigate`; o fixture passa a ser o mundo de duas dimensões que mantém a janela ao vivo exercitada |
 | D25 | Forma da porta no formato v3 | `version: 3`, com o par dentro do eixo: `window {kind, dimensionA, dimensionB, asset, radius}` + `action {kind, target}` + `arrivalFrom`, e **obrigatoriedade condicional** no esquema (ids declarados 0…447) |
 | D26 | Como o retrato existe na cena | **Dimensão derivada** por par único (`asset`, `radius`), na banda **448…511** (L15), `followCamera: false` e a esfera centrada na porta; duas portas para o mesmo mundo partilham-na |
-| D27 | Divisão dos assets (D7) e nome dos retratos | `assets/{panoramas,artworks,video}` com `git mv`, os retratos em `assets/previews/<origem>-to-<destino>.jpg` e `<mundo>-d<N>-<nome>` nos restantes |
-| D28 | Como cada mundo se identifica | O **slug sai do caminho** (`location.pathname` depois de `document.baseURI`; raiz = `gate`), o que deixa os **4 arranques byte-idênticos**, com o nome da pasta e o `world.slug` a serem conferidos |
+| D27 | Divisão dos assets (D7) e nome dos retratos | `assets/{panoramas,artworks,video,previews}` com `git mv`, os retratos em `assets/previews/<destino>.jpg` (**um por mundo de destino** — emenda do B5) e `<mundo>-d<N>-<nome>` nos restantes |
+| D28 | Como cada mundo se identifica | O **slug sai do caminho** (`location.pathname` depois de `document.baseURI`; raiz = `gate`), com os **4 arranques idênticos fora da linha do `<base>`** e o nome da pasta e o `world.slug` a serem conferidos |
+| D29 | A porta que faltava na praia | A porta 5 da praia passa a **regresso ao portão** (`window: none` + `navigate/gate` + `arrivalFrom: gate`), acabando com a porta duplicada que a cena anterior trazia |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -2078,7 +2139,14 @@ mesmo dia e **antes** de mexer em código). A **D24** decide o que a D14 não fi
 concreta da cena em mundos —, a **D25** diz o que a porta passa a ser no formato **v3**, a **D26**
 como o retrato existe (a dimensão derivada da L15), a **D27** onde ficam os assets e os retratos e
 a **D28** como cada mundo se identifica. O que a fase vai entregar, bloco a bloco, e as metas
-medidas estão na §9. **Nada implementado.**
+medidas estão na §9. *(D27 emendada ao fechar o B5 e D28 ao fechar o B7; execução de B1 a B7 feita
+e medida — ver a nota de 2026-10-16 no topo e os blocos em §9.)*
+
+**D29 fechada em 2026-10-16** — a **porta que faltava na praia**: a porta 5 passa a regresso ao
+portão, acabando com a porta duplicada que a cena anterior trazia. Não foi planeada: apareceu
+**medida**, no aviso que a primeira ronda de portas do B7 levantou (§9, nota do B7), e é a prova de
+que o instrumento vale mais do que a estimativa — a cena anterior tinha a mesma duplicação desde a
+Fase 2 e nada a assinalava.
 
 ### O que fica decidido, em uma frase
 

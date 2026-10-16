@@ -24,6 +24,9 @@ import { buildScene } from './scene/scene-builder.js';
 window.portalAR = state;
 window.portalDebug = {
   state: state,
+  // Which world the page is showing (D28), for the console and the regression scripts. `state`
+  // holds what the scene is made of; this says which file it was read from.
+  world: null,
   setActiveDimension: setActiveDimension,
   applyStencilState: applyStencilState,
   syncStencilValues: syncStencilValues,
@@ -66,25 +69,34 @@ document.addEventListener('keydown', (event) => {
 });
 
 // --- THE WORLD, FROM DATA ---
-// One file per world (D24): the gate is the root page and a room is a folder of its own (D28). The
-// file is named after the slug of the world, and `?scene=<slug>` loads another one — the fixture of
-// D9, and any room from the root while the folders are being built (block B7).
+// One file per world (D24) and one arranque per world: the gate is the root page and a room is a
+// folder of its own (D28). The arranque is the same file everywhere — it only differs in the `<base>`
+// that says how deep it is — and the world it serves is what is left of the path after that base:
+// `/praia/` is the world `praia`, and the root is the gate. `?scene=<slug>` overrides it, for the
+// fixture of D9 and for opening a room before its folder exists.
 const DEFAULT_WORLD = 'gate';
 const WORLD_NAME = /^[a-z0-9-]+$/;
-const worldFile = (slug) => 'data/worlds/' + slug + '.json';
+
+function worldFromPath() {
+  const base = new URL(document.baseURI).pathname;
+  const here = window.location.pathname;
+  const rest = here.startsWith(base) ? here.slice(base.length) : '';
+  const slug = rest.split('/').filter(Boolean)[0];
+  return slug && WORLD_NAME.test(slug) ? slug : DEFAULT_WORLD;
+}
 
 function requestedWorld() {
   const requested = new URLSearchParams(window.location.search).get('scene');
-  if (!requested) return DEFAULT_WORLD;
+  if (!requested) return worldFromPath();
   if (!WORLD_NAME.test(requested)) {
-    console.warn('[scene] "' + requested + '" is not a world name; loading ' + DEFAULT_WORLD);
-    return DEFAULT_WORLD;
+    console.warn('[scene] "' + requested + '" is not a world name; loading ' + worldFromPath());
+    return worldFromPath();
   }
   return requested;
 }
 
 async function loadScene() {
-  const file = worldFile(requestedWorld());
+  const file = 'data/worlds/' + requestedWorld() + '.json';
   const response = await fetch(file);
   if (!response.ok) throw new Error(file + ': HTTP ' + response.status);
   return response.json();
@@ -92,6 +104,7 @@ async function loadScene() {
 
 async function buildFromData() {
   const data = await loadScene();
+  window.portalDebug.world = data.world.slug;
   const report = validateScene(data);
 
   // The console is a test (T8): a scene that is fine says nothing at all. What cannot be checked

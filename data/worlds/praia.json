@@ -223,14 +223,13 @@
         "thickness": 0.3
       },
       "window": {
-        "kind": "preview",
-        "asset": "retrato-cidade",
-        "radius": 120
+        "kind": "none"
       },
       "action": {
         "kind": "navigate",
-        "target": "cidade"
-      }
+        "target": "gate"
+      },
+      "arrivalFrom": "gate"
     },
     {
       "id": 6,

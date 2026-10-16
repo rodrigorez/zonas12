@@ -3,6 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- A raiz da publicação (D28): é ela que resolve os caminhos relativos desta página — o mesmo
+         arranque serve qualquer mundo, um nível abaixo (`../`) nas salas, e o portão aqui. É também
+         o que dá ao `app.js` a fronteira de onde sai o slug do mundo: o que sobra do caminho. -->
+    <base href="./" />
     <title>Portal AR – Galeria Imersiva com Controlos Mobile</title>
     <meta name="description" content="Galeria imersiva em A-Frame: panoramas 360º ligados por portais de stencil, atravessáveis por telemóvel ou computador." />
     <meta property="og:type" content="website" />

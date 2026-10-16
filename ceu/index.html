@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- A raiz da publicação (D28): é ela que resolve os caminhos relativos desta página — o mesmo
+         arranque serve qualquer mundo, um nível abaixo (`../`) nas salas, e o portão aqui. É também
+         o que dá ao `app.js` a fronteira de onde sai o slug do mundo: o que sobra do caminho. -->
+    <base href="../" />
+    <title>Portal AR – Galeria Imersiva com Controlos Mobile</title>
+    <meta name="description" content="Galeria imersiva em A-Frame: panoramas 360º ligados por portais de stencil, atravessáveis por telemóvel ou computador." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Portal AR – Galeria Imersiva com Controlos Mobile" />
+    <meta property="og:description" content="Galeria imersiva em A-Frame: panoramas 360º ligados por portais de stencil, atravessáveis por telemóvel ou computador." />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:image" content="assets/panoramas/praia-d0-praia.jpg" />
+    <meta property="og:image:alt" content="Panorama 360º da dimensão 2 (praia)" />
+    <link rel="icon" href="data:,">
+
+    <!-- Dados estruturados: leitura por motores de busca e por motores de IA.
+         Sem `url`, de propósito: não há endereço canónico antes da D14. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Portal AR – Galeria Imersiva com Controlos Mobile",
+        "inLanguage": "pt-BR",
+        "description": "Galeria imersiva em A-Frame: panoramas 360º ligados por portais de stencil, atravessáveis por telemóvel ou computador."
+      }
+    </script>
+    
+    <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="js/app.js"></script>
+  </head>
+  
+  <body>
+    <!-- Título principal da página. É o único heading e não se vê: a cena ocupa o ecrã
+         todo, mas um leitor de ecrã e um motor de IA precisam de saber qual é o tema. -->
+    <h1 class="sr-only">Portal AR – Galeria Imersiva</h1>
+
+    <!-- Loading indicator -->
+    <div class="loading-overlay" id="loading-overlay" role="status" aria-live="polite">
+      Carregando...
+    </div>
+
+    <!-- OVERLAY: Janela Modal -->
+    <div id="modal-obra" role="dialog" aria-modal="true" aria-label="Obra aberta">
+      <button id="btn-fechar-obra" onclick="fecharObra()">Voltar para a Galeria</button>
+      <iframe id="iframe-obra" src="" tabindex="-1" title="Obra aberta em página externa" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+    <!-- Interface Inicial -->
+    <button id="btn-iniciar" onclick="iniciarCena()">ATIVAR EXPOSIÇÃO</button>
+
+    <!-- CONTROLOS MOBILE (Só aparecem se for smartphone/tablet).
+         São <button> e não <div>: assim chegam à árvore de acessibilidade com um nome
+         ("Avançar", "Recuar", …) em vez de um glifo sem significado. -->
+    <div id="controles-mobile" role="group" aria-label="Controlos de movimento">
+      <button type="button" id="btn-frente" class="dpad-btn" aria-label="Avançar">▲</button>
+      <button type="button" id="btn-tras" class="dpad-btn" aria-label="Recuar">▼</button>
+      <button type="button" id="btn-esq" class="dpad-btn" aria-label="Esquerda">◄</button>
+      <button type="button" id="btn-dir" class="dpad-btn" aria-label="Direita">►</button>
+    </div>
+
+    <!-- Fundo de Câmera. `aria-hidden`: é a imagem real por trás da cena, não conteúdo com
+         equivalente textual — para quem não vê, não há nada a anunciar. -->
+    <div id="container-video">
+      <video id="webcam-video" autoplay playsinline muted aria-hidden="true"></video>
+    </div>
+
+    <!-- Cena A-Frame -->
+    <div id="container-3d">
+      <!-- renderer: o stencil é obrigatório para o portal (buffer de stencil) -->
+      <a-scene ar-config renderer="alpha: true; antialias: true; stencil: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable">
+
+        <!-- A cena vem dos dados (docs/ROADMAP.md, Fase 3): data/scene.json. Fica aqui o que
+             nao e cena — o arranque do renderer (`ar-config`), o stencil, o cursor e o
+             raycast da cena, e o contentor de assets, que o construtor enche a partir do
+             catalogo. -->
+        <a-assets></a-assets>
+      </a-scene>
+    </div>
+
+  </body>
+</html>

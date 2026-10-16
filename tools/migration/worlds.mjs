@@ -54,9 +54,18 @@ const WORLDS = [
 const ARRIVAL = {
   gate: { cidade: 0, praia: 1 },
   cidade: { gate: 2, praia: 3 },
-  praia: { cidade: 4, ceu: 6 },
+  praia: { gate: 5, cidade: 4, ceu: 6 },
   ceu: { praia: 7 }
 };
+
+// One portal of the single scene pointed where the pair said, and nothing checked the door was a
+// good one. Portals 4 and 5 stood side by side in the beach and were the same door twice, both
+// opening onto the city; with one world per dimension that duplication turned into a missing way
+// out — the beach had no door back to the gate, and no door of it could say it was the arrival from
+// there (the visitor landed at whatever the camera said, and the runtime warned). Decision of
+// 2026-10-16 (§9, D29): the left door leads back to the gate, with `window: none` like the city's,
+// because there is still no picture of the gate. This table is the whole of the change.
+const RETARGET = { 5: 'gate' };
 
 // The portrait each door shows, by world of destination. The gate has none: the reality of the
 // gate is the camera, and there is no picture of it — a borrowed portrait would lie to the visitor
@@ -89,7 +98,8 @@ function readSingleScene() {
 // pair that is not the one the door stands in (the pair lives inside the window axis since D25).
 function worldDoor(portal, hereSlug, scene) {
   const pair = portal.window || {};
-  const there = worldOfDimension(pair.dimensionA === portal.ownedBy ? pair.dimensionB : pair.dimensionA);
+  const there = RETARGET[portal.id] ||
+    worldOfDimension(pair.dimensionA === portal.ownedBy ? pair.dimensionB : pair.dimensionA);
   const portrait = PORTRAIT[there];
   const door = {
     id: portal.id,
@@ -270,7 +280,8 @@ function correspondence(scene, worlds) {
   for (const portal of scene.portals) {
     const here = worldOfDimension(portal.ownedBy);
     const pair = portal.window || {};
-    const there = worldOfDimension(pair.dimensionA === portal.ownedBy ? pair.dimensionB : pair.dimensionA);
+    const there = RETARGET[portal.id] ||
+      worldOfDimension(pair.dimensionA === portal.ownedBy ? pair.dimensionB : pair.dimensionA);
     const door = bySlug.get(here).portals.find((candidate) => candidate.id === portal.id);
     const kind = door ? door.window.kind + ' + ' + door.action.kind + (door.arrivalFrom ? ' (arrival from ' + door.arrivalFrom + ')' : '') : 'NOT FOUND';
     lines.push({ what: 'portal ' + portal.id, from: here + ' (pair with ' + there + ')', to: there + ': ' + kind });
