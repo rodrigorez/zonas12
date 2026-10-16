@@ -416,6 +416,10 @@ O único sítio que conhece a cena toda.
 > esse id, para o `src: "#id"` do componente resolver. Uma dimensão de `kind: "camera"` **não tem
 > entidade**: o fundo dela é a webcam atrás do canvas.
 
+> **Como ficou (Fase 4, plano de 2026-10-16).** O `update`/`list` da API proposta **não** são
+> pedidos nesta fase: o editor **re-cria a entidade** com a `createDimension()` e o `remove()`
+> quando um campo muda (**D33**, §11) — uma via só, em vez de duas para a mesma geometria.
+
 ### 5.3 Módulo Obra
 
 - **Responsabilidade:** item de conteúdo de uma dimensão, opcionalmente clicável.
@@ -433,7 +437,8 @@ O único sítio que conhece a cena toda.
 > `interaction: "modal"` **não há** `url` nenhum no dado — o endereço deriva do catálogo (D20, o
 > fecho do **A6**) e chega à fábrica já resolvido, porque quem conhece o catálogo é o construtor de
 > cena. `url` só existe para `interaction: "link"`. O `title` por língua (D21) é lido pelo editor
-> (Fase 4): nenhuma fábrica o usa ainda.
+> (Fase 4): nenhuma fábrica o usa ainda. E, como na dimensão, o `update`/`list` da API proposta
+> **não** é pedido: o editor re-cria a entidade (**D33**, §11).
 
 ### 5.4 Módulo Portal
 
@@ -486,6 +491,11 @@ O único sítio que conhece a cena toda.
 > atravessar. Passou a depender de a porta **estar** onde o visitante está, e a máscara passou a
 > esconder-se quando a janela não mostra nada (escreve profundidade, e sem janela tapava o que está
 > atrás sem dar nada em troca).
+
+> **Como ficou (Fase 4, plano de 2026-10-16).** O `update`/`list` da API proposta **não** é pedido:
+> o editor re-cria a porta (`createPortal` + `removePortal`) quando um campo muda (**D33**, §11), e
+> é a mesma via que a fábrica usa no arranque. A validação da porta, essa, continua a ser **uma só**
+> — a `validateDoor()` da tabela dos eixos, que o formulário do editor reutiliza.
 
 #### Os dois eixos do portal (D14)
 
@@ -554,7 +564,8 @@ zonas12/
 ├── css/{style.css, editor.css}
 ├── js/
 │   ├── app.js               arranque da exposição
-│   ├── editor.js            arranque do editor
+│   ├── editor.js            arranque do editor (a entrada — D36)
+│   ├── editor/              modelo, painéis, pré-visualização e exportação (D36)
 │   ├── core/                estado, registos, stencil, ordem de desenho, eventos, limites
 │   ├── modules/             dimension.js, artwork.js, portal.js, camera.js
 │   └── scene/               scene-builder.js, schema.js, validation.js
@@ -576,8 +587,9 @@ zonas12/
 > cidade,praia,ceu,example}.json` (**desde o B6 a cena é um ficheiro por mundo** — o
 > `data/scene.json` do mundo único deixou de existir), `i18n/pt.json`,
 > `assets/{panoramas,artworks,video,previews}` (divididos por tipo no B5) e
-> `tools/{scene, migration, regression, assets}`. **Por fazer:** o `editor.html` e o `js/editor.js`
-> (Fase 4), o `en.json` (quando houver tradução) e os itens do autor em §14 (R10 e R11).
+> `tools/{scene, migration, regression, assets}`. **Por fazer:** o `editor.html`, o `js/editor.js` e
+> o `js/editor/` (Fase 4 — o plano está em §9, bloco B0), o `en.json` (quando houver tradução) e os
+> itens do autor em §14 (R10 e R11).
 
 Nota de nomenclatura: as pastas de **código** são em inglês (D10), e os ficheiros de dados
 também: `data/worlds/<slug>.json` é uma sala (ou o portão), e `data/worlds/example.json` é a cena de
@@ -820,6 +832,21 @@ O que a **Fase 3B** acrescenta ao modelo (nada disto existe ainda):
 | **Portal** | `window` + `action`, onde pertence, tamanho, caixa, gatilho | todos os campos, incluindo caixa e moldura | **validar** a combinação legal (§5.4), o destino fora de outras caixas, o valor de stencil; pré-visualizar a travessia | individual; se for o último portal de uma dimensão, avisar |
 | **Câmara** | — (é única) | posição inicial, altura, velocidade, webcam on/off | mostrar posição atual; botão "usar a posição atual como inicial" | — (não aplicável) |
 
+**Três notas do plano da Fase 4 (2026-10-16), porque duas linhas desta tabela não se podem
+cumprir como estão escritas:**
+
+- **«Mundo» — «pasta e arranque»** não é do editor: sob a **D2** ele **nunca escreve em disco** e,
+  sob a **D14**, não há manifesto que lhe diga que pastas existem. A criação da pasta e do arranque
+  é de uma **ferramenta** (`tools/scene/new-world.mjs`, **D31**, §11) e o editor mostra o comando.
+- **«Dimensão» — o tipo de fundo** só oferece o que a cena **constrói**: `kind: "color"` valida e
+  não é construído (é uma das quatro coisas do **R9**), logo o formulário não o oferece e o
+  validador **avisa** quem o escrever à mão (**D30**, §11).
+- **«Mundo» — «detetar sala inalcançável»** fica na **linha de comando**: descobrir uma sala que
+  ninguém alcança exige **listar a pasta** `data/worlds/`, e isso o `fetch` não dá. O editor vê o
+  que **alcança a partir do portão** (as portas do `gate` e as portas dessas salas), confere a
+  **L11** (o ficheiro do destino existe) e as chegadas (**L17/L19**) — e não constrói nenhum desses
+  mundos, que é o que a **L13** proíbe.
+
 Transversal a todos: **escolher o mundo a editar** (um de cada vez, D14), **importar/exportar
 JSON**, **validar tudo** antes de exportar, **desfazer**, e uma lista de problemas (ex.: "o
 portal 3 chega dentro da caixa do portal 5", "a sala `ceu` não tem porta de volta").
@@ -874,6 +901,12 @@ L16, L17 e L18** no bloco B3, **L10 e L14** no B5 e a **L19** no B8: as que se l
 o B2 estabeleceu — **uma lei e o dado que a satisfaz entram no mesmo bloco**. A **L14** e a **L9** são
 medíveis **só na linha de comando** (a forma de uma imagem, a existência de um ficheiro): o browser
 reporta-as como «não verificadas», pelo mesmo caminho que o `options.exists` abriu.
+
+> **Emenda (Fase 4, plano de 2026-10-16).** No **editor** elas passam a ser medíveis **no browser** —
+> o ficheiro existe por `fetch` e a forma da imagem por descodificação —, logo o relatório do editor
+> cobre o que a linha de comando cobre, **menos** o que exige listar a pasta (uma sala que ninguém
+> alcança: é da linha de comando, §7). Na **exposição** nada disto muda: continua a reportá-las como
+> «não verificadas».
 
 A **L6** foi reescrita em 2026-10-14 (**D16**): passou a enunciar o **invariante a validar**, e
 não a ação — medido na fonte do A-Frame 1.8.0, é o framework que fixa `sortObjects = true` na
@@ -1673,15 +1706,139 @@ gravação direta (Fase 5) · automatizar T1 e T4–T7 (Fase 6 — na 3B ficam m
 T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
-- **Entregável:** `editor.html` + `css/editor.css` + `js/editor.js`: CRUD por módulo,
+
+**Estado: plano registado em 2026-10-16 (B0) — nada implementado.** Como nas fases anteriores, o
+plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
+está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
+**três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
+faltavam ficaram fechadas (**D30–D36**, §11).
+
+- **Entregável:** `editor.html` + `css/editor.css` + `js/editor.js` (a entrada) com o modelo, os
+  painéis, a pré-visualização e a exportação em `js/editor/` (**D36**): CRUD por módulo,
   validação (§8), pré-visualização, importar/exportar.
 - **D12 aplica-se desde o primeiro ecrã:** todos os rótulos do editor saem do catálogo
   `i18n/pt.json` (`t('editor.…')`) e os campos de texto do conteúdo são **por língua**
   (variante A da §5.7). Fazer o editor só em português "para traduzir depois" era o que a D12
   veio evitar.
 - **Verificação:** criar uma dimensão + 2 obras + 1 portal **só pelo editor**, exportar,
-  substituir o JSON e ver a cena a funcionar; e os 9 testes de regressão na cena editada.
-- **Risco:** o editor e a exposição divergirem. Mitigação: o editor usa os **mesmos** módulos.
+  substituir o JSON e ver a cena a funcionar; e a **bateria dos doze testes** (§10) na cena
+  editada, na exposição, com os números da linha de base.
+- **Risco:** o editor e a exposição divergirem. Mitigação: o editor usa os **mesmos** módulos —
+  e essa mitigação tem um **pré-requisito medido no B0** (segunda tabela abaixo): hoje os módulos
+  **não** carregam numa página sem a UI da exposição.
+
+#### O que existe hoje (medido em 2026-10-16, no B0)
+
+| Peça | Medido | O que já serve à Fase 4 |
+| --- | --- | --- |
+| `index.html` e os 3 arranques | **86** linhas cada (o mesmo ficheiro, D28) | a marcação da exposição, que o editor **não** leva (D4) |
+| `js/app.js` | **139** | a forma do arranque magro que o `js/editor.js` copia |
+| `js/core/` | 7 ficheiros, **219** | `state`, `on`/`emit`, `syncStencilValues`, os registos e os limites — tudo o que o editor lê |
+| `js/modules/` | 5 ficheiros, **1008** | as **fábricas** (`createDimension`/`createArtwork`/`createPortal`) e os **`remove()`** que o editor passa a exercitar |
+| `js/scene/` | 4 ficheiros, **1002** | `schema.js` (a forma), `validation.js` (forma + L1…L19), `scene-builder.js` (`buildScene().remove()`), `arrival.js` |
+| `js/modules/portal-kinds.js` | **92** | a **matriz legal** e o `validateDoor()` que o formulário da porta reutiliza (escritos para isto) |
+| `data/worlds/` | 5 ficheiros, **12 portas** | o dado a editar e a prova do *round-trip* |
+| `i18n/pt.json` | **5** chaves | quase nada: **nada lê o catálogo** (medido por `grep`; só o comentário em `camera.js:137`) |
+| `tools/` | 9 ficheiros, **2664** | o validador, o verificador dos arranques e a bateria dos doze testes |
+
+E o que **não** existe: nenhuma marca de editor no repositório (só comentários a apontá-lo),
+nenhum `update`/`list` nas fábricas, nenhuma leitura do catálogo, nenhum `t('…')`, nenhum caminho
+de escrita.
+
+#### Três medições novas (B0) — e o que elas mudam no plano
+
+Medidas com a cena a correr, em páginas-sonda servidas por HTTP e apagadas no fim (a árvore ficou
+limpa):
+
+| # | O que se mediu | Resultado | O que muda |
+| --- | --- | --- | --- |
+| 1 | Importar os módulos numa página **sem a UI da exposição** | `js/core/`, `camera.js`, `dimension.js`, `portal.js` e `validation.js` → **OK**; **`artwork.js` → excepção** (`Cannot read properties of null (reading 'addEventListener')`), e com ele o `scene-builder.js`, que o importa | **o editor não consegue hoje montar a cena.** A mitigação do risco («usa os mesmos módulos») ganha um **pré-requisito**: o bloco **B2** |
+| 2 | O que o módulo da câmara só faz sentido na exposição | `setupMobileControls()` → **excepção** (sem o D-pad); `reportCameraError()` → **excepção** (sem `#btn-iniciar`, depois de já ter posto a mensagem no ecrã) | duas guardas no **B2** |
+| 3 | **R8** — o `remove()` que nunca correu | `buildScene(gate)` + `remove()`, **3 ciclos**: registos de volta a **0** dimensões, **0** entradas e **0** portais, a cena de volta às **3** entidades do A-Frame (as dele) | **o `remove()` funciona** — o R8 passa de risco a meta medida (**20** ciclos no B3) — e os assets são recarregados em cada `build`, o que fixa a **D33** |
+
+Um `grep` encontrou ainda um consumidor da ponte temporária que o documento não mencionava:
+`tools/regression/acceptance.mjs:422` chama `window.fecharObra()`. O instrumento passa a importar
+`closeArtwork()` no B1, com o **T6 re-medido**.
+
+#### As decisões que faltavam (D30–D36, §11)
+
+| # | Decisão | Escolha |
+| --- | --- | --- |
+| D30 | **R9** — o esquema declara o que a cena não constrói | O validador **avisa** (é a categoria que já existe) e o editor **não oferece** o que não é construído |
+| D31 | **§7 «Mundo» pedia «pasta e arranque»** — impossível sob a D2 | A pasta e o arranque são de uma **ferramenta** (`tools/scene/new-world.mjs`); o editor mostra o comando |
+| D32 | A pré-visualização e a navegação | A travessia `navigate` fica **inerte** na pré-visualização (aviso na consola), mais guarda de saída com alterações por gravar |
+| D33 | Como a pré-visualização reaplica o que se edita | **Re-criar a entidade editada** (`remove` + fábrica); reconstruir a cena só quando a estrutura muda |
+| D34 | A webcam no editor | Só liga por **gesto**, nunca na carga da página |
+| D35 | «Desfazer» | **Instantâneos** do JSON em memória (limite ~50) |
+| D36 | Estrutura do editor | `js/editor.js` = entrada (≤100 linhas) + `js/editor/` (modelo, painéis, pré-visualização, exportação, problemas) |
+
+#### Blocos de execução
+
+Um bloco por commit, como nas fases anteriores.
+
+| # | Bloco | Fecha | O que se mede |
+| --- | --- | --- | --- |
+| **B0** | Registar este plano, as decisões D30–D36 e o que existe medido (só documento) | — | `validate.mjs` exit 0; a bateria dos doze; as contagens desta secção |
+| **B1** | A interface passa a ler o catálogo: `js/i18n.js` (`t('…')`, `?lang=`, queda para o português, aviso de chave em falta), as chaves novas e **fora a ponte inline** (`onclick`, `window.iniciarCena`/`fecharObra`) | **R3** | 0 textos de interface em código; os 4 arranques iguais fora do `<base>`; `?lang=en` sem `en.json` → português e **1** aviso; T8 limpo; **T6 re-medido** |
+| **B2** | Os módulos deixam de exigir a UI da exposição (modal/iframe, D-pad, `#btn-iniciar`, overlay) | — | os 6 imports numa página sem a UI da exposição (hoje: **2** excepções); a exposição com os mesmos números |
+| **B3** | Pré-visualização: `buildScene` ganha o modo de pré-visualização (D32) e o editor chama o `remove()` | **R8** | ciclo build/remove ×**20**: registos vazios, **1** ouvinte de teclado, 0 erros |
+| **B4** | A casca do editor: `editor.html`, `css/editor.css`, `js/editor.js` e `js/editor/` — escolha do mundo, pré-visualização ao lado, importar/exportar | — | 0 erros e 0 avisos na consola do editor; exportar sem editar dá **0 diferenças** nos 5 mundos |
+| **B5** | **Câmara** (única: posição inicial, velocidade, webcam, «usar a posição actual») e **Dimensão** (ID, tipo, asset, raio, aviso da L1, faixa da L15) | §7 | CRUD da dimensão; a L1 avisa antes de exportar; apagar bloqueado com portas ou obras a apontar |
+| **B6** | **Obra** (por dimensão: asset, posição/rotação/tamanho, interacção, título por língua; asset em falta; `url` só com `link`) | §7, D21 | 2 obras inseridas pelo editor e vistas na pré-visualização; o `title` por língua no ficheiro exportado |
+| **B7** | **Portal**: os dois eixos (só as combinações legais da matriz), caixa, moldura, gatilho, destino fora das caixas (L4), valor de stencil, pré-visualização da travessia | §7 | uma porta por cada combinação legal criada pelo editor; a **L18** impossível de violar pelo formulário |
+| **B8** | **Mundo**: slug, nome por língua, etiqueta/retrato/raio da porta; lista de salas **derivada** das portas do portão; porta para mundo inexistente (L11) e chegadas (L17/L19) | §7 | um mundo novo ponta a ponta com a ferramenta da D31; as duas leis a acusar uma avaria injectada |
+| **B9** | Transversal: validar tudo antes de exportar (com `exists` e `imageSize` respondidos por `fetch`/descodificação), lista de problemas, desfazer, guarda de saída, e o **aviso do R9** com as avarias novas no `laws-selftest.mjs` | **R9** | as leis de §8 todas no relatório do editor; **17 → N de N** avarias detectadas; importar→exportar **0 diferenças** |
+| **B10** | Verificação e documentação: a aceitação abaixo, o README (secção do editor), a tabela de §9, as pendências de §14 e o marco **v0.0.7** | — | **1 dimensão + 2 obras + 1 portal só pelo editor**, exportar, substituir o ficheiro e correr a bateria na cena editada |
+
+#### Metas de sucesso
+
+**(a) Comportamento — nenhum número pode mudar.** Os **doze** testes de §10 na exposição, nos 5
+mundos, com os valores da v0.0.6 (a bateria é `runAcceptance()` mais `walkDoor(id)` e
+`checkArrival()`). Se algum número mexer, é bug.
+
+**(b) Arquitetura — metas novas, todas mensuráveis.**
+
+| # | Meta | Como se mede | Alvo |
+| --- | --- | --- | --- |
+| M1 | Os ficheiros do editor existem | `editor.html`, `css/editor.css`, `js/editor.js` | os **3** |
+| M2 | Zero texto de interface em código | `grep` de literais portugueses em `js/` | **0** (só `t('…')`) |
+| M3 | Zero texto em CSS | `grep "content:"` em `css/` | **0** |
+| M4 | O catálogo cobre o que a interface diz | script: toda a chave `t('…')` existe em `pt.json` | **100%** (fecha o **R3**) |
+| M5 | O editor não escreve em disco | `grep` de `fs`/`localStorage`/`writeFile` em `js/` | **0** (D2) |
+| M6 | O editor usa os mesmos módulos | `import` de `core/`, `modules/` e `scene/` em `js/editor*` | os **3** grupos (D4/D3) |
+| M7 | A exposição não conhece o editor | `grep editor` em `js/core/`, `js/modules/`, `js/scene/` e `js/app.js` | **0** (fora de comentários) — a regra da D4, literal |
+| M8 | **R8** fechado | ciclo build/remove ×**20** no editor | registos vazios, **1** ouvinte, 0 erros |
+| M9 | **R9** fechado | `laws-selftest.mjs` com uma avaria por valor não construído | **17 → N de N** |
+| M10 | A validação é uma só | `grep` de leis duplicadas no editor | **0** (importa `js/scene/validation.js`) |
+| M11 | O ficheiro exportado é estável | importar→exportar os 5 mundos | **0 diferenças** (2 espaços, ordem do `schema.js`, sem campos vazios) |
+| M12 | Não se pré-visualiza outro mundo | `grep` de `buildScene` com um ficheiro que não o mundo editado | **0** (L13) |
+| M13 | As 4 linhas de §7 por módulo | a tabela do editor | **5** módulos × **4** colunas |
+| M14 | Os módulos carregam em qualquer host | importar os 6 numa página sem a UI da exposição | **0** excepções (hoje: **2**) |
+| M15 | `?lang=` escolhe a língua | `/?lang=en` sem `en.json` | português, **1** aviso, 0 chaves cruas no ecrã |
+
+#### Aceitação da fase
+
+1. **Só pelo editor:** 1 dimensão + 2 obras + 1 portal, exportar e substituir o ficheiro do mundo.
+2. **A cena editada:** `validate.mjs` exit **0** e a bateria dos **doze** com os números da linha
+   de base.
+3. **O que não mudou:** a bateria nos 5 mundos do `main` e o `checkArranques` (os 4 arranques
+   iguais fora do `<base>`).
+4. **O editor:** 0 erros e 0 avisos na consola, na carga, ao trocar de mundo e no fim de uma ronda
+   de edições.
+5. **O *round-trip*:** importar e exportar os 5 mundos sem editar nada → **0 diferenças** (a mesma
+   prova das Fases 0 e 3).
+
+#### Riscos da fase
+
+| Risco | Gravidade | Mitigação |
+| --- | --- | --- |
+| **Os módulos exigirem a UI da exposição** (medido no B0: **2** excepções) | Alta | o **B2** antes de qualquer painel; a **M14** fecha-o |
+| O editor e a exposição divergirem | Média | os mesmos módulos (**M6**) e a **M7** (0 imports do editor no núcleo, nos módulos e na cena) |
+| A pré-visualização tirar o autor da ferramenta | Média | **D32**: navegação inerte e guarda de saída |
+| Reconstruir a cena a cada tecla (os assets recarregam — medido) | Média | **D33**: re-criar **a entidade**; reconstruir só quando a estrutura muda |
+| Duas fontes para os rótulos (código e catálogo) | Média | **M2** e **M4**, medidas por script e não por disciplina |
+| Exportar por cima do ficheiro errado | Baixa | o nome do ficheiro é o `world.slug`, e o validador já exige que a pasta seja o slug |
+| Uma sala inalcançável que o editor não vê | Baixa | fica na linha de comando (sem listagem de pasta por HTTP — nota da §7) |
 
 ### Fase 5 — Gravação direta *(só se a fricção de 2A incomodar)*
 - **Entregável:** servidor local mínimo que lê/grava `data/scene.json`, **fora** do que se
@@ -1897,6 +2054,13 @@ qualquer instrumento deste projeto:
 | D27 | Divisão dos assets (D7) e nome dos retratos | **FECHADA** (2026-10-15) — **emendada ao fechar o B5** | `assets/{panoramas,artworks,video,previews}` (a divisão por tipo da D7, feita com `git mv`) e `<mundo>-d<N>-<nome>` no nome dos ficheiros. **Emenda:** os retratos são **um por mundo de destino** (`assets/previews/<destino>.jpg`) e não um por par origem→destino, porque a partilha da **D26** («duas portas para o mesmo mundo partilham 1 textura, 1 valor, 1 desenho») só acontece se as portas nomearem **o mesmo asset** — com o nome por par seriam **7** ficheiros e **7** texturas para **4** imagens. O formato continua a deixar uma porta nomear o seu próprio retrato, quando for uma escolha do autor |
 | D28 | Como cada mundo se identifica | **FECHADA** (2026-10-15) — **emendada ao fechar o B7** | O **slug sai do caminho**: o que sobra de `location.pathname` depois de `document.baseURI` (raiz = `gate`). Assim os **4 arranques são o mesmo ficheiro copiado 4 vezes** — 1 fonte, não 4 — e a verificação das ferramentas exige que o nome da pasta e o `world.slug` do JSON coincidam. **Emenda:** idênticos **fora da linha do `<base>`** (a raiz leva `href="./"`, as salas `href="../"`), porque sem ela os caminhos relativos de uma sala resolvem para a raiz. **Custo aceite:** o nome da pasta *é* o slug, logo é implícito — e é exactamente por isso que passa a ser verificado |
 | D29 | A porta que faltava na praia | **FECHADA** (2026-10-16) | A porta **5 da praia** passa a ser o **regresso ao portão**: `window: none` + `action: navigate` com `target: gate` e `arrivalFrom: gate`, espelhando a porta 2 da cidade. **Motivo escrito:** na cena de onde a 3B nasceu os portais **4 e 5 eram a mesma porta duas vezes** (`ownedBy: 2`, par `2/1`); enquanto eram duas dimensões do mesmo ficheiro era redundância, mas com **um mundo por dimensão** passou a ser **falta de saída** — a praia não tinha porta para o portão e, ao chegar de lá, nenhuma porta podia dizer que era a chegada, logo o visitante aparecia onde a câmara dizia e o aviso do T8 disparava. **Medido:** o aviso apareceu na primeira ronda de portas do B7 (`praia?from=gate`), e a correção prova-se pelo **migrador emendado** — reposta a cena única e corrido outra vez, os 5 ficheiros saem iguais aos que estão em disco excepto a porta 5 (`1 file changed, 4 insertions(+), 5 deletions(-)`). **Custo aceite:** a praia perde a simetria esquerda/direita das duas portas para a cidade (fica uma); ganha o regresso directo ao portão, que era o que faltava |
+| D30 | **R9** — o esquema valida o que a cena não constrói (`model`/`text` de obra, `color` de dimensão, `interaction: link`) | **FECHADA** (2026-10-16) | **O validador passa a avisar e o editor não oferece o que não é construído.** Motivo escrito: implementar geometria de modelo, texto 3D e `link` a navegar é uma fase própria — nenhum deles tem arte nem caso de uso hoje —, enquanto a alternativa (o editor oferecer campos que a cena ignora) é exactamente o defeito que o **R9** mediu: quem escreve um desses campos vê o validador aceitar e a cena não mudar. O aviso entra na categoria que já existe (a mesma que avisa da dimensão de cor sem cor) e no `tools/scene/laws-selftest.mjs`, com uma avaria por valor. **Custo aceite:** o esquema continua a declarar mais do que constrói — passa a declará-lo **em voz alta** |
+| D31 | O que o editor faz quando se cria um **mundo** (§7 pedia «slug, nome por língua, **pasta e arranque**») | **FECHADA** (2026-10-16) | **O editor exporta o ficheiro (`data/worlds/<slug>.json`) e mostra o comando; a pasta e o arranque são de uma ferramenta** — `tools/scene/new-world.mjs`, que cria `<slug>/index.html` a partir do arranque da raiz e o confere com o `checkArranques` que já existe. Motivo escrito: a **D2** diz que o editor **nunca escreve em disco** (é um site estático: gravar é substituir o ficheiro à mão) e a **D14** recusou o manifesto (M5) — sem ele, uma pasta nova não é sequer *vista* pelo editor. A ferramenta tem precedente: `tools/assets/normalize.mjs` já escreve ficheiros. **Custo aceite:** criar uma sala passa a ter dois passos (o comando e o ficheiro exportado), e o editor não os faz por si |
+| D32 | A pré-visualização e a travessia de uma porta de mundo | **FECHADA** (2026-10-16) | **A acção `navigate` fica inerte na pré-visualização** (o construtor ganha a opção e a porta avisa na consola quem a atravessa) **e há guarda de saída** quando o modelo tem alterações por gravar. Motivo escrito: a pré-visualização é uma caminhada **dentro** da ferramenta, e uma travessia a navegar **sai da página** e leva o trabalho consigo — sem isto, bastava andar em frente para perder meia hora de edição. O `dimension-pair` + `enter-window` continua a funcionar (é o que se está a afinar) e a **L13** continua respeitada: nenhum outro mundo é carregado nem construído. **Custo aceite:** a pré-visualização não prova o caminho entre mundos — isso mede-se na exposição, com `walkDoor` |
+| D33 | Como o editor reaplica o que se edita | **FECHADA** (2026-10-16) | **Ao alterar um campo, re-cria-se a entidade editada** (`remove` + a fábrica, com o dado novo); **inserir, excluir, mudar o catálogo de assets ou trocar de mundo reconstroem a cena** (`remove()` + `buildScene`). Motivo escrito, com o que o B0 mediu: (1) um `build` completo reconstrói **todos** os assets, e recarregar imagens a cada tecla é o que a D3 não quer; (2) o `update` por campo **não existe** nos módulos (a §5.2–5.4 prometiam-no para esta fase) e acrescentá-lo seria uma **segunda via** para a mesma geometria — o que a §5.0 quis evitar; (3) a re-criação usa a fábrica e o `remove()` que já existem (**uma** via) e **não mexe na câmara**, logo o autor não perde o sítio onde estava a olhar. **Custo aceite:** o `remove`+`create` passa a ser caminho quente — o que faz do editor o primeiro consumidor do `remove()` e fecha o **R8** |
+| D34 | A webcam no editor | **FECHADA** (2026-10-16) | **Só liga por gesto** (o botão da pré-visualização, que escreve o `cameras.real.enabled` do dado) e **nunca na carga da página**. Motivo escrito: o `getUserMedia` exige um gesto na exposição (é o «ATIVAR EXPOSIÇÃO») e pedir a câmara a quem abre o editor para escrever números é o caminho mais curto para uma recusa que fica memorizada no browser. **Custo aceite:** a pré-visualização do portão começa sem a realidade — a dimensão 0 fica transparente até o autor pedir a câmara |
+| D35 | O «desfazer» (§7) | **FECHADA** (2026-10-16) | **Instantâneos do JSON em memória**, com limite (~**50**), e não um registo de comandos. Motivo escrito: o modelo é pequeno (o maior mundo tem 5133 bytes), o JSON **é** a verdade (D2) e um instantâneo é a única forma de desfazer que não pode divergir do modelo — um registo de comandos é uma segunda fonte de verdade. **Custo aceite:** o histórico vive só na sessão (recarregar perde-o) e uma ronda longa esquece o princípio |
+| D36 | A estrutura do editor e a regra da D4 | **FECHADA** (2026-10-16) | **`js/editor.js` é a entrada** (≤100 linhas, a forma do `app.js`: os imports e o arranque) **e o resto vive em `js/editor/`** — modelo, painéis, pré-visualização, exportação e problemas. Motivo escrito: a §5.6 só previa `js/editor.js` e a D4 escrevia a sua regra verificável a falar de `js/editor/`; a árvore passa a ter as duas coisas e a regra fica **literal** — **0** imports de `js/editor.js` ou de `js/editor/` dentro de `js/core/`, `js/modules/`, `js/scene/` e `js/app.js`. **Custo aceite:** mais uma pasta no `js/`, e o tamanho do editor deixa de ser um só número (mede-se por ficheiro; a meta é a entrada) |
 
 > **Emenda da D28 (2026-10-16) — ao fechar o B7.** A decisão dizia «4 arranques
 > **byte-idênticos**, 1 ficheiro copiado 4 vezes», e a execução mostrou que a linha do `<base>`
@@ -2165,8 +2329,10 @@ alteram comportamento.
 - Passa a haver dois pontos de entrada, ambos finos: `js/app.js` (exposição) e
   `js/editor.js` (editor). `index.html` e `editor.html` só têm a marcação e uma tag de
   script cada.
-- O código de edição **não pode** ser importado por `app.js` — regra verificável (basta
-  procurar imports de `js/editor/` dentro de `js/modules/` e `js/core/`).
+- O código de edição **não pode** ser importado por `app.js` — regra verificável e, desde a
+  **D36** (§11), literal: basta procurar imports de `js/editor.js` **ou** de `js/editor/` dentro de
+  `js/core/`, `js/modules/`, `js/scene/` e `js/app.js` (o `js/editor.js` é a **entrada** do editor,
+  com os painéis em `js/editor/`).
 - O `editor.html` não leva a UI de exposição (botão "ATIVAR EXPOSIÇÃO", D-pad, modal de
   obra): é uma ferramenta, não um modo de exibição.
 
@@ -2231,7 +2397,7 @@ alteram comportamento.
 
 ---
 
-## 13. Resumo — todas as decisões fechadas (2026-10-12 · D14 e D15 em 2026-10-13)
+## 13. Resumo — todas as decisões fechadas (2026-10-12 a 2026-10-16)
 
 | # | Decisão | Escolha |
 | --- | --- | --- |
@@ -2264,6 +2430,13 @@ alteram comportamento.
 | D27 | Divisão dos assets (D7) e nome dos retratos | `assets/{panoramas,artworks,video,previews}` com `git mv`, os retratos em `assets/previews/<destino>.jpg` (**um por mundo de destino** — emenda do B5) e `<mundo>-d<N>-<nome>` nos restantes |
 | D28 | Como cada mundo se identifica | O **slug sai do caminho** (`location.pathname` depois de `document.baseURI`; raiz = `gate`), com os **4 arranques idênticos fora da linha do `<base>`** e o nome da pasta e o `world.slug` a serem conferidos |
 | D29 | A porta que faltava na praia | A porta 5 da praia passa a **regresso ao portão** (`window: none` + `navigate/gate` + `arrivalFrom: gate`), acabando com a porta duplicada que a cena anterior trazia |
+| D30 | O que o esquema valida e a cena não constrói (R9) | O validador **avisa** e o editor **não oferece** o que não é construído: geometria de modelo, texto 3D, cor de fundo e `interaction: link` |
+| D31 | Criar um mundo no editor | O editor exporta `data/worlds/<slug>.json` e mostra o comando; a **pasta e o arranque** são de `tools/scene/new-world.mjs` (a D2 não deixa o editor escrever em disco) |
+| D32 | Pré-visualização e navegação | A travessia `navigate` fica **inerte** na pré-visualização (aviso na consola), mais guarda de saída com alterações por gravar |
+| D33 | Como o editor reaplica o que se edita | **Re-criar a entidade** (`remove` + fábrica); reconstruir a cena só quando a estrutura muda — sem `update`/`list` nos módulos (uma via só) |
+| D34 | A webcam no editor | Só liga por **gesto** (o botão da pré-visualização), nunca na carga da página |
+| D35 | «Desfazer» | **Instantâneos** do JSON em memória (~50), e não um registo de comandos |
+| D36 | Estrutura do editor | `js/editor.js` é a **entrada** (≤100 linhas) e o resto vive em `js/editor/` (modelo, painéis, pré-visualização, exportação, problemas); a regra da D4 fica literal |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -2315,6 +2488,15 @@ portão, acabando com a porta duplicada que a cena anterior trazia. Não foi pla
 **medida**, no aviso que a primeira ronda de portas do B7 levantou (§9, nota do B7), e é a prova de
 que o instrumento vale mais do que a estimativa — a cena anterior tinha a mesma duplicação desde a
 Fase 2 e nada a assinalava.
+
+**D30 a D36 fechadas em 2026-10-16** — o contrato da **Fase 4** (a página de edição), escrito no
+**B0**: o plano está em §9, foi escrito **antes** de mexer em código e três medições mudaram-no — os
+módulos **não** carregam numa página sem a UI da exposição (uma excepção medida, que fez nascer o
+bloco **B2**), o `remove()` do construtor de cena **funciona** (o **R8** desce de risco a meta
+medida) e reconstruir a cena **recarrega os assets** (o que fixa a **D33**). As decisões fecham o
+**R9** (aviso em vez de implementação), o que a §7 pedia e o editor **não pode** fazer (a pasta de um
+mundo), a navegação dentro da pré-visualização, a webcam, o desfazer e a estrutura dos ficheiros.
+Nada implementado.
 
 ### O que fica decidido, em uma frase
 
@@ -2414,7 +2596,8 @@ motivo e o que a fecha. **R5–R7 nasceram do plano da Fase 2 (§9) e foram fech
 Fase 3** — são as duas coisas que a Fase 3 deixou construídas mas **não exercitadas**. **R10–R12 nasceram do fecho da Fase 3B**: duas decisões que são do autor (o retrato do portão e a orientação
 da chegada no céu) e um teste que ficou por re-medir por não haver mudança que o justificasse — esse
 **fechou-se a 2026-10-16**, quando a bateria dos doze testes (§9) passou a trazer o rig do **T5**
-como instrumento.
+como instrumento. **R13 nasceu do plano da Fase 4** (§9), medido **antes** de mexer em código: os
+módulos **não** carregam numa página sem a UI da exposição.
 
 **R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
 apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o
@@ -2443,10 +2626,11 @@ só chega à interface na **Fase 4**, e é o editor o primeiro sítio que o lê.
 
 | # | Pendência | Porque fica | O que a fecha |
 | --- | --- | --- | --- |
-| R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves em `strings` (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`); as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` (a contagem no §13 foi corrigida em 2026-10-15) |
+| R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves em `strings` (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`); as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` (a contagem no §13 foi corrigida em 2026-10-15). **Plano registado no B0 de 2026-10-16: fecha no B1 da Fase 4 (§9)** |
 | R4 | **Feita em 2026-10-15** (decisão **D21**, §11) | O formato por língua estava documentado (§5.7 e §6) e **não instanciado**: as dimensões não tinham nome, as obras não tinham título e nenhum campo do JSON era por língua — nem o conversor nem o validador mencionavam idioma | O `{ pt, en }` entrou no esquema, no conversor e no validador e ficou **instanciado**: 4 nomes de dimensão e 6 descrições de asset (B3, §9). As **10 obras** ficam sem `title` — é opcional, e quem o lê é o editor (Fase 4) |
-| R8 | **O `remove()` do construtor de cena nunca correu** | `buildScene()` devolve um `remove()` que tira as portas, as obras, as dimensões, os assets e a câmara — e **nada o chama**: o `js/app.js` faz `await buildScene(data)` e deita fora o resultado (medido por `grep`, é a única chamada). Com ele ficam por exercitar as três funções `remove…` dos módulos e os `remove()` dos componentes que desregistam conteúdo do núcleo. O editor (Fase 4) vai ser o primeiro sítio a trocar de cena. É o mesmo tipo de risco que a **A4** teve até a Fase 2 o fechar: código de limpeza que ninguém exercita apodrece sem se notar | A Fase 4 (troca de cena no editor) ou um teste que construa e remova uma cena e confirme que o documento e os registos do núcleo ficam como estavam |
-| R9 | **O esquema declara mais do que a cena constrói** | Quatro coisas **validam** e não são construídas: `kind: "model"` e `"text"` numa obra (o `createArtwork()` ignora o `kind` e faz sempre uma `a-box` com a textura do `asset` — não há geometria de modelo nem texto 3D), `kind: "color"` numa dimensão (o `createDimension()` nunca passa o `color` ao componente — o ficheiro não menciona a palavra, medido por `grep`; o validador só avisa quando a cor **falta**, com «the background will be black») e `interaction: "link"` (o `addressToOpen()` devolve o endereço, mas o `open-artwork` mostra-o no **iframe do modal**, não navega). Medido: quatro variantes da cena da exposição, uma por campo, passam **todas** com 0 erros e 0 avisos — quem escrever um destes campos à mão vê o validador aceitar e a cena não mudar como esperava | Ou a Fase 4 os implementa (e o editor passa a oferecê-los), ou o esquema e o validador passam a **avisar** que esses valores ainda não são construídos — a categoria «aviso» já existe no validador e é onde isto encaixa (é a mesma que avisa da dimensão de cor sem cor) |
+| R8 | **O `remove()` do construtor de cena nunca correu** | `buildScene()` devolve um `remove()` que tira as portas, as obras, as dimensões, os assets e a câmara — e **nada o chama**: o `js/app.js` faz `await buildScene(data)` e deita fora o resultado (medido por `grep`, é a única chamada). Com ele ficam por exercitar as três funções `remove…` dos módulos e os `remove()` dos componentes que desregistam conteúdo do núcleo. O editor (Fase 4) vai ser o primeiro sítio a trocar de cena. É o mesmo tipo de risco que a **A4** teve até a Fase 2 o fechar: código de limpeza que ninguém exercita apodrece sem se notar | A Fase 4 (troca de cena no editor) ou um teste que construa e remova uma cena e confirme que o documento e os registos do núcleo ficam como estavam. **Medido no B0 de 2026-10-16: o `remove()` funciona** — 3 ciclos do portão deixam os registos vazios e a cena de volta ao que era; fecha no **B3** da Fase 4, com **20** ciclos (§9) |
+| R9 | **O esquema declara mais do que a cena constrói** | Quatro coisas **validam** e não são construídas: `kind: "model"` e `"text"` numa obra (o `createArtwork()` ignora o `kind` e faz sempre uma `a-box` com a textura do `asset` — não há geometria de modelo nem texto 3D), `kind: "color"` numa dimensão (o `createDimension()` nunca passa o `color` ao componente — o ficheiro não menciona a palavra, medido por `grep`; o validador só avisa quando a cor **falta**, com «the background will be black») e `interaction: "link"` (o `addressToOpen()` devolve o endereço, mas o `open-artwork` mostra-o no **iframe do modal**, não navega). Medido: quatro variantes da cena da exposição, uma por campo, passam **todas** com 0 erros e 0 avisos — quem escrever um destes campos à mão vê o validador aceitar e a cena não mudar como esperava | Ou a Fase 4 os implementa (e o editor passa a oferecê-los), ou o esquema e o validador passam a **avisar** que esses valores ainda não são construídos — a categoria «aviso» já existe no validador e é onde isto encaixa (é a mesma que avisa da dimensão de cor sem cor). **Decidido no B0 de 2026-10-16 (D30, §11): o validador avisa** e o editor não oferece esses valores; fecha no **B9** da Fase 4 (§9) |
 | R10 | **Não há retrato do portão** | A porta da cidade para o portão é `window: none` (e, desde a D29, também a da praia), porque não existe imagem da realidade: um retrato emprestado mentiria ao visitante sobre onde a porta leva. É uma decisão do autor, tomada ao fechar o B6 e reusada no B7 | Uma imagem do portão em `assets/previews/gate.jpg` mais as três linhas do catálogo e da porta — o formato e o caminho já a aceitam, e a L19 e o T10 já a mediriam |
 | R11 | **No céu, a chegada fica virada para o lado de onde se vem** | Medido no B9 (§9): o visitante aterra virado no sentido em que vinha — o −Z da porta —, o que é **o que faz do regresso um passo** (é o mecanismo, não um defeito). Em cada sala o que fica à frente varia: cidade **1** de 5 obras, praia **1** de 3, céu **0** de 2. O céu já vinha assim da cena anterior (nota do B6); nas outras salas há sempre alguma obra à frente | Uma decisão do autor sobre a orientação da chegada (é a rotação devolvida pelo `arrivalPoint`, em `js/scene/arrival.js`) ou um re-arranjo das obras do céu — o que ele preferir |
 | R12 | **O T5 não foi re-medido na Fase 3B** | Precisa do rig de **dois** portais (uma janela a tapar a moldura da outra) e a ordem de desenho **não mudou** na fase: `drawOrder` e as regras de stencil são os mesmos do fecho da Fase 3. Re-medir sem mudança nenhuma não diz nada de novo; o número da v0.0.5 (0 px da moldura de trás dentro da janela da frente, com 6 768 px de controlo) continua a ser o último | **FECHADA em 2026-10-16**, na bateria dos doze testes (§9): o rig passou a viver em `tools/regression/acceptance.mjs` (`checkStackedDoors`), com duas portas de 8×10 m a 20 m e a 30 m (a de trás deslocada 5 m para o lado, para a moldura dela atravessar a janela da frente), e o resultado é **0** px dentro, **1 657** px de controlo fora e **0** de ruído — nos **5** mundos |
+| R13 | **Os módulos exigem a UI da exposição** | Medido no **B0 da Fase 4** (§9), com páginas-sonda servidas por HTTP: importar `js/modules/artwork.js` num documento **sem** `#iframe-obra` dá excepção (`Cannot read properties of null (reading 'addEventListener')`) — e com ele o `js/scene/scene-builder.js`, que o importa —, e o `setupMobileControls()` sem o D-pad e o `reportCameraError()` sem o `#btn-iniciar` dão excepção pela mesma razão (o segundo **depois** de já ter posto a mensagem no ecrã). Ninguém notou até aqui porque **só existe um host** — a exposição — e ele tem todos esses elementos; é o mesmo tipo de risco que o R8: acoplamento que só aparece quando **um segundo host** tenta usar o código | A Fase 4 (**B2**, §9), com a meta **M14**: os 6 imports numa página sem a UI da exposição, **0** excepções |
