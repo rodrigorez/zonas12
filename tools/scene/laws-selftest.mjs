@@ -112,6 +112,16 @@ const cases = [
     inject: () => {}
   },
   {
+    law: 'L10',
+    what: 'an asset outside the folders of the D7 rule',
+    expect: 'law L10',
+    level: 'warning',
+    // A pasta errada costuma ser também um ficheiro que não existe (L9, erro), e o caso isola as
+    // duas leis: diz ao validador que o ficheiro está lá.
+    options: { exists: () => true },
+    inject: (copy) => { copy.assets.praia.path = 'assets/images/praia.jpg'; }
+  },
+  {
     law: 'L11',
     what: 'a door that navigates to a world that does not exist',
     expect: 'law L11',
@@ -133,6 +143,13 @@ const cases = [
         window: { kind: 'preview', asset: 'video', radius: 120 }
       }));
     }
+  },
+  {
+    law: 'L14',
+    what: 'a panorama that is not 2:1',
+    expect: 'law L14',
+    options: { imageSize: () => ({ width: 960, height: 240 }) },
+    inject: () => {}
   },
   {
     law: 'L15',

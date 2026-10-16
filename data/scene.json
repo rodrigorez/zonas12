@@ -22,7 +22,7 @@
   },
   "assets": {
     "cidade-360": {
-      "path": "assets/images/forest.jpg",
+      "path": "assets/panoramas/cidade-d0-forest.jpg",
       "type": "image",
       "alt": {
         "pt": "Panorama 360º da dimensão 1 (cidade)",
@@ -30,7 +30,7 @@
       }
     },
     "galeriaFoto1": {
-      "path": "assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg",
+      "path": "assets/artworks/cidade-d0-bryan-goff.jpg",
       "type": "image",
       "alt": {
         "pt": "Fotografia usada como obra nas dimensões 1 e 2",
@@ -38,7 +38,7 @@
       }
     },
     "galeriaFoto2": {
-      "path": "assets/images/eiffel.jpg",
+      "path": "assets/artworks/eiffel.jpg",
       "type": "image",
       "alt": {
         "pt": "Fotografia da Torre Eiffel usada como obra nas dimensões 1 e 2",
@@ -46,7 +46,7 @@
       }
     },
     "praia": {
-      "path": "assets/images/praia.jpg",
+      "path": "assets/panoramas/praia-d0-praia.jpg",
       "type": "image",
       "alt": {
         "pt": "Panorama 360º da dimensão 2 (praia)",
@@ -54,7 +54,7 @@
       }
     },
     "skycloud": {
-      "path": "assets/images/skycloud.jpg",
+      "path": "assets/panoramas/ceu-d0-skycloud.jpg",
       "type": "image",
       "alt": {
         "pt": "Panorama 360º da dimensão 3 (céu)",
@@ -62,11 +62,35 @@
       }
     },
     "video": {
-      "path": "assets/images/compequicolor1024vr.mp4",
+      "path": "assets/video/cidade-d0-compequicolor.mp4",
       "type": "video",
       "alt": {
         "pt": "Vídeo usado como obra na dimensão 1",
         "en": "Video used as an artwork in dimension 1"
+      }
+    },
+    "retrato-cidade": {
+      "path": "assets/previews/cidade.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta",
+        "en": "Portrait of the City 360º world, seen from the door"
+      }
+    },
+    "retrato-praia": {
+      "path": "assets/previews/praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Praia, visto da porta",
+        "en": "Portrait of the Beach world, seen from the door"
+      }
+    },
+    "retrato-ceu": {
+      "path": "assets/previews/ceu.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Céu 360º, visto da porta",
+        "en": "Portrait of the Sky 360º world, seen from the door"
       }
     }
   },

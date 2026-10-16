@@ -10,3 +10,10 @@ export const MAX_WINDOWS = 255;
 // portrait, in this band, and hands its id to the door (D26). A declared id inside it would end up
 // activated by mistake — the camera inside a portrait.
 export const DERIVED_DIMENSION_BASE = 448;
+
+// The standard of a panorama — a background or a portrait (law L14): 2:1 equirectangular, because
+// that is what a sphere unwraps to. The width is a ceiling and not a target: a texture costs four
+// bytes per pixel, so an image above the standard is what makes the memory unpredictable (measured:
+// 9923×2614 is 99 MB), and an image below it costs less and is not a defect.
+export const PANORAMA_WIDTH = 2048;
+export const PANORAMA_HEIGHT = 1024;

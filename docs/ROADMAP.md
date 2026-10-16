@@ -558,11 +558,12 @@ zonas12/
     └── skills/              harness de agents/skills — índice em .agent/skills_index.md (§3)
 ```
 
-> **Onde isto está (2026-10-15, fim da Fase 3).** Existem: `index.html` (sem entidades de cena),
-> `css/style.css`, `js/{app.js, core/, modules/, scene/}`, `data/{scene.json, scene-example.json}`,
-> `i18n/pt.json`, `assets/images/` e `tools/{scene, migration, regression}`. **Por fazer:** o
-> `editor.html` e o `js/editor.js` (Fase 4), o `en.json` (quando houver tradução), a pasta por
-> mundo e o `data/worlds/` (Fase 3B) e a divisão de `assets/` por tipo (D7, Fase 3B).
+| Onde isto está (2026-10-15, fim da Fase 3 + Fase 3B até ao B5).** Existem: `index.html` (sem
+> entidades de cena), `css/style.css`, `js/{app.js, core/, modules/, scene/}`,
+> `data/{scene.json, scene-example.json}`, `i18n/pt.json`, `assets/{panoramas,artworks,video,
+> previews}` (divididos por tipo no B5) e `tools/{scene, migration, regression, assets}`. **Por
+> fazer:** o `editor.html` e o `js/editor.js` (Fase 4), o `en.json` (quando houver tradução), a pasta
+> por mundo e o `data/worlds/` (Fase 3B, blocos B6–B7) e os 4 arranques.
 
 Nota de nomenclatura: as pastas de **código** são em inglês (D10), e os ficheiros de dados
 também: `data/scene.json` é a exposição e `data/scene-example.json` é a cena de exemplo
@@ -691,7 +692,7 @@ desde que as 6 regras acima estejam cumpridas.
     "real": { "enabled": true }
   },
   "assets": {
-    "cidade-360": { "path": "assets/images/forest.jpg", "type": "image",
+    "cidade-360": { "path": "assets/panoramas/cidade-d0-forest.jpg", "type": "image",
                     "alt": { "pt": "Panorama 360º da dimensão 1 (cidade)", "en": "360º panorama of dimension 1 (city)" } }
   },
   "dimensions": [
@@ -829,7 +830,7 @@ O editor deve impedi-las **antes** de exportar.
 | L11 | A porta de mundo tem `target` de um mundo que existe | Porta que navega para o vazio |
 | L12 | Nenhum caminho absoluto a partir da raiz nos dados | Publicado numa subpasta, tudo parte |
 | L13 | Nada de pré-visualização de um mundo carregado **ao vivo** | Contradiz a D14: o destino não existe na página de origem |
-| L14 | Panoramas (fundo e retrato) 2048×1024, 2:1 equirectangular | Distorção visível na janela e memória imprevisível (medido: 9923×2614 ≈ 99 MB de textura) |
+| L14 | Panoramas (fundo e retrato) **2:1** equirectangular; o padrão 2048×1024 é um **teto, não um alvo** — abaixo dele a imagem custa menos memória e não é defeito | Distorção visível na janela (aspecto errado) e memória imprevisível (medido: 9923×2614 ≈ 99 MB de textura) |
 | L15 | IDs declarados `0…447`; `448…511` reservados às dimensões derivadas de pré-visualização | A dimensão derivada é ativada por engano: a câmara fica dentro de um retrato |
 | L16 | A chegada fica atrás da porta, afastada mais do que meia profundidade da caixa + margem | Andar em frente ao aparecer dispara travessia (troca em cadeia) |
 | L17 | No máximo **uma** porta de chegada por origem, em cada mundo | O visitante aparece num sítio arbitrário |
@@ -839,17 +840,18 @@ As leis **L1–L8** vêm de defeitos medidos. As leis **L9–L18** vêm da D14 (
 L9 e L10 foram propostas pela D7 e ficam aqui registadas; L11–L18 nascem dos mundos e das
 portas de mundo.
 
-**O que está verificado ao fim da Fase 3.** O `js/scene/validation.js` — o mesmo módulo que a
-consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e
-que o editor (Fase 4) vai reutilizar — verifica a forma do formato e as leis **L1, L4, L5, L9 e
-L12**, cada uma com uma **avaria injetada** que prova que ela falha quando deve (**17 de 17**, §9).
-As leis **L2, L3, L6, L7 e L8** são de render (são propriedades do código, não do dado): a **L8**
-passou a valer no código em 2026-10-15 (§2.1). A **L10** (higiene do nome do ficheiro de asset) e
-as leis dos mundos — **L11, L13, L14, L15, L16, L17 e L18** — entram com a **Fase 3B**, que é a
-fase que cria portas de mundo, retratos e dimensões derivadas. O plano dessa fase está na §9, e
-cada lei entra com **uma avaria injetada** que prova que ela falha quando deve (§9, B2); a **L14**
-(precisão dos panoramas) é medível **só na linha de comando** — o browser reporta-a como «não
-verificada», pelo mesmo caminho que o `options.exists` da L9 já abriu.
+**O que está verificado hoje (fim do B5 da Fase 3B).** O `js/scene/validation.js` — o mesmo módulo
+que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de
+comando e que o editor (Fase 4) vai reutilizar — verifica a forma do formato e as leis **L1, L4, L5,
+L9, L10, L11, L12, L13, L14, L15, L16, L17 e L18**, cada uma com uma **avaria injetada** que prova
+que ela falha quando deve: **17 de 17** no instrumento `tools/scene/laws-selftest.mjs` (§9). As leis
+**L2, L3, L6, L7 e L8** são de render (são propriedades do código, não do dado): a **L8** passou a
+valer no código em 2026-10-15 (§2.1). As leis dos mundos entraram na **Fase 3B** — **L11, L13, L15,
+L16, L17 e L18** no bloco B3 e **L10 e L14** no B5: as duas que se leem dos **ficheiros** (um nome,
+os pixels de uma imagem) ficaram à espera do bloco que mexeu nos ficheiros, pela regra que o B2
+estabeleceu — **uma lei e o dado que a satisfaz entram no mesmo bloco**. A **L14** e a **L9** são
+medíveis **só na linha de comando** (a forma de uma imagem, a existência de um ficheiro): o browser
+reporta-as como «não verificadas», pelo mesmo caminho que o `options.exists` abriu.
 
 A **L6** foi reescrita em 2026-10-14 (**D16**): passou a enunciar o **invariante a validar**, e
 não a ação — medido na fonte do A-Frame 1.8.0, é o framework que fixa `sortObjects = true` na
@@ -1283,7 +1285,7 @@ fez.
 | **B2** | **O formato passa a v3, ponta a ponta**: `schema.js` v3 (o `world`, os dois eixos, a obrigatoriedade condicional e os ids declarados até 447), a tabela pura dos eixos (`js/modules/portal-kinds.js`), o migrador por script (`tools/migration/scene-v3.mjs`, com a comparação campo a campo) e o dado migrado, **mais** a fábrica e o componente a lerem o eixo | D22 e D25, no dado |
 | **B3** | As **leis dos mundos** que o dado de hoje já satisfaz — L11, L13, L15, L16, L17 e L18 —, mais as regras da forma, o cálculo da chegada (`js/scene/arrival.js`) e o grafo de mundos (`unreachableWorlds`), tudo com **uma avaria injetada por lei** no instrumento novo (`tools/scene/laws-selftest.mjs`) | As leis dos mundos, no dado |
 | **B4** | As **duas tabelas** no módulo do portal e `createPortal` a lê-las, com o caminho do par inalterado | Os dois eixos |
-| **B5** | D7, **L10 e L14**: os assets mudam para `assets/{panoramas,artworks,video,previews}` (com `git mv`), os panoramas normalizados a **2048×1024** e os retratos gerados, mais o leitor de pixels da linha de comando | L10, L14 e L9 |
+| **B5** | D7, **L10 e L14**: os assets mudam para `assets/{panoramas,artworks,video,previews}` (com `git mv`), os panoramas normalizados por **corte ao centro, sem ampliar** (`forest` → 2048×1024, `skycloud` → 480×240), as obras limitadas a 2048 px no lado maior, os retratos gerados e o leitor de pixels da linha de comando | L10, L14 e L9 |
 | **B6** | **A separação em mundos**: `data/worlds/*.json`, as dimensões renumeradas por mundo, `cameras.real.enabled` só no portão, as portas a `navigate` com `?from`, a **chegada** (L16) e as dimensões derivadas | D24 e D26 |
 | **B7** | As **pastas de mundo** (4 arranques byte-idênticos, `<base href="../">`), o slug por `document.baseURI` (D28) e a navegação por porta | O endereço por sala |
 | **B8** | Ferramentas: o migrador com guarda, o **grafo de mundos** no validador, a normalização e os retratos, e o verificador «os 4 arranques são iguais» e «o nome da pasta é o `world.slug`» | As ferramentas da D14 |
@@ -1311,7 +1313,27 @@ L17 e L18) e o instrumento que prova que elas falham quando devem (15 de 15).
 **Feito até agora (2026-10-15):** **B0** — plano e decisões registados (§9, §11, §6, §8, §13), commit
 `4c13673`, só documentação; **B1** — linha de base re-medida **antes** de mexer em código, com os
 números abaixo; **B2** — o formato v3 ponta a ponta; **B3** — as leis dos mundos no validador e o
-instrumento que as prova; **B4** — as duas tabelas com o comportamento de cada eixo.
+instrumento que as prova; **B4** — as duas tabelas com o comportamento de cada eixo; **B5** — os
+assets divididos por tipo, normalizados e com os retratos gerados.
+
+#### O que o B5 entregou e mediu (2026-10-15)
+
+**As decisões do autor neste bloco:** corte **ao centro, sem ampliar** (ampliar não acrescenta
+detalhe, só pixels a lembrar) e as obras limitadas a **2048 px no lado maior**. E uma correção à
+minha própria regra: a **L14 avisa só acima do padrão** — um panorama abaixo dele custa *menos*
+memória e não é defeito (o `praia.jpg`, 2:1 e leve, não pode sujar a consola).
+
+| Item | Medição |
+| --- | --- |
+| Os painéis | `forest` 9923×2614 (3,80:1) → **2048×1024** (2:1), textura **98,9 → 8 MB**, 528 KB no disco; `skycloud` 960×240 (4:1) → **480×240** (2:1), **0,9 → 0,4 MB**; `praia` 1024×512 (2:1) fica como está |
+| As obras | `bryan-goff` 6000×3000 → **2048×1024**, **68,7 → 8 MB**; `eiffel` 1226×855 fica como está (abaixo do limite) |
+| Os retratos | **3** gerados do panorama do destino, todos 2:1: cidade 2048×1024, praia 1024×512, céu 480×240 — e declarados no catálogo com `alt` nas duas línguas |
+| As pastas (D7) | 6 ficheiros movidos com `git mv` (o histórico segue-os) para `assets/{panoramas,artworks,video}`; `assets/images/` deixou de existir; os **9** assets do catálogo apontam para os caminhos novos, e o `og:image` do `index.html` com eles |
+| A ferramenta | `tools/assets/normalize.mjs` (corre no browser: descodificar um JPEG precisa de um descodificador, e o projeto não tem build nem dependências — D1). **Nunca amplia**: diz em cada ficheiro o que era e o que ficou |
+| As leis novas | **L10** (o nome do ficheiro) e **L14** (a forma do panorama, com `options.imageSize` na linha de comando e «não verificado» no browser): o instrumento passou a **17 de 17** avarias detetadas |
+| `validate.mjs` | **OK** nos dois ficheiros, 9 assets, **sem um único aviso** |
+| O browser | T1/T7 **8 de 8**, varredura **0/84** e **0** falhas em **15 714** amostras, **T8 0 erros, 0 avisos, 0 pedidos falhados** — e as **8** imagens carregadas com as formas novas (2048×1024, 2048×1024, 1226×855, 1024×512, 480×240, e os 3 retratos) |
+| A olho | a cidade continua a ler-se como paisagem depois do corte ao centro, com as duas janelas a mostrar os outros mundos (verificado numa captura) |
 
 #### O que o B4 entregou e mediu (2026-10-15)
 
@@ -1387,7 +1409,7 @@ medido na carga, sem interação).
 | Chegada (T11) | andar para dentro ao aparecer | **0** travessias em cadeia; **1** navegação por porta |
 | Retrato na moldura (T12) | a varredura de poses, apontada à porta | **0** poses com o retrato a sair da moldura (84 poses, controlos a 0) |
 | Consola | T8 **em cada um dos 4 mundos** | **0** erros, **0** avisos, **0** pedidos falhados |
-| Memória de textura e forma | L14, com um leitor de pixels na linha de comando | `forest` **98,9 → 8 MB** e `skycloud` **0,9 → 8 MB**; panoramas e retratos todos **2:1** |
+| Memória de textura e forma | L14, com um leitor de pixels na linha de comando | **2:1 em todos os panoramas e retratos**; `forest` **98,9 → 8 MB**, `skycloud` **0,9 → 0,4 MB** (corte, sem ampliar) e a obra `bryan-goff` **68,7 → 8 MB**; o aviso é só para o que passa **acima** do padrão de 2048 |
 | Grafo de mundos | validador (B8) | **0** portas para mundo inexistente, **0** mundos inalcançáveis, **0** portas sem retrato, **0** ids declarados em 448…511 |
 | Leis novas | 8 avarias injetadas (B2) | **8 de 8** detetadas |
 | Arranques | verificador das ferramentas | **4** `index.html` byte-idênticos, e cada pasta com o `world.slug` do seu JSON |
@@ -1615,7 +1637,7 @@ qualquer instrumento deste projeto:
 | D24 | A divisão da cena de hoje em mundos | **FECHADA** (2026-10-15) | **Quatro mundos, uma dimensão cada**: `gate` (a raiz, com a câmara/AR), `cidade`, `praia` e `céu`, com as **8 portas de hoje** — todas passam a `navigate`, porque nenhuma sala tem duas dimensões. O **fixture** (`data/worlds/example.json`) passa a ser o mundo de **duas dimensões** com uma porta interna, para o `dimension-pair` + `enter-window` continuar exercitado (T1–T9). **Custo aceite:** a exposição deixa de ter janelas ao vivo — as portas mostram retratos, que é o que a D14 já previa |
 | D25 | Forma da porta no formato v3 | **FECHADA** (2026-10-15) | `version: 3`, e o par muda **para dentro do eixo**: `window {kind, dimensionA, dimensionB, asset, radius}` + `action {kind, target}` + `arrivalFrom` no portal, com **obrigatoriedade condicional** (o par só com `dimension-pair`, o `target` só com `navigate`) e os ids declarados limitados a **0…447** (L15). O `action.from` do exemplo da §6 sai: o `?from` que a porta escreve é o **slug do mundo de origem**, que o código já tem. **Custo aceite:** um leitor v2 deixa de ler o ficheiro — é a regra da D23 |
 | D26 | Como o retrato existe na cena | **FECHADA** (2026-10-15) | **Dimensão derivada** (G2-b): o construtor cria uma por par único (`asset`, `radius`), com id na banda **448…511** (L15), `followCamera: false`, a esfera centrada **na porta** (sem isso não há paralaxe) e o yaw vindo da rotação dela. Duas portas para o mesmo mundo, com o mesmo raio, partilham-na — 1 textura, 1 valor de stencil, 1 desenho, que é o que os portais 4 e 5 já provam hoje. O retrato é um **nome do catálogo**, nunca um caminho (D20), ao contrário do exemplo da §6 |
-| D27 | Divisão dos assets (D7) e nome dos retratos | **FECHADA** (2026-10-15) | `assets/{panoramas,artworks,video}` (a divisão por tipo da D7, com `git mv`) e `assets/previews/<origem>-to-<destino>.jpg` para os retratos, com `<mundo>-d<N>-<nome>` nos restantes. Os **6** ficheiros de `assets/images/` mudam de sítio, e o catálogo do JSON e o `og:image` dos 4 arranques mudam no mesmo commit |
+| D27 | Divisão dos assets (D7) e nome dos retratos | **FECHADA** (2026-10-15) — **emendada ao fechar o B5** | `assets/{panoramas,artworks,video,previews}` (a divisão por tipo da D7, feita com `git mv`) e `<mundo>-d<N>-<nome>` no nome dos ficheiros. **Emenda:** os retratos são **um por mundo de destino** (`assets/previews/<destino>.jpg`) e não um por par origem→destino, porque a partilha da **D26** («duas portas para o mesmo mundo partilham 1 textura, 1 valor, 1 desenho») só acontece se as portas nomearem **o mesmo asset** — com o nome por par seriam **7** ficheiros e **7** texturas para **4** imagens. O formato continua a deixar uma porta nomear o seu próprio retrato, quando for uma escolha do autor |
 | D28 | Como cada mundo se identifica | **FECHADA** (2026-10-15) | O **slug sai do caminho**: o que sobra de `location.pathname` depois de `document.baseURI` (raiz = `gate`). Assim os **4 arranques são byte-idênticos** — 1 ficheiro copiado 4 vezes — e a verificação das ferramentas exige que o nome da pasta e o `world.slug` do JSON coincidam. **Custo aceite:** o nome da pasta *é* o slug, logo é implícito — e é exactamente por isso que passa a ser verificado |
 
 > **Emenda da L6 (2026-10-14) — decisão D16.** A lei L6 enunciava a **ação**

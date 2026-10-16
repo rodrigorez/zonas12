@@ -25,12 +25,16 @@ zonas12/
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos + página de edição)
 ├── assets/
-│   └── images/         panoramas 360º, fotos e vídeo usados na cena
+│   ├── panoramas/      fundos 360º (2:1, normalizados no B5 da Fase 3B)
+│   ├── artworks/       imagens das obras
+│   ├── video/          o vídeo usado como obra
+│   └── previews/       os retratos das portas de mundo (um por mundo de destino — D27)
 ├── tools/
 │   ├── scene/               validador dos ficheiros de cena (corre a mesma validação que o browser)
 │   │                        e o instrumento das leis (avarias injetadas, uma por lei)
 │   ├── migration/           o conversor HTML→JSON da Fase 0 e a migração para o formato v3, ambos
 │   │                        com guarda: são o registo das migrações
+│   ├── assets/              normalização das imagens (2:1 e teto de 2048 px — lei L14)
 │   └── regression/          varredura de poses T2/T3 (corre na consola do browser)
 ├── .harness/           fora do repositório (está no .gitignore)
 │   ├── dev/            ferramentas retiradas da raiz (não são precisas para o app)
@@ -53,7 +57,8 @@ zonas12/
   construção (o validador da cena, o conversor e a varredura de regressão) em `tools/`.
 - A cena da exposição vive em `data/scene.json`; o `index.html` não tem entidades de cena.
   Os textos da interface ficam em `i18n/` (hoje só o `pt.json`).
-- Todos os assets (imagens, vídeos) ficam em `assets/images/`.
+- Todos os assets ficam em `assets/`, separados por tipo: `panoramas/` (fundos 360º), `artworks/`
+  (imagens das obras), `video/` e `previews/` (os retratos das portas de mundo).
 - Código JavaScript em arquivos separados dentro de `js/`.
 - Código CSS em arquivos separados dentro de `css/`.
 - Tudo o que **não** é essencial para o projeto funcionar (ferramentas de
@@ -77,7 +82,7 @@ zonas12/
 
 #### Para Humanos
 
-- Mantenha todos os novos assets na estrutura `assets/images/`
+- Mantenha todos os novos assets na estrutura `assets/{panoramas,artworks,video,previews}/`
 - Utilize `index.html` como ponto de entrada principal
 - Mantenha a raiz limpa: o que não é essencial vai para `.harness/`
 - Arquivos em `.harness/` são históricos e não devem ser modificados
@@ -85,7 +90,8 @@ zonas12/
 
 #### Para IA
 
-- SEMPRE use `assets/images/` para novos assets
+- SEMPRE use `assets/{panoramas,artworks,video,previews}/` para novos assets, com o nome em
+  minúsculas e hífenes (`<mundo>-d<N>-<nome>.<ext>`, e `<destino>.jpg` nos retratos)
 - SEMPRE documente componentes novos no `README.md`
 - NUNCA ponha na raiz nada que não seja preciso para o projeto funcionar
 - NÃO modifique o material **histórico** de `.harness/` (`dev/`, `imagenTeste/`) — o
@@ -173,9 +179,10 @@ Pages serve o `main`). É o estado depois da **Fase 3** do roadmap (a cena vem d
 pelo autor em 2026-10-15 nas **três** versões — local, a publicada e no telemóvel. A versão
 anterior é a `v0.0.4` (o estado da Fase 2), marcada pela branch com o mesmo nome. Resumo do que
 existe hoje: `index.html` (**82 linhas**),
-`js/app.js` (**118**), `js/core/` (7 ficheiros, **219**), `js/modules/` (5 ficheiros, **1000**),
-`js/scene/` (**4 ficheiros**, 864), `css/style.css` (96), `data/scene.json` (a cena, **650
-linhas**), `data/scene-example.json` (o fixture), `i18n/pt.json` e as ferramentas em `tools/`.
+`js/app.js` (**118**), `js/core/` (7 ficheiros, **226**), `js/modules/` (5 ficheiros, **1000**),
+`js/scene/` (**4 ficheiros**, 907), `css/style.css` (96), `data/scene.json` (a cena, **674
+linhas**), `data/scene-example.json` (o fixture), `i18n/pt.json`, os **9** assets em
+`assets/{panoramas,artworks,video,previews}` e as ferramentas em `tools/`.
 
 O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
 regras de stencil — a única parte global, porque o stencil é um recurso de toda a cena.
@@ -199,7 +206,7 @@ O **`js/scene/`** é onde a cena em dados vive, e tem só três ficheiros:
 | Ficheiro | O que é |
 | --- | --- |
 | `schema.js` | A **forma do formato** (v3): campos, tipos, enumerações, as regras dos dois eixos da porta e o catálogo de assets. Puro — não conhece o DOM nem o A-Frame |
-| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L11, L12, L13, L15, L16, L17 e L18 (a L10 e a L14 chegam com o bloco dos assets). É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor vai reutilizar |
+| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L10, L11, L12, L13, L14, L15, L16, L17 e L18. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor vai reutilizar |
 | `arrival.js` | Onde o visitante aparece ao chegar de outro mundo (**L16**): puro e partilhado, para o construtor e o validador não discordarem da geometria |
 | `scene-builder.js` | O **único** dos três que conhece o A-Frame: cria o `<a-assets>` (e **espera** que os ficheiros carreguem), a câmara, as dimensões, as obras e os portais, a partir do JSON |
 

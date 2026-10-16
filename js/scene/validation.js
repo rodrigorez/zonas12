@@ -10,28 +10,35 @@
 //     requires and what it forbids (D25);
 //   - the laws of docs/ROADMAP.md section 8 that the data alone can prove: L1 (background wider
 //     than the scene), L4 (arrival outside every other box), L5 (at most 255 windows at once),
-//     L9 (every asset exists), L11 (a door that navigates names a world that exists), L12 (no
-//     absolute paths), L13 (a portrait is a picture, never a live world), L15 (the reserved band
-//     of ids), L16 and L17 (the arrival point, and one arrival door per origin) and L18 (the two
-//     axes combine legally).
+//     L9 (every asset exists), L10 (the name of an asset file says what it is — a warning), L11 (a
+//     door that navigates names a world that exists), L12 (no absolute paths), L13 (a portrait is a
+//     picture, never a live world), L14 (the 2:1 shape of a panorama, and its size — a warning only
+//     above the standard), L15 (the reserved band of ids), L16 and L17 (the arrival point, and one
+//     arrival door per origin) and L18 (the two axes combine legally).
 //
 // What it does not check, on purpose:
-//   - the laws of render (L2, L3, L6, L7, L8): they are properties of the code, not of the data;
-//   - L10 and L14 (the name and the 2:1 shape of an asset): both are read from the files
-//     themselves — a name that is already in the folders of the D7 rule, and the pixels of an
-//     image —, and both arrive with the block that rearranges and normalises the assets (Fase 3B,
-//     §9, block B5). A law and the data that satisfies it land in the same block: the exhibition's
-//     console is a test, and it counts warnings (T8).
+//   - the laws of render (L2, L3, L6, L7, L8): they are properties of the code, not of the data.
 //
 // Pure: no DOM, no A-Frame, no three. The only outside information it needs is how to tell
 // whether a file exists (`options.exists`), which only the command line can answer.
 
 import { SCENE, SCENE_VERSION, LANGUAGES } from './schema.js';
-import { MAX_WINDOWS, MAX_DIMENSIONS, DERIVED_DIMENSION_BASE } from '../core/index.js';
+import {
+  MAX_WINDOWS,
+  MAX_DIMENSIONS,
+  DERIVED_DIMENSION_BASE,
+  PANORAMA_WIDTH,
+  PANORAMA_HEIGHT
+} from '../core/index.js';
 import { validateDoor } from '../modules/portal-kinds.js';
 import { arrivalPoint } from './arrival.js';
 
 const EYE_HEIGHT = 1.6;
+
+// The shape of the name of an asset file (law L10): assets/<type>/<name>.<ext>, all lowercase, with
+// the hyphens the D7 rule uses. It is a warning and not an error because a file in the wrong place
+// still loads — what is lost is the folder being searchable.
+const ASSET_FILE = /^assets\/(panoramas|artworks|video|previews)\/[a-z0-9]+(?:-[a-z0-9]+)*\.(?:jpg|jpeg|png|webp|mp4|webm)$/;
 
 // The measurements of the scene, so a caller can print them without walking the data again.
 export function summarise(scene) {
@@ -100,6 +107,10 @@ export function validateScene(scene, options = {}) {
       }
     }
     if (!asset.alt) warn(`assets.${id}: no alt — the <img> the builder creates will have no description`);
+    // ---- L10: the name of the file says what it is (a warning: it is hygiene, not a break) ----
+    if (typeof asset.path === 'string' && !ASSET_FILE.test(asset.path)) {
+      warn(`assets.${id}: "${asset.path}" is not assets/<type>/<name>.<ext> — law L10 (the folder stops being searchable)`);
+    }
   }
 
   // ---- dimensions and what their background needs ----
@@ -233,6 +244,38 @@ export function validateScene(scene, options = {}) {
       err(`portals[${portal.id}]: arriving from "${portal.arrivalFrom}" lands inside the box of ` +
         `${where} — law L16 (the first step forward crosses it again: chain crossings)`);
       break;
+    }
+  }
+
+  // ---- L14: the shape of a panorama, which is a background or a portrait ----
+  const panoramas = [
+    ...dimensions
+      .filter((dimension) => dimension.asset && (dimension.kind === 'image' || dimension.kind === 'video'))
+      .map((dimension) => ({ what: `dimensions[${dimension.id}]`, asset: dimension.asset })),
+    ...(scene.portals || [])
+      .filter((portal) => (portal.window || {}).kind === 'preview' && portal.window.asset)
+      .map((portal) => ({ what: `portals[${portal.id}].window`, asset: portal.window.asset }))
+  ];
+  for (const panorama of panoramas) {
+    const entry = assets[panorama.asset];
+    if (!entry || typeof entry.path !== 'string') continue;
+    // Reading an image is another question only the command line can answer (the same shape as
+    // `exists`): in the browser it is reported as not verified.
+    if (typeof options.imageSize !== 'function') {
+      skipped.push(`${panorama.what}: the shape of "${entry.path}" was not measured (no way to read an image)`);
+      continue;
+    }
+    const size = options.imageSize(entry.path);
+    if (!size) {
+      skipped.push(`${panorama.what}: the shape of "${entry.path}" could not be read`);
+      continue;
+    }
+    if (size.width !== size.height * 2) {
+      err(`${panorama.what}: "${entry.path}" is ${size.width}×${size.height}, which is not the 2:1 of an ` +
+        `equirectangular panorama — law L14 (the distortion shows in the window)`);
+    } else if (size.width > PANORAMA_WIDTH) {
+      warn(`${panorama.what}: "${entry.path}" is ${size.width}×${size.height}; above the standard ` +
+        `${PANORAMA_WIDTH}×${PANORAMA_HEIGHT} — law L14 (the memory grows with the pixels)`);
     }
   }
 
