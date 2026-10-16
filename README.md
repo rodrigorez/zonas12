@@ -181,24 +181,22 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.5)
+## Estado atual do código (v0.0.6)
 
-> ⚠️ **A Fase 3B está a decorrer no `main`** (plano em [docs/ROADMAP.md](docs/ROADMAP.md), §9): o
-> formato dos dados passou a **v3** (o `world` e os dois eixos da porta), o validador ganhou as leis
-> dos mundos e a **L19**, cada mundo passou a ter **endereço** (`/cidade/`, `/praia/`, `/ceu/`) e a
-> verificação final no browser (bloco B9) passou. Falta o fecho da fase — a documentação e o marco
-> **v0.0.6** no bloco B10, que é quem acerta esta secção: os números, a verificação e o marco abaixo
-> são ainda os da **v0.0.5**.
+Marcado pela branch `v0.0.6`. É o estado depois da **Fase 3B** do roadmap — os **mundos** e as
+**portas de mundo** (D14), fechados bloco a bloco com o que cada um entregou e mediu em
+[docs/ROADMAP.md](docs/ROADMAP.md) §9. Tudo o que está nesta secção foi medido a **2026-10-16** na
+versão local (a bateria está em §9); **por testar pelo autor** nas outras duas — a publicada (o
+GitHub Pages serve o `main`, em <https://rodrigorez.github.io/zonas12/>, e publicar é empurrar o
+`main`) e no telemóvel, que é como as versões anteriores foram dadas por fechadas. A versão anterior
+é a `v0.0.5` (o estado depois da Fase 3), marcada pela branch com o mesmo nome.
 
-Marcado pela branch `v0.0.5` e **publicado** em <https://rodrigorez.github.io/zonas12/> (o GitHub
-Pages serve o `main`). É o estado depois da **Fase 3** do roadmap (a cena vem de dados), testado
-pelo autor em 2026-10-15 nas **três** versões — local, a publicada e no telemóvel. A versão
-anterior é a `v0.0.4` (o estado da Fase 2), marcada pela branch com o mesmo nome. Resumo do que
-existe hoje: `index.html` (**82 linhas**),
-`js/app.js` (**127**), `js/core/` (7 ficheiros, **226**), `js/modules/` (5 ficheiros, **1013**),
-`js/scene/` (**4 ficheiros**, 967), `css/style.css` (96), 5 mundos em `data/worlds/` (o portão, três salas e o fixture, **1234
-linhas no total**), `i18n/pt.json`, os **9** assets em
-`assets/{panoramas,artworks,video,previews}` e as ferramentas em `tools/`.
+Resumo do que existe hoje: `index.html` (**85 linhas**) e as **3** salas com o **mesmo** ficheiro
+(`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `js/app.js` (**139**),
+`js/core/` (7 ficheiros, **219**), `js/modules/` (5 ficheiros, **1008**), `js/scene/`
+(4 ficheiros, **1002**), `css/style.css` (96), **5** mundos em `data/worlds/` (o portão, as três
+salas e o fixture, **1259 linhas** no total e **12** portas), `i18n/pt.json`, os **9** assets em
+`assets/{panoramas,artworks,video,previews}` e as **8** ferramentas em `tools/` (**1994** linhas).
 
 O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
 regras de stencil — a única parte global, porque o stencil é um recurso de toda a cena.
@@ -210,14 +208,14 @@ Os **4 módulos** (Fase 2) vivem em `js/modules/`, e o `js/app.js` ficou com o a
 | `camera.js` | A câmara-jogador (posição, D-pad, limites) e o erro de câmara; é o **único** ficheiro que sabe onde a câmara está — desde a Fase 3 recebe-a do construtor de cena, em vez de a procurar pelo nome | `playerCamera`, `createPlayerCamera`, `startSession`, `setupMobileControls`, `reportCameraError` |
 | `artwork.js` | A obra: o material dimensional, o clique e o modal (foco preso, `inert`, Escape) | componentes `dimensional-material` e `open-artwork`; `createArtwork`/`removeArtwork`; `closeArtwork` |
 | `dimension.js` | O fundo 360º de uma dimensão (imagem ou vídeo) | componente `dimension-panorama`; `createDimension`/`removeDimension` |
-| `portal.js` | A porta: janela (máscara), moldura, caixa de colisão, travessia e caixa de debug — e o **driver de frame** da cena. Desde o B4 da Fase 3B a travessia e a janela são decididas pelos **dois eixos** (`window`/`action`) |
-| `portal-kinds.js` | A **tabela dos dois eixos**, pura: o que cada `window` mostra e o que cada `action` faz, a matriz das combinações legais, a validação de uma porta e o endereço de um mundo. Corre também em `node` (é ela que o validador lê) | componentes `stencil-portal` e `portal-driver`; `createPortal`/`removePortal`; `startFrameDriver` |
+| `portal.js` | A porta: janela (máscara), moldura, caixa de colisão, travessia e caixa de debug — e o **driver de frame** da cena. Desde o B4 da Fase 3B a travessia e a janela são decididas pelos **dois eixos** (`window`/`action`) | componentes `stencil-portal` e `portal-driver`; `createPortal`/`removePortal`; `startFrameDriver` |
+| `portal-kinds.js` | A **tabela dos dois eixos**, pura: o que cada `window` mostra e o que cada `action` faz, a matriz das combinações legais, a validação de uma porta e o endereço de um mundo. Corre também em `node` (é ela que o validador lê) | `WINDOW_KINDS`/`ACTION_KINDS`, `isLegalCombination`, `validateDoor`, `worldHref` e `ENTRY_WORLD` |
 
 Cada módulo tem o seu `remove()`, para que criar e destruir conteúdo em ciclo (o que o
 editor vai fazer) não deixe registos mortos nem memória agarrada — e desde a Fase 3 cada
 módulo tem também a sua **fábrica**, que constrói uma entidade a partir do dado.
 
-O **`js/scene/`** é onde a cena em dados vive, e tem só três ficheiros:
+O **`js/scene/`** é onde a cena em dados vive, e tem **quatro** ficheiros:
 
 | Ficheiro | O que é |
 | --- | --- |
@@ -236,10 +234,12 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 
 | Área | Estado |
 | --- | --- |
+| Mundos e endereços | **Um ficheiro por mundo** em `data/worlds/` (D24) e um endereço por sala: a raiz é o portão e `/cidade/`, `/praia/` e `/ceu/` são as salas, todas servindo o **mesmo** `index.html` (D28). O mundo sai do caminho e o `?scene=<mundo>` força um, para os testes; o validador exige que a pasta seja o `world.slug` |
+| Portas de mundo | A travessia de uma porta de mundo **navega** para o endereço do destino e o visitante aparece **atrás** da porta que lá se declara a chegada (`arrivalFrom`), na direcção em que vinha — o regresso é **um passo** (L16/L17/L19) |
 | Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID está no dado (`"id"`) e, na cena construída, em `data-dimension`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
-| Grafo de dimensões | Portais bidirecionais entre duas dimensões, com uma **dimensão ativa** global; a cena tem 4 dimensões e 8 portais |
-| Travessia | Por **colisão com a caixa** do portal (`box`, `boxPosition`, `boxRotation`), no plano do quadro ou na face da caixa (`trigger`) — nunca por distância |
-| Janelas | Uma por portal, com valor de stencil por **dimensão mostrada** (não por portal); portais que mostram o mesmo destino partilham o valor |
+| Grafo de dimensões | Portais bidirecionais entre duas dimensões, com uma **dimensão ativa** global; dentro de cada mundo é o que resta do grafo antigo, e o **grafo de mundos** é conferido pela linha de comando (alcançabilidade a partir do portão) |
+| Travessia | Por **colisão com a caixa** do portal (`box`, `boxPosition`, `boxRotation`), no plano do quadro ou na face da caixa (`trigger`) — nunca por distância; o que ela *faz* vem do eixo `action` (ficar, navegar ou nada — D25) |
+| Janelas | Uma por portal, com valor de stencil por **dimensão mostrada** (não por portal); portais que mostram o mesmo retrato partilham o valor e a dimensão derivada (D26) — é o que o **fixture** exercita, com duas portas de retrato |
 | Fundo 360º | `dimension-panorama` por dimensão (imagem ou vídeo), segue a câmara; a dimensão 0 é a câmara real (canvas transparente) |
 | Conteúdo | As obras pertencem à dimensão (o campo `dimension` de cada obra, no JSON); o clique só abre na dimensão ativa |
 | Molduras | Barra vermelha à volta do quadro, pertencente à dimensão onde o portal está; o bordo mantém-se fechado mesmo quando cruza a janela de outro portal |
@@ -265,25 +265,37 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 
 ### Verificado nesta versão (medido no browser)
 
-Medido a 2026-10-15, com a cena **construída de dados** — é a verificação final da Fase 3 (o B7 de
-§9 do roadmap):
+Medido a **2026-10-16**, com **a cache desligada** (medir com uma versão antiga em cache é medir o
+código que já não existe — a armadilha que a Fase 3 deixou registada), nas **5** páginas: as quatro
+salas e o fixture. É a verificação final da **Fase 3B** (bloco B9 de §9 do roadmap); os números
+anteriores, da v0.0.5, ficam em §9.
 
-- **8/8** travessias — medidas a andar, passo de 0,1 m: cada portal faz **uma só** travessia, para
-  a dimensão certa, sem ping-pong (cobre o T1 e o T7)
-- Moldura: **0** poses com o bordo cortado (de **84**) e **0** falhas no contorno (**21 752**
-  amostras, 420 controlos) — pela varredura automática (`tools/regression/pose-sweep.mjs`);
-  antes da correção do stencil eram 110 poses cortadas em 360. O número de amostras varia com o
-  tamanho da janela; as falhas é que têm de ser zero
-- **1** ouvinte de `keydown` na cena, na carga **e** depois de criar e destruir **20** portais em
-  ciclo (pelas fábricas dos módulos), com o registo a voltar às **8** portas e **10** ouvintes no
-  `document` antes e **10** depois (T9)
-- Janela do hub: alfa **255** dentro e **0** fora dela (T4) · **0** px de moldura de trás dentro da
-  janela da frente, com **6 768** px de controlo **fora** dela (T5, medido por diferença e com
-  margem — é o controlo que prova que a medição não é vazia)
-- Clique na obra abre só na dimensão ativa (T6)
-- O D-pad anda **4,2 m** em 250 ms, com a velocidade vinda do dado (`cameras.player.speed`)
-- Consola sem erros, sem avisos e sem pedidos falhados (T8)
-- `?scene=example` carrega o fixture e dá a mesma cena e os mesmos números
+- **T8/T9, em cada mundo**: **0** erros, **0** avisos e **0** pedidos falhados nas cinco páginas, e
+  **1** ouvinte de `keydown` no `document` em cada (4 no `window`, do A-Frame)
+- **T10** (o retrato), nas **8** portas de retrato: tingir a dimensão derivada muda os pixels
+  **dentro** da janela e **nada** fora dela (0, em dois controlos). No **portão**, onde o fundo é a
+  câmara, o alfa é **255 dentro** e **0 fora** — a métrica do T4
+- **T11** (a chegada), nas **8** arestas do grafo de mundos: o visitante aparece **exactamente** no
+  ponto que o `arrivalPoint` calcula a partir do dado; **0** navegações a andar 3 m para dentro da
+  sala e **1** a voltar, com a URL de volta ao mundo de origem
+- **T2/T3** (varredura de poses, no fixture — o mundo que tem duas dimensões): **84** poses (**84**
+  avaliadas, 0 não avaliáveis), **0** com o bordo cortado, **0** falhas no contorno em **15 714**
+  amostras, **420** controlos a **0**, método válido, 1,03 s — e as duas avarias injectadas
+  continuam a ser detectadas (`bar`: 1 315 amostras falhadas; `stencil`: 4 567 de 4 568). O número
+  de amostras varia com o tamanho da janela; as falhas é que têm de ser zero
+- **T12** (o retrato na moldura): **16** poses (as 8 portas a 12 m e a 30 m) e em **todas** a mancha
+  do retrato tingido ficou dentro do rectângulo esperado, com **0** pontos fora
+- O **ciclo portão → sala → portão** fecha nas duas salas, com **1** navegação por porta
+- No **telemóvel** (390×844): o botão de entrada responde, o D-pad fica visível e a **câmara real** é
+  o fundo da dimensão 0 (a captura mostra a sala em que se está, com a porta emoldurada)
+- A olho, uma captura por sala: a cidade mostra a porta **sem janela** (a do portão) ao lado do
+  retrato da praia; a praia mostra os **dois retratos** a ladear a porta **sem janela** (a que
+  voltou ao portão na D29); o céu mostra o retrato da praia
+- O D-pad anda **4,2 m** em 250 ms, com a velocidade vinda do dado (`cameras.player.speed`) *(da v0.0.5)*
+- Clique na obra abre só na dimensão ativa (T6) *(da v0.0.5)*
+- **T5** (ordem de desenho) **não foi re-medido** na 3B: precisa do rig de dois portais, e a ordem de
+  desenho não mudou na fase — os números (0 px da moldura de trás dentro da janela da frente, com
+  **6 768** px de controlo) são os da v0.0.5
 
 ### Limitações e decisões assumidas
 
@@ -301,12 +313,12 @@ Medido a 2026-10-15, com a cena **construída de dados** — é a verificação 
   do modal** em vez de navegar. São campos que existem para o editor (Fase 4) — pendência **R9**
   do roadmap.
 
-## Mundos e portas de mundo (Fase 3B, a decorrer)
+## Mundos e portas de mundo (Fase 3B, fechada em 2026-10-16)
 
-> ⚠️ **Os mundos têm endereço, e o que falta é o resto das ferramentas.** O que está feito — a
-> divisão em quatro mundos, as portas de mundo com retrato, a chegada atrás da porta e a **pasta
-> por mundo com o seu arranque** (`/praia/` e o resto, bloco **B7**) — entrou nos blocos B0–B7 de
-> [docs/ROADMAP.md](docs/ROADMAP.md) §9. O `?scene=<mundo>` continua a existir para os testes.
+> A fase correu **bloco a bloco** — de B0 (o plano) a B10 (esta documentação) — e cada bloco está em
+> [docs/ROADMAP.md](docs/ROADMAP.md) §9 com o que entregou e **mediu**; as decisões que a fecharam
+> (D24–D29) estão em §11. O `?scene=<mundo>` continua a existir para os testes, e as três salas têm
+> endereço próprio. O marco é a branch `v0.0.6`.
 
 Um **mundo** é um conjunto fechado de dimensões, com as suas portas e o seu conteúdo, e tem o seu
 próprio ficheiro em `data/worlds/`. O **portão** é o mundo de entrada, com a câmara/AR, e tem uma
@@ -728,8 +740,11 @@ Para confirmar que o instrumento consegue mesmo falhar, há duas avarias injetad
 
 - **A página de edição** (Fase 4 do roadmap): inserir, alterar e excluir por módulo, com validação,
   pré-visualização e importar/exportar — usando os **mesmos** módulos e o mesmo esquema
-- **Mundos com endereço próprio e portas de mundo** (Fase 3B): um ficheiro por sala, e a porta de
-  mundo a navegar com um retrato do destino
+- **Um retrato para o portão** (item do autor, medido em §9): a porta da cidade para o portão é
+  `window: none` porque não há imagem do portão; o caminho e o formato já a aceitam
+- **A orientação da chegada** (item do autor): o visitante chega virado no sentido em que vinha — o
+  que faz do regresso **um passo** —, e no **céu** nenhuma das duas obras fica à frente dele. Se o
+  autor preferir aterrar virado para a sala, é a rotação da chegada (`js/scene/arrival.js`)
 - Portais com movimento e rotação animados, definidos na cena
 - Mais conteúdo por dimensão (vídeo 360º como fundo, por exemplo)
 - Automatizar as restantes medições de §10 do roadmap — a moldura (T2 e T3) já é automática

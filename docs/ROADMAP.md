@@ -14,19 +14,23 @@
 > (local, endereço publicado e telemóvel) e marcado como **`v0.0.5`** (ramo `v0.0.5`).
 > O próximo passo é a **Fase 3B** (§13).
 >
-> **Atualização (2026-10-16, Fase 3B — a decorrer):** a fase está a ser executada **bloco a
-> bloco**, um commit por bloco, e cada bloco é dado por **medido** (browser e linha de comando) e
-> nunca por estimativa: **B0–B7 feitos** — o plano e a tabela de blocos na §9, as decisões
-> **D24–D29** em §11 e «o que o Bn entregou e mediu» logo a seguir à tabela. As **duas emendas ao
-> plano** (a migração dentro do B2 e as leis com o seu dado, no B5) estão registadas nessa secção.
-> Falta o **B8** (ferramentas), o **B9** (verificação final no browser) e o **B10** (documentação e
-> o marco `v0.0.6`).
+> **Atualização (2026-10-16, Fase 3B — fechada):** a fase correu **bloco a bloco**, um commit por
+> bloco, e cada bloco foi dado por **medido** (browser e linha de comando) e nunca por estimativa:
+> **B0–B10 feitos** — o plano e a tabela de blocos na §9, as decisões **D24–D29** em §11 e «o que o
+> Bn entregou e mediu» logo a seguir à tabela, onde ficaram também as **duas emendas ao plano** (a
+> migração dentro do B2 e as leis com o seu dado, no B5) e o achado que virou decisão (a porta que
+> faltava na praia, **D29**). O que a fase entregou: **quatro mundos** mais o fixture, cada um com o
+> seu ficheiro e o seu **endereço**, com a porta de mundo a mostrar um **retrato** derivado e a
+> navegar; a **L19** e o verificador dos **arranques** nas ferramentas; e a bateria de testes
+> (T10–T12, T2/T3, T8/T9) medida em cada mundo. **Marco: a branch `v0.0.6`.** O passo seguinte é a
+> **Fase 4** (a página de edição, §9) — e ficam três itens do autor em §14 (R10–R12).
 >
 > **Atualização (2026-10-15, Fase 3B — plano):** a fase seguinte foi planeada **antes** de mexer
 > em código e o contrato que a D14 não fixava ficou fechado: **D24** (quatro mundos, uma dimensão
 > cada, com as 8 portas de hoje a `navigate`), **D25** (o formato **v3** e os dois eixos dentro do
 > eixo), **D26** (o retrato como dimensão derivada), **D27** (os assets da D7 e os retratos) e
-> **D28** (o slug de cada mundo, com os 4 arranques byte-idênticos). O plano — o que existe hoje, o
+> **D28** (o slug de cada mundo — **emendada no B7**: os 4 arranques são iguais **fora da linha do
+> `<base>`**, não byte-idênticos). O plano — o que existe hoje, o
 > corte, os **11 blocos** e as metas medidas — está na §9, e as decisões em §11. **Nada
 > implementado.**
 >
@@ -566,13 +570,14 @@ zonas12/
     └── skills/              harness de agents/skills — índice em .agent/skills_index.md (§3)
 ```
 
-> **Onde isto está (2026-10-15, Fase 3B até ao B6).** Existem: `index.html` (sem entidades de cena),
-> `css/style.css`, `js/{app.js, core/, modules/, scene/}`, `data/worlds/{gate,cidade,praia,ceu,
-> example}.json` (**desde o B6 a cena é um ficheiro por mundo** — o `data/scene.json` do mundo único
-> deixou de existir), `i18n/pt.json`, `assets/{panoramas,artworks,video,previews}` (divididos por tipo
-> no B5) e `tools/{scene, migration, regression, assets}`. **Por fazer:** os **4 arranques
-> byte-idênticos** e a pasta por mundo (B7), o `editor.html` e o `js/editor.js` (Fase 4) e o
-> `en.json` (quando houver tradução).
+> **Onde isto está (2026-10-16, Fase 3B fechada).** Existem: `index.html` (sem entidades de cena) e
+> os **4 arranques** — a raiz e as pastas `cidade/`, `praia/` e `ceu/`, com o mesmo ficheiro fora da
+> linha do `<base>` —, `css/style.css`, `js/{app.js, core/, modules/, scene/}`, `data/worlds/{gate,
+> cidade,praia,ceu,example}.json` (**desde o B6 a cena é um ficheiro por mundo** — o
+> `data/scene.json` do mundo único deixou de existir), `i18n/pt.json`,
+> `assets/{panoramas,artworks,video,previews}` (divididos por tipo no B5) e
+> `tools/{scene, migration, regression, assets}`. **Por fazer:** o `editor.html` e o `js/editor.js`
+> (Fase 4), o `en.json` (quando houver tradução) e os itens do autor em §14 (R10 e R11).
 
 Nota de nomenclatura: as pastas de **código** são em inglês (D10), e os ficheiros de dados
 também: `data/worlds/<slug>.json` é uma sala (ou o portão), e `data/worlds/example.json` é a cena de
@@ -1334,7 +1339,22 @@ instrumento que as prova; **B4** — as duas tabelas com o comportamento de cada
 assets divididos por tipo, normalizados e com os retratos gerados; **B6** — a separação em mundos,
 com a chegada atrás da porta; **B7** — cada sala com endereço próprio, e o regresso da praia
 fechado (D29); **B8** — as ferramentas: a **L19** no validador e o verificador dos **arranques**;
-**B9** — a verificação final no browser, numa bateria só.
+**B9** — a verificação final no browser, numa bateria só; **B10** — esta documentação e o marco
+`v0.0.6`.
+
+#### O que o B10 entregou e mediu (2026-10-16)
+
+**A documentação, acertada com o que existe** — e o único bloco da fase sem código, de propósito:
+o que ele entrega são os **números medidos** (e não estimados) no `README.md` e a fase dada por
+fechada.
+
+| Item | Medição |
+| --- | --- |
+| Os números do `README.md` | contados ao disco: `index.html` **85** linhas (e as três salas com o mesmo ficheiro), `js/app.js` **139**, `js/core/` 7 ficheiros/**219**, `js/modules/` 5/**1008**, `js/scene/` 4/**1002**, `css/style.css` **96**, `data/worlds/` 5 ficheiros/**1259** linhas com **12** portas, `tools/` 8 ficheiros/**1994** |
+| O que a fase mudou no README | §Estado (marca **v0.0.6** e os números), §Estrutura (as pastas dos mundos), §Como usar (os endereços), §O que está implementado (duas linhas novas: mundos e portas de mundo) e §Verificado nesta versão (a bateria do B9) |
+| O que a fase mudou no roadmap | o cabeçalho (fase fechada), §6 (o exemplo e o `<base>`), §8 (a **L19**), §9 (os 11 blocos), §10 (o método do T12), §11 (**D24–D29**) e §13–§14 (o resumo e as pendências novas) |
+| O que fica aberto, escrito | **R10** (o retrato do portão), **R11** (a orientação da chegada no céu) e **R12** (o T5 por re-medir) — os três em §14, cada um com o motivo e o que o fecha |
+| O marco | a branch **`v0.0.6`** sobre o commit do B10 (a `v0.0.5` fica como estava); a publicação é empurrar o `main`, e quem testa nas três versões é o autor |
 
 #### O que o B9 entregou e mediu (2026-10-16)
 
@@ -1649,9 +1669,9 @@ Estes já foram medidos manualmente; passam a ser o critério de aceitação de 
 | T7 | Chegada a cada portal | sem trocas em cadeia |
 | T8 | Consola | sem erros nem avisos |
 | T9 *(novo)* | Criar/destruir portais em ciclo | 1 listener de teclado, registos limpos |
-| T10 *(novo, D14)* | Retrato da porta de mundo | Alfa **0 fora** da moldura e **255 dentro** (métrica por alfa, como T4) |
-| T11 *(novo, D14)* | Chegada atrás da porta inversa | **0** travessias em cadeia ao aparecer; andar para dentro da sala não dispara nada |
-| T12 *(novo, D14)* | Varredura de poses à volta da porta | **0** poses com o retrato a sair da moldura (como T2) |
+| T10 *(novo, D14)* | Retrato da porta de mundo | Alfa **255 dentro** e **0 fora** onde o fundo é a câmara (o portão); onde o fundo é a sala, tingir o retrato muda os pixels **dentro** da janela e **nada** fora (medido no B9, §9) |
+| T11 *(novo, D14)* | Chegada atrás da porta inversa | **0** travessias em cadeia ao aparecer; andar **na direcção em que o visitante fica virado** não dispara nada, e meia volta dispara **uma** travessia |
+| T12 *(novo, D14)* | O retrato não sai da moldura | Poses à frente da porta com o retrato tingido (no B9: **16** poses — as 8 portas a 12 m e a 30 m), **0** pontos mudados fora do rectângulo da abertura |
 
 ### Linha de base medida (2026-10-12, Fase 0)
 
@@ -2213,7 +2233,7 @@ mesmo dia e **antes** de mexer em código). A **D24** decide o que a D14 não fi
 concreta da cena em mundos —, a **D25** diz o que a porta passa a ser no formato **v3**, a **D26**
 como o retrato existe (a dimensão derivada da L15), a **D27** onde ficam os assets e os retratos e
 a **D28** como cada mundo se identifica. O que a fase vai entregar, bloco a bloco, e as metas
-medidas estão na §9. *(D27 emendada ao fechar o B5 e D28 ao fechar o B7; execução de B1 a B7 feita
+medidas estão na §9. *(D27 emendada ao fechar o B5 e D28 ao fechar o B7; execução de B1 a B10 feita
 e medida — ver a nota de 2026-10-16 no topo e os blocos em §9.)*
 
 **D29 fechada em 2026-10-16** — a **porta que faltava na praia**: a porta 5 passa a regresso ao
@@ -2290,27 +2310,36 @@ mundos.
 testadas pelo autor em 2026-10-15** — local, a publicada e no telemóvel. Marcada como **`v0.0.5`**
 (branch no commit do fecho); a anterior é a `v0.0.4`, do fim da Fase 2.
 
-## Próximo passo: Fase 3B (mundos e portas de mundo)
+## Fase 3B — fechada (2026-10-16)
 
-**O plano está registado (2026-10-15) e nada dele está implementado.** A **D14** (§11) foi
-decidida em 2026-10-13 e o contrato que faltava fechou-se a 2026-10-15 com as decisões **D24–D28**
-(§11): **quatro mundos** — `gate` na raiz, com a câmara/AR, e as salas `cidade`, `praia` e `céu`,
-uma dimensão cada — com as **8 portas de hoje** a passarem a `navigate`, o formato **v3** com os
-dois eixos na porta, o retrato como **dimensão derivada** na banda da L15, os assets divididos por
-tipo (D7) com os retratos em `assets/previews/`, e o slug de cada mundo derivado do caminho. A
-§9 tem o corte ficheiro a ficheiro, os **11 blocos** (B0–B10) e as metas medidas com o instrumento
-de cada uma; o fixture (`?scene=example`) passa a ser o mundo de duas dimensões que mantém a janela
-ao vivo exercitada. Agora que a cena vem de dados, criar um mundo é escrever um ficheiro — era
-exactamente o que faltava para a fase valer a pena.
+**A fase está feita e medida, bloco a bloco.** A **D14** (§11) foi decidida em 2026-10-13 e o
+contrato que faltava fechou-se a 2026-10-15 com **D24–D28**, mais a **D29** que a execução obrigou
+(a porta que faltava na praia). O que ficou entregue: **quatro mundos** — `gate` na raiz, com a
+câmara/AR, e as salas `cidade`, `praia` e `céu`, uma dimensão cada — mais o **fixture** de duas
+dimensões; cada mundo com o seu ficheiro (`data/worlds/<slug>.json`, formato **v3**), o seu
+**endereço** e o seu arranque (o mesmo `index.html` fora da linha do `<base>`); as **8 portas de
+hoje** (mais a quarta do fixture) a **navegar**, seis com retrato e duas sem janela; o retrato como
+**dimensão derivada** na banda da L15; os assets divididos por tipo (D7); a lei **L19** e o
+**verificador dos arranques** nas ferramentas; e a bateria de testes — T1/T7, T2/T3, T8/T9, T10,
+T11 e T12 — medida em cada mundo (o detalhe de cada bloco, com os números, está na §9). Agora que a
+cena vem de dados, criar um mundo é escrever um ficheiro — era exactamente o que faltava para a
+fase valer a pena.
+
+**O próximo passo é a Fase 4 (a página de edição, §9)**, que já tem o que precisa: o formato com um
+dono único, o validador que corre na consola, na linha de comando e no editor, e os módulos com
+fábrica e `remove()`. Antes dela ficam três itens **do autor**, em §14 — o retrato do portão (R10),
+a orientação da chegada no céu (R11) e o T5 por re-medir quando o desenho mudar (R12).
 
 ---
 
-## 14. Pendências registadas (2026-10-15)
+## 14. Pendências registadas (2026-10-16)
 
 O que fica em aberto depois de a documentação ser alinhada com o código. Cada linha tem o
 motivo e o que a fecha. **R5–R7 nasceram do plano da Fase 2 (§9) e foram fechadas no mesmo dia**
 (decisão **D19**, §11). **R8 e R9 nasceram da revisão de documentação a seguir ao fecho da
-Fase 3** — são as duas coisas que a Fase 3 deixou construídas mas **não exercitadas**.
+Fase 3** — são as duas coisas que a Fase 3 deixou construídas mas **não exercitadas**. **R10–R12
+nasceram do fecho da Fase 3B**: duas decisões que são do autor (o retrato do portão e a orientação
+da chegada no céu) e um teste que ficou por re-medir por não haver mudança que o justificasse.
 
 **R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
 apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o
@@ -2343,3 +2372,6 @@ só chega à interface na **Fase 4**, e é o editor o primeiro sítio que o lê.
 | R4 | **Feita em 2026-10-15** (decisão **D21**, §11) | O formato por língua estava documentado (§5.7 e §6) e **não instanciado**: as dimensões não tinham nome, as obras não tinham título e nenhum campo do JSON era por língua — nem o conversor nem o validador mencionavam idioma | O `{ pt, en }` entrou no esquema, no conversor e no validador e ficou **instanciado**: 4 nomes de dimensão e 6 descrições de asset (B3, §9). As **10 obras** ficam sem `title` — é opcional, e quem o lê é o editor (Fase 4) |
 | R8 | **O `remove()` do construtor de cena nunca correu** | `buildScene()` devolve um `remove()` que tira as portas, as obras, as dimensões, os assets e a câmara — e **nada o chama**: o `js/app.js` faz `await buildScene(data)` e deita fora o resultado (medido por `grep`, é a única chamada). Com ele ficam por exercitar as três funções `remove…` dos módulos e os `remove()` dos componentes que desregistam conteúdo do núcleo. O editor (Fase 4) vai ser o primeiro sítio a trocar de cena. É o mesmo tipo de risco que a **A4** teve até a Fase 2 o fechar: código de limpeza que ninguém exercita apodrece sem se notar | A Fase 4 (troca de cena no editor) ou um teste que construa e remova uma cena e confirme que o documento e os registos do núcleo ficam como estavam |
 | R9 | **O esquema declara mais do que a cena constrói** | Quatro coisas **validam** e não são construídas: `kind: "model"` e `"text"` numa obra (o `createArtwork()` ignora o `kind` e faz sempre uma `a-box` com a textura do `asset` — não há geometria de modelo nem texto 3D), `kind: "color"` numa dimensão (o `createDimension()` nunca passa o `color` ao componente — o ficheiro não menciona a palavra, medido por `grep`; o validador só avisa quando a cor **falta**, com «the background will be black») e `interaction: "link"` (o `addressToOpen()` devolve o endereço, mas o `open-artwork` mostra-o no **iframe do modal**, não navega). Medido: quatro variantes da cena da exposição, uma por campo, passam **todas** com 0 erros e 0 avisos — quem escrever um destes campos à mão vê o validador aceitar e a cena não mudar como esperava | Ou a Fase 4 os implementa (e o editor passa a oferecê-los), ou o esquema e o validador passam a **avisar** que esses valores ainda não são construídos — a categoria «aviso» já existe no validador e é onde isto encaixa (é a mesma que avisa da dimensão de cor sem cor) |
+| R10 | **Não há retrato do portão** | A porta da cidade para o portão é `window: none` (e, desde a D29, também a da praia), porque não existe imagem da realidade: um retrato emprestado mentiria ao visitante sobre onde a porta leva. É uma decisão do autor, tomada ao fechar o B6 e reusada no B7 | Uma imagem do portão em `assets/previews/gate.jpg` mais as três linhas do catálogo e da porta — o formato e o caminho já a aceitam, e a L19 e o T10 já a mediriam |
+| R11 | **No céu, a chegada fica virada para o lado de onde se vem** | Medido no B9 (§9): o visitante aterra virado no sentido em que vinha — o −Z da porta —, o que é **o que faz do regresso um passo** (é o mecanismo, não um defeito). Em cada sala o que fica à frente varia: cidade **1** de 5 obras, praia **1** de 3, céu **0** de 2. O céu já vinha assim da cena anterior (nota do B6); nas outras salas há sempre alguma obra à frente | Uma decisão do autor sobre a orientação da chegada (é a rotação devolvida pelo `arrivalPoint`, em `js/scene/arrival.js`) ou um re-arranjo das obras do céu — o que ele preferir |
+| R12 | **O T5 não foi re-medido na Fase 3B** | Precisa do rig de **dois** portais (uma janela a tapar a moldura da outra) e a ordem de desenho **não mudou** na fase: `drawOrder` e as regras de stencil são os mesmos do fecho da Fase 3. Re-medir sem mudança nenhuma não diz nada de novo; o número da v0.0.5 (0 px da moldura de trás dentro da janela da frente, com 6 768 px de controlo) continua a ser o último | Qualquer mudança ao `drawOrder`, ao `renderOrder` ou às regras de stencil — aí a varredura passa a ser obrigatória; ou um rig de dois portais, se o autor quiser o número refrescado antes disso |
