@@ -29,7 +29,11 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
-const scene = JSON.parse(readFileSync(join(root, 'data', 'scene.json'), 'utf8'));
+// The world the faults are injected into: the one that carries everything the cases need — the
+// assets the rules talk about (the video, a photo, a portrait), two doors, five artworks and the
+// dimensions. The scene of the exhibition is no longer one file (D24): it is four worlds and a
+// fixture, and any of them can be the subject of a fault.
+const scene = JSON.parse(readFileSync(join(root, 'data', 'worlds', 'cidade.json'), 'utf8'));
 
 // What the command line answers by default: the files are where the paths say, and every panorama
 // has the standard shape (the shapes themselves are checked by the layout of the disk, in B8).
@@ -83,14 +87,14 @@ const cases = [
   {
     law: 'the shape',
     what: 'a field the kind of the axis does not take',
-    expect: 'not written when kind is "dimension-pair"',
+    expect: 'window.radius: not written when kind is',
     inject: (copy) => { copy.portals[0].window.radius = 10; }
   },
   {
     law: 'L1',
     what: 'a background radius smaller than the scene',
     expect: 'law L1',
-    inject: (copy) => { copy.dimensions[1].radius = 10; }
+    inject: (copy) => { copy.dimensions[0].radius = 10; }
   },
   {
     law: 'L4',
@@ -155,7 +159,7 @@ const cases = [
     law: 'L15',
     what: 'a declared id inside the reserved band',
     expect: 'law L15',
-    inject: (copy) => { copy.dimensions[1].id = 448; }
+    inject: (copy) => { copy.dimensions[0].id = 448; }
   },
   {
     law: 'L16',
@@ -167,13 +171,16 @@ const cases = [
     law: 'L17',
     what: 'two arrival doors for the same world of origin',
     expect: 'law L17',
-    inject: (copy) => { copy.portals[0].arrivalFrom = 'ceu'; copy.portals[2].arrivalFrom = 'ceu'; }
+    inject: (copy) => { copy.portals[0].arrivalFrom = 'ceu'; copy.portals[1].arrivalFrom = 'ceu'; }
   },
   {
     law: 'L18',
-    what: 'a window that shows this world with an action that leaves it',
+    what: 'a window that shows another world with an action that stays in this one',
     expect: 'law L18',
-    inject: (copy) => { copy.portals[0].action = { kind: 'navigate', target: 'ceu' }; }
+    inject: (copy) => {
+      copy.portals[0].window = { kind: 'preview', asset: 'retrato-praia', radius: 120 };
+      copy.portals[0].action = { kind: 'enter-window' };
+    }
   }
 ];
 
@@ -204,10 +211,11 @@ for (const testCase of cases) {
 const clean = validateScene(JSON.parse(JSON.stringify(scene)), options);
 const control = { errors: clean.errors.length, warnings: clean.warnings.length, ok: clean.ok };
 
-// And the graph: a world nobody can reach is a world nobody visits.
+// And the graph: a world nobody can reach is a world nobody visits. The entry is the world the
+// cases are injected into (a world reaches itself) and the orphan is the one nobody points at.
 const orphan = JSON.parse(JSON.stringify(scene));
 orphan.world = { slug: 'orfao', name: { pt: 'Órfão', en: 'Orphan' } };
-const reachable = unreachableWorlds([scene, orphan], 'gate');
+const reachable = unreachableWorlds([scene, orphan], scene.world.slug);
 
 // The tables of the two axes (section 5.4): what each kind means, which combinations are legal and
 // where the address of a world lives. Pure, so it is checked here and not in the browser.

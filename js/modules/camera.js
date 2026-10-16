@@ -150,6 +150,10 @@ export function reportCameraError(error) {
 export function createPlayerCamera(player, parent) {
   const el = document.createElement('a-camera');
   if (player && player.position) el.setAttribute('position', vector(player.position));
+  // A rotation comes from the builder when the visitor arrives from another world: they look the way
+  // the door crosses, which is the way the window showed (D14). A scene that declares none starts
+  // looking along -Z.
+  if (player && Array.isArray(player.rotation)) el.setAttribute('rotation', vector(player.rotation));
   el.setAttribute('look-controls', CAMERA_RIG.lookControls);
   el.setAttribute('wasd-controls', CAMERA_RIG.wasdControls);
 

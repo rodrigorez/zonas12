@@ -65,19 +65,26 @@ document.addEventListener('keydown', (event) => {
   });
 });
 
-// --- THE SCENE, FROM DATA ---
-// One name per file: `?scene=example` loads the fixture of D9 (data/scene-example.json). Any
-// other value is a typo, and the exhibition loads with its own scene.
-const DEFAULT_SCENE = 'data/scene.json';
-const SCENE_FILES = { example: 'data/scene-example.json' };
+// --- THE WORLD, FROM DATA ---
+// One file per world (D24): the gate is the root page and a room is a folder of its own (D28). The
+// file is named after the slug of the world, and `?scene=<slug>` loads another one — the fixture of
+// D9, and any room from the root while the folders are being built (block B7).
+const DEFAULT_WORLD = 'gate';
+const WORLD_NAME = /^[a-z0-9-]+$/;
+const worldFile = (slug) => 'data/worlds/' + slug + '.json';
+
+function requestedWorld() {
+  const requested = new URLSearchParams(window.location.search).get('scene');
+  if (!requested) return DEFAULT_WORLD;
+  if (!WORLD_NAME.test(requested)) {
+    console.warn('[scene] "' + requested + '" is not a world name; loading ' + DEFAULT_WORLD);
+    return DEFAULT_WORLD;
+  }
+  return requested;
+}
 
 async function loadScene() {
-  const requested = new URLSearchParams(window.location.search).get('scene');
-  let file = DEFAULT_SCENE;
-  if (requested) {
-    if (SCENE_FILES[requested]) file = SCENE_FILES[requested];
-    else console.warn('[scene] there is no scene called "' + requested + '"; loading ' + DEFAULT_SCENE);
-  }
+  const file = worldFile(requestedWorld());
   const response = await fetch(file);
   if (!response.ok) throw new Error(file + ': HTTP ' + response.status);
   return response.json();
@@ -88,8 +95,8 @@ async function buildFromData() {
   const report = validateScene(data);
 
   // The console is a test (T8): a scene that is fine says nothing at all. What cannot be checked
-  // here — whether the file of an asset exists on disk — is the command line's job
-  // (tools/scene/validate.mjs).
+  // here — whether the file of an asset exists on disk, or the shape of an image — is the command
+  // line's job (tools/scene/validate.mjs).
   if (!report.ok) {
     report.errors.forEach((error) => console.error('[scene] ' + error));
     return false;
@@ -97,8 +104,10 @@ async function buildFromData() {
   report.warnings.forEach((warning) => console.warn('[scene] ' + warning));
 
   // The build is asynchronous because the assets have to be loaded before the components that
-  // use them are created (see scene-builder.js).
-  await buildScene(data);
+  // use them are created (see scene-builder.js). `from` is the world the visitor came from, when
+  // they came through a door (D14).
+  const from = new URLSearchParams(window.location.search).get('from');
+  await buildScene(data, { from });
   return true;
 }
 

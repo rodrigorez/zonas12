@@ -558,16 +558,17 @@ zonas12/
     └── skills/              harness de agents/skills — índice em .agent/skills_index.md (§3)
 ```
 
-| Onde isto está (2026-10-15, fim da Fase 3 + Fase 3B até ao B5).** Existem: `index.html` (sem
-> entidades de cena), `css/style.css`, `js/{app.js, core/, modules/, scene/}`,
-> `data/{scene.json, scene-example.json}`, `i18n/pt.json`, `assets/{panoramas,artworks,video,
-> previews}` (divididos por tipo no B5) e `tools/{scene, migration, regression, assets}`. **Por
-> fazer:** o `editor.html` e o `js/editor.js` (Fase 4), o `en.json` (quando houver tradução), a pasta
-> por mundo e o `data/worlds/` (Fase 3B, blocos B6–B7) e os 4 arranques.
+> **Onde isto está (2026-10-15, Fase 3B até ao B6).** Existem: `index.html` (sem entidades de cena),
+> `css/style.css`, `js/{app.js, core/, modules/, scene/}`, `data/worlds/{gate,cidade,praia,ceu,
+> example}.json` (**desde o B6 a cena é um ficheiro por mundo** — o `data/scene.json` do mundo único
+> deixou de existir), `i18n/pt.json`, `assets/{panoramas,artworks,video,previews}` (divididos por tipo
+> no B5) e `tools/{scene, migration, regression, assets}`. **Por fazer:** os **4 arranques
+> byte-idênticos** e a pasta por mundo (B7), o `editor.html` e o `js/editor.js` (Fase 4) e o
+> `en.json` (quando houver tradução).
 
 Nota de nomenclatura: as pastas de **código** são em inglês (D10), e os ficheiros de dados
-também: `data/scene.json` é a exposição e `data/scene-example.json` é a cena de exemplo
-(decisão D13).
+também: `data/worlds/<slug>.json` é uma sala (ou o portão), e `data/worlds/example.json` é a cena de
+exemplo (decisão D13, com o nome do ficheiro a ser o slug do mundo — D28).
 
 Nota (D14, a partir da Fase 3B): passa a haver **uma pasta por mundo** com o seu arranque —
 `praia/index.html`, `cidade/index.html` — e, em `data/worlds/`, **um ficheiro por mundo**
@@ -670,12 +671,14 @@ desde que as 6 regras acima estejam cumpridas.
 
 ---
 
-## 6. Modelo de dados da cena — implementado (formato v2)
+## 6. Modelo de dados da cena — implementado (formato v3, um ficheiro por mundo)
 
-> **Nota (2026-10-15, Fase 3B).** O formato **v3** — o `world` por ficheiro e os **dois eixos** na
-> porta — está decidido (**D25**, §11) e planeado na §9; **nada dele está implementado**. O que
-> está descrito abaixo é o **v2**, que é o que existe e o que o código lê; a forma do v3 está na
-> nota do fim desta secção.
+> **Nota (2026-10-15, Fase 3B, fim do B6).** O formato **v3** está implementado e a cena é um
+> **ficheiro por mundo** (`data/worlds/{gate,cidade,praia,ceu}.json`): o `world` por ficheiro, os
+> **dois eixos** na porta, as dimensões renumeradas de 0 em cada mundo e os assets de cada mundo
+> declarados no seu catálogo. O `data/scene.json` do mundo único deixou de existir — a migração
+> está em `tools/migration/worlds.mjs` (bloco B6, §9). Os **endereços** (uma pasta por mundo, com o
+> seu arranque) são o bloco seguinte.
 
 > **Estado: implementado em 2026-10-15** (Fase 3). Isto deixou de ser proposta: é o formato que o
 > `js/scene/schema.js` descreve, que o `js/scene/validation.js` verifica e que o
@@ -1314,7 +1317,42 @@ L17 e L18) e o instrumento que prova que elas falham quando devem (15 de 15).
 `4c13673`, só documentação; **B1** — linha de base re-medida **antes** de mexer em código, com os
 números abaixo; **B2** — o formato v3 ponta a ponta; **B3** — as leis dos mundos no validador e o
 instrumento que as prova; **B4** — as duas tabelas com o comportamento de cada eixo; **B5** — os
-assets divididos por tipo, normalizados e com os retratos gerados.
+assets divididos por tipo, normalizados e com os retratos gerados; **B6** — a separação em mundos,
+com a chegada atrás da porta.
+
+#### O que o B6 entregou e mediu (2026-10-15)
+
+**A separação, por script** (`tools/migration/worlds.mjs`), com a **tabela de correspondência** que
+substitui o «0 diferenças» (uma mudança de sentido não se prova assim): 4 dimensões → 4 mundos,
+10 obras → 10 obras, e as **8 portas** com o destino certo — `preview` + `navigate` em sete e
+`window: none` na porta da cidade para o portão (a decisão do autor: sem retrato até haver imagem).
+O grafo não mudou: a praia continua sem porta para o portão, e todos os mundos são alcançáveis.
+
+| Item | Medição |
+| --- | --- |
+| Os mundos | `gate` (1 dimensão-câmara, 2 portas, **2** imagens), `cidade` (1 + 5 obras, 2 portas, 6), `praia` (1 + 3 obras, 3 portas, 6), `ceu` (1 + 2 obras, 1 porta, 4) e o fixture (2 dimensões, 7 obras, 3 portas) — cada um carrega **só os assets que usa** |
+| `validate.mjs` | **OK** nos **5** ficheiros, e o grafo: «4 rooms (+1 fixture), all reachable from gate» (exit 0). A **L11** provada de ponta a ponta: com uma porta para um mundo inexistente, o ficheiro **falha** |
+| As dimensões derivadas (D26) | cada retrato é **uma** dimensão na banda 448…511: no portão 448 e 449; e as **duas** portas da praia para a cidade **partilham a 448** — 1 textura, 1 valor de stencil, 1 desenho |
+| **T10** (o retrato) | alfa **255** dentro da janela e **0** fora (acima e à esquerda) — a métrica do T4 |
+| **T11** (a chegada) | em `praia?from=cidade` o visitante aparece em **(−25, 1,6, −81)** (atrás da porta 4, marcada `arrivalFrom: cidade`); **0** navegações a andar 3 m para dentro; **1** navegação a voltar — o regresso é **um passo** |
+| **T1/T7 no fixture** | ida 0→1 e volta 1→0, **1** transição cada, e a porta de mundo com **1** navegação sem mudar a dimensão — **duas janelas vivas ao mesmo tempo** (o par no valor 1 e o retrato no 2), que é para o que o fixture existe |
+| **T8** | **0** erros, **0** avisos e **0** pedidos falhados **nos cinco** mundos, com **1** ouvinte de `keydown` em cada |
+| **T2/T3** | passam no portão e no fixture: **0** de 84 poses, **0** falhas em 15 714 amostras, 420 controlos a 0 |
+| A olho | a sala da praia lê-se: os dois retratos da cidade ladeiam a porta do céu |
+
+**Três coisas que a execução apanhou (e que ficam registadas):**
+
+1. **A conta da chegada tinha o sinal trocado.** O `arrivalPoint()` punha o visitante do lado *de
+   fora* do plano da porta — com a porta à frente, a sala do outro lado — e o T11 viu-o: andar para
+   dentro disparava **uma navegação** (de volta!). O instrumento quase o escondia: a travessia de uma
+   porta que navega **não** muda a dimensão ativa, e a minha primeira versão do T11 só contava
+   dimensões. Passou a contar **navegações** também.
+2. **O fixture era uma armadilha de sentido único.** A porta do par tinha `ownedBy: 0`, e uma porta
+   só existe na dimensão onde está — quem atravessasse para a dimensão 1 ficava sem caminho de
+   volta. A cena de onde ele nasceu tinha porta de cada lado; o fixture passou a ter as duas.
+3. **O céu tem a chegada virada ao contrário** — e já tinha, antes da fase: a porta está em
+   `z = -120` e as obras em `z = -110`, ou seja atrás de quem chega. Não é um defeito da 3B (é o
+   retrato da cena original), mas é o primeiro sítio a olhar quando a exposição for revista.
 
 #### O que o B5 entregou e mediu (2026-10-15)
 

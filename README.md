@@ -8,7 +8,7 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 
 ````markdown
 zonas12/
-├── index.html          ponto de entrada: a página (a cena vem de data/scene.json)
+├── index.html          ponto de entrada: a página (a cena vem de data/worlds/)
 ├── README.md           documentação principal (fica sempre na raiz)
 ├── css/
 │   └── style.css       estilos da página, HUD, modal e D-pad
@@ -18,8 +18,8 @@ zonas12/
 │   ├── modules/        dimensão, obra, portal e câmara (Fase 2), com as fábricas da Fase 3
 │   └── scene/          a cena em dados: schema, validação e construtor (Fase 3)
 ├── data/
-│   ├── scene.json          a exposição, no formato v3
-│   └── scene-example.json  a mesma cena, como fixture (?scene=example)
+│   └── worlds/         uma cena por mundo (D24): gate, cidade, praia, ceu e o fixture `example`
+│                       (?scene=<mundo> escolhe qual; o portão é o que abre por omissão)
 ├── i18n/
 │   └── pt.json         textos da interface (5 chaves; nada os lê ainda — Fase 4)
 ├── docs/
@@ -55,7 +55,7 @@ zonas12/
   `data/`, `i18n/`, `assets/`, `README.md` e `.gitignore`.
 - Documentação de planeamento (roadmap, decisões) fica em `docs/`; ferramentas de
   construção (o validador da cena, o conversor e a varredura de regressão) em `tools/`.
-- A cena da exposição vive em `data/scene.json`; o `index.html` não tem entidades de cena.
+- A cena vive em `data/worlds/` — um ficheiro por mundo (D24) — e o `index.html` não tem entidades de cena.
   Os textos da interface ficam em `i18n/` (hoje só o `pt.json`).
 - Todos os assets ficam em `assets/`, separados por tipo: `panoramas/` (fundos 360º), `artworks/`
   (imagens das obras), `video/` e `previews/` (os retratos das portas de mundo).
@@ -179,9 +179,9 @@ Pages serve o `main`). É o estado depois da **Fase 3** do roadmap (a cena vem d
 pelo autor em 2026-10-15 nas **três** versões — local, a publicada e no telemóvel. A versão
 anterior é a `v0.0.4` (o estado da Fase 2), marcada pela branch com o mesmo nome. Resumo do que
 existe hoje: `index.html` (**82 linhas**),
-`js/app.js` (**118**), `js/core/` (7 ficheiros, **226**), `js/modules/` (5 ficheiros, **1000**),
-`js/scene/` (**4 ficheiros**, 907), `css/style.css` (96), `data/scene.json` (a cena, **674
-linhas**), `data/scene-example.json` (o fixture), `i18n/pt.json`, os **9** assets em
+`js/app.js` (**127**), `js/core/` (7 ficheiros, **226**), `js/modules/` (5 ficheiros, **1013**),
+`js/scene/` (**4 ficheiros**, 967), `css/style.css` (96), 5 mundos em `data/worlds/` (o portão, três salas e o fixture, **1234
+linhas no total**), `i18n/pt.json`, os **9** assets em
 `assets/{panoramas,artworks,video,previews}` e as ferramentas em `tools/`.
 
 O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
@@ -210,11 +210,11 @@ O **`js/scene/`** é onde a cena em dados vive, e tem só três ficheiros:
 | `arrival.js` | Onde o visitante aparece ao chegar de outro mundo (**L16**): puro e partilhado, para o construtor e o validador não discordarem da geometria |
 | `scene-builder.js` | O **único** dos três que conhece o A-Frame: cria o `<a-assets>` (e **espera** que os ficheiros carreguem), a câmara, as dimensões, as obras e os portais, a partir do JSON |
 
-A cena está em **`data/scene.json`** (formato **v3**, descrito no roadmap §6): um catálogo
+A cena está em **`data/worlds/<mundo>.json`** (formato **v3**, descrito no roadmap §6): um catálogo
 `assets` onde cada caminho aparece **uma vez**, as dimensões e as obras a apontarem para ele pelo
 nome, o texto de conteúdo por língua, o mundo a que o ficheiro pertence (`world.slug`) e a porta
 com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensões lá dentro) e
-`action` (o que a travessia faz). `?scene=example` carrega o `data/scene-example.json`.
+`action` (o que a travessia faz). `?scene=example` carrega o `data/worlds/example.json`.
 
 ### O que está implementado
 
@@ -245,7 +245,7 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
    `depthTest: false` (o mundo do outro lado da janela não conta com a profundidade dela).
 6. Uma dimensão **sem janela** usa `Never` e não se desenha.
 7. O raio do panorama de uma dimensão tem de ser maior do que a distância a qualquer
-   portal (`radius: 500` em `data/scene.json`); sem isso o fundo aparece dentro da janela.
+   portal (`radius: 500` em `data/worlds/<mundo>.json`); sem isso o fundo aparece dentro da janela.
 
 ### Verificado nesta versão (medido no browser)
 
@@ -285,38 +285,44 @@ Medido a 2026-10-15, com a cena **construída de dados** — é a verificação 
   do modal** em vez de navegar. São campos que existem para o editor (Fase 4) — pendência **R9**
   do roadmap.
 
-## Mundos e portas de mundo — planeado, não implementado
+## Mundos e portas de mundo (Fase 3B, a decorrer)
 
-> ⚠️ **Nada desta secção existe no código.** É planeamento aprovado em **2026-10-13**
-> (decisão **D14**, registada em [docs/ROADMAP.md](docs/ROADMAP.md), §11). Fica aqui para o
-> conceito não viver só no roadmap.
+> ⚠️ **Os dados e o código dos mundos existem; os endereços ainda não.** O que está feito — a
+> divisão em quatro mundos, as portas de mundo com retrato, a chegada atrás da porta — entrou nos
+> blocos B0–B6 de [docs/ROADMAP.md](docs/ROADMAP.md) §9; a **pasta por mundo e o arranque** de cada
+> uma (`/praia/` e o resto) são o bloco **B7**. Até lá, uma sala abre-se com `?scene=<mundo>`.
 
-Um **mundo** é o que hoje é a cena inteira: um conjunto fechado de dimensões, com os seus
-portais internos e o seu conteúdo. Passa a haver **um endereço por mundo** (`/praia/`) e um
-**portão** — o mundo de entrada, na raiz, com a câmara/AR — com uma porta para cada sala.
-Dentro de uma sala só se navega pelas dimensões dessa sala.
+Um **mundo** é um conjunto fechado de dimensões, com as suas portas e o seu conteúdo, e tem o seu
+próprio ficheiro em `data/worlds/`. O **portão** é o mundo de entrada, com a câmara/AR, e tem uma
+porta para cada sala. Dentro de uma sala só se navega pelas dimensões dessa sala.
 
-| Hoje | Planeado |
+| Antes (Fase 3) | Agora (Fase 3B) |
 | --- | --- |
-| Uma página, uma cena, quatro dimensões | Uma **pasta por mundo**, com o seu próprio JSON e o seu arranque `index.html` |
-| O portal liga duas dimensões (`dimensionA`/`dimensionB`) | O portal passa a ter **dois eixos**: `window` (o que a janela mostra) e `action` (o que a travessia faz) |
-| A travessia muda a dimensão ativa | A **porta de mundo** mostra um **retrato** do destino (imagem panorâmica, com paralaxe) e a travessia **navega para a URL** e recarrega a página |
-| Técnica do stencil | **Igual dentro de cada sala** — as leis L1–L8 e os testes T1–T8 continuam a valer |
+| Uma página, uma cena, quatro dimensões | **Uma cena por mundo**, com o seu ficheiro (`data/worlds/`) e — no bloco seguinte — o seu endereço `index.html` |
+| O portal ligava duas dimensões (`dimensionA`/`dimensionB`) | O portal tem **dois eixos**: `window` (o que a janela mostra: o par, um retrato ou nada) e `action` (o que a travessia faz: ficar, navegar ou nada) |
+| A travessia mudava a dimensão ativa | A **porta de mundo** mostra um **retrato** do destino (uma dimensão derivada, com paralaxe porque a esfera não segue a câmara) e a travessia **navega** para a URL do outro mundo |
+| Técnica do stencil | **Igual dentro de cada sala** — as leis L1–L8 e os testes T1–T9 continuam a valer, e a porta de mundo entra na mesma máquina (máscara, moldura, valor de stencil) |
 
 Como o isolamento é por endereço, **nada do outro mundo é lido** pela página de origem: só
-atravessam o *slug* do destino, um parâmetro opcional `?from=<slug>` e a imagem do retrato.
-O formato dos dados, as leis novas (L9–L18), os testes (T10–T12) e a fase de execução
-(**Fase 3B**) estão em [docs/ROADMAP.md](docs/ROADMAP.md).
+atravessam o *slug* do destino (na própria porta) e um parâmetro opcional `?from=<slug>`, que é o
+que faz o visitante aparecer **atrás da porta inversa** — com o regresso a um passo. O formato dos
+dados, as leis (L9–L18), os testes (T10–T12) e o estado de cada bloco estão em
+[docs/ROADMAP.md](docs/ROADMAP.md).
 
-**O plano está registado (2026-10-15) — nada implementado.** A divisão decidida (**D24**) são
-**quatro mundos**: o portão na raiz (`gate`, com a câmara/AR) e as salas `cidade`, `praia` e
-`ceu`, uma dimensão cada, com as **8 portas de hoje** a passarem a navegar. O formato passa a
-**v3** (**D25**), com os dois eixos na própria porta (`window {kind, dimensionA, dimensionB,
-asset, radius}` e `action {kind, target}`); o retrato é uma **dimensão derivada** na banda
-reservada da L15 (**D26**); os assets dividem-se por tipo, com os retratos em
-`assets/previews/` (**D27**); e o slug de cada mundo sai do próprio caminho, o que deixa os
-**4 arranques byte-idênticos** (**D28**). O corte ficheiro a ficheiro, os **11 blocos** (B0–B10)
-e as metas medidas com o instrumento de cada uma estão na §9 do roadmap.
+**O que falta na fase:** os endereços por sala (B7), o validador com o grafo de mundos na linha de
+comando e o verificador dos arranques (B8), a verificação final no browser (B9) e a documentação
+com o marco (B10).
+
+**A divisão decidida (D24)** são **quatro mundos**: o portão na raiz (`gate`, com a câmara/AR) e as
+salas `cidade`, `praia` e `ceu`, uma dimensão cada, com as **8 portas de hoje** a passarem a
+navegar — sete com retrato e a da cidade para o portão sem janela (não há imagem do portão, e um
+retrato emprestado mentiria). O formato **v3** (**D25**) tem os dois eixos na própria porta
+(`window {kind, dimensionA, dimensionB, asset, radius}` e `action {kind, target}`); o retrato é uma
+**dimensão derivada** na banda reservada da L15 (**D26**), o que faz duas portas para o mesmo mundo
+partilharem 1 textura e 1 valor de stencil; os assets estão divididos por tipo, com os retratos em
+`assets/previews/` (**D27**); e o slug de cada mundo sai do próprio caminho, o que deixará os
+**4 arranques byte-idênticos** (**D28**). A tabela de correspondência da migração, os **11 blocos**
+(B0–B10) e as metas medidas com o instrumento de cada uma estão na §9 do roadmap.
 
 ## Funcionalidades Principais
 
@@ -404,44 +410,40 @@ Exemplo — uma central (0) com dois destinos, e conteúdo nas dimensões:
 Os outros campos (`width`, `height`, `box`, `boxPosition`, `trigger`, `frame`) têm omissões — o
 roadmap §6 tem o formato completo e `js/scene/schema.js` é a descrição que manda.
 
-#### Cena atual (`data/scene.json`)
+#### Os mundos e as suas portas
 
-O `data/scene.json` monta **4 dimensões**. As dimensões 0, 1 e 2 formam um grafo completo (2
-portais cada uma, um para cada uma das outras); a **dimensão 2 tem 3 portais** — dois para
-a dimensão 1 e um para a dimensão 3 — e a dimensão 3 volta à 2.
+A cena é **um ficheiro por mundo** em `data/worlds/`. Cada mundo tem uma dimensão (a sua sala) e as
+portas que dele saem; o portão não tem conteúdo 3D — vê-se a câmara.
 
-| Dimensão | Conteúdo | Portais (id: liga para onde) |
-| --- | --- | --- |
-| **0** (realidade / hub) | Vê-se a câmara | `0 → 1`, `1 → 2` — em `x = ∓6`, `z = -8` |
-| **1** (cidade 360º) | `#cidade-360` + 5 obras | `2 → 0`, `3 → 2` — em `x = ∓25`, `z = -45` |
-| **2** (praia) | `#praia` + 3 obras | `4 → 1`, `5 → 1` e `6 → 3` — em `x = -25`, `x = 25` e `x = 0`, `z = -80` |
-| **3** (céu 360º) | `#skycloud` + 2 obras | `7 → 2` — em `x = 0`, `z = -120` |
+| Mundo | Dimensão | Conteúdo | Portas (id: para onde) |
+| --- | --- | --- | --- |
+| `gate` (o portão, na raiz) | 0 — realidade | Vê-se a câmara | `0 → cidade`, `1 → praia` — em `x = ∓6`, `z = -8` |
+| `cidade` | 0 — cidade 360º | `cidade-360` + 5 obras | `2 → gate`, `3 → praia` — em `x = ∓25`, `z = -45` |
+| `praia` | 0 — praia | `praia` + 3 obras | `4 → cidade`, `5 → cidade`, `6 → céu` — em `x = -25`, `x = 25` e `x = 0`, `z = -80` |
+| `ceu` | 0 — céu 360º | `skycloud` + 2 obras | `7 → praia` — em `x = 0`, `z = -120` |
 
-Cada portal tem `ownedBy` igual à sua dimensão, por isso dentro de uma dimensão só se
-vêem os portais dela. As travessias são todas bidirecionais (o mesmo portal serve de ida
-e de volta):
+O grafo das portas é o que era — as oito, nos mesmos sítios —, mas cada uma leva agora a um
+**mundo**, e não a uma dimensão do mesmo ficheiro:
 
 ```
-0 ⇄ 1 (portal 0)      0 ⇄ 2 (portal 1)
-1 ⇄ 0 (portal 2)      1 ⇄ 2 (portal 3)
-2 ⇄ 1 (portal 4)      2 ⇄ 1 (portal 5)      2 ⇄ 3 (portal 6)
-3 ⇄ 2 (portal 7)
+gate   ⇄ cidade   (portas 0 e 2)      gate  ⇄ praia  (portas 1 e 4)
+cidade ⇄ praia    (portas 3 e 4)      praia ⇄ céu    (portas 6 e 7)
 ```
 
-Os portais 4 e 5 (os dois que vão da dimensão 2 para a 1) são a prova de que **o valor de
-stencil pertence à dimensão mostrada, não ao portal**: ambos escrevem o mesmo valor e
-ambas as janelas mostram a dimensão 1 ao mesmo tempo, junto com a janela do portal 6 (que
-mostra a dimensão 3). Na dimensão 2 há então 3 janelas no ecrã com 2 valores de stencil.
+As portas **4 e 5** (as duas que vão da praia para a cidade) continuam a ser a prova de que o valor
+de stencil pertence à **dimensão mostrada** e não à porta: as duas mostram o **mesmo retrato** e
+partilham a mesma dimensão derivada — 1 textura, 1 valor, 1 desenho.
 
-Como a dimensão 2 não tem portal direto para a 0 (é o que esta cena pede), o regresso ao
-hub faz-se por `2 → 1 → 0` (portais 4 ou 5 e depois o portal 2).
-
-As posições foram escolhidas para que o ponto onde se chega (o portal atravessado) nunca
-caia dentro da caixa de outro portal — sem isso haveria trocas em cadeia ao chegar.
+Como a praia não tem porta direta para o portão (é o que esta cena pede), o regresso faz-se por
+`praia → cidade → gate`. Cada porta é **bidirecional**: atravessar no sentido contrário é a mesma
+porta. A que marca `arrivalFrom` é por onde se chega a esse mundo (uma por origem — lei L17), e a
+chegada é **atrás** dela, virada para dentro da sala — o que faz do regresso um passo. As posições
+foram escolhidas para que o ponto de chegada nunca caia dentro da caixa de outra porta — sem isso
+haveria trocas em cadeia ao chegar.
 
 #### Atributos do portal
 
-Estes são os **campos do dado** (`portals[]` em `data/scene.json`) e as suas omissões — que são,
+Estes são os **campos do dado** (`portals[]` em `data/worlds/<mundo>.json`) e as suas omissões — que são,
 ao mesmo tempo, as do componente (`js/modules/portal.js`); o conversor lê as do componente e
 escreve-as no JSON, que é o que impede os dois de divergirem:
 
@@ -529,7 +531,7 @@ panorama, mesmas obras).
     máscara não conta para ele).
   - **dimensão sem janela**: `Never`, não desenha.
 - **O raio do panorama de uma dimensão tem de ser maior do que a distância a qualquer
-  portal** (`radius: 500` em `data/scene.json`): o fundo da dimensão ativa tem de estar sempre
+  portal** (`radius: 500` em `data/worlds/<mundo>.json`): o fundo da dimensão ativa tem de estar sempre
   atrás do plano das janelas, senão apareceria dentro delas.
 - `portal-driver` (no módulo do portal, ligado à cena no arranque) é o único que decide:
   percorre os portais a cada frame, cada um deteta a sua própria travessia e o núcleo
@@ -544,15 +546,18 @@ for a **dimensão ativa**: vê-la pela janela não conta.
 ### Recursos Recentes
 
 - **A Cena Vem de Dados** (Fase 3): a exposição (dimensões, obras, portais, câmara) vive em
-  `data/scene.json`, não em entidades escritas à mão no `index.html` — que passou de 240 para
-  **82 linhas** e deixou de ter cena nenhuma dentro
+  `data/worlds/`, um ficheiro por mundo, não em entidades escritas à mão no `index.html` — que
+  passou de 240 para **82 linhas** e deixou de ter cena nenhuma dentro
+- **Mundos e portas de mundo** (Fase 3B): cada sala é um mundo com o seu ficheiro e a sua porta,
+  a porta de mundo mostra um **retrato** do destino (com paralaxe) e a travessia **muda de
+  endereço**; a chegada é atrás da porta inversa, com o regresso a um passo
 - **Catálogo de Assets**: cada caminho de ficheiro aparece **uma vez**, no catálogo `assets`, e
   as dimensões e as obras apontam para ele pelo nome (o modal deriva daí o seu endereço)
 - **Texto por Língua no Dado**: os nomes das dimensões e as descrições dos assets são
   `{ "pt": "…", "en": "…" }` — acrescentar uma língua é acrescentar um campo
 - **Validação da Cena**: o mesmo módulo (`js/scene/validation.js`) corre na consola ao arrancar,
   na linha de comando (`node tools/scene/validate.mjs`) e vai correr no editor (Fase 4)
-- **`?scene=example`**: carrega o `data/scene-example.json`, para experimentar sem tocar na cena
+- **`?scene=<mundo>`**: abre um mundo (`cidade`, `praia`, `ceu` ou o fixture `example`), para experimentar sem tocar no portão
   da exposição
 - **Grafo de Dimensões**: portais bidirecionais entre duas dimensões (qualquer par), com
   uma dimensão ativa global — permite a central que dá acesso a todas
@@ -647,18 +652,26 @@ Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caix
 3. Permita o acesso à câmera quando solicitado (é a dimensão 0, a realidade)
 4. Explore o ambiente utilizando o mouse (desktop) ou o D-pad (mobile)
 
-Quem quiser experimentar sem mexer na cena da exposição pode abrir
-`http://127.0.0.1:8123/index.html?scene=example`: carrega o `data/scene-example.json` (a mesma
-cena, como ficheiro de ensaio).
+Quem quiser experimentar sem mexer na exposição pode abrir `?scene=example`
+(`http://127.0.0.1:8123/index.html?scene=example`): carrega o `data/worlds/example.json`, o mundo
+de ensaio com duas dimensões e uma porta de cada tipo. Enquanto os endereços por sala não existirem
+(o bloco B7), uma sala abre-se do mesmo modo: `?scene=cidade`, `?scene=praia`, `?scene=ceu`. E
+`&from=<mundo>` diz de que mundo se vem, o que faz o visitante aparecer atrás da porta de chegada:
+`?scene=praia&from=cidade`.
 
 ### 2. Personalizar Conteúdo
 
-- Modifique as imagens e vídeos na pasta `assets/`
-- Atualize os caminhos no **catálogo `assets`** de `data/scene.json` — cada caminho aparece lá
-  **uma vez**, e as dimensões e as obras apontam para ele pelo nome (D20)
+- Modifique as imagens e vídeos em `assets/{panoramas,artworks,video,previews}/`
+- Atualize os caminhos no **catálogo `assets`** do mundo (`data/worlds/<mundo>.json`) — cada
+  caminho aparece lá **uma vez**, e as dimensões e as obras apontam para ele pelo nome (D20)
 - Acrescente dimensões, obras e portais às listas do mesmo ficheiro (o roadmap §6 tem o formato, e
   `js/scene/schema.js` é a descrição que manda)
-- Valide antes de publicar: `node tools/scene/validate.mjs`
+- Para acrescentar um **mundo**, escreva `data/worlds/<slug>.json` (e, com o B7, a pasta com o
+  mesmo nome); para o ligar ao portão, acrescente uma porta ao `gate.json` — com o retrato do
+  destino em `assets/previews/` e o `radius` do retrato
+- As imagens têm de ser **2:1** e ficam melhor com 2048 de largura (lei L14); a ferramenta
+  `tools/assets/normalize.mjs` corta e reduz sem ampliar
+- Valide antes de publicar: `node tools/scene/validate.mjs` (confere todos os mundos e o grafo)
 
 ### 3. Correr a varredura de regressão (T2 e T3)
 

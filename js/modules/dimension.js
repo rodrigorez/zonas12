@@ -10,6 +10,11 @@ import { playerCamera } from './camera.js';
 
 const DIMENSION_COMPONENT = 'dimension-panorama';
 
+// A-Frame's vec3 in the object form needs { x, y, z }: an array there is read as an object with no
+// axes and falls back to the default, silently (measured in A-Frame 1.8, utils/coordinates.js
+// parse). The data writes vectors as arrays, so the factory translates.
+const vector = (value) => ({ x: value[0], y: value[1], z: value[2] });
+
 AFRAME.registerComponent(DIMENSION_COMPONENT, {
   schema: {
     dimension: { type: 'int', default: 0 },
@@ -98,6 +103,10 @@ export function createDimension(dimension, parent) {
   if (typeof dimension.followCamera === 'boolean') settings.followCamera = dimension.followCamera;
 
   const el = document.createElement('a-entity');
+  // The position is not a field of the format: it is what the builder passes for a portrait, whose
+  // sphere sits at the door (D26) — the sphere of a declared dimension follows the camera or sits at
+  // the origin. It is set before the entity is added, so the component initialises once (law L7).
+  if (Array.isArray(dimension.position)) el.setAttribute('position', vector(dimension.position));
   el.setAttribute(DIMENSION_COMPONENT, settings);
   parent.appendChild(el);
   return el;

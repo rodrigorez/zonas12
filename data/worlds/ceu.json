@@ -1,0 +1,158 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "ceu",
+    "name": {
+      "pt": "Céu 360º",
+      "en": "Sky 360º"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": false
+    }
+  },
+  "assets": {
+    "skycloud": {
+      "path": "assets/panoramas/ceu-d0-skycloud.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da dimensão 3 (céu)",
+        "en": "360º panorama of dimension 3 (sky)"
+      }
+    },
+    "praia": {
+      "path": "assets/panoramas/praia-d0-praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da dimensão 2 (praia)",
+        "en": "360º panorama of dimension 2 (beach)"
+      }
+    },
+    "cidade-360": {
+      "path": "assets/panoramas/cidade-d0-forest.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da dimensão 1 (cidade)",
+        "en": "360º panorama of dimension 1 (city)"
+      }
+    },
+    "retrato-praia": {
+      "path": "assets/previews/praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Praia, visto da porta",
+        "en": "Portrait of the Beach world, seen from the door"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "image",
+      "asset": "skycloud",
+      "name": {
+        "pt": "Céu 360º",
+        "en": "Sky 360º"
+      },
+      "radius": 500
+    }
+  ],
+  "artworks": [
+    {
+      "id": 8,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "praia",
+      "position": [
+        -15,
+        1.5,
+        -110
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal"
+    },
+    {
+      "id": 9,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "cidade-360",
+      "position": [
+        15,
+        1.5,
+        -110
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal"
+    }
+  ],
+  "portals": [
+    {
+      "id": 7,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        -120
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-praia",
+        "radius": 120
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "praia"
+      },
+      "arrivalFrom": "praia"
+    }
+  ]
+}

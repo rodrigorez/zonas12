@@ -14,10 +14,12 @@
 //   3. the dimensions, then the artworks, then the portals.
 
 import { SCENE, ORIGIN_LANGUAGE, textIn } from './schema.js';
+import { DERIVED_DIMENSION_BASE, MAX_DIMENSIONS } from '../core/index.js';
 import { createPlayerCamera, useRealCamera } from '../modules/camera.js';
 import { createDimension, removeDimension } from '../modules/dimension.js';
 import { createArtwork, removeArtwork } from '../modules/artwork.js';
-import { createPortal, removePortal } from '../modules/portal.js';
+import { createPortal, removePortal, setWorld } from '../modules/portal.js';
+import { arrivalPoint } from './arrival.js';
 
 // Fills in the defaults the schema declares, so that the rest of this file — and the factories —
 // can read a field without asking whether it was written. An object that is not there stays
@@ -37,6 +39,9 @@ export async function buildScene(scene, options = {}) {
   const language = options.language || ORIGIN_LANGUAGE;
   const catalogue = scene.assets || {};
   const cameras = scene.cameras || {};
+  // The world this page serves (D24). The portal module writes it into `?from` when a door
+  // navigates, and it never reads the data itself — the same shape as `useRealCamera`.
+  setWorld(scene.world && scene.world.slug);
 
   const elements = {
     assets: createAssets(catalogue, parent, language),
@@ -53,7 +58,47 @@ export async function buildScene(scene, options = {}) {
   // and a black panel on the screen.
   await Promise.all(elements.assets.map(waitForAsset));
 
+  // The portraits of the world doors (D26): one derived dimension per pair (asset, radius), in the
+  // band of ids reserved for them (L15), as a sphere that does not follow the camera and sits at the
+  // door — that is what gives the parallax. Two doors that name the same portrait with the same
+  // radius share it: one texture, one stencil value, one drawing.
+  const portraits = new Map();
+  for (const portal of scene.portals || []) {
+    const axis = portal.window || {};
+    if (axis.kind !== 'preview' || !axis.asset) continue;
+    const key = axis.asset + '@' + axis.radius;
+    if (portraits.has(key)) continue;
+    const id = DERIVED_DIMENSION_BASE + portraits.size;
+    if (id >= MAX_DIMENSIONS) {
+      console.warn('[scene] no id left for the portrait of ' + axis.asset + '; the door shows nothing');
+      continue;
+    }
+    const el = createDimension({
+      id,
+      kind: 'image',
+      asset: axis.asset,
+      radius: axis.radius,
+      followCamera: false,
+      position: portal.position
+    }, parent);
+    if (!el) continue;
+    portraits.set(key, id);
+    elements.dimensions.push(el);
+  }
+
+  // Where the visitor starts: the data, unless they are arriving from another world, in which case
+  // the place is behind that world's arrival door (D14, laws L16 and L17 — one home for the
+  // geometry, js/scene/arrival.js).
   const player = withDefaults(cameras.player || {}, SCENE.cameras.fields.player);
+  const arrival = arrivalDoor(scene, options.from);
+  if (arrival) {
+    const point = arrivalPoint(arrival, player.position[1]);
+    player.position = point.position;
+    player.rotation = point.rotation;
+  } else if (options.from) {
+    console.warn('[scene] no door of this world says it is the arrival from "' + options.from +
+      '"; the visitor starts where the camera says');
+  }
   elements.camera = createPlayerCamera(player, parent);
   useRealCamera(cameras.real ? cameras.real.enabled === true : false);
 
@@ -69,7 +114,9 @@ export async function buildScene(scene, options = {}) {
   }
 
   for (const portal of scene.portals || []) {
-    elements.portals.push(createPortal(withDefaults(portal, SCENE.portals), parent));
+    const axis = portal.window || {};
+    const previewDimension = axis.kind === 'preview' ? portraits.get(axis.asset + '@' + axis.radius) : undefined;
+    elements.portals.push(createPortal(withDefaults(portal, SCENE.portals), parent, { previewDimension }));
   }
 
   return {
@@ -89,6 +136,14 @@ export async function buildScene(scene, options = {}) {
       elements.camera = null;
     }
   };
+}
+
+// The door this world arrives by, when the visitor comes from another one: the door marked with that
+// world as its origin (D14). Law L17 keeps it unique inside a world, and `?from` is the only thing
+// besides the address that crosses the boundary between worlds.
+function arrivalDoor(scene, from) {
+  if (typeof from !== 'string' || from.length === 0) return null;
+  return (scene.portals || []).find((portal) => portal.arrivalFrom === from) || null;
 }
 
 // What an artwork opens, if it opens anything: an external address when `interaction` is `link`,

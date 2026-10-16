@@ -1,0 +1,136 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "gate",
+    "name": {
+      "pt": "Portão",
+      "en": "Gate"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "retrato-cidade": {
+      "path": "assets/previews/cidade.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta",
+        "en": "Portrait of the City 360º world, seen from the door"
+      }
+    },
+    "retrato-praia": {
+      "path": "assets/previews/praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Praia, visto da porta",
+        "en": "Portrait of the Beach world, seen from the door"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [],
+  "portals": [
+    {
+      "id": 0,
+      "ownedBy": 0,
+      "position": [
+        -6,
+        0,
+        -8
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-cidade",
+        "radius": 120
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "cidade"
+      },
+      "arrivalFrom": "cidade"
+    },
+    {
+      "id": 1,
+      "ownedBy": 0,
+      "position": [
+        6,
+        0,
+        -8
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-praia",
+        "radius": 120
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "praia"
+      },
+      "arrivalFrom": "praia"
+    }
+  ]
+}

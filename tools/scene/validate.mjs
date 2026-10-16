@@ -27,6 +27,10 @@ const root = resolve(here, '..', '..');
 
 // O mundo de entrada é o portão (D24), e é dele que se parte para saber se alguma sala ficou sem
 // caminho. O nome vem da tabela dos eixos, que é onde ele já vive para a porta de mundo navegar.
+//
+// O fixture (D9) não é uma sala: é um ficheiro de ensaio que se abre com `?scene=example`, e ninguém
+// chega a ele por uma porta — por isso fica fora do grafo, e não é reportado como inalcançável.
+const FIXTURES = ['example'];
 
 // Um caminho absoluto já é erro de L12; não vale a pena perguntar ao disco por ele.
 const exists = (assetPath) => (/^([a-zA-Z]:[\\/]|[\\/])/.test(assetPath) ? undefined : existsSync(join(root, assetPath)));
@@ -114,9 +118,11 @@ for (const file of files) {
 // O grafo: todas as salas têm de ser alcançáveis a partir do portão (D14). Vale a pena só quando
 // há mais do que um mundo — com um ficheiro só não há grafo nenhum.
 if (worlds.size > 1) {
-  const unreachable = unreachableWorlds(validated, ENTRY_WORLD);
-  console.log(`world graph: ${worlds.size} worlds, ` +
-    (unreachable.length ? 'unreachable: ' + unreachable.join(', ') : 'all reachable from ' + ENTRY_WORLD));
+  const rooms = validated.filter((scene) => !FIXTURES.includes(scene.world.slug));
+  const unreachable = unreachableWorlds(rooms, ENTRY_WORLD);
+  console.log(`world graph: ${rooms.length} rooms` +
+    (worlds.size > rooms.length ? ` (+${worlds.size - rooms.length} fixture)` : '') +
+    (unreachable.length ? ', unreachable: ' + unreachable.join(', ') : `, all reachable from ${ENTRY_WORLD}`));
   if (unreachable.length) failed++;
 }
 
