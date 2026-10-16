@@ -43,7 +43,8 @@ zonas12/
 │   ├── migration/           o conversor HTML→JSON da Fase 0 e a migração para o formato v3, ambos
 │   │                        com guarda: são o registo das migrações
 │   ├── assets/              normalização das imagens (2:1 e teto de 2048 px — lei L14)
-│   └── regression/          varredura de poses T2/T3 (corre na consola do browser)
+│   └── regression/          a varredura de poses T2/T3 e a bateria dos doze testes (correm na
+│                            consola do browser, com a exposição aberta)
 ├── .harness/           fora do repositório (está no .gitignore)
 │   ├── dev/            ferramentas retiradas da raiz (não são precisas para o app)
 │   │   ├── package.json, package-lock.json   dependências npm (A-Frame vem do CDN)
@@ -196,7 +197,7 @@ Resumo do que existe hoje: `index.html` (**85 linhas**) e as **3** salas com o *
 `js/core/` (7 ficheiros, **219**), `js/modules/` (5 ficheiros, **1008**), `js/scene/`
 (4 ficheiros, **1002**), `css/style.css` (96), **5** mundos em `data/worlds/` (o portão, as três
 salas e o fixture, **1259 linhas** no total e **12** portas), `i18n/pt.json`, os **9** assets em
-`assets/{panoramas,artworks,video,previews}` e as **8** ferramentas em `tools/` (**1994** linhas).
+`assets/{panoramas,artworks,video,previews}` e as **9** ferramentas em `tools/` (**2664** linhas).
 
 O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
 regras de stencil — a única parte global, porque o stencil é um recurso de toda a cena.
@@ -267,25 +268,30 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 
 Medido a **2026-10-16**, com **a cache desligada** (medir com uma versão antiga em cache é medir o
 código que já não existe — a armadilha que a Fase 3 deixou registada), nas **5** páginas: as quatro
-salas e o fixture. É a verificação final da **Fase 3B** (bloco B9 de §9 do roadmap); os números
-anteriores, da v0.0.5, ficam em §9.
+salas e o fixture. É a verificação final da **Fase 3B** (bloco B9 de §9 do roadmap) e, depois dela,
+**a bateria dos doze testes da §10** — os números que se seguem são dessa bateria, com o instrumento
+em `tools/regression/acceptance.mjs`.
 
 - **T8/T9, em cada mundo**: **0** erros, **0** avisos e **0** pedidos falhados nas cinco páginas, e
-  **1** ouvinte de `keydown` no `document` em cada (4 no `window`, do A-Frame)
-- **T10** (o retrato), nas **8** portas de retrato: tingir a dimensão derivada muda os pixels
-  **dentro** da janela e **nada** fora dela (0, em dois controlos). No **portão**, onde o fundo é a
-  câmara, o alfa é **255 dentro** e **0 fora** — a métrica do T4
-- **T11** (a chegada), nas **8** arestas do grafo de mundos: o visitante aparece **exactamente** no
-  ponto que o `arrivalPoint` calcula a partir do dado; **0** navegações a andar 3 m para dentro da
-  sala e **1** a voltar, com a URL de volta ao mundo de origem
-- **T2/T3** (varredura de poses, no fixture — o mundo que tem duas dimensões): **84** poses (**84**
-  avaliadas, 0 não avaliáveis), **0** com o bordo cortado, **0** falhas no contorno em **15 714**
-  amostras, **420** controlos a **0**, método válido, 1,03 s — e as duas avarias injectadas
-  continuam a ser detectadas (`bar`: 1 315 amostras falhadas; `stencil`: 4 567 de 4 568). O número
-  de amostras varia com o tamanho da janela; as falhas é que têm de ser zero
-- **T12** (o retrato na moldura): **16** poses (as 8 portas a 12 m e a 30 m) e em **todas** a mancha
-  do retrato tingido ficou dentro do rectângulo esperado, com **0** pontos fora
-- O **ciclo portão → sala → portão** fecha nas duas salas, com **1** navegação por porta
+  **1** ouvinte de `keydown` no `document` em cada (**3** na janela, do A-Frame) — contados com o
+  `DOMDebugger.getEventListeners`, que vê os ouvintes **vivos**; **20** ciclos de criar e destruir
+  portais deixam o registo e a árvore exactamente como estavam
+- **T1** (as portas), medida porta a porta e a passo de 0,1 m: as **8** portas de mundo fazem **1**
+  travessia cada, para o mundo certo, e a dupla de dimensões do fixture dá **1 + 1**
+- **T4** (a janela), nas cinco: no **portão** (fundo transparente) o alfa é **255 dentro** e **0
+  fora** da janela; nas salas, dentro vê-se a imagem do destino e fora a sala
+- **T5** (duas portas, uma atrás da outra): **0** px da moldura de trás dentro da janela da frente,
+  **1 657** px de controlo **fora** dela e **0** de ruído entre dois desenhos iguais
+- **T6** (o clique na obra): abre o modal com o `path` do catálogo nas **4** salas, e no fixture a
+  obra da **outra** dimensão não abre
+- **T7/T11** (a chegada), nas **9** chegadas do grafo: o visitante aparece **exactamente** no ponto
+  que o `arrivalPoint` calcula, **0** travessias a andar para dentro da sala e **1** a voltar
+- **T10/T12** (o retrato), nas **8** portas de retrato a 12 m e a 30 m: tingir a dimensão derivada
+  muda os pixels **dentro** da janela (123 088 no portão a 12 m) e **nenhum** fora da moldura
+- **T2/T3** (varredura de poses), nas cinco: **84** poses (**84** avaliadas, 0 não avaliáveis), **0**
+  com o bordo cortado, **0** falhas em **20 554** amostras, **420** controlos a **0**, método
+  válido, ~1,0 s — e as duas avarias injectadas continuam a ser detectadas. O número de amostras
+  varia com o tamanho da janela; as falhas é que têm de ser zero
 - No **telemóvel** (390×844): o botão de entrada responde, o D-pad fica visível e a **câmara real** é
   o fundo da dimensão 0 (a captura mostra a sala em que se está, com a porta emoldurada)
 - A olho, uma captura por sala: a cidade mostra a porta **sem janela** (a do portão) ao lado do
@@ -735,6 +741,30 @@ inválido (avisou que os dois renders diferem por outra razão). Leva cerca de 1
 Para confirmar que o instrumento consegue mesmo falhar, há duas avarias injetadas de propósito:
 `runPoseSweep({ fault: 'bar' })` (uma barra da moldura nunca é desenhada) e
 `runPoseSweep({ fault: 'stencil' })` (o defeito da lei L3, a moldura levando teste de stencil).
+
+### 4. Correr a bateria da fase (T4–T12)
+
+Na mesma consola, com uma página (portão ou sala) aberta:
+
+```js
+(await import('/tools/regression/acceptance.mjs')).runAcceptance()
+```
+
+Mede, de uma vez, a **janela** (T4), o **rig das duas portas** (T5: ganha a da frente e a moldura
+de trás não invade a janela), o **clique na obra** (T6), o **ciclo de 20 portais** (T9), o
+**retrato** (T10 e T12, a duas distâncias) e chama a varredura (T2/T3). Os três que precisam de uma
+porta ou de uma chegada concreta correm em separado, e é a sessão que os junta:
+
+- `walkDoor(<id da porta>)` — o **T1**: atravessa a porta a passo de 0,1 m e diz quantas
+  travessias ela fez (as que navegam deixam o registo em `sessionStorage`, porque a página vai
+  embora com ele)
+- `checkArrival()` — o **T7/T11**: numa página aberta com `?from=<mundo>`, confirma que o visitante
+  está onde o `arrivalPoint` calcula, que andar para dentro da sala não dispara nada e que meia
+  volta dispara **uma** travessia
+
+O T8 (a consola) mede-se **de fora**, instrumentando `console.error`/`warn` antes da carga: a
+bateria lê essa sonda quando ela existe. Os números medidos estão no roadmap §9; os três erros que o
+próprio instrumento cometeu primeiro (e as lições) estão na §10.
 
 ## Melhorias Planejadas
 

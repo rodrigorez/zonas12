@@ -1339,8 +1339,58 @@ instrumento que as prova; **B4** — as duas tabelas com o comportamento de cada
 assets divididos por tipo, normalizados e com os retratos gerados; **B6** — a separação em mundos,
 com a chegada atrás da porta; **B7** — cada sala com endereço próprio, e o regresso da praia
 fechado (D29); **B8** — as ferramentas: a **L19** no validador e o verificador dos **arranques**;
-**B9** — a verificação final no browser, numa bateria só; **B10** — esta documentação e o marco
-`v0.0.6`.
+**B9** — a verificação final no browser, numa bateria só; **B10** — a documentação e o marco
+`v0.0.6`; **e depois da fase fechada, os doze testes da §10 corridos como bateria, em cada mundo**
+(com um instrumento novo e o T5 re-medido — a nota abaixo).
+
+#### Os doze testes da fase, medidos de uma vez (2026-10-16)
+
+**Porque é que isto existe.** A fase foi medida bloco a bloco, e cada bloco provou o que entregou —
+mas os doze testes da §10 nunca tinham sido corridos **como bateria** e **em cada mundo**. O T5, por
+exemplo, ficou por re-medir desde a v0.0.5 (pendência R12) e o T1/T7 só existiam na versão de um
+mundo só. Ficou um instrumento (`tools/regression/acceptance.mjs`, descrito na §10) que corre a
+bateria na página onde ela está aberta — e a bateria foi corrida nas **5** páginas e nas **8** portas
+e **9** chegadas do grafo.
+
+| Teste | Medição | Onde |
+| --- | --- | --- |
+| **T1** | as **8** portas de mundo: **1** travessia cada, para o mundo certo (`?from` correcto); no fixture, a dupla de dimensões dá **1 + 1** | portão, cidade, praia, céu e fixture |
+| **T2** | **0** poses com o bordo cortado, de **84** (84 avaliadas, 0 não avaliáveis) | nos **5** mundos |
+| **T3** | **0** falhas em **20 554** amostras, **420** controlos a **0**, método válido, ~1,0 s | nos **5** mundos |
+| **T4** | no **portão** (fundo transparente): alfa **255 dentro** e **0 fora** da janela; nas **4** salas: dentro vê-se a imagem do destino e fora a sala (`[177,212,242]` contra `[150,159,158]` na cidade) | nos **5** mundos |
+| **T5** | **0** px da moldura de trás dentro da janela da frente, **1 657** px de controlo **fora** dela, **0** px de ruído entre dois desenhos iguais — e dentro da janela ganha a dimensão da frente | nos **5** mundos |
+| **T6** | o clique abre o modal com o `path` do catálogo (**4** salas); no fixture, a obra da **outra** dimensão **não** abre (a guarda `canInteract` faz o seu trabalho) | cidade, praia, céu e fixture (o portão não tem obras) |
+| **T7/T11** | as **9** chegadas: o visitante aparece **exactamente** no ponto que o `arrivalPoint` calcula, **0** travessias a andar para dentro da sala e **1** a voltar — a meia volta é um passo | as 8 arestas + o fixture |
+| **T8** | **0** erros, **0** avisos e **0** pedidos falhados nas cinco páginas; **1** ouvinte de `keydown` no `document` e **3** na janela, medidos pelo `DOMDebugger.getEventListeners` | nos **5** mundos |
+| **T9** | **20** ciclos de criar/destruir portais: registo e árvore de volta ao mesmo (**12** nós no portão, **24** no fixture), ouvintes de teclado iguais antes e depois, 0 nós deixados | nos **5** mundos |
+| **T10** | tingir a dimensão derivada muda os pixels **dentro** da janela (123 088 no portão a 12 m, 190 096 a 30 m) | as **8** portas de retrato |
+| **T12** | e **0** pixels mudados **fora da moldura**, a 12 m e a 30 m | as **8** portas de retrato |
+
+**O que a bateria apanhou — e nem tudo foi da cena:**
+
+1. **O T5 fica re-medido e a pendência R12 fecha** (§14). O rig é novo e está escrito no
+   instrumento (duas portas de 8×10 m, a da frente a 20 m e a de trás a 30 m deslocada 5 m para o
+   lado, para a moldura dela atravessar a janela da frente): **0** px dentro, **1 657** de controlo
+   fora. O número de controlo não é comparável com os 6 767 da v0.0.5 — o rig e o buffer são
+   outros —, mas a afirmação é a mesma e o controlo continua a provar que a medição não é vazia.
+2. **`arrivalFrom` não está no componente da porta.** Vive no ficheiro do mundo e quem o lê é o
+   construtor de cena; o instrumento tentava lê-lo da porta em execução e concluía que nenhum mundo
+   tinha chegadas. Fica escrito: quem quiser a chegada lê-a do **dado**.
+3. **Três erros do próprio instrumento**, todos com a mesma forma — uma medição que dava um número
+   plausível e errado: o rectângulo da janela tirado de uma projecção com o `fov` errado (media a
+   moldura), a margem de 8 px que contava a **borda da própria janela** como invasão da moldura de
+   trás (13 164 px "fora" que eram dentro), e um laço com `NaN` (`Math.abs(vetor - vetor)`) que não
+   andava e fazia a chegada passar sem medir nada. Os três foram apanhados pelo mesmo hábito: os
+   números tinham de fazer sentido (dentro = 0, controlo ≠ 0), e não tinham.
+4. **A sonda da sessão conta chamadas, não ouvintes.** Depois de abrir e fechar o modal, o contador
+   dela subia de 1 para 2 e parecia uma fuga; o `DOMDebugger.getEventListeners` — o método que o
+   A2/A3 já usava — mostrou **1 antes e 1 depois**, com o DOM a deduplicar o registo repetido. O
+   instrumento passou a contar ouvintes **vivos** com a semântica do DOM.
+5. **O centro do ecrã tem o botão da exposição por cima.** Um clique no meio do quadro (onde o
+   `elementFromPoint` devolve `BUTTON#btn-iniciar`) bate na interface e não no canvas: o
+   instrumento aponta a obra fora do centro de propósito. Não é defeito desta fase — a interface é a
+   da Fase 4 —, mas fica registado: quem estiver a olhar para a obra pelo centro do ecrã tem de
+   desviar o rato.
 
 #### O que o B10 entregou e mediu (2026-10-16)
 
@@ -1672,6 +1722,30 @@ Estes já foram medidos manualmente; passam a ser o critério de aceitação de 
 | T10 *(novo, D14)* | Retrato da porta de mundo | Alfa **255 dentro** e **0 fora** onde o fundo é a câmara (o portão); onde o fundo é a sala, tingir o retrato muda os pixels **dentro** da janela e **nada** fora (medido no B9, §9) |
 | T11 *(novo, D14)* | Chegada atrás da porta inversa | **0** travessias em cadeia ao aparecer; andar **na direcção em que o visitante fica virado** não dispara nada, e meia volta dispara **uma** travessia |
 | T12 *(novo, D14)* | O retrato não sai da moldura | Poses à frente da porta com o retrato tingido (no B9: **16** poses — as 8 portas a 12 m e a 30 m), **0** pontos mudados fora do rectângulo da abertura |
+
+### Os instrumentos destes testes
+
+Dois, e ambos correm **na página** (o que se mede é o que está desenhado, e o projeto não tem build
+nem dependências — D1). Carregam-se da consola, com a exposição aberta por HTTP:
+
+| Instrumento | O que mede | Como corre |
+| --- | --- | --- |
+| `tools/regression/pose-sweep.mjs` | **T2** e **T3**: 84 poses em frente de um portal isolado, por diferença entre dois desenhos, com controlos dentro da abertura e duas avarias injectadas que provam que ele falha quando deve | `(await import('/tools/regression/pose-sweep.mjs')).runPoseSweep()` |
+| `tools/regression/acceptance.mjs` | A bateria da fase: **T4, T5, T6, T9, T10, T12** de uma vez, mais **T2/T3** (chama a varredura) e **T8** (lê a sonda da sessão). O **T1** e o **T7/T11** medem-se porta a porta e chegada a chegada (`walkDoor`, `checkArrival`) | `(await import('/tools/regression/acceptance.mjs')).runAcceptance()` |
+
+O `acceptance.mjs` nasceu da medição da fase e traz três lições de método escritas no próprio
+ficheiro, todas de erros que ele próprio cometeu primeiro:
+
+1. **O rectângulo de uma janela tira-se da máscara** (a geometria do próprio objecto) e não de uma
+   projecção paralela: a primeira versão projectou os cantos com o `fov` errado (60 em vez de 80) e
+   mediu a moldura em vez da janela.
+2. **A câmara de um rig move-se só na posição.** O `look-controls` é dono da rotação e desfaz o que
+   lhe for escrito à mão — uma rotação posta por script dura menos de um segundo, e a medição que
+   dependa dela mede outra coisa.
+3. **Contar chamadas a `addEventListener` não conta ouvintes.** O DOM deduplica registos iguais, e
+   a sonda que conta chamadas chegou a dizer 2 onde havia 1. A resposta certa veio do
+   `DOMDebugger.getEventListeners` da sessão (o método que o fecho de A2/A3 já usava), e o
+   instrumento passou a replicar a semântica do DOM para poder responder sozinho.
 
 ### Linha de base medida (2026-10-12, Fase 0)
 
@@ -2337,9 +2411,10 @@ a orientação da chegada no céu (R11) e o T5 por re-medir quando o desenho mud
 O que fica em aberto depois de a documentação ser alinhada com o código. Cada linha tem o
 motivo e o que a fecha. **R5–R7 nasceram do plano da Fase 2 (§9) e foram fechadas no mesmo dia**
 (decisão **D19**, §11). **R8 e R9 nasceram da revisão de documentação a seguir ao fecho da
-Fase 3** — são as duas coisas que a Fase 3 deixou construídas mas **não exercitadas**. **R10–R12
-nasceram do fecho da Fase 3B**: duas decisões que são do autor (o retrato do portão e a orientação
-da chegada no céu) e um teste que ficou por re-medir por não haver mudança que o justificasse.
+Fase 3** — são as duas coisas que a Fase 3 deixou construídas mas **não exercitadas**. **R10–R12 nasceram do fecho da Fase 3B**: duas decisões que são do autor (o retrato do portão e a orientação
+da chegada no céu) e um teste que ficou por re-medir por não haver mudança que o justificasse — esse
+**fechou-se a 2026-10-16**, quando a bateria dos doze testes (§9) passou a trazer o rig do **T5**
+como instrumento.
 
 **R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
 apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o
@@ -2374,4 +2449,4 @@ só chega à interface na **Fase 4**, e é o editor o primeiro sítio que o lê.
 | R9 | **O esquema declara mais do que a cena constrói** | Quatro coisas **validam** e não são construídas: `kind: "model"` e `"text"` numa obra (o `createArtwork()` ignora o `kind` e faz sempre uma `a-box` com a textura do `asset` — não há geometria de modelo nem texto 3D), `kind: "color"` numa dimensão (o `createDimension()` nunca passa o `color` ao componente — o ficheiro não menciona a palavra, medido por `grep`; o validador só avisa quando a cor **falta**, com «the background will be black») e `interaction: "link"` (o `addressToOpen()` devolve o endereço, mas o `open-artwork` mostra-o no **iframe do modal**, não navega). Medido: quatro variantes da cena da exposição, uma por campo, passam **todas** com 0 erros e 0 avisos — quem escrever um destes campos à mão vê o validador aceitar e a cena não mudar como esperava | Ou a Fase 4 os implementa (e o editor passa a oferecê-los), ou o esquema e o validador passam a **avisar** que esses valores ainda não são construídos — a categoria «aviso» já existe no validador e é onde isto encaixa (é a mesma que avisa da dimensão de cor sem cor) |
 | R10 | **Não há retrato do portão** | A porta da cidade para o portão é `window: none` (e, desde a D29, também a da praia), porque não existe imagem da realidade: um retrato emprestado mentiria ao visitante sobre onde a porta leva. É uma decisão do autor, tomada ao fechar o B6 e reusada no B7 | Uma imagem do portão em `assets/previews/gate.jpg` mais as três linhas do catálogo e da porta — o formato e o caminho já a aceitam, e a L19 e o T10 já a mediriam |
 | R11 | **No céu, a chegada fica virada para o lado de onde se vem** | Medido no B9 (§9): o visitante aterra virado no sentido em que vinha — o −Z da porta —, o que é **o que faz do regresso um passo** (é o mecanismo, não um defeito). Em cada sala o que fica à frente varia: cidade **1** de 5 obras, praia **1** de 3, céu **0** de 2. O céu já vinha assim da cena anterior (nota do B6); nas outras salas há sempre alguma obra à frente | Uma decisão do autor sobre a orientação da chegada (é a rotação devolvida pelo `arrivalPoint`, em `js/scene/arrival.js`) ou um re-arranjo das obras do céu — o que ele preferir |
-| R12 | **O T5 não foi re-medido na Fase 3B** | Precisa do rig de **dois** portais (uma janela a tapar a moldura da outra) e a ordem de desenho **não mudou** na fase: `drawOrder` e as regras de stencil são os mesmos do fecho da Fase 3. Re-medir sem mudança nenhuma não diz nada de novo; o número da v0.0.5 (0 px da moldura de trás dentro da janela da frente, com 6 768 px de controlo) continua a ser o último | Qualquer mudança ao `drawOrder`, ao `renderOrder` ou às regras de stencil — aí a varredura passa a ser obrigatória; ou um rig de dois portais, se o autor quiser o número refrescado antes disso |
+| R12 | **O T5 não foi re-medido na Fase 3B** | Precisa do rig de **dois** portais (uma janela a tapar a moldura da outra) e a ordem de desenho **não mudou** na fase: `drawOrder` e as regras de stencil são os mesmos do fecho da Fase 3. Re-medir sem mudança nenhuma não diz nada de novo; o número da v0.0.5 (0 px da moldura de trás dentro da janela da frente, com 6 768 px de controlo) continua a ser o último | **FECHADA em 2026-10-16**, na bateria dos doze testes (§9): o rig passou a viver em `tools/regression/acceptance.mjs` (`checkStackedDoors`), com duas portas de 8×10 m a 20 m e a 30 m (a de trás deslocada 5 m para o lado, para a moldura dela atravessar a janela da frente), e o resultado é **0** px dentro, **1 657** px de controlo fora e **0** de ruído — nos **5** mundos |
