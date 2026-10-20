@@ -568,7 +568,7 @@ zonas12/
 │   ├── editor/              modelo, painéis, pré-visualização e exportação (D36)
 │   ├── core/                estado, registos, stencil, ordem de desenho, eventos, limites
 │   ├── modules/             dimension.js, artwork.js, portal.js, camera.js
-│   └── scene/               scene-builder.js, schema.js, validation.js
+│   └── scene/               scene-builder.js, schema.js, validation.js, arrival.js, render-config.js
 ├── data/                    scene.json + scene-example.json (D13)
 │   └── worlds/              um ficheiro por mundo + gate.json — D14 (Fase 3B)
 ├── i18n/                    pt.json (+ en.json quando houver tradução)
@@ -587,9 +587,10 @@ zonas12/
 > cidade,praia,ceu,example}.json` (**desde o B6 a cena é um ficheiro por mundo** — o
 > `data/scene.json` do mundo único deixou de existir), `i18n/pt.json`,
 > `assets/{panoramas,artworks,video,previews}` (divididos por tipo no B5) e
-> `tools/{scene, migration, regression, assets}`. **Por fazer:** o `editor.html`, o `js/editor.js` e
-> o `js/editor/` (Fase 4 — o plano está em §9, bloco B0), o `en.json` (quando houver tradução) e os
-> itens do autor em §14 (R10 e R11).
+> `tools/{scene, migration, regression, assets}`. **Existem desde o B4 de 2026-10-20:** o
+> `editor.html`, o `css/editor.css`, o `js/editor.js` (a entrada) e o `js/editor/` (modelo,
+> pré-visualização, problemas). **Por fazer:** os painéis de edição (B5–B8), o `en.json` (quando
+> houver tradução) e o **R11** (no B10); o **R10** foi aceite e não se faz.
 
 Nota de nomenclatura: as pastas de **código** são em inglês (D10), e os ficheiros de dados
 também: `data/worlds/<slug>.json` é uma sala (ou o portão), e `data/worlds/example.json` é a cena de
@@ -1707,7 +1708,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: plano registado em 2026-10-16 (B0), com o B1, o B2 e o B3 entregues em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
+**Estado: plano registado em 2026-10-16 (B0), com o B1, o B2, o B3 e o B4 entregues em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -1906,6 +1907,59 @@ números do B2 (T4 `0` · T5 `0/2319/0` · T9 `2→2` · T10 `183 457/28 539` e 
 ser importado (é a mesma técnica do `acceptance.mjs`), e o ouvinte único do `app.js` é mais antigo —
 daí `0` nas duas colunas. O que o ciclo prova não é o número absoluto: é que **não aparece nenhum a
 mais**, em 20 construções e 20 remoções.
+
+#### O que o B4 entregou e mediu (2026-10-20) — a ferramenta existe
+
+`editor.html` + `css/editor.css` + `js/editor.js` (a entrada) e o `js/editor/` da D36. A ferramenta
+abre com a cena ao lado, e o caminho `data/worlds/ → ecrã → download` está fechado.
+
+| Peça | O que é |
+| --- | --- |
+| `editor.html` | A marcação: barra (mundo, validar, exportar, importar), painel de problemas e a cena da pré-visualização. Sem `onclick` (B1) e com as chaves do catálogo |
+| `css/editor.css` | Duas colunas, tema escuro, e o botão de VR do A-Frame escondido — é da exposição, não desta ferramenta |
+| `js/editor.js` (**15** linhas) | A entrada, com a forma do `app.js`: o `ar-config`, o catálogo, o arranque |
+| `js/editor/index.js` (**168**) | A composição: a lista de mundos, abrir, validar, importar, exportar |
+| `js/editor/model.js` (**58**) | O mundo em memória, o `parse`, o export estável, o slug e as contagens |
+| `js/editor/preview.js` (**41**) | O `buildScene(…, { preview: true })` e o `remove()` da cena anterior |
+| `js/editor/problems.js` (**56**) | O relatório do validador: três contagens e uma linha por problema |
+
+**Medido** (editor aberto por HTTP, cache desligada):
+
+- o **`gate`** abre sozinho: **2** portais, **2** dimensões, canvas **998 × 475**, `preview: true`,
+  `stencil: true`, **0** erros, **0** avisos e **0** pedidos falhados na consola;
+- a lista de mundos tem `gate`, `example`, `cidade` e `praia` — **derivada** das portas do portão (não
+  há manifesto, D14), e escrever outro slug continua a funcionar;
+- **round-trip**: o export do modelo devolve os **5** mundos **byte a byte iguais** (2 301 · 5 115 ·
+  4 903 · 2 765 · 6 879 bytes);
+- **exportar** dispara um download chamado `praia.json` com os mesmos **4 903** bytes do ficheiro;
+- **importar** um ficheiro com uma obra a menos muda o estado (`obras: 2`) e reconstrói a cena (**5**
+  entradas de conteúdo em vez de 6);
+- trocar de mundo pelo campo + **Abrir** põe `praia` no ecrã (**3** portais, **3** dimensões);
+- **M8 re-medido no editor**: `runSceneCycle()` com **20** ciclos, **0** desvios, a pré-visualização de
+  pé e a navegação ainda desligada.
+
+**Um defeito apanhado pela medição, não pelo olho:** a primeira versão da pré-visualização **não
+arrancava o driver de frame**, e as janelas ficavam **negras** — medido, `0` valores de stencil e
+**alfa 0 dentro** da janela, com o T4 a falhar. Passou a chamar `startFrameDriver()` depois de
+construir: o mesmo T4 dá **alfa 255 dentro** e **0 fora**, e o T10/T12 dão **0** px fora da moldura.
+
+**Duas mudanças que a fase obrigou, e que tocam a exposição:**
+
+1. **O `ar-config` saiu do `js/app.js`** para `js/scene/render-config.js`. A cena tem agora **dois
+   hosts** e as três regras de desenho (L6) não podem ter duas cópias — o `app.js` passou de **151**
+   para **134** linhas. O componente ganhou ainda uma **guarda**: avisa quando o `<a-scene>` não tem
+   `stencil: true`, em vez de a cena ficar sem janelas em silêncio.
+2. **O `<title>` passou a levar a chave** (`data-i18n="app.title"` na exposição, `editor.title` no
+   editor) e o `applyTexts()` deixou de saber qual é o título — cada página diz o seu.
+
+A exposição **não mudou**: a bateria do portão mantém os números do B3 (T4 `0` · T5 `0/2319/0` · T9
+`2→2` · T10 `183 457/28 539` com **0** fora · T2/T3 **0** de 84 e **0** em **24 906** · T8 limpo, sem
+o aviso do stencil), e os **4** arranques continuam iguais fora do `<base>`.
+
+**Metas medidas neste bloco:** **M1** (os 3 ficheiros), **M2** (**0** literais de interface em `js/`),
+**M3** (**0** `content:` nos dois CSS), **M4** (**0** chaves em falta), **M5** (**0** `localStorage`/
+escrita em `js/`), **M6** (o editor importa de `core/`, `modules/` e `scene/`), **M7** (**0** imports
+do editor na exposição) e **M11** (o *round-trip*).
 
 #### Metas de sucesso
 

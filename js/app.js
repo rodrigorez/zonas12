@@ -18,6 +18,10 @@ import { startFrameDriver } from './modules/portal.js';
 import { validateScene } from './scene/validation.js';
 import { buildScene } from './scene/scene-builder.js';
 import { initI18n, languageFromUrl } from './i18n.js';
+// Registers the `ar-config` component. It lives in js/scene/ because the scene's renderer settings
+// are the scene's: the editor's preview needs the same ones (Fase 4), and two copies would be two
+// sources of the drawing rules (law L6).
+import './scene/render-config.js';
 
 // --- DEBUG AND TEST HANDLE ---
 // The console and the regression scripts (docs/ROADMAP.md section 10) drive the scene
@@ -33,27 +37,6 @@ window.portalDebug = {
   syncStencilValues: syncStencilValues,
   on: on
 };
-
-AFRAME.registerComponent('ar-config', {
-  init: function () {
-    this.el.setAttribute('embedded', '');
-    this.applyRendererConfig();
-    this.el.addEventListener('render-target-loaded', () => this.applyRendererConfig());
-  },
-  applyRendererConfig: function () {
-    const renderer = this.el.renderer;
-    if (!renderer) return;
-    renderer.setClearColor(0x000000, 0);
-    // Confirms what A-Frame 1.8.0 already fixes when it initialises the renderer system
-    // (src/systems/renderer.js): with sortObjects false, three ignores the renderOrder and
-    // draws in tree order, which only works by accident with a portal. With several, the masks
-    // have to be drawn before all the content.
-    // (renderOrder: mask 1, panorama 2, artworks 3, frame 4)
-    renderer.sortObjects = true;
-    // The stencil is cleared to 0 every frame; 0 means "no window here".
-    renderer.autoClearStencil = true;
-  }
-});
 
 // Development keyboard shortcuts: one listener for the whole scene, walking the portal
 // registry. Registering one listener per portal (as before) left a dead listener behind for

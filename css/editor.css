@@ -1,0 +1,185 @@
+/* O editor é uma ferramenta: duas colunas, a cena à direita e o que se sabe dela à esquerda.
+   Nada de `content:` com texto (D12, regra 3) — os rótulos vêm todos do catálogo. */
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background-color: #0c0000;
+  color: #f2ecec;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px;
+}
+
+body {
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+/* --- barra --- */
+#barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.6rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #3a1f1f;
+  background-color: #140707;
+}
+
+#barra h1 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.grupo {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.grupo label {
+  color: #c9b8b8;
+}
+
+input[type="text"] {
+  width: 9rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #5a2a2a;
+  border-radius: 4px;
+  background-color: #1b0d0d;
+  color: inherit;
+  font: inherit;
+}
+
+input[type="text"]:focus-visible,
+button:focus-visible,
+.ficheiro:focus-within {
+  outline: 2px solid #ff6b6b;
+  outline-offset: 2px;
+}
+
+button,
+.ficheiro {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #6b2f2f;
+  border-radius: 4px;
+  background-color: #241010;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:hover,
+.ficheiro:hover {
+  background-color: #3a1616;
+}
+
+/* O input de ficheiro cobre a etiqueta: continua focável e clicável, sem mostrar o cromo nativo. */
+.ficheiro {
+  position: relative;
+  overflow: hidden;
+}
+
+.ficheiro input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* --- painéis e pré-visualização --- */
+main {
+  display: grid;
+  grid-template-columns: minmax(17rem, 25rem) 1fr;
+  min-height: 0;
+}
+
+#lado {
+  min-height: 0;
+  padding: 0.9rem 1rem 2rem;
+  overflow-y: auto;
+  border-right: 1px solid #3a1f1f;
+}
+
+#lado h2 {
+  margin: 1.1rem 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c9b8b8;
+}
+
+#estado {
+  min-height: 1.3em;
+  margin: 0;
+  color: #9fd6a4;
+}
+
+#estado.erro {
+  color: #ff9b9b;
+}
+
+#contagens {
+  margin: 0 0 0.5rem;
+  color: #b8a6a6;
+  font-variant-numeric: tabular-nums;
+}
+
+#problemas {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.problema {
+  padding: 0.35rem 0.5rem;
+  border-left: 3px solid #5a2a2a;
+  background-color: #170a0a;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.problema.erro { border-left-color: #ff6b6b; }
+.problema.aviso { border-left-color: #ffce5c; }
+.problema.nota { border-left-color: #6b6b6b; color: #b0a4a4; }
+
+.nota {
+  color: #9c9090;
+  line-height: 1.4;
+}
+
+#pre-visualizacao {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+
+#pre-visualizacao a-scene {
+  width: 100%;
+  height: 100%;
+}
+
+/* O botão de VR do A-Frame é da exposição, não desta ferramenta. */
+a-enter-vr {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  main {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(10rem, 38vh) 1fr;
+  }
+
+  #lado {
+    border-right: 0;
+    border-bottom: 1px solid #3a1f1f;
+  }
+}

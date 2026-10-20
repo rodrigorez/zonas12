@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- A mesma raiz da publicação que o arranque da exposição (D28): é ela que resolve `data/worlds/`,
+         `js/editor.js` e `css/editor.css`. O editor é uma ferramenta, não um mundo: não tem slug. -->
+    <base href="./" />
+    <title data-i18n="editor.title">Editor da exposição</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="data:," />
+    <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+    <link rel="stylesheet" href="css/editor.css" />
+    <script type="module" src="js/editor.js"></script>
+  </head>
+
+  <body>
+    <header id="barra">
+      <h1 data-i18n="editor.title">Editor da exposição</h1>
+
+      <div class="grupo">
+        <label for="mundo" data-i18n="editor.world.label">Mundo</label>
+        <input
+          id="mundo"
+          type="text"
+          list="mundos"
+          value="gate"
+          spellcheck="false"
+          autocomplete="off"
+          data-i18n-title="editor.world.hint"
+          title="O slug de um mundo é o nome do ficheiro em data/worlds/"
+        />
+        <datalist id="mundos"></datalist>
+        <button type="button" id="abrir" data-i18n="editor.world.open">Abrir</button>
+      </div>
+
+      <div class="grupo">
+        <button type="button" id="validar" data-i18n="editor.validate">Validar</button>
+        <button type="button" id="exportar" data-i18n="editor.export">Exportar</button>
+        <!-- O input fica coberto pela etiqueta: o rato e o teclado chegam-lhe, e o texto continua a
+             ser uma chave do catálogo (D12). `display: none` tirá-lo-ia da ordem de foco. -->
+        <label class="ficheiro">
+          <input type="file" id="importar" accept="application/json,.json" />
+          <span data-i18n="editor.import">Importar JSON</span>
+        </label>
+      </div>
+    </header>
+
+    <main>
+      <section id="lado">
+        <p id="estado" role="status" aria-live="polite"></p>
+
+        <h2 data-i18n="editor.problems.title">Problemas</h2>
+        <p id="contagens"></p>
+        <ul id="problemas"></ul>
+
+        <p class="nota" data-i18n="editor.panels.todo">
+          Os painéis de edição — câmara, dimensão, obra, portal e mundo — chegam nos blocos seguintes do plano.
+        </p>
+      </section>
+
+      <section id="pre-visualizacao" aria-label="Pré-visualização">
+        <!-- A mesma cena do arranque da exposição, menos o cursor e o raycaster: no editor caminha-se,
+             não se visita — e sem fonte de cliques nenhuma obra tenta abrir um modal que aqui não existe
+             (R13). O `stencil` é obrigatório (lei L6) e o `ar-config` confirma-o. -->
+        <a-scene ar-config renderer="alpha: true; antialias: true; stencil: true;">
+          <a-assets></a-assets>
+        </a-scene>
+      </section>
+    </main>
+  </body>
+</html>

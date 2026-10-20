@@ -62,8 +62,16 @@ export async function runSceneCycle(options = {}) {
   const construcoes = [];
   const desvios = [];
 
+  const opcoes = { parent: cena };
+  // O modo de pré-visualização segue o da página, a não ser que o chamador diga outra coisa: no editor
+  // a navegação está desligada (D32) e um ciclo não a pode voltar a ligar sem querer.
+  const previa = options.preview === undefined
+    ? Boolean(window.portalDebug && window.portalDebug.preview === true)
+    : options.preview === true;
+  if (previa) opcoes.preview = true;
+
   for (let volta = 1; volta <= ciclos; volta++) {
-    const construida = await buildScene(dado, { parent: cena, preview: options.preview === true });
+    const construida = await buildScene(dado, opcoes);
     await doisQuadros();
     const durante = retrato(cena, estado);
     construida.remove();

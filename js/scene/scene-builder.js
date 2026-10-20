@@ -1,7 +1,8 @@
 // Builds the exhibition from data — the file this phase exists for.
 //
-// It is the only file of js/scene/ that knows A-Frame: the schema describes the format, the
-// validator checks it, and each module knows its own component. What lives here is the order of
+// It is one of the two files of js/scene/ that knows A-Frame (the other is render-config.js, the
+// renderer settings): the schema describes the format, the validator checks it, and each module knows
+// its own component. What lives here is the order of
 // the build, the defaults the data may leave out, and the two things the data does not carry
 // resolved: the address an artwork opens (D20: it comes from the assets catalogue) and the
 // language of the text (D21).

@@ -9,8 +9,8 @@
 // of languages is read from the scene format so that the content and the interface never disagree
 // about which languages exist.
 //
-// Contract with the host: `initI18n()` has to run before any `t('…')`. Until it does, there is no
-// catalogue and `t()` can only return the key — the warning says so, but a host that skips it shows
+// Contract with the host: `initI18n()` has to run before any call to `t`. Until it does, there is no
+// catalogue and `t` can only return the key — the warning says so, but a host that skips it shows
 // keys instead of texts.
 import { LANGUAGES, ORIGIN_LANGUAGE } from './scene/schema.js';
 
@@ -74,10 +74,11 @@ export function t(key, params) {
 
 // Applies the catalogue to the markup. The HTML keeps the Portuguese written by hand as the value
 // that exists before this runs (D12, rule 4) and carries the key: `data-i18n` sets the text,
-// `data-i18n-label` the aria-label and `data-i18n-title` the title.
+// `data-i18n-label` the aria-label and `data-i18n-title` the title. The `<title>` of the page is a
+// text like any other — it carries `data-i18n` too, so the exhibition and the editor name themselves
+// from the catalogue instead of this file knowing one of them.
 export function applyTexts(root) {
   const scope = root || document;
-  document.title = t('app.title');
   document.documentElement.lang = current === ORIGIN_LANGUAGE ? 'pt-BR' : current;
   scope.querySelectorAll('[data-i18n]').forEach((element) => {
     element.textContent = t(element.getAttribute('data-i18n'));
