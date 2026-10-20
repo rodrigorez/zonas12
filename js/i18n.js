@@ -8,6 +8,10 @@
 // This file is interface only. It knows nothing about the scene, the portals or the editor; the list
 // of languages is read from the scene format so that the content and the interface never disagree
 // about which languages exist.
+//
+// Contract with the host: `initI18n()` has to run before any `t('…')`. Until it does, there is no
+// catalogue and `t()` can only return the key — the warning says so, but a host that skips it shows
+// keys instead of texts.
 import { LANGUAGES, ORIGIN_LANGUAGE } from './scene/schema.js';
 
 const FOLDER = 'i18n/';

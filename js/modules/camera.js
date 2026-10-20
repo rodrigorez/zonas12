@@ -93,6 +93,8 @@ function stepMobileMovement() {
 
 function bindPadButton(id, direction) {
   const button = document.getElementById(id);
+  // The D-pad is the exhibition's: a host without it wires nothing (R13).
+  if (!button) return false;
   const set = function (value) {
     return function (event) {
       event.preventDefault();
@@ -104,15 +106,24 @@ function bindPadButton(id, direction) {
   button.addEventListener('mousedown', set(true));
   button.addEventListener('mouseup', set(false));
   button.addEventListener('mouseleave', set(false));
+  return true;
 }
 
+let movementLoopRunning = false;
+
 // Wires the on-screen D-pad and starts the movement loop. The interface calls it when the
-// visitor activates the exhibition on a touch device (index.html, `iniciarCena`).
+// visitor activates the exhibition on a touch device (index.html, the start button).
 export function setupMobileControls() {
-  bindPadButton('btn-frente', 'forward');
-  bindPadButton('btn-tras', 'backward');
-  bindPadButton('btn-esq', 'left');
-  bindPadButton('btn-dir', 'right');
+  const bound = [
+    bindPadButton('btn-frente', 'forward'),
+    bindPadButton('btn-tras', 'backward'),
+    bindPadButton('btn-esq', 'left'),
+    bindPadButton('btn-dir', 'right')
+  ].filter(Boolean).length;
+  // No D-pad in this page, no loop: a frame driver walking a camera nobody can steer is work for
+  // nothing — and the editor has no D-pad (R13).
+  if (bound === 0 || movementLoopRunning) return;
+  movementLoopRunning = true;
   stepMobileMovement();
 }
 
@@ -140,7 +151,8 @@ export function reportCameraError(error) {
   message.textContent = t('camera.error');
   message.style.display = 'flex';
   document.body.appendChild(message);
-  document.getElementById('btn-iniciar').style.display = 'none';
+  const start = document.getElementById('btn-iniciar');
+  if (start) start.style.display = 'none';
 }
 
 // ---- the camera as data (Fase 3) ----
@@ -183,8 +195,11 @@ export function startSession() {
   const start = document.getElementById('btn-iniciar');
   if (start) start.style.display = 'none';
 
+  // The D-pad group is the exhibition's markup; a host without it still gets the controls wired
+  // (if it has the buttons) and never breaks here (R13).
   if (AFRAME.utils.device.isMobile()) {
-    document.getElementById('controles-mobile').style.display = 'block';
+    const pad = document.getElementById('controles-mobile');
+    if (pad) pad.style.display = 'block';
     setupMobileControls();
   }
 
@@ -201,6 +216,14 @@ export function startSession() {
   }
 
   const video = document.getElementById('webcam-video');
+  if (!video) {
+    // The data asks for the real world but this page has no surface for it: the exhibition's
+    // <video> is the only one, and a host without it says so instead of throwing inside the
+    // promise — where the failure would look like a camera error (R13).
+    console.warn('[camera] the data asks for the real world and this page has no <video> for it');
+    hideLoading();
+    return;
+  }
   navigator.mediaDevices
     .getUserMedia({ video: { width: 1280, height: 720, facingMode: 'environment' } })
     .then((stream) => {

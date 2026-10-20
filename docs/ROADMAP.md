@@ -1707,7 +1707,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: plano registado em 2026-10-16 (B0) e o B1 entregue em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
+**Estado: plano registado em 2026-10-16 (B0), com o B1 e o B2 entregues em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -1836,6 +1836,38 @@ que nenhum manifesto pode evitar — e é por isso que a tradução só entra qu
 bateria no fixture correu **antes de a cena estar construída** (T4, T5, T10 e T2 falharam com um
 mundo a meio). As duas foram refeitas — cache desligada por `Network.setCacheDisabled` e à espera
 do `renderer` e da `a-camera`. É a lição da Fase 3 outra vez, agora com dois sítios onde ela morde.
+
+#### O que o B2 entregou e mediu (2026-10-20) — fecha o **R13**
+
+Os módulos deixaram de exigir a UI da exposição: cada elemento que usam é um **host opcional** — o
+modal e o `iframe`, o D-pad, o `#btn-iniciar`, o overlay e o `<video>` da webcam.
+
+| Antes (medido no B0) | Depois |
+| --- | --- |
+| `artwork.js` rebentava **no import** (`Cannot read properties of null (reading 'addEventListener')`), e com ele o `scene-builder.js` | o ouvinte do `load` do `iframe` passou a ser ligado **na abertura** do modal e não no import — o `iframe` é do host, e um import não tem direito a exigi-lo |
+| `setupMobileControls()` e `reportCameraError()` rebentavam sem o D-pad e sem o `#btn-iniciar` | ambos guardados; sem D-pad **não** arranca o ciclo de movimento, e ele corre no máximo uma vez |
+| `startSession()` exigia o `#controles-mobile` e o `<video>` | guardados; sem `<video>` avisa e devolve, em vez de rebentar **dentro** da promessa, onde a falha se confundiria com um erro de câmara |
+
+**Medido, numa página com A-Frame e sem a UI da exposição: 16 de 16 verificações OK** — os **8**
+imports (o `core`, os **5** módulos e o `scene-builder`), as **três** chamadas que rebentavam, o
+`buildScene(gate)` com **2** portas, o `startSession()`, o `remove()` e os registos de volta a **0**.
+A meta **M14** fecha: **0** excepções.
+
+E a exposição **não mudou**: a bateria do **portão** e do **fixture** com os mesmos números do B1
+(T4 `0` e `255` · T5 `0/2319/0` · T6 `flex → none` · T9 `2→2` e `4→4` · T10 `183 457/28 539` e
+`275 425/42 903` com **0** fora · T2/T3 **0** de 84 poses e **0** em **24 906** amostras · T8
+limpo); o **D-pad anda 4,2 m em 250 ms**, o mesmo número da Fase 2; e abrir uma obra pelo clique e
+fechar com **Escape** continua a funcionar — o `iframe` ganha o ouvinte de teclas na abertura.
+
+**Duas notas que o B2 deixa para os blocos seguintes.** (1) Os avisos novos só aparecem em quem
+**não tem** o elemento (`[artwork] this page has no modal`, `[camera] … has no <video>`), e nunca na
+exposição — é por isso que o T8 continua limpo. (2) Fica um **contrato** para o editor:
+`initI18n()` tem de correr **antes** de qualquer `t('…')`, senão a chave sai crua — foi o que a
+sonda mostrou ao chamar `reportCameraError` sem catálogo. Está escrito no `js/i18n.js` e entra no B4.
+
+**Uma terceira nota de método:** deixar o modal **aberto** antes da bateria estraga o T6 — o
+instrumento responde `sem zona do ecra livre para apontar`, e a leitura sai `{}` (não uma
+regressão). O T6 precisa do ecrã livre.
 
 #### Metas de sucesso
 
@@ -2680,4 +2712,4 @@ só chega à interface na **Fase 4**, e é o editor o primeiro sítio que o lê.
 | R10 | **Não há retrato do portão** | A porta da cidade para o portão é `window: none` (e, desde a D29, também a da praia), porque não existe imagem da realidade: um retrato emprestado mentiria ao visitante sobre onde a porta leva. É uma decisão do autor, tomada ao fechar o B6 e reusada no B7 | Uma imagem do portão em `assets/previews/gate.jpg` mais as três linhas do catálogo e da porta — o formato e o caminho já a aceitam, e a L19 e o T10 já a mediriam. **FECHADO em 2026-10-20, decisão do autor: aceita-se que não exista.** As duas portas para a realidade ficam `window: none` — é o único caso em que a ausência é honesta, porque um retrato emprestado mentiria sobre o destino |
 | R11 | **No céu, a chegada fica virada para o lado de onde se vem** | Medido no B9 (§9): o visitante aterra virado no sentido em que vinha — o −Z da porta —, o que é **o que faz do regresso um passo** (é o mecanismo, não um defeito). Em cada sala o que fica à frente varia: cidade **1** de 5 obras, praia **1** de 3, céu **0** de 2. O céu já vinha assim da cena anterior (nota do B6); nas outras salas há sempre alguma obra à frente | Uma decisão do autor sobre a orientação da chegada (é a rotação devolvida pelo `arrivalPoint`, em `js/scene/arrival.js`) ou um re-arranjo das obras do céu — o que ele preferir. **DECIDIDO em 2026-10-20: re-arranjar as duas obras do céu**, no **B10** e **com o próprio editor** (é o primeiro uso real que se lhe dá, e é o que permite acertar as posições na pré-visualização). É dado, não código, e o mecanismo da chegada não se toca |
 | R12 | **O T5 não foi re-medido na Fase 3B** | Precisa do rig de **dois** portais (uma janela a tapar a moldura da outra) e a ordem de desenho **não mudou** na fase: `drawOrder` e as regras de stencil são os mesmos do fecho da Fase 3. Re-medir sem mudança nenhuma não diz nada de novo; o número da v0.0.5 (0 px da moldura de trás dentro da janela da frente, com 6 768 px de controlo) continua a ser o último | **FECHADA em 2026-10-16**, na bateria dos doze testes (§9): o rig passou a viver em `tools/regression/acceptance.mjs` (`checkStackedDoors`), com duas portas de 8×10 m a 20 m e a 30 m (a de trás deslocada 5 m para o lado, para a moldura dela atravessar a janela da frente), e o resultado é **0** px dentro, **1 657** px de controlo fora e **0** de ruído — nos **5** mundos |
-| R13 | **Os módulos exigem a UI da exposição** | Medido no **B0 da Fase 4** (§9), com páginas-sonda servidas por HTTP: importar `js/modules/artwork.js` num documento **sem** `#iframe-obra` dá excepção (`Cannot read properties of null (reading 'addEventListener')`) — e com ele o `js/scene/scene-builder.js`, que o importa —, e o `setupMobileControls()` sem o D-pad e o `reportCameraError()` sem o `#btn-iniciar` dão excepção pela mesma razão (o segundo **depois** de já ter posto a mensagem no ecrã). Ninguém notou até aqui porque **só existe um host** — a exposição — e ele tem todos esses elementos; é o mesmo tipo de risco que o R8: acoplamento que só aparece quando **um segundo host** tenta usar o código | A Fase 4 (**B2**, §9), com a meta **M14**: os 6 imports numa página sem a UI da exposição, **0** excepções |
+| R13 | **Os módulos exigem a UI da exposição** | Medido no **B0 da Fase 4** (§9), com páginas-sonda servidas por HTTP: importar `js/modules/artwork.js` num documento **sem** `#iframe-obra` dá excepção (`Cannot read properties of null (reading 'addEventListener')`) — e com ele o `js/scene/scene-builder.js`, que o importa —, e o `setupMobileControls()` sem o D-pad e o `reportCameraError()` sem o `#btn-iniciar` dão excepção pela mesma razão (o segundo **depois** de já ter posto a mensagem no ecrã). Ninguém notou até aqui porque **só existe um host** — a exposição — e ele tem todos esses elementos; é o mesmo tipo de risco que o R8: acoplamento que só aparece quando **um segundo host** tenta usar o código | A Fase 4 (**B2**, §9), com a meta **M14**: os 6 imports numa página sem a UI da exposição, **0** excepções. **FECHADO em 2026-10-20 (B2):** cada elemento da exposição passou a ser um **host opcional** (o modal e o `iframe`, o D-pad, o `#btn-iniciar`, o overlay e o `<video>`), o ouvinte do `iframe` passou a ligar-se na **abertura** do modal e não no import, e uma página com A-Frame e **sem** essa UI deu **16 de 16** verificações OK (os 8 imports, as 3 chamadas que rebentavam, `buildScene(gate)`, `startSession()` e `remove()`), com a exposição nos mesmos números |

@@ -53,18 +53,43 @@ function setInert(active) {
   });
 }
 
+// The modal is the exhibition's, and this module never assumes it is there: a host that imports the
+// module without the dialog — the editor is the second one (Fase 4) — still gets the components, and
+// a click that has nowhere to open says so once instead of throwing (docs/ROADMAP.md, R13).
+const MODAL_ID = 'modal-obra';
+const FRAME_ID = 'iframe-obra';
+const BACK_ID = 'btn-fechar-obra';
+
+let warnedNoModal = false;
+
 function openArtwork(url) {
-  document.getElementById('iframe-obra').src = url;
-  document.getElementById('modal-obra').style.display = 'flex';
+  const dialog = document.getElementById(MODAL_ID);
+  if (!dialog) {
+    if (!warnedNoModal) {
+      warnedNoModal = true;
+      console.warn('[artwork] this page has no modal (' + MODAL_ID + '): the artworks open nowhere');
+    }
+    return;
+  }
+  const frame = document.getElementById(FRAME_ID);
+  if (frame) {
+    frame.src = url;
+    bindFrameKeys(frame);
+  }
+  dialog.style.display = 'flex';
   setInert(true);
-  document.getElementById('btn-fechar-obra').focus();
+  const back = document.getElementById(BACK_ID);
+  if (back) back.focus();
   document.removeEventListener('keydown', onModalKeydown);
   document.addEventListener('keydown', onModalKeydown);
 }
 
+// Closing what is not there is a no-op, not an error: a host without the modal may still call it.
 export function closeArtwork() {
-  document.getElementById('modal-obra').style.display = 'none';
-  document.getElementById('iframe-obra').src = '';
+  const dialog = document.getElementById(MODAL_ID);
+  const frame = document.getElementById(FRAME_ID);
+  if (dialog) dialog.style.display = 'none';
+  if (frame) frame.src = '';
   setInert(false);
   document.removeEventListener('keydown', onModalKeydown);
 }
@@ -76,16 +101,25 @@ export function closeArtwork() {
 // listener, and it always uses the outer `document`); for those of another origin there is no
 // access — there the back button (`artwork.back`) is what remains, as it does not depend on the
 // keyboard.
-document.getElementById('iframe-obra').addEventListener('load', function () {
-  try {
-    const frameDocument = this.contentDocument;
-    if (!frameDocument) return;
-    frameDocument.removeEventListener('keydown', onModalKeydown);
-    frameDocument.addEventListener('keydown', onModalKeydown);
-  } catch (error) {
-    // Artwork of another origin: no access to the document of the frame.
-  }
-});
+//
+// It is bound when the modal is first opened and not when the module is imported: the iframe is the
+// host's, and an import has no right to require it (R13).
+const framesWithKeys = new WeakSet();
+
+function bindFrameKeys(frame) {
+  if (framesWithKeys.has(frame)) return;
+  framesWithKeys.add(frame);
+  frame.addEventListener('load', function () {
+    try {
+      const frameDocument = this.contentDocument;
+      if (!frameDocument) return;
+      frameDocument.removeEventListener('keydown', onModalKeydown);
+      frameDocument.addEventListener('keydown', onModalKeydown);
+    } catch (error) {
+      // Artwork of another origin: no access to the document of the frame.
+    }
+  });
+}
 
 // --- The A-Frame components ---
 
