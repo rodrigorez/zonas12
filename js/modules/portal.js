@@ -34,6 +34,15 @@ export function setWorld(slug) {
   worldSlug = typeof slug === 'string' ? slug : null;
 }
 
+// Whether a door may leave the page (D32). The exhibition navigates; the editor's preview does not —
+// a walk inside the tool must not take the work away with it. The builder hands this over too, for
+// the same reason it hands over the world: the module never reads the data.
+let navigationEnabled = true;
+
+export function setNavigation(enabled) {
+  navigationEnabled = enabled !== false;
+}
+
 // Reused vectors: the driver and the collision run every frame and must not allocate.
 const _worldPoint = new THREE.Vector3();
 const _boxPoint = new THREE.Vector3();
@@ -313,6 +322,16 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
   // one — the frame driver keeps running until the new document takes over, and a second call would
   // fight with the first.
   navigate: function () {
+    // D32: in a preview the navigation is inert. The door says so **once**, because walking into it
+    // is the author testing the door, not a defect.
+    if (!navigationEnabled) {
+      if (!this.warnedPreview) {
+        this.warnedPreview = true;
+        console.warn('[portal] door ' + this.data.id + ' opens "' + this.data.target +
+          '" and this page is a preview: the traversal stops here (D32)');
+      }
+      return;
+    }
     if (this.navigating) return;
     this.navigating = true;
     const url = new URL(worldHref(this.data.target, document.baseURI));

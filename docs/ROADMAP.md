@@ -1707,7 +1707,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: plano registado em 2026-10-16 (B0), com o B1 e o B2 entregues em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
+**Estado: plano registado em 2026-10-16 (B0), com o B1, o B2 e o B3 entregues em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -1869,6 +1869,44 @@ sonda mostrou ao chamar `reportCameraError` sem catálogo. Está escrito no `js/
 instrumento responde `sem zona do ecra livre para apontar`, e a leitura sai `{}` (não uma
 regressão). O T6 precisa do ecrã livre.
 
+#### O que o B3 entregou e mediu (2026-10-20) — fecha o **R8**
+
+Duas coisas, e a segunda é a que faltava desde a Fase 3.
+
+1. **A pré-visualização (D32).** `buildScene(scene, { preview: true })` desliga a navegação no módulo
+   do portal (`setNavigation`), o construtor **liga-a sempre** numa construção normal, e a porta que
+   navega **avisa uma vez** e deixa o visitante onde está. Medido num mundo construído em
+   pré-visualização: a porta 1 diz que abre `praia`, a **URL não muda** e aparece **1** aviso
+   (`[portal] door 1 opens "praia" and this page is a preview: the traversal stops here (D32)`).
+2. **O `remove()` em ciclo, com instrumento.** `tools/regression/scene-cycle.mjs`
+   (`runSceneCycle({ cycles, world })`) constrói e remove um mundo **N** vezes e compara o retrato do
+   princípio com o do fim de **cada** ciclo: portais, dimensões, entradas de conteúdo, valores de
+   stencil, dimensão ativa, nós dentro do `<a-scene>` e ouvintes do documento. Um ciclo que deixe
+   qualquer um destes a crescer fica registado com o número da volta e o campo.
+
+**20 ciclos em cada mundo:**
+
+| | Portão | Fixture |
+| --- | --- | --- |
+| Antes | 2 portais · 2 dimensões · 2 entradas · 2 valores · **18** nós | 4 · 3 · 10 · 2 · **33** |
+| Durante a construção | **4** · 2 · **4** · — · **26** | **8** · 3 · **20** · — · **56** |
+| Depois dos 20 ciclos | **2 · 2 · 2 · 2 · 18** | **4 · 3 · 10 · 2 · 33** |
+| Desvios | **0** | **0** |
+
+O instrumento exige que a construção tenha mesmo **acrescentado** portais ou conteúdo: um `build`
+que não construísse nada também passaria (não haveria nada para o `remove()` estragar).
+
+**E o que não podia partir:** a navegação da exposição continua a funcionar — `walkDoor(0)` no portão
+levou a página a `/cidade/?from=gate`, e a chegada em `cidade` mediu o ponto calculado, **0**
+travessias ao andar para dentro e **1** à meia volta (T7/T11). A bateria do portão dá os mesmos
+números do B2 (T4 `0` · T5 `0/2319/0` · T9 `2→2` · T10 `183 457/28 539` e **0** fora · T2/T3 **0** de
+84 e **0** em **24 906** · T8 limpo).
+
+**Uma nota sobre os ouvintes:** o instrumento conta os que a própria página registou **depois** de ele
+ser importado (é a mesma técnica do `acceptance.mjs`), e o ouvinte único do `app.js` é mais antigo —
+daí `0` nas duas colunas. O que o ciclo prova não é o número absoluto: é que **não aparece nenhum a
+mais**, em 20 construções e 20 remoções.
+
 #### Metas de sucesso
 
 **(a) Comportamento — nenhum número pode mudar.** Os **doze** testes de §10 na exposição, nos 5
@@ -1886,7 +1924,7 @@ mundos, com os valores da v0.0.6 (a bateria é `runAcceptance()` mais `walkDoor(
 | M5 | O editor não escreve em disco | `grep` de `fs`/`localStorage`/`writeFile` em `js/` | **0** (D2) |
 | M6 | O editor usa os mesmos módulos | `import` de `core/`, `modules/` e `scene/` em `js/editor*` | os **3** grupos (D4/D3) |
 | M7 | A exposição não conhece o editor | `grep editor` em `js/core/`, `js/modules/`, `js/scene/` e `js/app.js` | **0** (fora de comentários) — a regra da D4, literal |
-| M8 | **R8** fechado | ciclo build/remove ×**20** no editor | registos vazios, **1** ouvinte, 0 erros |
+| M8 | **R8** fechado | ciclo build/remove ×**20** no editor | registos vazios, **1** ouvinte, 0 erros. **Medido no B3 (2026-10-20)**, no portão e no fixture: **0** desvios em 20 ciclos com `tools/regression/scene-cycle.mjs`; falta **re-medir no editor** (B4) |
 | M9 | **R9** fechado | `laws-selftest.mjs` com uma avaria por valor não construído | **17 → N de N** |
 | M10 | A validação é uma só | `grep` de leis duplicadas no editor | **0** (importa `js/scene/validation.js`) |
 | M11 | O ficheiro exportado é estável | importar→exportar os 5 mundos | **0 diferenças** (2 espaços, ordem do `schema.js`, sem campos vazios) |
@@ -2707,7 +2745,7 @@ só chega à interface na **Fase 4**, e é o editor o primeiro sítio que o lê.
 | --- | --- | --- | --- |
 | R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves em `strings` (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`); as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` (a contagem no §13 foi corrigida em 2026-10-15). **Plano registado no B0 de 2026-10-16: fecha no B1 da Fase 4 (§9)**. **FECHADO em 2026-10-20 (B1):** o catálogo tem **13** chaves, a interface lê-as por `data-i18n*`, o `?lang=en` cai no português com **1** aviso — e as duas pontes `window.iniciarCena`/`fecharObra` saíram com os `onclick`. Medido: **0** literais de interface em `js/`, **0** chaves em falta, **0** `onclick` nos 4 arranques |
 | R4 | **Feita em 2026-10-15** (decisão **D21**, §11) | O formato por língua estava documentado (§5.7 e §6) e **não instanciado**: as dimensões não tinham nome, as obras não tinham título e nenhum campo do JSON era por língua — nem o conversor nem o validador mencionavam idioma | O `{ pt, en }` entrou no esquema, no conversor e no validador e ficou **instanciado**: 4 nomes de dimensão e 6 descrições de asset (B3, §9). As **10 obras** ficam sem `title` — é opcional, e quem o lê é o editor (Fase 4) |
-| R8 | **O `remove()` do construtor de cena nunca correu** | `buildScene()` devolve um `remove()` que tira as portas, as obras, as dimensões, os assets e a câmara — e **nada o chama**: o `js/app.js` faz `await buildScene(data)` e deita fora o resultado (medido por `grep`, é a única chamada). Com ele ficam por exercitar as três funções `remove…` dos módulos e os `remove()` dos componentes que desregistam conteúdo do núcleo. O editor (Fase 4) vai ser o primeiro sítio a trocar de cena. É o mesmo tipo de risco que a **A4** teve até a Fase 2 o fechar: código de limpeza que ninguém exercita apodrece sem se notar | A Fase 4 (troca de cena no editor) ou um teste que construa e remova uma cena e confirme que o documento e os registos do núcleo ficam como estavam. **Medido no B0 de 2026-10-16: o `remove()` funciona** — 3 ciclos do portão deixam os registos vazios e a cena de volta ao que era; fecha no **B3** da Fase 4, com **20** ciclos (§9) |
+| R8 | **O `remove()` do construtor de cena nunca correu** | `buildScene()` devolve um `remove()` que tira as portas, as obras, as dimensões, os assets e a câmara — e **nada o chama**: o `js/app.js` faz `await buildScene(data)` e deita fora o resultado (medido por `grep`, é a única chamada). Com ele ficam por exercitar as três funções `remove…` dos módulos e os `remove()` dos componentes que desregistam conteúdo do núcleo. O editor (Fase 4) vai ser o primeiro sítio a trocar de cena. É o mesmo tipo de risco que a **A4** teve até a Fase 2 o fechar: código de limpeza que ninguém exercita apodrece sem se notar | A Fase 4 (troca de cena no editor) ou um teste que construa e remova uma cena e confirme que o documento e os registos do núcleo ficam como estavam. **Medido no B0 de 2026-10-16: o `remove()` funciona** — 3 ciclos do portão deixam os registos vazios e a cena de volta ao que era; fecha no **B3** da Fase 4, com **20** ciclos (§9). **FECHADO em 2026-10-20 (B3):** o instrumento `tools/regression/scene-cycle.mjs` constrói e remove um mundo **20** vezes e compara portais, dimensões, entradas de conteúdo, valores de stencil, dimensão ativa, nós do `<a-scene>` e ouvintes — **0** desvios no portão (2→4→2 portais) e no fixture (4→8→4), com a navegação da exposição a continuar a funcionar (`walkDoor(0)` levou a `/cidade/?from=gate`) |
 | R9 | **O esquema declara mais do que a cena constrói** | Quatro coisas **validam** e não são construídas: `kind: "model"` e `"text"` numa obra (o `createArtwork()` ignora o `kind` e faz sempre uma `a-box` com a textura do `asset` — não há geometria de modelo nem texto 3D), `kind: "color"` numa dimensão (o `createDimension()` nunca passa o `color` ao componente — o ficheiro não menciona a palavra, medido por `grep`; o validador só avisa quando a cor **falta**, com «the background will be black») e `interaction: "link"` (o `addressToOpen()` devolve o endereço, mas o `open-artwork` mostra-o no **iframe do modal**, não navega). Medido: quatro variantes da cena da exposição, uma por campo, passam **todas** com 0 erros e 0 avisos — quem escrever um destes campos à mão vê o validador aceitar e a cena não mudar como esperava | Ou a Fase 4 os implementa (e o editor passa a oferecê-los), ou o esquema e o validador passam a **avisar** que esses valores ainda não são construídos — a categoria «aviso» já existe no validador e é onde isto encaixa (é a mesma que avisa da dimensão de cor sem cor). **Decidido no B0 de 2026-10-16 (D30, §11): o validador avisa** e o editor não oferece esses valores; fecha no **B9** da Fase 4 (§9) |
 | R10 | **Não há retrato do portão** | A porta da cidade para o portão é `window: none` (e, desde a D29, também a da praia), porque não existe imagem da realidade: um retrato emprestado mentiria ao visitante sobre onde a porta leva. É uma decisão do autor, tomada ao fechar o B6 e reusada no B7 | Uma imagem do portão em `assets/previews/gate.jpg` mais as três linhas do catálogo e da porta — o formato e o caminho já a aceitam, e a L19 e o T10 já a mediriam. **FECHADO em 2026-10-20, decisão do autor: aceita-se que não exista.** As duas portas para a realidade ficam `window: none` — é o único caso em que a ausência é honesta, porque um retrato emprestado mentiria sobre o destino |
 | R11 | **No céu, a chegada fica virada para o lado de onde se vem** | Medido no B9 (§9): o visitante aterra virado no sentido em que vinha — o −Z da porta —, o que é **o que faz do regresso um passo** (é o mecanismo, não um defeito). Em cada sala o que fica à frente varia: cidade **1** de 5 obras, praia **1** de 3, céu **0** de 2. O céu já vinha assim da cena anterior (nota do B6); nas outras salas há sempre alguma obra à frente | Uma decisão do autor sobre a orientação da chegada (é a rotação devolvida pelo `arrivalPoint`, em `js/scene/arrival.js`) ou um re-arranjo das obras do céu — o que ele preferir. **DECIDIDO em 2026-10-20: re-arranjar as duas obras do céu**, no **B10** e **com o próprio editor** (é o primeiro uso real que se lhe dá, e é o que permite acertar as posições na pré-visualização). É dado, não código, e o mecanismo da chegada não se toca |

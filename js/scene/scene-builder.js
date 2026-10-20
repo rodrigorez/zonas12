@@ -18,7 +18,7 @@ import { DERIVED_DIMENSION_BASE, MAX_DIMENSIONS } from '../core/index.js';
 import { createPlayerCamera, useRealCamera } from '../modules/camera.js';
 import { createDimension, removeDimension } from '../modules/dimension.js';
 import { createArtwork, removeArtwork } from '../modules/artwork.js';
-import { createPortal, removePortal, setWorld } from '../modules/portal.js';
+import { createPortal, removePortal, setWorld, setNavigation } from '../modules/portal.js';
 import { arrivalPoint } from './arrival.js';
 
 // Fills in the defaults the schema declares, so that the rest of this file — and the factories —
@@ -42,6 +42,9 @@ export async function buildScene(scene, options = {}) {
   // The world this page serves (D24). The portal module writes it into `?from` when a door
   // navigates, and it never reads the data itself — the same shape as `useRealCamera`.
   setWorld(scene.world && scene.world.slug);
+  // D32: the editor's preview walks **inside** the tool. With the navigation off, a door that
+  // navigates says so and the visitor stays here — leaving the page would take the work with it.
+  setNavigation(options.preview !== true);
 
   const elements = {
     assets: createAssets(catalogue, parent, language),
