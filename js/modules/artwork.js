@@ -74,8 +74,8 @@ export function closeArtwork() {
 // document any more: Escape stopped closing and Tab stopped being kept inside the dialog. For
 // artworks of the same origin the document of the frame can be listened to (it is the same
 // listener, and it always uses the outer `document`); for those of another origin there is no
-// access — there the "Voltar para a Galeria" button is what remains, as it does not depend on
-// the keyboard.
+// access — there the back button (`artwork.back`) is what remains, as it does not depend on the
+// keyboard.
 document.getElementById('iframe-obra').addEventListener('load', function () {
   try {
     const frameDocument = this.contentDocument;

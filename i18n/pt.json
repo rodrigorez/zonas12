@@ -3,9 +3,17 @@
   "name": "Português",
   "strings": {
     "app.title": "Portal AR – Galeria Imersiva com Controlos Mobile",
+    "app.heading": "Portal AR – Galeria Imersiva",
     "app.loading": "Carregando...",
     "app.start": "ATIVAR EXPOSIÇÃO",
     "artwork.back": "Voltar para a Galeria",
-    "camera.error": "Não foi possível acessar a câmera. Por favor, verifique as permissões."
+    "artwork.dialog": "Obra aberta",
+    "artwork.frameTitle": "Obra aberta em página externa",
+    "camera.error": "Não foi possível acessar a câmera. Por favor, verifique as permissões.",
+    "controls.group": "Controlos de movimento",
+    "controls.forward": "Avançar",
+    "controls.backward": "Recuar",
+    "controls.left": "Esquerda",
+    "controls.right": "Direita"
   }
 }

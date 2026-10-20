@@ -37,30 +37,30 @@
   <body>
     <!-- Título principal da página. É o único heading e não se vê: a cena ocupa o ecrã
          todo, mas um leitor de ecrã e um motor de IA precisam de saber qual é o tema. -->
-    <h1 class="sr-only">Portal AR – Galeria Imersiva</h1>
+    <h1 class="sr-only" data-i18n="app.heading">Portal AR – Galeria Imersiva</h1>
 
     <!-- Loading indicator -->
-    <div class="loading-overlay" id="loading-overlay" role="status" aria-live="polite">
+    <div class="loading-overlay" id="loading-overlay" role="status" aria-live="polite" data-i18n="app.loading">
       Carregando...
     </div>
 
     <!-- OVERLAY: Janela Modal -->
-    <div id="modal-obra" role="dialog" aria-modal="true" aria-label="Obra aberta">
-      <button id="btn-fechar-obra" onclick="fecharObra()">Voltar para a Galeria</button>
-      <iframe id="iframe-obra" src="" tabindex="-1" title="Obra aberta em página externa" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <div id="modal-obra" role="dialog" aria-modal="true" data-i18n-label="artwork.dialog" aria-label="Obra aberta">
+      <button id="btn-fechar-obra" data-i18n="artwork.back">Voltar para a Galeria</button>
+      <iframe id="iframe-obra" src="" tabindex="-1" data-i18n-title="artwork.frameTitle" title="Obra aberta em página externa" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 
     <!-- Interface Inicial -->
-    <button id="btn-iniciar" onclick="iniciarCena()">ATIVAR EXPOSIÇÃO</button>
+    <button id="btn-iniciar" data-i18n="app.start">ATIVAR EXPOSIÇÃO</button>
 
     <!-- CONTROLOS MOBILE (Só aparecem se for smartphone/tablet).
          São <button> e não <div>: assim chegam à árvore de acessibilidade com um nome
          ("Avançar", "Recuar", …) em vez de um glifo sem significado. -->
-    <div id="controles-mobile" role="group" aria-label="Controlos de movimento">
-      <button type="button" id="btn-frente" class="dpad-btn" aria-label="Avançar">▲</button>
-      <button type="button" id="btn-tras" class="dpad-btn" aria-label="Recuar">▼</button>
-      <button type="button" id="btn-esq" class="dpad-btn" aria-label="Esquerda">◄</button>
-      <button type="button" id="btn-dir" class="dpad-btn" aria-label="Direita">►</button>
+    <div id="controles-mobile" role="group" data-i18n-label="controls.group" aria-label="Controlos de movimento">
+      <button type="button" id="btn-frente" class="dpad-btn" data-i18n-label="controls.forward" aria-label="Avançar">▲</button>
+      <button type="button" id="btn-tras" class="dpad-btn" data-i18n-label="controls.backward" aria-label="Recuar">▼</button>
+      <button type="button" id="btn-esq" class="dpad-btn" data-i18n-label="controls.left" aria-label="Esquerda">◄</button>
+      <button type="button" id="btn-dir" class="dpad-btn" data-i18n-label="controls.right" aria-label="Direita">►</button>
     </div>
 
     <!-- Fundo de Câmera. `aria-hidden`: é a imagem real por trás da cena, não conteúdo com

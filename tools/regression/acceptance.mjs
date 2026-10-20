@@ -26,6 +26,10 @@
 // juntar: contar as navegações de página (o contexto morre na navegação — por isso o T1 deixa o
 // registo em `sessionStorage`) e observar a consola desde antes da carga (o T8).
 
+// The modal is the artwork module's (D19), so the instrument closes it through the module and not
+// through a global: the `window.fecharObra` bridge left with the inline attributes in Fase 4.
+import { closeArtwork } from '/js/modules/artwork.js';
+
 const MARCA = 'zonas12-aceitacao';
 const RUÍDO = 12;
 
@@ -419,7 +423,7 @@ export async function checkArtworkClick(options = {}) {
   enviar('mouseup', { buttons: 0 });
   await new Promise((resolve) => setTimeout(resolve, 500));
   const aberto = estadoDoModal();
-  window.fecharObra();
+  closeArtwork();
   await new Promise((resolve) => setTimeout(resolve, 300));
   const fechado = estadoDoModal();
 

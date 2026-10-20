@@ -17,6 +17,7 @@ import { closeArtwork } from './modules/artwork.js';
 import { startFrameDriver } from './modules/portal.js';
 import { validateScene } from './scene/validation.js';
 import { buildScene } from './scene/scene-builder.js';
+import { initI18n, languageFromUrl } from './i18n.js';
 
 // --- DEBUG AND TEST HANDLE ---
 // The console and the regression scripts (docs/ROADMAP.md section 10) drive the scene
@@ -126,14 +127,25 @@ async function buildFromData() {
 
 // The frame driver starts only after the build: until then there is no portal to walk, and the
 // camera the collision asks for does not exist yet either.
-buildFromData()
-  .then((built) => { if (built) startFrameDriver(); })
-  .catch((error) => console.error('[scene] the scene could not be built:', error));
+//
+// The catalogue comes first: the interface is written with keys and the texts only arrive when this
+// resolves (D12). A scene that is fine still says nothing in the console (test T8).
+async function start() {
+  await initI18n(languageFromUrl());
+  const built = await buildFromData();
+  if (built) startFrameDriver();
+}
 
-// --- TEMPORARY BRIDGE TO THE INTERFACE ---
-// index.html still calls these two from inline attributes (`onclick`). The names are the
-// interface's, so they keep their Portuguese spelling until Fase 4 takes the inline attributes
-// away. `configurarBotoesMobile` and `tratarErroCamera` left the bridge with the inline script
-// that used to call them: `startSession` (js/modules/camera.js) is what drives both now.
-window.iniciarCena = startSession;
-window.fecharObra = closeArtwork;
+start().catch((error) => console.error('[scene] the scene could not be built:', error));
+
+// --- THE INTERFACE'S BUTTONS ---
+// Bound here instead of with inline attributes (`onclick`), which were the last code in the HTML
+// and are gone since Fase 4: the markup carries a key, never a call. `js/app.js` is the exhibition's
+// entry point, so it is what knows these two buttons exist — the modules do not.
+function bind(id, handler) {
+  const element = document.getElementById(id);
+  if (element) element.addEventListener('click', handler);
+}
+
+bind('btn-iniciar', startSession);
+bind('btn-fechar-obra', closeArtwork);

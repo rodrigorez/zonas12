@@ -12,6 +12,8 @@
 //
 // Nothing here knows about dimensions, portals, stencil or draw order.
 
+import { t } from '../i18n.js';
+
 // Step of the on-screen D-pad, in metres per frame. It is the fallback: the value comes from the
 // data (cameras.player.speed) and `createPlayerCamera` replaces it. The converter reads this
 // constant to write the JSON, which is what keeps the two from drifting.
@@ -134,9 +136,8 @@ export function reportCameraError(error) {
   message.className = 'loading-overlay';
   message.id = 'erro-camera';
   message.setAttribute('role', 'alert');
-  // Interface text: still a literal because nothing reads the i18n catalogue yet
-  // (docs/ROADMAP.md, R3 — the interface only uses `t('…')` from Fase 4 on).
-  message.innerHTML = 'Não foi possível acessar a câmera. Por favor, verifique as permissões.';
+  // Interface text: a key from the catalogue (D12), never a literal in the code.
+  message.textContent = t('camera.error');
   message.style.display = 'flex';
   document.body.appendChild(message);
   document.getElementById('btn-iniciar').style.display = 'none';
@@ -173,9 +174,9 @@ export function useRealCamera(enabled) {
   realCameraEnabled = enabled === true;
 }
 
-// What the "ATIVAR EXPOSIÇÃO" button does. It was the inline script of index.html until Fase 3,
-// and it lives here because all of it is the camera's business: the webcam, the loading overlay,
-// the error message and the on-screen D-pad.
+// What the start button does (`app.start` in the catalogue, whose key the markup carries). It was
+// the inline script of index.html until Fase 3, and it lives here because all of it is the camera's
+// business: the webcam, the loading overlay, the error message and the on-screen D-pad.
 export function startSession() {
   const overlay = document.getElementById('loading-overlay');
   if (overlay) overlay.style.display = 'flex';

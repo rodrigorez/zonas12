@@ -1707,7 +1707,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: plano registado em 2026-10-16 (B0) — nada implementado.** Como nas fases anteriores, o
+**Estado: plano registado em 2026-10-16 (B0) e o B1 entregue em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -1772,6 +1772,17 @@ Um `grep` encontrou ainda um consumidor da ponte temporária que o documento nã
 | D35 | «Desfazer» | **Instantâneos** do JSON em memória (limite ~50) |
 | D36 | Estrutura do editor | `js/editor.js` = entrada (≤100 linhas) + `js/editor/` (modelo, painéis, pré-visualização, exportação, problemas) |
 
+#### As decisões do autor (2026-10-20)
+
+| # | Pergunta | Decisão |
+| --- | --- | --- |
+| **R10** | O retrato do portão existe? | **Aceita-se que não.** As **duas** portas para a realidade (`cidade` 2 e `praia` 5, ambas já `window: none`) ficam assim: é o único caso em que a ausência é honesta — um retrato emprestado mentiria sobre o destino. Se um dia houver a fotografia, são três linhas de catálogo e uma da porta, e o T10 volta a medi-las |
+| **R11** | A chegada no céu fica de costas para a sala | **Re-arranjar as duas obras do céu** — é **dado**, não código, e faz-se no **B10** com o **próprio editor**: é o primeiro uso real que se lhe dá, e é o que permite acertar as posições a olho na pré-visualização. O mecanismo (a chegada a olhar no sentido em que se vinha, que faz do regresso um passo) **não** se toca |
+| — | Quando se traduz | **Depois do B10**, com o conjunto de chaves estável: o editor acrescenta dezenas de `editor.…` nos B4–B9, e traduzir antes seria traduzir duas vezes. Até lá o `?lang=en` cai no português com **1** aviso |
+| — | O painel «Mundo» | **Mantém-se**: a fase fica com os **11** blocos (sem ele o editor só edita mundos que já existem) |
+| — | A ordem dos blocos | **Como está**: catálogo (B1) → módulos (B2) → editor. O editor **nasce** a falar pelo catálogo, sem reescrever rótulos |
+| — | Marcos de versão | **Uma tag só**, a `v0.0.7`, no **B10** |
+
 #### Blocos de execução
 
 Um bloco por commit, como nas fases anteriores.
@@ -1789,6 +1800,42 @@ Um bloco por commit, como nas fases anteriores.
 | **B8** | **Mundo**: slug, nome por língua, etiqueta/retrato/raio da porta; lista de salas **derivada** das portas do portão; porta para mundo inexistente (L11) e chegadas (L17/L19) | §7 | um mundo novo ponta a ponta com a ferramenta da D31; as duas leis a acusar uma avaria injectada |
 | **B9** | Transversal: validar tudo antes de exportar (com `exists` e `imageSize` respondidos por `fetch`/descodificação), lista de problemas, desfazer, guarda de saída, e o **aviso do R9** com as avarias novas no `laws-selftest.mjs` | **R9** | as leis de §8 todas no relatório do editor; **17 → N de N** avarias detectadas; importar→exportar **0 diferenças** |
 | **B10** | Verificação e documentação: a aceitação abaixo, o README (secção do editor), a tabela de §9, as pendências de §14 e o marco **v0.0.7** | — | **1 dimensão + 2 obras + 1 portal só pelo editor**, exportar, substituir o ficheiro e correr a bateria na cena editada |
+
+#### O que o B1 entregou e mediu (2026-10-20) — fecha o **R3**
+
+A interface deixou de ter texto escrito em código: cada rótulo é uma **chave** que o catálogo
+resolve, e o HTML deixou de ter código dentro dele.
+
+| O que mudou | Medido |
+| --- | --- |
+| **`js/i18n.js`** (novo, **87** linhas): `t('…')`, `?lang=`, queda para o português, aviso **uma vez** por chave em falta, e `applyTexts()` que lê `data-i18n` (texto), `data-i18n-label` (`aria-label`) e `data-i18n-title` (`title`) | — |
+| **`i18n/pt.json`**: **5 → 13** chaves. As **8** novas são `app.heading`, `artwork.dialog`, `artwork.frameTitle`, `controls.group` e os quatro do D-pad | **0** chaves usadas no `js/` em falta |
+| Os **4 arranques** passam a levar as chaves e **perdem os `onclick`**; o `app.js` liga os dois botões e as pontes `window.iniciarCena` / `window.fecharObra` **desaparecem** (o `acceptance.mjs` passou a importar `closeArtwork()`) | **0** `onclick` nos 4 HTML · as duas globais `undefined` · os 4 arranques iguais fora do `<base>` (`validate.mjs` exit **0**) |
+| `camera.js`: a mensagem de erro da câmara sai do catálogo (`camera.error`) | O texto do `#erro-camera` é **igual** ao do catálogo |
+| A regra da §5.7 fica mensurável | **0** literais de interface em `js/` · **0** declarações `content:` em `css/` |
+
+**A bateria, antes e depois do B1** (medida com a cache desligada, à espera da câmara):
+
+| | Portão | Fixture (`?scene=example`) |
+| --- | --- | --- |
+| T4 (alfa fora) | **0** | **255** (critério por cor: passa) |
+| T5 (dentro / moldura de trás fora / ruído) | **0 / 2 319 / 0** | **0 / 2 319 / 0** |
+| T6 (clique na obra) | não aplicável (sem obras) | **abre** (`flex`, com `src` do catálogo) e **fecha** (`none`) — agora pelo módulo |
+| T9 (20 ciclos) | 2 → **2** portas | 4 → **4** portas |
+| T10/T12 (mudados dentro / fora) | **183 457** e **28 539** dentro, **0** fora | **275 425** e **42 903** dentro, **0** fora |
+| T2/T3 | **0** de **84** poses · **0** falhas em **24 906** amostras | idem |
+| T8 (consola) | **0** erros, **0** avisos, **0** pedidos falhados | idem |
+
+Os números são **os mesmos de antes do B1** — que é o critério. A sala `/cidade/` carrega com o
+`<base>` e o catálogo (mundo `cidade`, **2** portas, **0** erros). `?lang=en` sem `en.json` mostra
+**português** e dá **1** aviso (`[i18n] i18n/en.json: HTTP 404; showing pt`), mais o **404 da rede**
+que nenhum manifesto pode evitar — e é por isso que a tradução só entra quando houver tradução.
+
+**Duas notas de método**, porque custaram duas medições erradas: a primeira leitura do B1 viu
+**código da cache** (`window.iniciarCena` ainda existia, e `onclick` ainda no HTML) e a primeira
+bateria no fixture correu **antes de a cena estar construída** (T4, T5, T10 e T2 falharam com um
+mundo a meio). As duas foram refeitas — cache desligada por `Network.setCacheDisabled` e à espera
+do `renderer` e da `a-camera`. É a lição da Fase 3 outra vez, agora com dois sítios onde ela morde.
 
 #### Metas de sucesso
 
@@ -2626,11 +2673,11 @@ só chega à interface na **Fase 4**, e é o editor o primeiro sítio que o lê.
 
 | # | Pendência | Porque fica | O que a fecha |
 | --- | --- | --- | --- |
-| R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves em `strings` (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`); as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` (a contagem no §13 foi corrigida em 2026-10-15). **Plano registado no B0 de 2026-10-16: fecha no B1 da Fase 4 (§9)** |
+| R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves em `strings` (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`); as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` (a contagem no §13 foi corrigida em 2026-10-15). **Plano registado no B0 de 2026-10-16: fecha no B1 da Fase 4 (§9)**. **FECHADO em 2026-10-20 (B1):** o catálogo tem **13** chaves, a interface lê-as por `data-i18n*`, o `?lang=en` cai no português com **1** aviso — e as duas pontes `window.iniciarCena`/`fecharObra` saíram com os `onclick`. Medido: **0** literais de interface em `js/`, **0** chaves em falta, **0** `onclick` nos 4 arranques |
 | R4 | **Feita em 2026-10-15** (decisão **D21**, §11) | O formato por língua estava documentado (§5.7 e §6) e **não instanciado**: as dimensões não tinham nome, as obras não tinham título e nenhum campo do JSON era por língua — nem o conversor nem o validador mencionavam idioma | O `{ pt, en }` entrou no esquema, no conversor e no validador e ficou **instanciado**: 4 nomes de dimensão e 6 descrições de asset (B3, §9). As **10 obras** ficam sem `title` — é opcional, e quem o lê é o editor (Fase 4) |
 | R8 | **O `remove()` do construtor de cena nunca correu** | `buildScene()` devolve um `remove()` que tira as portas, as obras, as dimensões, os assets e a câmara — e **nada o chama**: o `js/app.js` faz `await buildScene(data)` e deita fora o resultado (medido por `grep`, é a única chamada). Com ele ficam por exercitar as três funções `remove…` dos módulos e os `remove()` dos componentes que desregistam conteúdo do núcleo. O editor (Fase 4) vai ser o primeiro sítio a trocar de cena. É o mesmo tipo de risco que a **A4** teve até a Fase 2 o fechar: código de limpeza que ninguém exercita apodrece sem se notar | A Fase 4 (troca de cena no editor) ou um teste que construa e remova uma cena e confirme que o documento e os registos do núcleo ficam como estavam. **Medido no B0 de 2026-10-16: o `remove()` funciona** — 3 ciclos do portão deixam os registos vazios e a cena de volta ao que era; fecha no **B3** da Fase 4, com **20** ciclos (§9) |
 | R9 | **O esquema declara mais do que a cena constrói** | Quatro coisas **validam** e não são construídas: `kind: "model"` e `"text"` numa obra (o `createArtwork()` ignora o `kind` e faz sempre uma `a-box` com a textura do `asset` — não há geometria de modelo nem texto 3D), `kind: "color"` numa dimensão (o `createDimension()` nunca passa o `color` ao componente — o ficheiro não menciona a palavra, medido por `grep`; o validador só avisa quando a cor **falta**, com «the background will be black») e `interaction: "link"` (o `addressToOpen()` devolve o endereço, mas o `open-artwork` mostra-o no **iframe do modal**, não navega). Medido: quatro variantes da cena da exposição, uma por campo, passam **todas** com 0 erros e 0 avisos — quem escrever um destes campos à mão vê o validador aceitar e a cena não mudar como esperava | Ou a Fase 4 os implementa (e o editor passa a oferecê-los), ou o esquema e o validador passam a **avisar** que esses valores ainda não são construídos — a categoria «aviso» já existe no validador e é onde isto encaixa (é a mesma que avisa da dimensão de cor sem cor). **Decidido no B0 de 2026-10-16 (D30, §11): o validador avisa** e o editor não oferece esses valores; fecha no **B9** da Fase 4 (§9) |
-| R10 | **Não há retrato do portão** | A porta da cidade para o portão é `window: none` (e, desde a D29, também a da praia), porque não existe imagem da realidade: um retrato emprestado mentiria ao visitante sobre onde a porta leva. É uma decisão do autor, tomada ao fechar o B6 e reusada no B7 | Uma imagem do portão em `assets/previews/gate.jpg` mais as três linhas do catálogo e da porta — o formato e o caminho já a aceitam, e a L19 e o T10 já a mediriam |
-| R11 | **No céu, a chegada fica virada para o lado de onde se vem** | Medido no B9 (§9): o visitante aterra virado no sentido em que vinha — o −Z da porta —, o que é **o que faz do regresso um passo** (é o mecanismo, não um defeito). Em cada sala o que fica à frente varia: cidade **1** de 5 obras, praia **1** de 3, céu **0** de 2. O céu já vinha assim da cena anterior (nota do B6); nas outras salas há sempre alguma obra à frente | Uma decisão do autor sobre a orientação da chegada (é a rotação devolvida pelo `arrivalPoint`, em `js/scene/arrival.js`) ou um re-arranjo das obras do céu — o que ele preferir |
+| R10 | **Não há retrato do portão** | A porta da cidade para o portão é `window: none` (e, desde a D29, também a da praia), porque não existe imagem da realidade: um retrato emprestado mentiria ao visitante sobre onde a porta leva. É uma decisão do autor, tomada ao fechar o B6 e reusada no B7 | Uma imagem do portão em `assets/previews/gate.jpg` mais as três linhas do catálogo e da porta — o formato e o caminho já a aceitam, e a L19 e o T10 já a mediriam. **FECHADO em 2026-10-20, decisão do autor: aceita-se que não exista.** As duas portas para a realidade ficam `window: none` — é o único caso em que a ausência é honesta, porque um retrato emprestado mentiria sobre o destino |
+| R11 | **No céu, a chegada fica virada para o lado de onde se vem** | Medido no B9 (§9): o visitante aterra virado no sentido em que vinha — o −Z da porta —, o que é **o que faz do regresso um passo** (é o mecanismo, não um defeito). Em cada sala o que fica à frente varia: cidade **1** de 5 obras, praia **1** de 3, céu **0** de 2. O céu já vinha assim da cena anterior (nota do B6); nas outras salas há sempre alguma obra à frente | Uma decisão do autor sobre a orientação da chegada (é a rotação devolvida pelo `arrivalPoint`, em `js/scene/arrival.js`) ou um re-arranjo das obras do céu — o que ele preferir. **DECIDIDO em 2026-10-20: re-arranjar as duas obras do céu**, no **B10** e **com o próprio editor** (é o primeiro uso real que se lhe dá, e é o que permite acertar as posições na pré-visualização). É dado, não código, e o mecanismo da chegada não se toca |
 | R12 | **O T5 não foi re-medido na Fase 3B** | Precisa do rig de **dois** portais (uma janela a tapar a moldura da outra) e a ordem de desenho **não mudou** na fase: `drawOrder` e as regras de stencil são os mesmos do fecho da Fase 3. Re-medir sem mudança nenhuma não diz nada de novo; o número da v0.0.5 (0 px da moldura de trás dentro da janela da frente, com 6 768 px de controlo) continua a ser o último | **FECHADA em 2026-10-16**, na bateria dos doze testes (§9): o rig passou a viver em `tools/regression/acceptance.mjs` (`checkStackedDoors`), com duas portas de 8×10 m a 20 m e a 30 m (a de trás deslocada 5 m para o lado, para a moldura dela atravessar a janela da frente), e o resultado é **0** px dentro, **1 657** px de controlo fora e **0** de ruído — nos **5** mundos |
 | R13 | **Os módulos exigem a UI da exposição** | Medido no **B0 da Fase 4** (§9), com páginas-sonda servidas por HTTP: importar `js/modules/artwork.js` num documento **sem** `#iframe-obra` dá excepção (`Cannot read properties of null (reading 'addEventListener')`) — e com ele o `js/scene/scene-builder.js`, que o importa —, e o `setupMobileControls()` sem o D-pad e o `reportCameraError()` sem o `#btn-iniciar` dão excepção pela mesma razão (o segundo **depois** de já ter posto a mensagem no ecrã). Ninguém notou até aqui porque **só existe um host** — a exposição — e ele tem todos esses elementos; é o mesmo tipo de risco que o R8: acoplamento que só aparece quando **um segundo host** tenta usar o código | A Fase 4 (**B2**, §9), com a meta **M14**: os 6 imports numa página sem a UI da exposição, **0** excepções |
