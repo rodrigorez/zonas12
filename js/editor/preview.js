@@ -6,8 +6,11 @@
 // One scene at a time. The build is asynchronous (the assets load first), so the previous scene goes
 // down before the next one goes up: two built scenes at once would double the textures in memory for
 // no gain, since only one is ever shown.
-import { buildScene } from '../scene/scene-builder.js';
+import { buildScene, withDefaults } from '../scene/scene-builder.js';
+import { SCENE } from '../scene/schema.js';
 import { startFrameDriver } from '../modules/portal.js';
+import { createDimension, removeDimension } from '../modules/dimension.js';
+import { createPlayerCamera } from '../modules/camera.js';
 
 let built = null;
 
@@ -37,4 +40,41 @@ export function clear() {
 // Whether there is a scene up — what the first panel will ask before touching anything.
 export function isShowing() {
   return built !== null;
+}
+
+// ---- changing one thing without rebuilding everything (D33) ----
+//
+// A number typed in a panel changes one entity. Rebuilding the whole scene would reload every asset
+// (measured: the build awaits all of them) and would move the camera, so the two functions below take
+// down **one** entity and build it again with the data as it is now.
+
+function dimensionElement(id) {
+  if (!built) return null;
+  return built.elements.dimensions.find(
+    (element) => Number(element.getAttribute('data-dimension')) === Number(id)
+  ) || null;
+}
+
+export function replaceDimension(dimension) {
+  if (!built) return null;
+  const previous = dimensionElement(dimension.id);
+  if (previous) {
+    const at = built.elements.dimensions.indexOf(previous);
+    if (at >= 0) built.elements.dimensions.splice(at, 1);
+    // `removeDimension` is the module's own: it takes the registry entry and the GPU memory with it
+    // (A4), which is what makes this loop safe to repeat.
+    removeDimension(previous);
+  }
+  // A dimension of kind `camera` has no entity — the webcam is the background — and the factory says
+  // so by returning null.
+  const created = createDimension(withDefaults(dimension, SCENE.dimensions), previewElement());
+  if (created) built.elements.dimensions.push(created);
+  return created;
+}
+
+export function replaceCamera(player) {
+  if (!built) return null;
+  if (built.elements.camera) built.elements.camera.remove();
+  built.elements.camera = createPlayerCamera(withDefaults(player, SCENE.cameras.fields.player), previewElement());
+  return built.elements.camera;
 }

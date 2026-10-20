@@ -1708,7 +1708,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: plano registado em 2026-10-16 (B0), com o B1, o B2, o B3 e o B4 entregues em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
+**Estado: plano registado em 2026-10-16 (B0), com o B1 ao B5 entregues em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -1960,6 +1960,49 @@ o aviso do stencil), e os **4** arranques continuam iguais fora do `<base>`.
 **M3** (**0** `content:` nos dois CSS), **M4** (**0** chaves em falta), **M5** (**0** `localStorage`/
 escrita em `js/`), **M6** (o editor importa de `core/`, `modules/` e `scene/`), **M7** (**0** imports
 do editor na exposição) e **M11** (o *round-trip*).
+
+#### O que o B5 entregou e mediu (2026-10-20) — os painéis de câmara e dimensão
+
+Os primeiros dois painéis da §7, com o caminho de edição que a **D33** fixou: um número muda **uma
+entidade**, a estrutura muda o mundo.
+
+| Peça | O que é |
+| --- | --- |
+| `js/editor/fields.js` | Os controlos partilhados: rótulo do catálogo, `name` = chave do campo, e o *debounce* de **120 ms** que separa «o dado mudou» de «a geometria foi refeita» |
+| `js/editor/panels/index.js` | A lista dos painéis, na ordem da §7 |
+| `js/editor/panels/camera.js` | A câmara única: posição, velocidade, webcam (dado), «usar a posição atual» e «ligar a câmara» (o gesto da D34) |
+| `js/editor/panels/dimension.js` | As quatro colunas da dimensão: inserir, alterar, manter (contagens, L1, L15) e excluir — com o bloqueio da §7 |
+| `preview.js` | Ganhou `replaceDimension()` e `replaceCamera()`: **re-criam a entidade** com a fábrica do módulo e o `remove()` que a A4 deixou pronto |
+
+**Medido, ronda a ronda, com a consola da sonda ligada:**
+
+| O que se pediu | Resultado |
+| --- | --- |
+| Alterar a **velocidade** | `0.1 → 0.25` no dado |
+| **«Usar a posição atual»** | Escreve `[3, 1.6, −4]` no dado, nos campos **e** na câmara da cena |
+| Ligar/desligar a **webcam** | `cameras.real.enabled` acompanha |
+| Alterar o **raio** de 500 para 250 | A esfera **na cena** passa a **250** — a entidade foi refeita, o mundo não (D33) |
+| Pôr o raio a **5** | **Erro da L1 em direto**: «radius 5 is not larger than the scene extent (92.2) — law L1», com **Erros: 1** antes de qualquer export |
+| **Excluir** uma dimensão com obras e portas | Botão desativado e a razão escrita: «…obras: 3, portais: 3» |
+| **Criar** com o id 0 (tomado) | «Já existe uma dimensão com o ID 0.» |
+| **Criar** com o id 448 | «O ID tem de ser um número inteiro de 0 a 447.» (a faixa da L15) |
+| **Criar** uma dimensão nova | Cartão `#1` na lista e esfera `1:120` na cena |
+| **Excluir** essa (nada aponta para ela) | Sai do dado **e** da cena |
+| A linha de estado | Acompanha: **1 → 2 → 1** dimensões |
+
+**Abrir não reescreve:** os **5** mundos, abertos e exportados **sem tocar em nada**, saem **byte a
+byte iguais** aos ficheiros. Foi esta medição que apanhou o defeito do resto do bloco: a primeira
+versão dos painéis **criava** `cameras` e `dimensions` só por ser desenhada, e um mundo sem essas
+chaves ganharia duas linhas em branco no export. Passaram a criá-las **a primeira tecla que precise
+delas**.
+
+**Consola:** 0 erros e 0 avisos em todas as rondas. A exposição mantém a bateria do B4 (T4 `0` · T5
+`0/2319/0` · T9 `20` com `2→2` · T10 `183 457/28 539` com **0** fora · T2/T3 **0** de 84 e **0** em
+**24 906**).
+
+Uma nota de âmbito: o painel da dimensão **não oferece** `kind: "color"` (a **D30** decidiu que o
+editor não oferece o que a cena não constrói) nem deixa mudar o **id** de uma dimensão existente —
+mudá-lo deixaria todas as obras e portas a apontar para um nome que já não existe.
 
 #### Metas de sucesso
 

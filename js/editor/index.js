@@ -4,11 +4,12 @@
 // world, the preview builds it, and the validator says what is wrong with it. The three pieces it
 // talks to live next to this file, so the entry point (js/editor.js) stays the few lines of a start.
 import { validateScene } from '../scene/validation.js';
-import { state } from '../core/index.js';
+import { state, setActiveDimension } from '../core/index.js';
 import { t } from '../i18n.js';
 import { setWorld, currentWorld, parseWorld, exportWorld, slugOf, countsOf } from './model.js';
 import * as preview from './preview.js';
 import * as problems from './problems.js';
+import * as panels from './panels/index.js';
 
 // The gate is the world the exhibition starts in (D24), so it is the one the editor opens with.
 const START_WORLD = 'gate';
@@ -66,25 +67,69 @@ function validate() {
   return report;
 }
 
+function refreshStatus() {
+  const world = currentWorld();
+  if (!world) return;
+  const counts = countsOf(world.data);
+  setStatus(t('editor.status.loaded', {
+    slug: slugOf(world.data, world.file.split('/').pop().replace(/\.json$/i, '')),
+    dimensions: counts.dimensions,
+    artworks: counts.artworks,
+    portals: counts.portals
+  }));
+}
+
+// Where the visitor stands is a dimension id, and a world may stop having it after a deletion. The
+// exhibition always starts at 0 and never faces this; the editor does, and a preview pointing at a
+// dimension that no longer exists is a black screen with no explanation.
+function ensureActiveDimension(data) {
+  const ids = (data.dimensions || []).map((dimension) => dimension.id);
+  if (ids.length > 0 && ids.indexOf(state.activeDimension) === -1) setActiveDimension(ids[0]);
+}
+
+// The contract a panel works against: the data, a way to say what changed, and a way to repaint. A
+// geometry change re-creates the entity itself (D33) and only needs the validator to look again; a
+// change of structure rebuilds the scene, because the ids in the rest of the file stop matching.
+function panelContext() {
+  return {
+    world: () => currentWorld() && currentWorld().data,
+    async change(options) {
+      const world = currentWorld();
+      if (!world) return;
+      if (options && options.rebuild) {
+        try {
+          await preview.show(world.data);
+        } catch (error) {
+          setStatus(t('editor.error.build', { message: error.message }), 'erro');
+          return;
+        }
+        ensureActiveDimension(world.data);
+      }
+      validate();
+      // The line at the top counts what the file has, so it has to follow an insert or a deletion;
+      // leaving it saying "dimensões: 1" next to two cards is the kind of quiet lie this project
+      // spends its measurements avoiding.
+      refreshStatus();
+    },
+    rerender: () => panels.renderAll(panelContext())
+  };
+}
+
 // Everything that happens when a world becomes the one being edited, whatever it came from: a file in
 // the repository or a file the author dropped on the page. There is one path, so an imported world is
 // treated exactly like an opened one (D2/D3).
 async function adopt(data, file) {
   setWorld(data, file);
-  validate();
   try {
     await preview.show(data);
   } catch (error) {
     setStatus(t('editor.error.build', { message: error.message }), 'erro');
     return;
   }
-  const counts = countsOf(data);
-  setStatus(t('editor.status.loaded', {
-    slug: slugOf(data, file.split('/').pop().replace(/\.json$/i, '')),
-    dimensions: counts.dimensions,
-    artworks: counts.artworks,
-    portals: counts.portals
-  }));
+  ensureActiveDimension(data);
+  validate();
+  panels.renderAll(panelContext());
+  refreshStatus();
   if (window.portalDebug) window.portalDebug.world = slugOf(data, null);
 }
 
