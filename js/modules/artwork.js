@@ -6,6 +6,7 @@
 // makes them exist. The modal is this application's, not the editor's: the core never sees it
 // (docs/ROADMAP.md, section 5.0).
 import { state, registerContent, unregisterContent } from '../core/index.js';
+import { createLabel, disposeLabel } from './label.js';
 
 const ARTWORK_COMPONENT = 'dimensional-material';
 const OPENING_COMPONENT = 'open-artwork';
@@ -148,12 +149,44 @@ AFRAME.registerComponent(OPENING_COMPONENT, {
 });
 
 AFRAME.registerComponent(ARTWORK_COMPONENT, {
-  schema: { dimension: { type: 'int', default: 0 } },
+  schema: {
+    dimension: { type: 'int', default: 0 },
+    // The name of the work, for the debug view (D40). Written by the builder from the data, like the
+    // door's (D39): this component only draws what it is given.
+    label: { type: 'string', default: '' },
+    // Whether the name starts visible: the exhibition shows it with the debug key, the editor's
+    // preview from the start.
+    labelAlways: { type: 'boolean', default: false },
+    // How far above the centre the top of the work is — the works are not all the same height, and
+    // the name goes above the work, not over it.
+    labelY: { type: 'number', default: 1.5 }
+  },
   init: function () {
     this.el.setAttribute('data-dimension', this.data.dimension);
     this.el.classList.add('dimension-' + this.data.dimension);
     this.el.addEventListener('loaded', () => this.applyStencil());
     if (this.el.getObject3D('mesh')) this.applyStencil();
+    if (this.data.labelAlways) this.showLabel(true);
+  },
+  // The name above the work, for whoever is debugging (D40). Same sprite as the doors (js/modules/
+  // label.js), so the two read the same and are sized by the same rules.
+  showLabel: function (visible) {
+    if (visible && !this.labelSprite && this.data.label) {
+      this.labelSprite = createLabel(this.data.label, { name: 'artwork-' + this.el.getAttribute('data-artwork-id') + '-label' });
+      // `labelY` is the top of the work: the name sits above it, clear of the picture.
+      this.labelSprite.position.set(0, this.data.labelY + this.labelSprite.scale.y / 2 + 0.4, 0);
+      this.el.object3D.add(this.labelSprite);
+    }
+    if (this.labelSprite) this.labelSprite.visible = visible;
+  },
+  toggleLabel: function () {
+    // The first press builds it, the next ones only hide it: the text is painted once.
+    if (!this.labelSprite) {
+      this.showLabel(true);
+      return true;
+    }
+    this.labelSprite.visible = !this.labelSprite.visible;
+    return this.labelSprite.visible;
   },
   applyStencil: function () {
     const mesh = this.el.getObject3D('mesh');
@@ -170,6 +203,12 @@ AFRAME.registerComponent(ARTWORK_COMPONENT, {
   // The counterpart of applyStencil: an artwork that leaves the scene has to leave the registry
   // too, or the core keeps configuring materials that no longer exist (docs/ROADMAP.md, A4).
   remove: function () {
+    // The name is a sprite this component made: its material and its texture go with it, and the
+    // geometry, which is three's own and shared, does not (D40).
+    if (this.labelSprite) {
+      disposeLabel(this.labelSprite);
+      this.labelSprite = null;
+    }
     const mesh = this.el.getObject3D('mesh');
     if (!mesh) return;
     mesh.traverse((node) => {
@@ -177,6 +216,18 @@ AFRAME.registerComponent(ARTWORK_COMPONENT, {
     });
   }
 });
+
+// The names of the works, all at once, for the debug key (D40): the same key that shows the collision
+// boxes of the doors shows the name of every work, and the module that owns the entity is the one
+// that knows how to find it.
+export function toggleArtworkLabels() {
+  let visible = false;
+  document.querySelectorAll('[data-artwork-id]').forEach((element) => {
+    const component = element.components && element.components[ARTWORK_COMPONENT];
+    if (component) visible = component.toggleLabel();
+  });
+  return visible;
+}
 
 // ---- the artwork as data (Fase 3) ----
 
@@ -187,7 +238,7 @@ AFRAME.registerComponent(ARTWORK_COMPONENT, {
 //
 // A subtlety of the two names: `asset` is the id of the entry in `<a-assets>` — the catalogue id
 // the builder gives the <img>/<video> — and it becomes the `#id` selector the material loads.
-export function createArtwork(artwork, parent) {
+export function createArtwork(artwork, parent, derived = {}) {
   const el = document.createElement('a-box');
   el.setAttribute('class', 'interactable');
   // The id in the DOM, like a portal's and a dimension's: it is what the editor uses to find the
@@ -199,7 +250,13 @@ export function createArtwork(artwork, parent) {
   el.setAttribute('depth', artwork.size[2]);
   el.setAttribute('position', vector(artwork.position));
   if (artwork.rotation) el.setAttribute('rotation', vector(artwork.rotation));
-  el.setAttribute(ARTWORK_COMPONENT, { dimension: artwork.dimension });
+  const settings = { dimension: artwork.dimension };
+  // The name in the debug view (D40) and where it sits, which the builder knows because it has the
+  // size of the work.
+  if (typeof derived.label === 'string' && derived.label) settings.label = derived.label;
+  if (derived.labelAlways) settings.labelAlways = true;
+  settings.labelY = artwork.size[1] / 2;
+  el.setAttribute(ARTWORK_COMPONENT, settings);
   if (artwork.url) {
     el.setAttribute(OPENING_COMPONENT, { url: artwork.url });
   }

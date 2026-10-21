@@ -280,7 +280,7 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 | Fundo 360º | `dimension-panorama` por dimensão (imagem ou vídeo), segue a câmara; a dimensão 0 é a câmara real (canvas transparente) |
 | Conteúdo | As obras pertencem à dimensão (o campo `dimension` de cada obra, no JSON); o clique só abre na dimensão ativa |
 | Molduras | Barra vermelha à volta do quadro, pertencente à dimensão onde o portal está; o bordo mantém-se fechado mesmo quando cruza a janela de outro portal |
-| Modo debug | Tecla `D` mostra a caixa de colisão (sempre igual à usada na deteção) e o **nome de cada porta** — o id, o que a janela mostra e para onde leva (D39); tecla `R` roda o portal |
+| Modo debug | Tecla `D` mostra a caixa de colisão (sempre igual à usada na deteção) e o **nome de cada porta** e de **cada obra** — o id, o que mostram e para onde levam (D39/D40); tecla `R` roda o portal |
 
 ### Modelo de render (ler antes de mexer)
 
@@ -816,7 +816,7 @@ for a **dimensão ativa**: vê-la pela janela não conta.
 - Pressione a tecla **R** para girar o portal 180 graus (a janela continua a funcionar
   nos dois sentidos, porque a máscara é de face dupla)
 - Pressione a tecla **D** para ativar/desativar o modo debug (mostra a caixa de colisão e o nome de
-  cada porta)
+  cada porta e de cada obra)
 - A moldura vermelha marca a porta; dentro dela vê-se a dimensão do outro lado
 
 ### Funcionamento do Portal
@@ -839,7 +839,7 @@ de stencil e decide o que cada material desenha, a partir da colisão com a caix
 ### 7. Modo Debug
 
 Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caixa de colisão do portal
-e o **nome de cada porta** (tecla **D**):
+e o **nome de cada porta e de cada obra** (tecla **D**):
 
 - A caixa de debug aparece como um wireframe azul semi-transparente (nome `portal-<id>-debug-box`)
 - Tem sempre as mesmas dimensões X, Y e Z, posição e rotação que a caixa de colisão (`box`, `boxPosition` e `boxRotation`)
@@ -850,9 +850,14 @@ e o **nome de cada porta** (tecla **D**):
   janela mostra e para onde a travessia leva, tudo tirado do dado — por exemplo
   `#2 · Cidade 360º ↔ Realidade → Portão` (o par de dimensões, pelos nomes delas) ou
   `#3 · retrato-praia → praia` (o retrato e o mundo de destino, pelo *slug*, que é o nome de um
-  mundo — **D28**; o portão é a exceção e tem o nome do catálogo). O nome é um *sprite*: lê-se
-  igual dos **dois lados** da porta, o que importa a quem aterra atrás dela. No editor aparece
-  sempre, sem tecla nenhuma
+  mundo — **D28**; o portão é a exceção e tem o nome do catálogo)
+- Por cima de cada **obra** aparece o nome dela (`artwork-<id>-label`, decisão **D40**) com a mesma
+  forma: `#0 · galeriaFoto1 · Cidade 360º · modal` — o título (quando o dado tem um, **D21**) ou o id
+  do asset, a dimensão a que pertence (pelo nome) e o que o clique faz (`modal`, `none` ou `link`,
+  que é o campo tal como se escreve no ficheiro)
+- O nome é um *sprite* e o texto é pintado **uma vez**: lê-se igual dos **dois lados** da porta, o que
+  importa a quem aterra atrás dela, e não custa nada por frame. No editor aparece sempre, sem tecla
+  nenhuma; o mesmo sprite serve às portas e às obras (`js/modules/label.js`)
 - A consola só avisa se um ID de portal estiver fora do intervalo (`[portal] ID … out of range …`)
 
 ## Tecnologias Utilizadas

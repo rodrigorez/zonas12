@@ -13,7 +13,7 @@ import {
   on
 } from './core/index.js';
 import { startSession } from './modules/camera.js';
-import { closeArtwork } from './modules/artwork.js';
+import { closeArtwork, toggleArtworkLabels } from './modules/artwork.js';
 import { startFrameDriver } from './modules/portal.js';
 import { validateScene } from './scene/validation.js';
 import { buildScene } from './scene/scene-builder.js';
@@ -43,9 +43,13 @@ window.portalDebug = {
 // every portal created and destroyed — and the removed portal stayed alive in the closure,
 // with no way of being collected. Creating and destroying portals in a loop is test T9
 // (docs/ROADMAP.md section 10).
+//
+// The same key shows the **name** of every door (D39) and of every work (D40): they are both part of
+// the debug view, and one key for the two is one thing to remember.
 document.addEventListener('keydown', (event) => {
   const key = event.key.toLowerCase();
   if (key !== 'r' && key !== 'd') return;
+  if (key === 'd') toggleArtworkLabels();
   state.portals.slice().forEach(function (portal) {
     if (key === 'r') portal.rotate();
     else portal.toggleDebugMode();

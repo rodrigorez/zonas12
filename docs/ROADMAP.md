@@ -1721,7 +1721,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: FECHADA em 2026-10-21 — B0 ao B13 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
+**Estado: FECHADA em 2026-10-21 — B0 ao B14 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -2393,6 +2393,49 @@ arranque (`labels: true`), porque a ferramenta não tem teclas e é lá que se a
 | O editor | **35 de 35**, importar→exportar byte-idêntico |
 | `validate.mjs` / `laws-selftest` | **0** / **21 de 21** |
 
+#### O que o B14 entregou e mediu (2026-10-21) — o nome das obras, com a mesma tecla
+
+Pedido do autor, a seguir ao das portas: «vamos colocar isso para obras também». A tecla **D** passa
+a mostrar, acima de cada obra, o nome dela:
+
+| Mundo | O que as obras dizem |
+| --- | --- |
+| cidade | `#0 · galeriaFoto1 · Cidade 360º · modal`, `#1 · galeriaFoto2 …`, `#2 · video …`, `#3 · praia …`, `#4 · skycloud …` |
+| praia | `#5 · skycloud · Praia · modal`, `#6 · galeriaFoto2 …`, `#7 · galeriaFoto1 …` |
+| céu | `#8 · praia · Céu 360º · modal`, `#9 · cidade-360 · Céu 360º · modal` |
+
+**O que o nome diz:** o **título** quando o dado tem um (D21 — hoje nenhuma obra tem), senão o **id do
+asset** (que é o que se edita no ficheiro), a **dimensão pelo nome** e a **interacção** pela palavra do
+dado (`modal`, `none`, `link`), porque é essa a palavra que se escreve no JSON. Escrito pelo
+**construtor** (`artworkLabel()`, ao lado do `portalLabel()` da D39) e entregue ao componente como
+atributo: o componente só desenha.
+
+**Um desenho só para os dois (D40):** a pintura do nome saiu da porta para **`js/modules/label.js`**
+(`createLabel`/`disposeLabel`), e portas e obras usam-na — assim o tamanho, a cor, o tipo de letra e o
+`renderOrder` não podem divergir. A posição é que é de cada um: a porta põe-no acima do **seu** `height`,
+a obra acima do **topo dela** (`size[1] / 2`), que o construtor conhece.
+
+**Medido (21 de 21):**
+
+| O que | Resultado |
+| --- | --- |
+| Sem a tecla `D` | **0** nomes nas 5, 3 e 2 obras dos três mundos (a vista do visitante não mudou) |
+| Com `D` | um nome por obra, **na árvore e visível**, com o texto esperado; e outra vez `D` esconde os nomes **e** as caixas das portas (uma tecla para a vista toda) |
+| Onde fica | acima do topo de cada obra (y local **2,45** para obras de 3 m) |
+| No **portão**, que não tem obras | a tecla não rebenta: as 2 caixas das portas aparecem na mesma |
+| O editor | os 3 nomes da praia à chegada, iguais aos da exposição |
+| 10 obras com nome criadas e destruídas | texturas na GPU `13 → 23 → 13` e a árvore de volta ao que era — o `remove()` do componente liberta o material e o `map` do sprite, e não a geometria (é da three, partilhada) |
+| A consola | **0** erros e **0** avisos |
+| A bateria dos doze, nos 5 mundos | passa em todos (os nomes não existem sem `D`) |
+| O editor | **35 de 35**, importar→exportar byte-idêntico |
+| `validate.mjs` / `laws-selftest` | **0** / **21 de 21** |
+
+**O que mudou:** `js/modules/label.js` (novo, o desenho partilhado), `js/modules/portal.js` (passa a
+usá-lo; a pintura saiu daqui), `js/modules/artwork.js` (`label`/`labelAlways`/`labelY`,
+`showLabel`/`toggleLabel`, `toggleArtworkLabels()` e a libertação no `remove()`),
+`js/scene/scene-builder.js` (`artworkLabel()` e o repassar de `labels`), `js/editor/preview.js` (o nome
+na obra re-criada) e `js/app.js` (a tecla `D` passa a chamar as duas coisas).
+
 #### Metas de sucesso
 
 **(a) Comportamento — nenhum número pode mudar.** Os **doze** testes de §10 na exposição, nos 5
@@ -3047,6 +3090,7 @@ alteram comportamento.
 | D37 | Chegar por uma porta e o ecrã de entrada | A chegada por uma porta (`?from=`) **arranca a exposição sozinha** — `startSession({ arrival: true })`: o botão «ATIVAR EXPOSIÇÃO» fica para a **primeira visita** e volta como **recuo** se a câmara for recusada (o gesto que o browser pode exigir). Cada mundo é uma página (D24) e a porta navega, por isso o ecrã de entrada repetia-se em cada sala mesmo sem câmara nenhuma para pedir |
 | D38 | A porta que volta ao portão mostra a realidade | A sala declara uma dimensão `kind: "camera"` e a porta para o portão um `dimension-pair` com ela; a matriz da **L18** ganha a exceção «par com a câmara + `navigate` para o mundo de entrada», porque o que a janela mostra é **exactamente** o que espera o visitante do outro lado. Uma dimensão de câmara **não desenha nada**: o rectângulo da janela fica transparente sobre o vídeo e a realidade vê-se dos **dois lados**. A sala passa a pedir a câmara (o mesmo `real.enabled` do portão), e o editor mostra a combinação como vinda do dado em vez de a reescrever |
 | D39 | O nome de cada porta | O nome vive no **dado**: o id, o que a janela mostra (os nomes das dimensões do par, ou o retrato) e para onde leva (o *slug* do mundo — o portão pelo catálogo), escrito pelo construtor num atributo do componente. Desenha-se como **sprite** (lê-se dos dois lados, o que importa a quem aterra atrás dela), com a tecla **D** na exposição e **sempre** no editor, que não tem teclas |
+| D40 | O nome de cada obra | O mesmo, com a mesma tecla: `#0 · galeriaFoto1 · Cidade 360º · modal` — o **título** quando o dado tem um (D21), senão o **id do asset** (que é o que se edita no ficheiro), a dimensão pelo **nome** e a interacção pela palavra do dado (`modal`/`none`/`link`). O desenho é um só para portas e obras — `js/modules/label.js` —, para os dois não divergirem em tamanho, cor ou tipo de letra |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -3151,6 +3195,14 @@ No editor aparece sem tecla nenhuma. Um *sprite*, para se ler dos dois lados da 
 **23 de 23** (0 nomes sem `D`, um por porta com ela nos 4 mundos, o editor desde o arranque, e 10
 portas com nome criadas e destruídas sem deixar textura nem nó), a bateria dos doze nos 5 mundos, o
 editor em **35 de 35** e a consola com 0 erros e 0 avisos.
+
+**B14, ainda no mesmo dia** — o **nome das obras** (**D40**), com a mesma tecla: acima de cada obra
+aparece `#0 · galeriaFoto1 · Cidade 360º · modal` — o título (quando o dado tem um) ou o id do asset, a
+dimensão pelo nome e a interacção pela palavra do ficheiro. O desenho do nome passou a ser **um só**
+para portas e obras (`js/modules/label.js`), para não divergirem. Medido: **21 de 21** (nome por obra
+só com `D`, o editor sem tecla, 10 obras com nome criadas e destruídas sem deixar textura nem nó, a
+tecla no portão sem obras), a bateria dos doze nos 5 mundos, o editor em **35 de 35** e a consola com
+0 erros e 0 avisos.
 
 ### O que fica decidido, em uma frase
 

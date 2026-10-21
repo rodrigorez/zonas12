@@ -6,7 +6,7 @@
 // One scene at a time. The build is asynchronous (the assets load first), so the previous scene goes
 // down before the next one goes up: two built scenes at once would double the textures in memory for
 // no gain, since only one is ever shown.
-import { buildScene, withDefaults, addressToOpen, portalLabel } from '../scene/scene-builder.js';
+import { buildScene, withDefaults, addressToOpen, portalLabel, artworkLabel } from '../scene/scene-builder.js';
 import { SCENE } from '../scene/schema.js';
 import { startFrameDriver } from '../modules/portal.js';
 import { createDimension, removeDimension } from '../modules/dimension.js';
@@ -99,7 +99,10 @@ export function replaceArtwork(artwork, catalogue) {
   // The address an artwork opens is derived from the catalogue, never written in the data (D20) — and
   // it is the builder's own function, so the preview cannot open something the exhibition would not.
   data.url = addressToOpen(data, catalogue);
-  const created = createArtwork(data, previewElement());
+  const created = createArtwork(data, previewElement(), {
+    label: artworkLabel(data, built.scene && built.scene.dimensions),
+    labelAlways: true
+  });
   built.elements.artworks.push(created);
   return created;
 }

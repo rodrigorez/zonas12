@@ -15,6 +15,7 @@ import {
   on
 } from '../core/index.js';
 import { playerCamera } from './camera.js';
+import { createLabel, disposeLabel } from './label.js';
 import {
   WINDOW_KINDS,
   ACTION_KINDS,
@@ -46,41 +47,6 @@ export function setNavigation(enabled) {
 // Reused vectors: the driver and the collision run every frame and must not allocate.
 const _worldPoint = new THREE.Vector3();
 const _boxPoint = new THREE.Vector3();
-
-// ---- o nome da porta, na vista de debug (D39) ----
-//
-// The text is drawn once, into a canvas, when the label is built — never per frame. The sizes are in
-// metres because the label lives in the scene, not on the screen.
-const LABEL_FONT = '600 48px system-ui, "Segoe UI", Roboto, sans-serif';
-const LABEL_PADDING = 22;
-const LABEL_HEIGHT = 1.1;
-const LABEL_MAX_WIDTH = 12;
-
-function paintLabel(text) {
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  context.font = LABEL_FONT;
-  const width = Math.ceil(context.measureText(text).width) + LABEL_PADDING * 2;
-  const height = 48 + LABEL_PADDING * 2;
-  canvas.width = width;
-  canvas.height = height;
-  // Resizing a canvas forgets the drawing state, the font included.
-  context.font = LABEL_FONT;
-  context.textBaseline = 'middle';
-  const rounded = typeof context.roundRect === 'function';
-  if (rounded) context.roundRect(1.5, 1.5, width - 3, height - 3, 12);
-  else context.rect(1.5, 1.5, width - 3, height - 3);
-  context.fillStyle = 'rgba(10, 4, 4, 0.82)';
-  context.fill();
-  context.lineWidth = 3;
-  context.strokeStyle = 'rgba(255, 107, 107, 0.95)';
-  context.stroke();
-  context.fillStyle = '#f6eded';
-  context.fillText(text, LABEL_PADDING, height / 2 + 2);
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  return { texture: texture, aspect: width / height };
-}
 
 // A-Frame's vec3 in the object form of setAttribute needs { x, y, z }: an array there is read as
 // an object with no axes and falls back to the default, silently (measured in A-Frame 1.8,
@@ -171,7 +137,11 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     this.portalGroup.children.slice().forEach(function (child) {
       // A sprite shares its geometry with every other sprite in the scene (it is three's own): only
       // the material and the texture of the label belong to this door.
-      if (!child.isSprite && child.geometry) child.geometry.dispose();
+      if (child.isSprite) {
+        disposeLabel(child);
+        return;
+      }
+      if (child.geometry) child.geometry.dispose();
       const materials = Array.isArray(child.material) ? child.material : [child.material];
       materials.forEach(function (material) {
         if (!material) return;
@@ -329,25 +299,12 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     if (this.labelSprite) this.labelSprite.visible = visible;
   },
   buildLabel: function () {
-    const painted = paintLabel(this.data.label);
-    const material = new THREE.SpriteMaterial({
-      map: painted.texture,
-      transparent: true,
-      depthWrite: false
+    this.labelSprite = createLabel(this.data.label, {
+      name: this.portalName + '-label',
+      maxWidth: this.data.width
     });
-    this.labelSprite = new THREE.Sprite(material);
-    this.labelSprite.name = this.portalName + '-label';
-    // As large as it has to be to be read from across the room, and never wider than the door: a
-    // label wider than the door would be the only thing one sees through a window.
-    let height = LABEL_HEIGHT;
-    let width = height * painted.aspect;
-    if (width > LABEL_MAX_WIDTH) {
-      width = LABEL_MAX_WIDTH;
-      height = width / painted.aspect;
-    }
-    this.labelSprite.scale.set(width, height, 1);
-    this.labelSprite.position.set(0, this.data.height + height * 0.8, 0);
-    this.labelSprite.renderOrder = state.drawOrder.debug;
+    // Above the door, on its own plane: the height of the door is what says where the top is.
+    this.labelSprite.position.set(0, this.data.height + this.labelSprite.scale.y * 0.8, 0);
     this.portalGroup.add(this.labelSprite);
   },
   // Collision with the box, in the space of the portal (position and rotation included): there

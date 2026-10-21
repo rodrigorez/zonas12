@@ -73,6 +73,17 @@ export function portalLabel(portal, dimensions, language) {
   return '#' + portal.id + ' · ' + shows + goes;
 }
 
+// The name of a work, in the debug view (D40): what it shows, which dimension it belongs to and what
+// clicking it does. It says `galeriaFoto1` and not the file's name on purpose — that is the id the
+// file uses, the one somebody edits.
+export function artworkLabel(artwork, dimensions, language) {
+  const chosen = language || ORIGIN_LANGUAGE;
+  const dimension = (dimensions || []).find((entry) => entry.id === artwork.dimension);
+  const name = dimension ? textIn(dimension.name, chosen) : '';
+  const title = textIn(artwork.title, chosen) || artwork.asset;
+  return '#' + artwork.id + ' · ' + title + ' · ' + (name || '#' + artwork.dimension) + ' · ' + artwork.interaction;
+}
+
 export async function buildScene(scene, options = {}) {
   const parent = options.parent || document.querySelector('a-scene');
   if (!parent) throw new Error('scene-builder: there is no <a-scene> to build into');
@@ -153,7 +164,10 @@ export async function buildScene(scene, options = {}) {
   for (const artwork of scene.artworks || []) {
     const data = withDefaults(artwork, SCENE.artworks);
     data.url = addressToOpen(data, catalogue);
-    elements.artworks.push(createArtwork(data, parent));
+    elements.artworks.push(createArtwork(data, parent, {
+      label: artworkLabel(data, scene.dimensions, language),
+      labelAlways: options.labels === true
+    }));
   }
 
   for (const portal of scene.portals || []) {
