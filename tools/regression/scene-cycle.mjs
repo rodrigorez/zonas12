@@ -8,14 +8,14 @@
 //
 // Uso, com uma página aberta por HTTP:
 //
-//   (await import('/tools/regression/scene-cycle.mjs')).runSceneCycle()
-//   (await import('/tools/regression/scene-cycle.mjs')).runSceneCycle({ cycles: 5, world: 'example' })
+//   (await import('./tools/regression/scene-cycle.mjs')).runSceneCycle()
+//   (await import('./tools/regression/scene-cycle.mjs')).runSceneCycle({ cycles: 5, world: 'example' })
 //
 // O que conta como «voltar ao que era»: os portais registados, as dimensões (e as entradas de
 // conteúdo dentro delas), os valores de stencil, os nós dentro do `<a-scene>`, os ouvintes do
 // documento e a dimensão ativa. Se um ciclo deixar algum destes a crescer, o `remove()` está a falhar
 // em algum sítio — e é isso que o instrumento responde, ciclo a ciclo, em vez de dizer só «passou».
-import { buildScene } from '/js/scene/scene-builder.js';
+import { buildScene } from '../../js/scene/scene-builder.js';
 import { liveListeners } from './acceptance.mjs';
 
 const doisQuadros = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));

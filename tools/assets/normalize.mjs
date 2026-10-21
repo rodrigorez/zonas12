@@ -13,7 +13,7 @@
 // and `normalizeOne(job)` gives one back for a caller that writes files itself.
 //
 // Usage, with the exhibition open over HTTP:
-//   (await import('/tools/assets/normalize.mjs')).runNormalize()
+//   (await import('./tools/assets/normalize.mjs')).runNormalize()
 //
 // The jobs below are the record of this migration, the same way the converter of Fase 0 keeps its
 // own (tools/migration/convert.mjs): the files that only change folder are not here — a `git mv`

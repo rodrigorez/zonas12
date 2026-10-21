@@ -5,7 +5,11 @@
 //
 // Uso, com uma sala (ou o portão) aberta por HTTP:
 //
-//   (await import('/tools/regression/acceptance.mjs')).runAcceptance()
+//   (await import('./tools/regression/acceptance.mjs')).runAcceptance()
+//
+// O caminho é **relativo à página**, e não a partir da raiz: é o que faz o instrumento correr tanto
+// em `http://127.0.0.1:8123/` como na versão publicada, que vive debaixo de `/zonas12/` (medido no
+// B10, quando o publicado foi aberto e as importações absolutas deram 404).
 //
 // O que cada teste mede e porquê:
 //
@@ -28,7 +32,7 @@
 
 // The modal is the artwork module's (D19), so the instrument closes it through the module and not
 // through a global: the `window.fecharObra` bridge left with the inline attributes in Fase 4.
-import { closeArtwork } from '/js/modules/artwork.js';
+import { closeArtwork } from '../../js/modules/artwork.js';
 
 const MARCA = 'zonas12-aceitacao';
 const RUÍDO = 12;
@@ -466,7 +470,7 @@ export async function checkArrival(options = {}) {
     cada.navigate = function () { contagem.navegacoesPedidas++; };
   });
 
-  const modulo = await import('/js/scene/arrival.js');
+  const modulo = await import('../../js/scene/arrival.js');
   const esperado = modulo.arrivalPoint(dado, options.alturaDosOlhos || 1.6);
   const camera = cameraEl.object3D.position;
   const noSitio = Math.abs(esperado.position[0] - camera.x) < 0.05 && Math.abs(esperado.position[2] - camera.z) < 0.05;
@@ -517,7 +521,7 @@ export async function checkArrival(options = {}) {
 // T9: criar e destruir 20 portais pelas fábricas. Um ouvinte de teclado na carga e outro no fim, o
 // registo de volta ao que era e nenhum nó deixado na árvore.
 export async function checkPortalCycle(options = {}) {
-  const modulo = await import('/js/modules/portal.js');
+  const modulo = await import('../../js/modules/portal.js');
   const sceneEl = document.querySelector('a-scene');
   const state = window.portalDebug.state;
   const voltas = options.voltas || 20;
@@ -616,7 +620,7 @@ export async function checkPortrait(options = {}) {
 // T2 e T3: a varredura de poses, que já vive no seu instrumento. Aqui só se chama, para a bateria
 // ter os doze testes no mesmo relatório.
 export async function checkFrameSweep(options = {}) {
-  const modulo = await import('/tools/regression/pose-sweep.mjs');
+  const modulo = await import('./pose-sweep.mjs');
   const r = await modulo.runPoseSweep(options.sweep || {});
   return {
     poses: r.poses,

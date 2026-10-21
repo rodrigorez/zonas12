@@ -8,7 +8,7 @@
 // dependencies (decision D1), and section 10 of the roadmap defines the automation as "the same
 // script we already use in the browser". Load the scene over HTTP and run, from the console:
 //
-//   (await import('/tools/regression/pose-sweep.mjs')).runPoseSweep()
+//   (await import('./tools/regression/pose-sweep.mjs')).runPoseSweep()
 //
 // Method, per pose: the frame is rendered twice, with the four bars visible and hidden, and the
 // difference between the two renders gives the frame's own pixels - presence, not colour, which
