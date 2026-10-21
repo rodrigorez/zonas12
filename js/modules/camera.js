@@ -33,6 +33,8 @@ const held = { forward: false, backward: false, left: false, right: false };
 let playerEl = null;
 let mobileSpeed = MOBILE_SPEED;
 let realCameraEnabled = false;
+// The stream of the webcam, once there is one (D41): the button asks this, not the click.
+let stream = null;
 
 // A-Frame's vec3 in the object form needs { x, y, z }: an array there is read as an object with
 // no axes and falls back to the default, silently (measured in A-Frame 1.8,
@@ -138,9 +140,40 @@ function hideLoading() {
 
 // The button is the first visit's gesture, and the fallback of an arrival whose camera was refused
 // (D37): the browser may be waiting for a gesture, and the visitor is the one who can give it.
+//
+// It is also the **way to the camera**, so it follows the camera and not the click (D41): whoever has
+// a stream has nothing to activate, and the button is hidden the moment the stream exists — even when
+// the camera is not in sight (in a room, the camera is only the window of the door that goes back).
+function hideStartButton() {
+  const start = document.getElementById('btn-iniciar');
+  if (start) start.style.display = 'none';
+}
+
 function showStartButton() {
+  if (isCameraActive()) return;
   const start = document.getElementById('btn-iniciar');
   if (start) start.style.display = 'block';
+}
+
+// Whether the camera is on right now — the question the button asks, and the one a page can answer
+// about a stream another part of the app started.
+export function isCameraActive() {
+  if (!stream) return false;
+  const tracks = stream.getVideoTracks();
+  return stream.active && tracks.some((track) => track.readyState === 'live');
+}
+
+// Whether the browser already has the visitor's permission for the camera, from a previous visit.
+// Then there is no gesture to ask for and the exhibition can start by itself (D41). Safari has no
+// `camera` in `permissions.query` — it throws, the answer is `false`, and the gesture rule stays.
+export async function cameraAlreadyAllowed() {
+  if (!navigator.permissions || typeof navigator.permissions.query !== 'function') return false;
+  try {
+    const status = await navigator.permissions.query({ name: 'camera' });
+    return status.state === 'granted';
+  } catch (error) {
+    return false;
+  }
 }
 
 export function reportCameraError(error) {
@@ -205,8 +238,7 @@ export function startSession(options) {
   const arrival = Boolean(options && options.arrival);
   const overlay = document.getElementById('loading-overlay');
   if (overlay) overlay.style.display = 'flex';
-  const start = document.getElementById('btn-iniciar');
-  if (start) start.style.display = 'none';
+  hideStartButton();
 
   // The D-pad group is the exhibition's markup; a host without it still gets the controls wired
   // (if it has the buttons) and never breaks here (R13).
@@ -239,9 +271,12 @@ export function startSession(options) {
   }
   navigator.mediaDevices
     .getUserMedia({ video: { width: 1280, height: 720, facingMode: 'environment' } })
-    .then((stream) => {
-      video.srcObject = stream;
+    .then((mediaStream) => {
+      stream = mediaStream;
+      video.srcObject = mediaStream;
       video.play();
+      // The camera is on, so there is nothing left to activate — whatever asked for it (D41).
+      hideStartButton();
       // The canvas has to be resized once the stream is running: without this the first frames
       // are squeezed into the size the page had before the camera started.
       setTimeout(() => {

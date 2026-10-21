@@ -1721,7 +1721,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: FECHADA em 2026-10-21 — B0 ao B14 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
+**Estado: FECHADA em 2026-10-21 — B0 ao B15 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -1818,7 +1818,8 @@ Um bloco por commit, como nas fases anteriores.
 Quatro blocos acrescentados depois do fecho, por achados do autor a jogar o publicado:** o
 **B11** (a chegada por uma porta não pede licença, **D37**), o **B12** (a porta do portão mostra a
 realidade ao vivo, **D38**), o **B13** (o nome de cada porta, **D39**) e o **B14** (o nome de cada
-obra, **D40**) — todos com o seu registo abaixo, na mesma ordem e com as medições.
+obra, **D40**) — todos com o seu registo abaixo, na mesma ordem e com as medições. O **B15** veio
+depois do teste no telemóvel (**D41**: o botão de entrada segue a câmara, não o clique).
 
 #### O que o B1 entregou e mediu (2026-10-20) — fecha o **R3**
 
@@ -2440,6 +2441,45 @@ usá-lo; a pintura saiu daqui), `js/modules/artwork.js` (`label`/`labelAlways`/`
 `showLabel`/`toggleLabel`, `toggleArtworkLabels()` e a libertação no `remove()`),
 `js/scene/scene-builder.js` (`artworkLabel()` e o repassar de `labels`), `js/editor/preview.js` (o nome
 na obra re-criada) e `js/app.js` (a tecla `D` passa a chamar as duas coisas).
+
+#### O que o B15 entregou e mediu (2026-10-21) — o botão de entrada segue a câmara
+
+Pedido do autor, depois de testar no telemóvel («ok, mas um refinamento»): «o botão de ativar a
+exposição deve desaparecer quando a câmara estiver ativa, mesmo que a imagem da câmara não estiver na
+visão do interator».
+
+**O que estava errado.** O botão seguia o **clique**, não a câmara: aparecia enquanto a câmara não
+existisse (certo) mas voltava sempre que a chegada era recusada — e nunca se escondia por si só. Numa
+sala a câmara não está à vista (é só a janela da porta que volta ao portão, **D38**), e mesmo assim a
+página pedia para «ativar a exposição».
+
+**A regra (D41).** O botão é a **porta para a câmara**, portanto:
+
+1. esconde-se **no instante em que há um stream** (`isCameraActive()`), mesmo que a câmara não esteja
+   à vista — quem já tem câmara não tem nada para ativar;
+2. **nunca** volta a aparecer com um stream vivo (`showStartButton()` pergunta primeiro);
+3. uma visita em que o browser **já tem a permissão** — `permissions.query({name:'camera'})` diz
+   `granted` — arranca **sozinha**, sem gesto: a permissão *é* o registo do gesto de uma visita
+   anterior. Em browsers que não respondem a essa pergunta (**Safari**, que lança), a resposta é
+   `false` e fica a regra do gesto (**D34**, **D37**).
+
+**Medido (7 de 7)**, em três instâncias de Chrome porque o que muda é a permissão:
+
+| Caso | Resultado |
+| --- | --- |
+| primeira visita, **sem** permissão | botão **visível**, **0** pedidos, sem stream — a regra do gesto mantém-se |
+| chegada por uma porta, **sem** permissão | **1** pedido, falha, botão **volta** com a mensagem (o recuo da D37) |
+| primeira visita, com a permissão **já dada** | botão **fora**, câmara **ligada** (**1** pedido), overlay fora |
+| **numa sala** (câmara só na janela), com a permissão dada | botão **fora**, câmara ligada — é este o caso que o autor descreveu |
+| o módulo | `isCameraActive()` **true**, `cameraAlreadyAllowed()` **true**, botão `none` |
+| **telemóvel** (390×844, toque, com permissão) | botão **fora**, câmara ligada, **D-pad dentro** |
+
+E o resto não se mexeu: a consola das 5 páginas com **0** erros e **0** avisos, a bateria dos doze a
+passar no portão, na cidade e na praia, o `validate.mjs` a **0** e as metas todas.
+
+**O que mudou:** `js/modules/camera.js` (o `stream` do módulo, `isCameraActive()`,
+`cameraAlreadyAllowed()`, `hideStartButton()`/`showStartButton()`) e `js/app.js` (o arranque
+automático quando a permissão já existe).
 
 #### Metas de sucesso
 
@@ -3096,6 +3136,7 @@ alteram comportamento.
 | D38 | A porta que volta ao portão mostra a realidade | A sala declara uma dimensão `kind: "camera"` e a porta para o portão um `dimension-pair` com ela; a matriz da **L18** ganha a exceção «par com a câmara + `navigate` para o mundo de entrada», porque o que a janela mostra é **exactamente** o que espera o visitante do outro lado. Uma dimensão de câmara **não desenha nada**: o rectângulo da janela fica transparente sobre o vídeo e a realidade vê-se dos **dois lados**. A sala passa a pedir a câmara (o mesmo `real.enabled` do portão), e o editor mostra a combinação como vinda do dado em vez de a reescrever |
 | D39 | O nome de cada porta | O nome vive no **dado**: o id, o que a janela mostra (os nomes das dimensões do par, ou o retrato) e para onde leva (o *slug* do mundo — o portão pelo catálogo), escrito pelo construtor num atributo do componente. Desenha-se como **sprite** (lê-se dos dois lados, o que importa a quem aterra atrás dela), com a tecla **D** na exposição e **sempre** no editor, que não tem teclas |
 | D40 | O nome de cada obra | O mesmo, com a mesma tecla: `#0 · galeriaFoto1 · Cidade 360º · modal` — o **título** quando o dado tem um (D21), senão o **id do asset** (que é o que se edita no ficheiro), a dimensão pelo **nome** e a interacção pela palavra do dado (`modal`/`none`/`link`). O desenho é um só para portas e obras — `js/modules/label.js` —, para os dois não divergirem em tamanho, cor ou tipo de letra |
+| D41 | O botão de entrada segue a câmara | O botão «ATIVAR EXPOSIÇÃO» é a **porta para a câmara**, por isso só existe enquanto não há câmara: esconde-se **no instante em que há um stream** (mesmo que a câmara não esteja à vista — numa sala ela é só a janela da porta) e nunca volta a aparecer com um stream vivo. E uma visita em que o browser **já tem a permissão** (`permissions.query`) arranca sozinha, sem gesto: a permissão *é* o registo do gesto. Em browsers que não respondem a essa pergunta (Safari), fica a regra do gesto (**D34**) |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -3208,6 +3249,13 @@ para portas e obras (`js/modules/label.js`), para não divergirem. Medido: **21 
 só com `D`, o editor sem tecla, 10 obras com nome criadas e destruídas sem deixar textura nem nó, a
 tecla no portão sem obras), a bateria dos doze nos 5 mundos, o editor em **35 de 35** e a consola com
 0 erros e 0 avisos.
+
+**B15, depois do teste no telemóvel** — o botão «ATIVAR EXPOSIÇÃO» passou a **seguir a câmara** e não
+o clique (**D41**): esconde-se no instante em que há um stream (mesmo que a câmara não esteja à vista,
+como numa sala, onde ela é só a janela da porta) e nunca volta com um stream vivo; e uma visita em que
+o browser **já tem a permissão** arranca sozinha, porque a permissão é o registo do gesto. Medido:
+**7 de 7** em três instâncias (sem permissão, com permissão, e em emulação de telemóvel 390×844 — onde
+o botão sai e o D-pad entra), com a consola e a bateria nos mesmos números.
 
 ### O que fica decidido, em uma frase
 

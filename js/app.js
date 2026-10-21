@@ -12,7 +12,7 @@ import {
   setActiveDimension,
   on
 } from './core/index.js';
-import { startSession } from './modules/camera.js';
+import { startSession, cameraAlreadyAllowed } from './modules/camera.js';
 import { closeArtwork, toggleArtworkLabels } from './modules/artwork.js';
 import { startFrameDriver } from './modules/portal.js';
 import { validateScene } from './scene/validation.js';
@@ -127,11 +127,17 @@ function arrivedFromADoor() {
 //
 // The catalogue comes first: the interface is written with keys and the texts only arrive when this
 // resolves (D12). A scene that is fine still says nothing in the console (test T8).
+// Two reasons for the page to start by itself, and neither of them is a first visit: the visitor came
+// through a door (D37), or they have already allowed the camera in a previous visit (D41) — the
+// browser remembers the gesture, so there is nothing to ask them again. On a browser that cannot
+// answer the second question (Safari), the button stays and the visitor gives the gesture (D34).
 async function start() {
   await initI18n(languageFromUrl());
   const built = await buildFromData();
   if (built) startFrameDriver();
+  if (!built) return;
   if (arrivedFromADoor()) startSession({ arrival: true });
+  else if (await cameraAlreadyAllowed()) startSession({ arrival: true });
 }
 
 start().catch((error) => console.error('[scene] the scene could not be built:', error));

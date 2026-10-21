@@ -207,9 +207,9 @@ da Fase 3B), marcada pela branch com o mesmo nome.
 
 Resumo do que existe hoje: `index.html` (**86 linhas**) e as **3** salas com o **mesmo** ficheiro
 (`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `editor.html` (**83**),
-`js/app.js` (**149**), `js/editor.js` (**14**, a entrada do editor — D36), `js/editor/`
+`js/app.js` (**155**), `js/editor.js` (**14**, a entrada do editor — D36), `js/editor/`
 (**10** ficheiros, **2697** linhas com os painéis), `js/i18n.js` (**92**), `js/core/` (7 ficheiros,
-**219**), `js/modules/` (6 ficheiros, **1291**), `js/scene/` (5 ficheiros, **1126**),
+**219**), `js/modules/` (6 ficheiros, **1326**), `js/scene/` (5 ficheiros, **1126**),
 `css/style.css` (96) e `css/editor.css` (**313**), **5** mundos em `data/worlds/` (o portão, as três
 salas e o fixture, **1279 linhas** no total e **12** portas), `i18n/pt.json` (**154** chaves), os
 **9** assets em `assets/{panoramas,artworks,video,previews}` e as **9** ferramentas em `tools/`
@@ -435,6 +435,10 @@ dois sítios.
 - **As salas pedem a câmara** (desde a **D38**): é o preço de a porta do portão a mostrar ao vivo.
   Quem recusar vê a mensagem da câmara e a janela dessa porta sem imagem; o resto da sala não depende
   dela.
+- **O botão de entrada nunca aparece com a câmara ligada** (**D41**): ele é a porta para a câmara, não
+  um «play». Depois da primeira autorização o browser guarda-a, e a visita seguinte arranca sozinha —
+  no telemóvel é o que faz o D-pad aparecer sem mais nenhum toque. Em browsers que não dizem se a
+  permissão existe (Safari), o botão continua a ser o gesto que a pede.
 
 ## Mundos e portas de mundo (Fase 3B, fechada em 2026-10-16)
 
@@ -534,6 +538,15 @@ praia: a chegada é em `z = -121` a olhar para −Z e as obras em `z = -110`. Fo
 editor** (posições `[-6, 1.5, -131]` e `[6, 1.5, -131]`, vista na pré-visualização), exportadas e o
 ficheiro substituído — e o resultado mediu-se: **0 → 2** obras no primeiro plano da chegada, com a
 bateria do céu nos mesmos números de antes e o `validate.mjs` a sair com **0**.
+
+**O botão de entrada segue a câmara (D41, o B15).** Depois do teste no telemóvel, o autor pediu que o
+botão «ATIVAR EXPOSIÇÃO» desaparecesse quando a câmara está ativa — mesmo com a câmara fora da vista.
+Passou a ser assim e está medido em três instâncias de Chrome, porque o que muda é a permissão:
+**7 de 7** — sem permissão a primeira visita fica com o botão e **0** pedidos (a regra do gesto); uma
+chegada sem permissão tenta, falha e devolve o botão com a mensagem; com a permissão **já dada** a
+visita arranca sozinha (**0** toques, botão fora, câmara ligada), tanto no portão como **numa sala**
+onde a câmara só se vê pela janela da porta; e no **telemóvel** (390×844, toque) o botão sai e o
+**D-pad entra**. Em Safari, que não responde se a permissão existe, fica a regra do gesto.
 
 ## Funcionalidades Principais
 
@@ -886,7 +899,8 @@ e o **nome de cada porta e de cada obra** (tecla **D**):
    a entrada é um módulo ES (`js/app.js`) e os módulos não carregam por `file://`. Na raiz
    do projeto, por exemplo: `python -m http.server 8123`, e abra
    `http://127.0.0.1:8123/`
-2. Clique no botão "ATIVAR EXPOSIÇÃO"
+2. Clique no botão "ATIVAR EXPOSIÇÃO" — que **só existe enquanto não há câmara**: numa visita
+   seguinte, em que o browser já guarda a autorização, a exposição arranca sozinha (decisão **D41**)
 3. Permita o acesso à câmera quando solicitado (é a dimensão 0, a realidade)
 4. Explore o ambiente utilizando o mouse (desktop) ou o D-pad (mobile)
 
