@@ -35,6 +35,11 @@
   </head>
   
   <body>
+    <!-- A ponte de imagem entre mundos (D43). Script clássico e a primeira coisa do <body>, de
+         propósito: tem de pintar o último quadro da página que saiu **antes** da primeira pintura
+         desta, e um módulo só correria depois de carregar toda a sua árvore de importações. -->
+    <script src="js/arrival-frame.js"></script>
+
     <!-- Título principal da página. É o único heading e não se vê: a cena ocupa o ecrã
          todo, mas um leitor de ecrã e um motor de IA precisam de saber qual é o tema. -->
     <h1 class="sr-only" data-i18n="app.heading">Portal AR – Galeria Imersiva</h1>

@@ -22,6 +22,8 @@ zonas12/
 │   └── editor.css      estilos da página de edição
 ├── js/
 │   ├── app.js          arranque: carrega e valida a cena, constrói, e a ponte da interface
+│   ├── arrival-frame.js  a ponte de imagem entre mundos (D43): o último quadro de uma página
+│   │                   pintado pela página seguinte, antes de ela ter cena
 │   ├── editor.js       o arranque da página de edição (a entrada, 14 linhas — D36)
 │   ├── i18n.js         o catálogo da interface: `t()`, `?lang=` e a aplicação ao markup (D12)
 │   ├── core/           núcleo: estado, registos, stencil, eventos, limites
@@ -205,12 +207,13 @@ contra o que o GitHub Pages serve (abaixo); fica **por testar pelo autor** no **
 como as versões anteriores foram dadas por fechadas. A versão anterior é a `v0.0.6` (o estado depois
 da Fase 3B), marcada pela branch com o mesmo nome.
 
-Resumo do que existe hoje: `index.html` (**87 linhas**) e as **3** salas com o **mesmo** ficheiro
+Resumo do que existe hoje: `index.html` (**93 linhas**) e as **3** salas com o **mesmo** ficheiro
 (`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `editor.html` (**83**),
-`js/app.js` (**173**), `js/editor.js` (**14**, a entrada do editor — D36), `js/editor/`
+`js/app.js` (**179**), `js/arrival-frame.js` (**124**, a ponte de imagem entre mundos — D43),
+`js/editor.js` (**14**, a entrada do editor — D36), `js/editor/`
 (**10** ficheiros, **2697** linhas com os painéis), `js/i18n.js` (**92**), `js/core/` (7 ficheiros,
-**219**), `js/modules/` (6 ficheiros, **1346**), `js/scene/` (5 ficheiros, **1126**),
-`css/style.css` (96) e `css/editor.css` (**313**), **5** mundos em `data/worlds/` (o portão, as três
+**219**), `js/modules/` (6 ficheiros, **1351**), `js/scene/` (5 ficheiros, **1126**),
+`css/style.css` (105) e `css/editor.css` (**313**), **5** mundos em `data/worlds/` (o portão, as três
 salas e o fixture, **1279 linhas** no total e **12** portas), `i18n/pt.json` (**154** chaves), os
 **9** assets em `assets/{panoramas,artworks,video,previews}` e as **9** ferramentas em `tools/`
 (**2915** linhas).
@@ -442,6 +445,10 @@ dois sítios.
 - **Ao atravessar um portal não se vê o botão** (**D42**): cada mundo é uma página (D24), e o botão
   está escondido no markup — a decisão de o mostrar é tomada **antes** de a cena carregar. Enquanto os
   assets chegam, o que se vê é «Carregando…» (com a rede de um telemóvel, alguns segundos).
+- **Ao atravessar um portal também não se vê um ecrã preto** (**D43**): a página que sai deixa o
+  **último quadro** que estava a mostrar e a que chega pinta-o como primeira coisa, antes de ter cena;
+  quando o mundo está construído, o quadro desvanece-se. O que se vê é uma travessia contínua, e não
+  uma ida ao preto e volta.
 
 ## Mundos e portas de mundo (Fase 3B, fechada em 2026-10-16)
 
@@ -560,6 +567,20 @@ vê-lo **antes** dos assets (botão aos **357 ms**, primeira porta aos **373 ms*
 que anota cada mudança, numa rede de 800 kB/s: **9 de 9**. E a permissão (D41) ganhou um tempo-limite
 de **1 s** — sem ele, uma resposta que não chegasse deixava a exposição presa em «Carregando…» (foi o
 que se mediu com a rede estrangulada).
+
+**A ponte de imagem entre mundos (D43, o B17).** Um segundo vídeo do autor
+(`.harness/imagenTeste/02.mp4`) mostrou, ao atravessar uma porta, a sequência «imagem do mundo que
+vou → quadro preto → o mundo» — duas vezes. A causa não era a cena: **cada mundo é uma página (D24)**,
+e a página que chega não pinta nada até a cena estar construída; no meio ficava o preto do
+`#container-video`. Medido no browser, com fotogramas a cada ~50 ms: **2 amostras escuras** (0,0 e 1,1
+de brilho) e a primeira imagem do destino **180 ms** depois. A correção é a única imagem que serve —
+a que o visitante já estava a ver: a página que sai guarda o quadro em `sessionStorage`
+(`js/arrival-frame.js`, um script **clássico** porque tem de pintar antes da primeira pintura) e a que
+chega pinta-o antes de tudo, com o `js/app.js` a desvanecê-lo quando há cena. Medido: **0 amostras
+escuras** em 89, o quadro é a imagem do ecrã (**76 kB**, 780×1688, brilho **191,5** num ecrã de
+telemóvel), sai aos **746 ms**, e **7 de 7** na bateria do bloco — incluindo a chave de uso único
+(recarregar não repete a imagem) e a guarda de **10 s** para uma cena que não chegue. Na **versão
+publicada** (GitHub Pages), a mesma travessia a pé: **122** amostras, **0** escuras.
 
 ## Funcionalidades Principais
 
@@ -744,6 +765,9 @@ panorama, mesmas obras).
   stencil **não é criado por omissão**.
 - `<script type="module" src="js/app.js">`: a entrada é um módulo ES (D1 do roadmap), por
   isso o projeto tem de ser servido por HTTP.
+- `<script src="js/arrival-frame.js">` no início do `<body>` (D43): é o único script **clássico** do
+  projeto, e é de propósito — tem de pintar o último quadro da página anterior **antes** da primeira
+  pintura desta, e um módulo só corre depois de carregar a sua árvore de importações.
 - `renderer.sortObjects` ativo (`ar-config`, em `js/app.js`): com `false` o three
   **ignora o `renderOrder`** e desenha pela ordem da árvore — o que só funciona por acaso
   com um portal. Com vários, as máscaras têm de ser desenhadas antes de todo o conteúdo.
@@ -915,7 +939,7 @@ e o **nome de cada porta e de cada obra** (tecla **D**):
 2. Clique no botão "ATIVAR EXPOSIÇÃO" — que **só existe enquanto não há câmara**: numa visita
    seguinte, em que o browser já guarda a autorização, a exposição arranca sozinha (decisão **D41**);
    e ao atravessar um portal o botão **não aparece** — a página carrega com a linha «Carregando…»
-   (decisão **D42**)
+   (decisão **D42**) e com o último quadro da página anterior por baixo (decisão **D43**)
 3. Permita o acesso à câmera quando solicitado (é a dimensão 0, a realidade)
 4. Explore o ambiente utilizando o mouse (desktop) ou o D-pad (mobile)
 

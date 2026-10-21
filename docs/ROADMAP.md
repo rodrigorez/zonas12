@@ -1819,8 +1819,9 @@ Quatro blocos acrescentados depois do fecho, por achados do autor a jogar o publ
 **B11** (a chegada por uma porta não pede licença, **D37**), o **B12** (a porta do portão mostra a
 realidade ao vivo, **D38**), o **B13** (o nome de cada porta, **D39**) e o **B14** (o nome de cada
 obra, **D40**) — todos com o seu registo abaixo, na mesma ordem e com as medições. O **B15** veio
-depois do teste no telemóvel (**D41**: o botão de entrada segue a câmara, não o clique) e o **B16**
-do vídeo do autor a mostrar o botão a meio de uma transição entre portais (**D42**).
+depois do teste no telemóvel (**D41**: o botão de entrada segue a câmara, não o clique), o **B16**
+do vídeo do autor a mostrar o botão a meio de uma transição entre portais (**D42**) e o **B17** de um
+segundo vídeo, do ecrã preto no meio da mesma travessia (**D43**).
 
 #### O que o B1 entregou e mediu (2026-10-20) — fecha o **R3**
 
@@ -2529,6 +2530,67 @@ regenerados a partir da raiz (o `index.html` mudou).
 build, o clique que espera, o `showLoading()` na chegada), `js/modules/camera.js` (`showLoading`
 exportado, `hideStartButton`/`showStartButton` com o atributo `hidden`, e o tempo-limite da permissão).
 
+#### O que o B17 entregou e mediu (2026-10-22) — a travessia deixou de passar pelo preto
+
+Achado pelo autor, num segundo vídeo (`.harness/imagenTeste/02.mp4`, 25,3 s, 1570×796), depois do B16:
+ao atravessar uma porta via-se, **na sequência**, a imagem do mundo para onde ia, a imagem esférica,
+**um quadro preto**, outra vez a imagem do mundo, **outro quadro preto**, e só então o mundo. Ele
+descreveu-o como acontecendo «com a câmara, com mundos e com dimensões».
+
+**Primeiro foi preciso ler o vídeo.** Não há `ffmpeg` nesta máquina e o primeiro instrumento lia todos
+os fotogramas iguais (brilho 88, `currentTime` preso em 0, `readyState` 4): o servidor do arnês não
+respondia a `Range`, e sem isso o Chrome não consegue procurar dentro de um mp4. Com o `Range` no
+servidor, o vídeo leu-se e a linha do tempo apareceu — **preto dos 11,35 aos 12,1 s** (0,85 s) e outra
+vez aos **21,5 s** (uma amostra), exactamente nos dois sítios onde há uma travessia.
+
+**A causa, medida e não deduzida.** Cada mundo é uma página (D24) e **todas** as portas da cidade e da
+praia são `navigate` (nenhuma muda de dimensão dentro da página): por isso «câmara, mundos e
+dimensões» são o mesmo caso — uma navegação. A página que chega não pinta nada até a cena estar
+construída, e no meio ficava o **preto do `#container-video`** (é ele, e não o `body`, que é opaco).
+Medido no browser a atravessar a porta 4 da praia a pé, com fotogramas a cada ~50 ms:
+
+| | amostras escuras | primeira imagem do destino |
+| --- | --- | --- |
+| antes | **2** (brilho **0,0** aos 242 ms e **1,1** aos 325 ms) | aos **403 ms** |
+| depois | **0** em 89 amostras | aos **213 ms** |
+
+**A correção (D43) — a ponte de imagem.** A única imagem que serve é a que o visitante já estava a ver:
+a página que sai compõe o **último quadro** (o `<video>` da câmara por baixo, o canvas por cima, na
+ordem e no enquadramento do CSS) e guarda-o em `sessionStorage`; a página que chega pinta-o **antes de
+tudo o resto**, e o `js/app.js` desvanece-o quando há cena. O `js/arrival-frame.js` é o único script
+**clássico** do projeto e a única linha de código no markup: um módulo só corre depois de carregar a
+sua árvore de importações, e enquanto isso o ecrã já estava preto.
+
+**Medido (7 de 7)**, num ecrã de telemóvel (390×844, `dpr` 2) com câmara falsa:
+
+| Caso | Medição |
+| --- | --- |
+| o quadro guardado é a imagem do ecrã | **76 kB**, 780×1688, brilho **191,5** (o canvas sozinho é transparente: sem compor o vídeo, a ponte seria preta) |
+| a travessia não tem fotograma escuro | **0** em **89** amostras (antes: **2**) |
+| a ponte está lá na primeira pintura | `frame 1 ponte=true` — o teste corre dentro do primeiro `requestAnimationFrame`, que precede a pintura |
+| desvanece e sai quando há cena | desvanece aos **678 ms**, sai aos **746 ms** |
+| a chave é de uso único | recarregar a seguir: sem ponte, chave apagada |
+| sem cena (construção falhada) | a ponte sai na mesma ao fim da guarda de **10 s** |
+| custo da captura | **43–57 ms** para 780×1688 (uma vez por travessia; o ecrã não muda enquanto decorre) |
+
+Sem regressões: a consola com **0** erros e **0** avisos nas 5 páginas, a bateria dos doze nos 5 mundos
+(com o T10/T12 do `example` exactamente nos mesmos números de antes — verificado com e sem a
+alteração), o editor em **35 de 35**, a D37 em **5 de 5**, a D41 em **7 de 7**, a D42 em **9 de 9**,
+`validate.mjs` **0** e `laws-selftest` **21 de 21**, e as metas todas. Os quatro arranques foram
+regenerados a partir da raiz (o `index.html` mudou).
+
+E na **versão publicada** (GitHub Pages, `/zonas12/praia/`, com a cache desligada e o mesmo caminho a
+pé pela porta 4): **122** amostras, **0** escuras, a ponte no primeiro fotograma, chegada à cidade —
+**4 de 4**. É onde o autor viu o defeito, e é onde ele deixou de existir.
+
+*(A bateria da D37 acusava duas falhas herdadas: era anterior à D41, e esperava o botão à espera numa
+primeira visita com a permissão já dada. Foram corrigidas as expectativas, não o código — com e sem
+esta alteração o resultado era o mesmo 3 de 5.)*
+
+**O que mudou:** `js/arrival-frame.js` (novo), `index.html` e os três arranques (a linha do script),
+`css/style.css` (`.ultimo-quadro`), `js/modules/portal.js` (o `capture()` antes de navegar) e
+`js/app.js` (o `hide()` quando há cena).
+
 #### Metas de sucesso
 
 **(a) Comportamento — nenhum número pode mudar.** Os **doze** testes de §10 na exposição, nos 5
@@ -3186,6 +3248,7 @@ alteram comportamento.
 | D40 | O nome de cada obra | O mesmo, com a mesma tecla: `#0 · galeriaFoto1 · Cidade 360º · modal` — o **título** quando o dado tem um (D21), senão o **id do asset** (que é o que se edita no ficheiro), a dimensão pelo **nome** e a interacção pela palavra do dado (`modal`/`none`/`link`). O desenho é um só para portas e obras — `js/modules/label.js` —, para os dois não divergirem em tamanho, cor ou tipo de letra |
 | D41 | O botão de entrada segue a câmara | O botão «ATIVAR EXPOSIÇÃO» é a **porta para a câmara**, por isso só existe enquanto não há câmara: esconde-se **no instante em que há um stream** (mesmo que a câmara não esteja à vista — numa sala ela é só a janela da porta) e nunca volta a aparecer com um stream vivo. E uma visita em que o browser **já tem a permissão** (`permissions.query`) arranca sozinha, sem gesto: a permissão *é* o registo do gesto. Em browsers que não respondem a essa pergunta (Safari), fica a regra do gesto (**D34**) |
 | D42 | O botão não aparece a meio de uma transição | O botão está **escondido no markup** e só aparece quando a página decidiu que é ele que falta — e a decisão é tomada **antes de a cena carregar**: com `?from=` (chegada) nunca aparece, e na primeira visita aparece antes dos assets. Enquanto carrega, a chegada mostra a linha «Carregando…» em vez de um ecrã preto com um botão por cima (era o que se via no vídeo do autor entre portais). A pergunta da permissão é esperada no máximo **1 s**: uma resposta que não chega não pode travar a exposição |
+| D43 | A travessia entre mundos não passa pelo preto | A página que sai guarda o **último quadro** que estava a mostrar (`sessionStorage`) e a que chega pinta-o antes de tudo o resto, desvanecendo-o quando há cena. O quadro é **composto**: o `<video>` da câmara por baixo e o canvas por cima, na ordem e no enquadramento do CSS — o canvas é `alpha: true` e, sem essa composição, a ponte seria um retângulo preto nas salas onde a câmara é o chão da cena. Vive em `js/arrival-frame.js`, e é o único script **clássico** do projeto: tem de correr antes da primeira pintura, e um módulo só corre depois de carregar a sua árvore de importações (que é exactamente a janela que se quer fechar). A chave é de **uso único** (recarregar não repete a imagem) e tem um prazo de **20 s**; uma cena que não chegue ao fim vê a ponte sair na mesma ao fim de **10 s**, para uma imagem parada não esconder um erro |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -3314,6 +3377,17 @@ chegada mostra «Carregando…» em vez de um ecrã preto. A pergunta da permiss
 uma sonda que anota cada mudança numa rede de 800 kB/s (o botão **nunca** aparece numa chegada; na
 primeira visita aparece **antes** dos assets), sem regressões na bateria, no editor, nas etiquetas e
 nas leis.
+
+**B17, a partir de um segundo vídeo do autor** — a travessia deixou de passar pelo **preto** (**D43**):
+lido o vídeo fotograma a fotograma (foi preciso dar `Range` ao servidor do arnês, senão o Chrome não
+procura dentro do mp4), o preto estava nos dois sítios onde há uma travessia — 0,85 s e uma amostra.
+Cada mundo é uma página (D24) e todas as portas navegam, por isso «câmara, mundos e dimensões» é o
+mesmo caso. A página que sai deixa o **último quadro** composto (vídeo + canvas) e a que chega
+pinta-o antes de tudo, desvanecendo-o quando há cena (`js/arrival-frame.js`, o único script clássico,
+porque tem de correr antes da primeira pintura). Medido: **2 → 0** amostras escuras, o quadro é a
+imagem do ecrã (**76 kB**, brilho **191,5**), sai aos **746 ms**, e **7 de 7** na bateria do bloco —
+sem regressões no resto. Verificado também na **versão publicada** (GitHub Pages): **122** amostras
+numa travessia a pé, **0** escuras.
 
 ### O que fica decidido, em uma frase
 

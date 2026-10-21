@@ -149,6 +149,12 @@ async function start() {
   if (built) startFrameDriver();
   if (!built) return;
   if (auto) startSession({ arrival: true });
+  // The image bridge has done its work once there is a scene to look at (D43): what the visitor sees
+  // from here on is the world. Two frames, not one — the canvas has to be on the screen before the
+  // frame that was covering it fades.
+  if (window.arrivalFrame) {
+    requestAnimationFrame(() => requestAnimationFrame(() => window.arrivalFrame.hide()));
+  }
 }
 
 // The click is bound at module level, before the scene exists: a visitor who taps the button while the

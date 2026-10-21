@@ -374,6 +374,11 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     // The only thing that crosses the boundary, besides the address, is the slug of this world: the
     // destination uses it to choose which door the visitor appears behind (law L17).
     if (worldSlug) url.searchParams.set('from', worldSlug);
+    // The image bridge (D43): this page leaves the last frame it is showing for the one that
+    // arrives, which paints it before it has a scene. `js/arrival-frame.js` is a classic script
+    // because it has to run before the first paint and a module cannot — so it is reached through
+    // the window, and a host without it navigates exactly as before.
+    if (window.arrivalFrame) window.arrivalFrame.capture();
     window.location.assign(url.href);
   }
 });

@@ -19,6 +19,15 @@ html, body {
 }
 #webcam-video { width: 100% !important; height: 100% !important; object-fit: cover; }
 
+/* A ponte entre dois mundos (D43): o último quadro da página que saiu, por cima do preto da câmara
+   e por baixo da cena. Enquanto a cena não estiver construída é isto que se vê, em vez de um ecrã
+   preto a meio de uma travessia. O `js/app.js` baixa a opacidade quando há cena. */
+.ultimo-quadro {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 2; pointer-events: none;
+  opacity: 1; transition: opacity 240ms ease-out;
+}
+
 /* Elementos AR 3D */
 #container-3d {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
