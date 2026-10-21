@@ -152,8 +152,9 @@ function arrivalDoor(scene, from) {
 
 // What an artwork opens, if it opens anything: an external address when `interaction` is `link`,
 // and otherwise the file the catalogue has for its asset (D20 — the artwork names the asset once
-// and the address derives from it, here, in one place).
-function addressToOpen(artwork, catalogue) {
+// and the address derives from it, here, in one place). Exported because the editor re-creates one
+// artwork at a time and has to resolve the same address the same way (Fase 4, D33).
+export function addressToOpen(artwork, catalogue) {
   if (artwork.interaction === 'link') return artwork.url || null;
   if (artwork.interaction !== 'modal') return null;
   const asset = catalogue[artwork.asset];

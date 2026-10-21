@@ -2,8 +2,9 @@
 // that a panel that has nothing to say stays invisible, and the composition is one list.
 import * as cameraPanel from './camera.js';
 import * as dimensionPanel from './dimension.js';
+import * as artworkPanel from './artwork.js';
 
-const PANELS = [cameraPanel, dimensionPanel];
+const PANELS = [cameraPanel, dimensionPanel, artworkPanel];
 
 // `context` is the small contract between a panel and the editor:
 //   world()                  the data being edited

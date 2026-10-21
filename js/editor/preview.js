@@ -6,10 +6,11 @@
 // One scene at a time. The build is asynchronous (the assets load first), so the previous scene goes
 // down before the next one goes up: two built scenes at once would double the textures in memory for
 // no gain, since only one is ever shown.
-import { buildScene, withDefaults } from '../scene/scene-builder.js';
+import { buildScene, withDefaults, addressToOpen } from '../scene/scene-builder.js';
 import { SCENE } from '../scene/schema.js';
 import { startFrameDriver } from '../modules/portal.js';
 import { createDimension, removeDimension } from '../modules/dimension.js';
+import { createArtwork, removeArtwork } from '../modules/artwork.js';
 import { createPlayerCamera } from '../modules/camera.js';
 
 let built = null;
@@ -77,4 +78,25 @@ export function replaceCamera(player) {
   if (built.elements.camera) built.elements.camera.remove();
   built.elements.camera = createPlayerCamera(withDefaults(player, SCENE.cameras.fields.player), previewElement());
   return built.elements.camera;
+}
+
+// An artwork is found by the id it carries in the DOM (`data-artwork-id`, set by the module): the
+// array order would work too, but an id is what the data says and what a reader of the DOM can see.
+export function replaceArtwork(artwork, catalogue) {
+  if (!built) return null;
+  const previous = built.elements.artworks.find(
+    (element) => Number(element.getAttribute('data-artwork-id')) === Number(artwork.id)
+  ) || null;
+  if (previous) {
+    const at = built.elements.artworks.indexOf(previous);
+    if (at >= 0) built.elements.artworks.splice(at, 1);
+    removeArtwork(previous);
+  }
+  const data = withDefaults(artwork, SCENE.artworks);
+  // The address an artwork opens is derived from the catalogue, never written in the data (D20) — and
+  // it is the builder's own function, so the preview cannot open something the exhibition would not.
+  data.url = addressToOpen(data, catalogue);
+  const created = createArtwork(data, previewElement());
+  built.elements.artworks.push(created);
+  return created;
 }

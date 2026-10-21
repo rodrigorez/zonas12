@@ -1708,7 +1708,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: plano registado em 2026-10-16 (B0), com o B1 ao B5 entregues em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
+**Estado: plano registado em 2026-10-16 (B0), com o B1 ao B6 entregues em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -2003,6 +2003,40 @@ delas**.
 Uma nota de âmbito: o painel da dimensão **não oferece** `kind: "color"` (a **D30** decidiu que o
 editor não oferece o que a cena não constrói) nem deixa mudar o **id** de uma dimensão existente —
 mudá-lo deixaria todas as obras e portas a apontar para um nome que já não existe.
+
+#### O que o B6 entregou e mediu (2026-10-20) — o painel da obra
+
+| Peça | O que é |
+| --- | --- |
+| `js/editor/panels/artwork.js` | As obras **agrupadas por dimensão** (§7), um cartão por obra (asset, posição, rotação, tamanho, interacção, título por língua, excluir) e o formulário de inserção |
+| `preview.replaceArtwork(artwork, catalogue)` | Re-cria **uma** obra e resolve o endereço com o `addressToOpen` do construtor — **exportado**, para o editor não abrir o que a exposição não abriria |
+| `createArtwork` | Passou a escrever `data-artwork-id`, como os portais já tinham `data-portal-id`: é o que deixa o editor encontrar a entidade sem depender da ordem do array |
+
+Duas escolhas que a **D30** obrigou:
+
+- **`kind` não é um campo.** Vem do tipo do asset no catálogo (`image`/`video`) — e a validação já
+  recusa um `kind` e um `asset` em desacordo, por isso não há dois sítios a dizer o mesmo.
+- **`interaction` oferece `modal` e `none`.** Um ficheiro que diga `link` mostra-o **selecionado e
+  desativado**, com a nota da D30: não se oferece o que a cena não constrói, mas também não se
+  apresenta o ficheiro a dizer outra coisa.
+
+**Medido:**
+
+| O que se pediu | Resultado |
+| --- | --- |
+| **Inserir 2 obras** pela interface | Entradas de conteúdo **6 → 8**, malhas **3 → 5**, com as posições `[5, 1.5, −50]` e `[−5, 1.5, −50]` **na cena** |
+| O **título por língua** no ficheiro exportado | `title: { "pt", "en" }` numa e `{ "pt" }` na outra |
+| **Mover** uma obra (x → 8) | A malha vai para `8` — a entidade foi refeita, o mundo não (D33) |
+| Passar uma obra a **`none`** | O elemento perde o `open-artwork` (deixa de abrir) e o dado diz `none` |
+| **Excluir** uma obra | **4** obras e **4** malhas; a linha de estado acompanha |
+| Um ficheiro com **asset em falta** | Cartão marcado + «O asset «nao-existe» não está no catálogo.» + o erro da **L9** no validador, sem erros de consola |
+
+A exposição mantém os números nos dois mundos medidos: portão (T4 `0` · T5 `0/2319/0` · T9 `20` com
+`2→2` · T10 `183 457/28 539` com **0** fora · T2/T3 **0** de 84 e **0** em **24 906**) e fixture (T4
+`255` · **T6 sim** · T9 `20` com `4→4` · T10 `275 425/42 903` com **0** fora · T2/T3 idem).
+
+**O que ficou por fazer deste painel:** a exclusão **em lote por dimensão** (§7) não entrou — é uma
+operação destrutiva e merece a confirmação que a **D35** e o B9 vão trazer.
 
 #### Metas de sucesso
 

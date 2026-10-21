@@ -190,6 +190,9 @@ AFRAME.registerComponent(ARTWORK_COMPONENT, {
 export function createArtwork(artwork, parent) {
   const el = document.createElement('a-box');
   el.setAttribute('class', 'interactable');
+  // The id in the DOM, like a portal's and a dimension's: it is what the editor uses to find the
+  // element of the artwork it is changing without rebuilding the world (Fase 4, D33).
+  el.setAttribute('data-artwork-id', artwork.id);
   el.setAttribute('src', '#' + artwork.asset);
   el.setAttribute('width', artwork.size[0]);
   el.setAttribute('height', artwork.size[1]);
