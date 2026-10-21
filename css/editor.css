@@ -249,6 +249,17 @@ fieldset.campo input[type="number"] {
   color: #ffce5c;
 }
 
+.nota.bom {
+  color: #9fd6a4;
+}
+
+.nota.comando {
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.85rem;
+  color: #d8cfcf;
+  overflow-wrap: anywhere;
+}
+
 .nota.erro {
   color: #ff9b9b;
   min-height: 1.2em;

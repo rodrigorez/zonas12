@@ -1708,7 +1708,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: plano registado em 2026-10-16 (B0), com o B1 ao B7 entregues em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
+**Estado: plano registado em 2026-10-16 (B0), com o B1 ao B8 entregues em 2026-10-20 — falta o B9 e o B10.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -2068,6 +2068,44 @@ O painel diz isso no topo, para o campo não ser procurado onde não existe.
 A exposição mantém os números (portão: T4 `0` · T5 `0/2319/0` · T9 `2→2` · T10 `183 457/28 539` com
 **0** fora · T2/T3 **0** de 84 e **0** em **24 906**; fixture: T4 `255` · **T6 sim** · T9 `4→4` · T10
 `275 425/42 903` · T2/T3 idem), e o painel do portal não tocou em código partilhado.
+
+#### O que o B8 entregou e mediu (2026-10-20) — o painel do mundo e a ferramenta da D31
+
+| Peça | O que é |
+| --- | --- |
+| `js/editor/panels/world.js` | O que um mundo **é** (slug, nome por língua), o que **abre** (as portas para outros mundos, com o retrato e o raio), o **mapa da casa** e o bloco «nova sala» |
+| `js/editor/worlds.js` | O único sítio que lê um mundo que não se está a editar — para responder à **L11** e à **L19**. Lê e guarda; **nunca constrói** (L13) |
+| `tools/scene/new-world.mjs` | A pasta e o arranque de um mundo novo (D31): o mesmo `index.html` com `<base href="../">`, conferido pelo `checkArranques` |
+| `js/editor/index.js` | `validateScene(…, { worldExists })` — a resposta que o browser também pode dar, o que transforma a L11 de «não verificada» em erro a sério |
+
+**A D31 em três medições, todas da ferramenta:**
+
+| Comando | Resultado |
+| --- | --- |
+| `node tools/scene/new-world.mjs cidade2` | Cria `cidade2/index.html`; **5** arranques conferidos; o ficheiro é **igual** ao da raiz fora do `<base>` |
+| o mesmo, outra vez | `cidade2/ já existe: a ferramenta não escreve por cima do que lá está.` (exit **1**) |
+| `… Cidade2` e `… gate` | slug inválido e «o portão vive na raiz, não numa pasta» (exit **1**, cada um) |
+
+**No editor, as duas leis a acusar uma avaria injectada:**
+
+| Avaria | O que o editor disse |
+| --- | --- |
+| Uma porta apontada a `nao-existe` | No cartão da porta: «O ficheiro do destino «nao-existe» não existe (L11)», e no validador: `portals[0]: the world "nao-existe" does not exist — law L11` |
+| A chegada de `gate` apagada em `cidade` (a porta passa a dizer `praia`) | O **mapa** acusou `gate → cidade: o destino não declara a chegada` — e voltou ao «bom» quando a chegada foi reposta |
+| Uma sala nova ligada pelo painel (`cidade2`, com retrato e raio) | Porta criada (`preview`, `retrato-cidade`, raio `60`), com a mensagem «Porta criada para «cidade2». Arruma-a no painel Portais.» e a **L11** a avisar que o **ficheiro** do mundo ainda não existe (a pasta é da ferramenta; o JSON é o export) |
+
+**Três defeitos apanhados pela medição, e o que cada um ensinou:**
+
+1. Os cartões das portas e o da nova sala eram construídos e **nunca anexados** — a medição viu o título
+   e nenhum cartão. Um `appendChild` que falta não faz barulho.
+2. O painel comparava o **caminho** do ficheiro (`data/worlds/gate.json`) com o slug e acusava uma
+   divergência que não existia — passou a comparar só o nome.
+3. O **mapa** não se repintava depois de mudar uma chegada (e repintar a cada tecla tirava o foco do
+   campo): as chegadas e os destinos passaram a ter `debounce` **e** repintura.
+
+E uma decisão que a medição obrigou a alinhar com a linha de comando: o **fixture** fica fora do mapa
+(`graphScenes()`), tal como o `validate.mjs` já o deixa de fora — senão o editor acusava
+`example → praia`, uma porta que a linha de comando não conta e que existe para exercitar mecanismos.
 
 #### Metas de sucesso
 

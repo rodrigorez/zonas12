@@ -247,12 +247,16 @@ function card(portal, context, data) {
     name: 'portal.' + portal.id + '.arrivalFrom',
     labelKey: 'editor.portal.arrivalFrom',
     value: portal.arrivalFrom || '',
-    onChange: (value) => {
+    // Debounced, and it repaints: the map in the Mundo panel is made of these doors, so it has to
+    // follow. Repainting on every keystroke would take the focus out of the field being typed in, so
+    // the paint waits for the typing to stop.
+    onChange: debounce(async (value) => {
       if (value.trim() === '') delete portal.arrivalFrom;
       else portal.arrivalFrom = value.trim();
       // It is read when the visitor arrives, not when the door is drawn: no entity to re-create.
-      context.change();
-    }
+      await context.change();
+      context.rerender();
+    }, 400)
   });
 
   button(box, {
@@ -399,11 +403,14 @@ function actionAxis(box, portal, context) {
       labelKey: 'editor.portal.target',
       value: portal.action.target || '',
       datalist: 'mundos-portal',
-      onChange: (value) => {
+      // Debounced for the same reason as `arrivalFrom`: it changes what the map says, and repainting
+      // while the author is typing would take the focus away.
+      onChange: debounce(async (value) => {
         portal.action.target = value.trim();
         preview.replacePortal(portal);
-        context.change();
-      }
+        await context.change();
+        context.rerender();
+      }, 400)
     });
   }
 }

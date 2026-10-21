@@ -4,8 +4,10 @@ import * as cameraPanel from './camera.js';
 import * as dimensionPanel from './dimension.js';
 import * as artworkPanel from './artwork.js';
 import * as portalPanel from './portal.js';
+import * as worldPanel from './world.js';
 
-const PANELS = [cameraPanel, dimensionPanel, artworkPanel, portalPanel];
+// The order of section 7 of the roadmap: what the world is, what it is made of, and the camera.
+const PANELS = [worldPanel, dimensionPanel, artworkPanel, portalPanel, cameraPanel];
 
 // `context` is the small contract between a panel and the editor:
 //   world()                  the data being edited

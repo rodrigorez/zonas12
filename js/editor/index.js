@@ -10,6 +10,7 @@ import { setWorld, currentWorld, parseWorld, exportWorld, slugOf, countsOf } fro
 import * as preview from './preview.js';
 import * as problems from './problems.js';
 import * as panels from './panels/index.js';
+import * as worlds from './worlds.js';
 
 // The gate is the world the exhibition starts in (D24), so it is the one the editor opens with.
 const START_WORLD = 'gate';
@@ -34,20 +35,16 @@ async function fetchWorld(slug) {
   return response.json();
 }
 
-// The worlds the editor offers. There is no manifest (D14, M5) and a page cannot list a folder, so
-// the list is **derived**: the gate plus every world its doors open — which is what a room is — plus
-// the fixture. Typing any other slug still works, and is the way to open a world before its door
-// exists.
+// The worlds the editor offers. There is no manifest (D14, M5) and a page cannot list a folder, so the
+// list is **derived** by js/editor/worlds.js: the gate plus every world its doors open — which is what
+// a room is — plus the fixture. Typing any other slug still works, and is the way to open a world
+// before its door exists.
 async function fillWorldList() {
   const list = byId('mundos');
   if (!list) return;
-  const slugs = new Set([START_WORLD, FIXTURE_WORLD]);
+  let slugs = [];
   try {
-    const gate = await fetchWorld(START_WORLD);
-    for (const portal of gate.portals || []) {
-      const action = portal.action || {};
-      if (action.kind === 'navigate' && typeof action.target === 'string') slugs.add(action.target);
-    }
+    slugs = await worlds.refresh();
   } catch (error) {
     // The gate could not be read: the list keeps what it has, and a world can still be opened by slug.
     console.warn('[editor] the list of worlds could not be derived from the gate:', error.message);
@@ -62,9 +59,24 @@ async function fillWorldList() {
 function validate() {
   const world = currentWorld();
   if (!world) return null;
-  const report = validateScene(world.data);
+  // `worldExists` is the answer the command line gives (L11) and the page can give too, because the
+  // editor reads the files: without it the law is reported as "not verified" and a door to nowhere
+  // looks fine. A slug that has not been looked for yet answers `undefined`, never a false accusation.
+  const report = validateScene(world.data, { worldExists: (slug) => worlds.exists(slug) });
   problems.show(report);
   return report;
+}
+
+// Before validating, make sure every world this one names has been looked for — that is what turns
+// L11 from "not verified" into a real answer.
+async function revalidate() {
+  const world = currentWorld();
+  if (!world) return;
+  const targets = ((world.data.portals) || [])
+    .map((portal) => (portal.action || {}).target)
+    .filter((target) => typeof target === 'string' && WORLD_NAME.test(target));
+  await worlds.ensure(targets);
+  validate();
 }
 
 function refreshStatus() {
@@ -105,7 +117,7 @@ function panelContext() {
         }
         ensureActiveDimension(world.data);
       }
-      validate();
+      await revalidate();
       // The line at the top counts what the file has, so it has to follow an insert or a deletion;
       // leaving it saying "dimensões: 1" next to two cards is the kind of quiet lie this project
       // spends its measurements avoiding.
@@ -114,6 +126,8 @@ function panelContext() {
     // A panel may need to say something that is not a count (a door whose action had to change to stay
     // legal, for instance). It goes to the same line, which is where the author is already looking.
     message: (text) => setStatus(text),
+    // The name of the file the world was read from — the panel compares it with the slug (D28).
+    file: () => (currentWorld() ? currentWorld().file : ''),
     rerender: () => panels.renderAll(panelContext())
   };
 }
@@ -130,7 +144,7 @@ async function adopt(data, file) {
     return;
   }
   ensureActiveDimension(data);
-  validate();
+  await revalidate();
   panels.renderAll(panelContext());
   refreshStatus();
   if (window.portalDebug) window.portalDebug.world = slugOf(data, null);
@@ -205,8 +219,9 @@ export async function startEditor() {
   bind('mundo', 'keydown', (event) => {
     if (event.key === 'Enter') openWorld(input.value.trim());
   });
-  bind('validar', 'click', () => {
-    if (validate()) setStatus(t('editor.status.valid'));
+  bind('validar', 'click', async () => {
+    await revalidate();
+    setStatus(t('editor.status.valid'));
   });
   bind('exportar', 'click', exportCurrent);
   bind('importar', 'change', (event) => importFile(event.target.files && event.target.files[0]));
