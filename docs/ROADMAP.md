@@ -2245,6 +2245,23 @@ por catálogo), o §Verificado nesta versão (a bateria dos doze nas 5 páginas,
 de fora, as 35 verificações do editor e o R11), o §Limitações (a D30 e o que o editor **não** faz) e
 uma secção nova, §A página de edição, mais o passo 5 do §Como usar.
 
+**A versão publicada, medida depois do `push` (B10).** Com o `main` empurrado, o endereço
+<https://rodrigorez.github.io/zonas12/> passou a servir a Fase 4 — e foi medido no browser, com a
+cache desligada: **7 de 7**. O **editor publicado** abre a cidade com a cena construída (5 malhas) e
+`Erros: 0 · Avisos: 0 · Por verificar: 0`, com o «Desfazer» desactivado e a marca escondida; o
+**portão publicado** passa o **T4** (alfa 0 fora), o **T5**, o **T9** `2 → 2` (12 nós), o
+**T10/T12** (as 4 portas de retrato, 0 px fora da moldura) e o **T2/T3** (84 poses, 0 falhas); e o
+**céu publicado**, aberto com `?from=praia`, tem as **duas** obras no primeiro plano da chegada — o
+R11 está na versão que o mundo vê.
+
+**E revelou um defeito no instrumento.** As importações de `tools/regression/acceptance.mjs` eram
+absolutas a partir da raiz (`/js/scene/arrival.js`): funcionam em `http://127.0.0.1:8123/` e dão
+**404** debaixo de `/zonas12/`, onde a versão publicada vive — o `import` dinâmico rebentava com
+`Failed to fetch dynamically imported module`. Passaram a relativas ao próprio módulo
+(`../../js/…`) e os comentários de uso a `import('./tools/…')`, relativo à página; a bateria local
+manteve os mesmos números e a publicada passou a correr. É a terceira vez na fase que medir a **versão
+que o mundo vê** encontra o que medir a cópia local não encontrava.
+
 **Marco: a branch `v0.0.7`.**
 
 #### Metas de sucesso

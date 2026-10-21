@@ -199,10 +199,10 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 Marcado pela branch `v0.0.7`. É o estado depois da **Fase 4** do roadmap — a **página de edição**
 (`editor.html`), fechada bloco a bloco com o que cada um entregou e mediu em
 [docs/ROADMAP.md](docs/ROADMAP.md) §9. Tudo o que está nesta secção foi medido a **2026-10-20** na
-versão local (a bateria está em §9); **por testar pelo autor** nas outras duas — a publicada (o
-GitHub Pages serve o `main`, em <https://rodrigorez.github.io/zonas12/>, e publicar é empurrar o
-`main`) e no telemóvel, que é como as versões anteriores foram dadas por fechadas. A versão anterior
-é a `v0.0.6` (o estado depois da Fase 3B), marcada pela branch com o mesmo nome.
+versão local (a bateria está em §9) e, no mesmo dia, **na publicada** — 7 verificações no browser
+contra o que o GitHub Pages serve (abaixo); fica **por testar pelo autor** no **telemóvel**, que é
+como as versões anteriores foram dadas por fechadas. A versão anterior é a `v0.0.6` (o estado depois
+da Fase 3B), marcada pela branch com o mesmo nome.
 
 Resumo do que existe hoje: `index.html` (**86 linhas**) e as **3** salas com o **mesmo** ficheiro
 (`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `editor.html` (**83**),
@@ -359,6 +359,23 @@ sessão que conte navegações de página — o B3 mediu `walkDoor(0)` a navegar
 a captura no **telemóvel** (390×844) e o D-pad (**4,2 m** em 250 ms) — os três são da v0.0.6 e a
 Fase 4 não lhes tocou: a única mudança no construtor de cena foi a pré-visualização sem navegação
 (D32), que só o editor usa.
+
+**A versão publicada** (<https://rodrigorez.github.io/zonas12/>, o `main` servido pelo GitHub Pages),
+medida no browser depois do *push*, com a cache desligada — **7 de 7**:
+
+- o **editor publicado** abre a cidade com a cena construída (**5** malhas) e o relatório em
+  `Erros: 0 · Avisos: 0 · Por verificar: 0`; «Desfazer» começa desactivado e a marca «alterado»,
+  escondida
+- o **portão publicado** passa o **T4** (alfa **0** fora da janela), o **T5** e o **T9** (`2 → 2`,
+  12 nós), o **T10/T12** (as **4** portas de retrato, 0 px fora da moldura) e o **T2/T3**
+  (**84** poses, **0** falhas)
+- o **céu publicado**, aberto com `?from=praia`, tem as **duas** obras no primeiro plano da chegada
+  — o R11 está na versão que o mundo vê
+
+Foi esta medição que apanhou um defeito no instrumento: as importações do `acceptance.mjs` eram
+absolutas a partir da raiz (`/js/scene/arrival.js`), o que funciona em `127.0.0.1:8123` e dá 404
+debaixo de `/zonas12/`. Passaram a relativas ao módulo, e é por isso que a bateria corre agora nos
+dois sítios.
 
 ### Limitações e decisões assumidas
 
