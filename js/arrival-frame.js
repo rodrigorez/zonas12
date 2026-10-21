@@ -7,7 +7,8 @@
 //
 // Este ficheiro fecha essa janela com a única imagem que serve: a última que o visitante estava a
 // ver. A página que sai guarda-a em `sessionStorage` no instante de atravessar (`capture`); a que
-// chega pinta-a antes de tudo o resto e o `js/app.js` desvanece-a quando há cena (`hide`).
+// chega pinta-a antes de tudo o resto e o `js/app.js` tira-a quando há cena (`hide`), num só
+// fotograma e sem desvanecimento — a travessia não deve dar a ver que houve uma (D44).
 //
 // É um script **clássico**, e não um módulo, de propósito: um módulo só corre depois de a sua
 // árvore de importações estar carregada, e enquanto isso o ecrã já estava preto. Este corre a meio
@@ -103,10 +104,10 @@
     if (!shown) return;
     const image = shown;
     shown = null;
-    image.style.opacity = '0';
-    setTimeout(function () {
-      if (image.parentNode) image.parentNode.removeChild(image);
-    }, 300);
+    // Um corte, não um desvanecimento (D44): as duas imagens são a mesma cena a um passo de
+    // distância, e dissolvê-las durante 240 ms vê-se como um efeito — exactamente a «impressão de
+    // transição» que a ponte existe para não haver. Sai no mesmo fotograma em que o mundo aparece.
+    if (image.parentNode) image.parentNode.removeChild(image);
   }
 
   shown = restore();

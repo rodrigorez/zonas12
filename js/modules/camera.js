@@ -132,7 +132,13 @@ export function setupMobileControls() {
 // The loading overlay is interface state, but it belongs here: it is only meaningful while
 // the webcam is being requested. Since D42 the entry point also shows it while the assets load, so an
 // arrival has something on the screen instead of a black page with a button on it.
+//
+// Since D43 an arrival already has something on the screen — the last frame of the world it came from
+// — and a line appearing over it is itself the sign of a crossing (measured seam: the bridge and the
+// arriving world differ by less than one step of walking, so any new element is what one notices).
+// The line is therefore only for a screen that would otherwise be empty (D44).
 export function showLoading() {
+  if (window.arrivalFrame && window.arrivalFrame.element()) return;
   const overlay = document.getElementById('loading-overlay');
   if (overlay) overlay.style.display = 'flex';
 }

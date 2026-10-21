@@ -447,8 +447,8 @@ dois sítios.
   assets chegam, o que se vê é «Carregando…» (com a rede de um telemóvel, alguns segundos).
 - **Ao atravessar um portal também não se vê um ecrã preto** (**D43**): a página que sai deixa o
   **último quadro** que estava a mostrar e a que chega pinta-o como primeira coisa, antes de ter cena;
-  quando o mundo está construído, o quadro desvanece-se. O que se vê é uma travessia contínua, e não
-  uma ida ao preto e volta.
+  quando o mundo está construído, o quadro sai **de uma vez**, num só fotograma (**D44**). O que se vê
+  é uma travessia contínua, e não uma ida ao preto e volta.
 
 ## Mundos e portas de mundo (Fase 3B, fechada em 2026-10-16)
 
@@ -581,6 +581,13 @@ escuras** em 89, o quadro é a imagem do ecrã (**76 kB**, 780×1688, brilho **1
 telemóvel), sai aos **746 ms**, e **7 de 7** na bateria do bloco — incluindo a chave de uso único
 (recarregar não repete a imagem) e a guarda de **10 s** para uma cena que não chegue. Na **versão
 publicada** (GitHub Pages), a mesma travessia a pé: **122** amostras, **0** escuras.
+
+E a travessia não se anuncia (**D44**): o quadro que veio da página anterior sai **de uma vez**, num só
+fotograma, e enquanto ele cobre o ecrã não aparece a linha «Carregando…» — os dois sinais que ainda
+diziam que algo tinha acontecido (medido: **0** desvanecimentos e **0** linhas na travessia, **8 de 8**).
+O que sobra é o que a sala de destino tem e o retrato dela não tinha — as obras que estão em frente da
+chegada —, e isso mede-se: **3,94** de diferença entre o quadro e o mundo, contra **2,69** do maior
+salto de um passo a caminhar.
 
 ## Funcionalidades Principais
 

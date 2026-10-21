@@ -2591,6 +2591,47 @@ esta alteração o resultado era o mesmo 3 de 5.)*
 `css/style.css` (`.ultimo-quadro`), `js/modules/portal.js` (o `capture()` antes de navegar) e
 `js/app.js` (o `hide()` quando há cena).
 
+#### O que o B18 entregou e mediu (2026-10-21) — a travessia não dá a ver que houve uma
+
+O autor testou o B17 e recusou-o: «não deveria ter quadro preto ou outra imagem, deveria ser somente
+a imagem que já estava vendo, sem a impressão de transição, isso deveria ser imperceptível». Duas
+coisas na ponte do B17 **eram** a transição: o quadro desvanecia-se em **240 ms** e a linha
+**«Carregando…»** aparecia por cima dele. Uma dissolução entre duas imagens parecidas lê-se como
+efeito, e uma linha a aparecer é exactamente aquilo em que se repara quando o resto não muda.
+
+**A costura, medida.** Foi preciso corrigir o instrumento primeiro: ele atravessava a porta **de
+costas** (mexia na posição da câmara e não na rotação), e o quadro guardado era o mundo de onde se
+vinha visto de lado, não a janela. Com a câmara a olhar para a porta e a andar 8,5 m até 2,5 m depois
+do plano, cada amostra comparada com a anterior por uma assinatura 4×4 de luminosidade:
+
+| O que se compara | Salto |
+| --- | --- |
+| último ecrã → quadro da ponte | **0,22** (a ponte é, de facto, o ecrã) |
+| quadro da ponte → mundo já assente | **3,94** |
+| maior salto a caminhar, antes de a janela encher o ecrã | **2,69** |
+| a janela a encher o ecrã (o efeito do portal, que é para existir) | **35,13** |
+
+Ou seja: o único salto que sobra é o do tamanho de **um passo de caminhada**, e o que ele mostra é o
+que a sala de destino tem e o retrato dela não tinha — em frente da chegada da cidade está a obra 3
+(a 9 m), que passa a ver-se (é a R11: a chegada é virada para dentro da sala). Não há como uma
+fotografia da página que sai prever os objectos 3D da página que chega.
+
+**A correção (D44):**
+
+- a ponte sai **de uma vez**, no mesmo fotograma em que o mundo aparece — sem `transition` no CSS e
+  sem `setTimeout` de remoção: medido, **sempre a opacidade 1** até desaparecer (aos 429 ms);
+- a linha «Carregando…» **não aparece** quando há ponte no ecrã (`showLoading()` pergunta-lhe): medido
+  na travessia, **nunca apareceu**. Continua a aparecer na primeira visita, onde a ponte não existe e
+  o ecrã estaria vazio.
+
+**Medido (8 de 8):** as seis verificações do B17 (o quadro é a imagem do ecrã, **0** fotogramas
+escuros, a ponte na primeira pintura, a chave de uso único, a guarda de 10 s, a chegada ao outro
+mundo) mais as duas novas (sai num só passo; a linha não aparece).
+
+**O que mudou:** `js/arrival-frame.js` (`hide()` sem desvanecimento e sem `setTimeout`),
+`css/style.css` (fora a `transition`), `js/modules/camera.js` (`showLoading()` cala-se quando a ponte
+cobre o ecrã) e `js/app.js` (o comentário da ordem).
+
 #### Metas de sucesso
 
 **(a) Comportamento — nenhum número pode mudar.** Os **doze** testes de §10 na exposição, nos 5
@@ -3249,6 +3290,7 @@ alteram comportamento.
 | D41 | O botão de entrada segue a câmara | O botão «ATIVAR EXPOSIÇÃO» é a **porta para a câmara**, por isso só existe enquanto não há câmara: esconde-se **no instante em que há um stream** (mesmo que a câmara não esteja à vista — numa sala ela é só a janela da porta) e nunca volta a aparecer com um stream vivo. E uma visita em que o browser **já tem a permissão** (`permissions.query`) arranca sozinha, sem gesto: a permissão *é* o registo do gesto. Em browsers que não respondem a essa pergunta (Safari), fica a regra do gesto (**D34**) |
 | D42 | O botão não aparece a meio de uma transição | O botão está **escondido no markup** e só aparece quando a página decidiu que é ele que falta — e a decisão é tomada **antes de a cena carregar**: com `?from=` (chegada) nunca aparece, e na primeira visita aparece antes dos assets. Enquanto carrega, a chegada mostra a linha «Carregando…» em vez de um ecrã preto com um botão por cima (era o que se via no vídeo do autor entre portais). A pergunta da permissão é esperada no máximo **1 s**: uma resposta que não chega não pode travar a exposição |
 | D43 | A travessia entre mundos não passa pelo preto | A página que sai guarda o **último quadro** que estava a mostrar (`sessionStorage`) e a que chega pinta-o antes de tudo o resto, desvanecendo-o quando há cena. O quadro é **composto**: o `<video>` da câmara por baixo e o canvas por cima, na ordem e no enquadramento do CSS — o canvas é `alpha: true` e, sem essa composição, a ponte seria um retângulo preto nas salas onde a câmara é o chão da cena. Vive em `js/arrival-frame.js`, e é o único script **clássico** do projeto: tem de correr antes da primeira pintura, e um módulo só corre depois de carregar a sua árvore de importações (que é exactamente a janela que se quer fechar). A chave é de **uso único** (recarregar não repete a imagem) e tem um prazo de **20 s**; uma cena que não chegue ao fim vê a ponte sair na mesma ao fim de **10 s**, para uma imagem parada não esconder um erro |
+| D44 | A travessia não dá a ver que houve uma | A ponte não se **desvanece**: sai num só fotograma, quando o mundo já está a ser desenhado — uma dissolução de 240 ms entre duas fotografias do mesmo sítio lê-se como efeito, e o que se quer é que a travessia não se anuncie. E enquanto a ponte cobre o ecrã **não se mostra a linha «Carregando…»**: o ecrã nunca está vazio, e um elemento a aparecer é o sinal mais visível de todos. Medido: o quadro da ponte difere do ecrã em **0,22** (é o ecrã), o mundo difere do quadro em **3,94** — um passo de caminhada (o maior salto a caminhar é **2,69**) —, o que sobra é a obra que está em frente da chegada, que nenhuma fotografia da página anterior pode prever |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -3388,6 +3430,13 @@ porque tem de correr antes da primeira pintura). Medido: **2 → 0** amostras es
 imagem do ecrã (**76 kB**, brilho **191,5**), sai aos **746 ms**, e **7 de 7** na bateria do bloco —
 sem regressões no resto. Verificado também na **versão publicada** (GitHub Pages): **122** amostras
 numa travessia a pé, **0** escuras.
+
+**B18, no mesmo dia, por recusa do autor** — «não deveria ter… outra imagem… sem a impressão de
+transição» (**D44**): a ponte deixou de se desvanecer (sai num fotograma só) e a linha «Carregando…»
+deixou de aparecer quando há ponte. Medida a costura com uma assinatura 4×4 de luminosidade, amostra
+a amostra: a ponte é o ecrã (**0,22** de diferença), o mundo difere dela em **3,94** — o tamanho de um
+passo (o maior a caminhar é **2,69**) —, e o que resta é a obra que está em frente da chegada, que uma
+fotografia da página anterior não pode adivinhar. **8 de 8**.
 
 ### O que fica decidido, em uma frase
 

@@ -21,11 +21,11 @@ html, body {
 
 /* A ponte entre dois mundos (D43): o último quadro da página que saiu, por cima do preto da câmara
    e por baixo da cena. Enquanto a cena não estiver construída é isto que se vê, em vez de um ecrã
-   preto a meio de uma travessia. O `js/app.js` baixa a opacidade quando há cena. */
+   preto a meio de uma travessia. O `js/app.js` tira-a quando há cena — num fotograma só, sem
+   transição: as duas imagens são a mesma cena, e uma transição ver-se-ia (D44). */
 .ultimo-quadro {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   object-fit: cover; z-index: 2; pointer-events: none;
-  opacity: 1; transition: opacity 240ms ease-out;
 }
 
 /* Elementos AR 3D */
