@@ -25,7 +25,8 @@ zonas12/
 │   ├── editor.js       o arranque da página de edição (a entrada, 14 linhas — D36)
 │   ├── i18n.js         o catálogo da interface: `t()`, `?lang=` e a aplicação ao markup (D12)
 │   ├── core/           núcleo: estado, registos, stencil, eventos, limites
-│   ├── modules/        dimensão, obra, portal e câmara (Fase 2), com as fábricas da Fase 3
+│   ├── modules/        dimensão, obra, portal e câmara (Fase 2), com as fábricas da Fase 3, e o
+│   │                   nome das coisas na vista de debug (`label.js`, Fase 4)
 │   ├── scene/          a cena em dados: schema, validação, construtor e as regras de desenho
 │   └── editor/         o editor (Fase 4): modelo, painéis, pré-visualização, problemas, os
 │                       controlos partilhados e as respostas que a página pode dar sobre os ficheiros
@@ -34,7 +35,7 @@ zonas12/
 │                       (o mundo sai do **endereço**: `/` é o portão, `/cidade/` é a cidade; o
 │                       `?scene=<mundo>` continua a forçar um deles, para os testes)
 ├── i18n/
-│   └── pt.json         textos da interface: 150 chaves (137 delas do editor), lidas por js/i18n.js
+│   └── pt.json         textos da interface: 154 chaves (137 delas do editor), lidas por js/i18n.js
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos, mundos e página de edição)
 ├── assets/
@@ -206,13 +207,13 @@ da Fase 3B), marcada pela branch com o mesmo nome.
 
 Resumo do que existe hoje: `index.html` (**86 linhas**) e as **3** salas com o **mesmo** ficheiro
 (`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `editor.html` (**83**),
-`js/app.js` (**134**), `js/editor.js` (**14**, a entrada do editor — D36), `js/editor/`
-(**10** ficheiros, **2687** linhas com os painéis), `js/i18n.js` (**92**), `js/core/` (7 ficheiros,
-**219**), `js/modules/` (5 ficheiros, **1127**), `js/scene/` (5 ficheiros, **1065**),
+`js/app.js` (**149**), `js/editor.js` (**14**, a entrada do editor — D36), `js/editor/`
+(**10** ficheiros, **2697** linhas com os painéis), `js/i18n.js` (**92**), `js/core/` (7 ficheiros,
+**219**), `js/modules/` (6 ficheiros, **1291**), `js/scene/` (5 ficheiros, **1126**),
 `css/style.css` (96) e `css/editor.css` (**313**), **5** mundos em `data/worlds/` (o portão, as três
-salas e o fixture, **1279 linhas** no total e **12** portas), `i18n/pt.json` (**150** chaves), os
+salas e o fixture, **1279 linhas** no total e **12** portas), `i18n/pt.json` (**154** chaves), os
 **9** assets em `assets/{panoramas,artworks,video,previews}` e as **9** ferramentas em `tools/`
-(**2895** linhas).
+(**2915** linhas).
 
 O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
 regras de stencil — a única parte global, porque o stencil é um recurso de toda a cena.
@@ -271,7 +272,7 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 | Página de edição | `editor.html` (`?world=<slug>`) é uma **ferramenta separada** (D4) que usa os **mesmos** módulos: abre um mundo, edita-o por **cinco painéis** (câmara, dimensão, obra, portal, mundo), mostra a **pré-visualização** com a mesma cena da exposição e exporta o JSON — sem nada escrever em disco (D2). A pasta de um mundo novo é da ferramenta `tools/scene/new-world.mjs` (**D31**) |
 | Desfazer, «alterado» e guarda de saída | Editar → desfazer (**50** instantâneos do JSON, **D35**) → exportar; a marca «alterado» e o aviso antes de fechar com alterações que não saíram num ficheiro (**D32**); e a exportação **recusa** um mundo com erros — valida tudo antes de exportar |
 | As leis no editor | O editor corre o **mesmo** `validation.js` e responde às duas perguntas que eram só da linha de comando: o asset existe (**L9**) e a imagem mede 2:1 (**L14**). Num mundo saudável o relatório diz `Erros: 0 · Avisos: 0 · Por verificar: 0` |
-| Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**150** chaves), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` pede outra língua (cai no português, com **1** aviso, enquanto `en.json` não existir — está decidido para depois desta fase) |
+| Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**154** chaves), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` pede outra língua (cai no português, com **1** aviso, enquanto `en.json` não existir — está decidido para depois desta fase) |
 | Portas de mundo | A travessia de uma porta de mundo **navega** para o endereço do destino e o visitante aparece **atrás** da porta que lá se declara a chegada (`arrivalFrom`), na direcção em que vinha — o regresso é **um passo** (L16/L17/L19). Como cada mundo é uma **página** (D24), a chegada **arranca a exposição sozinha** (`?from=`, D37): o botão «ATIVAR EXPOSIÇÃO» fica para a primeira visita e volta se a câmara for recusada. E a porta que volta ao portão mostra a **realidade ao vivo** pela janela (**D38**): a sala declara uma dimensão `kind: "camera"`, que não desenha nada, e o rectângulo fica transparente sobre o vídeo — vê-se a câmara dos **dois lados**, que é o que a porta mostrava na Fase 3 |
 | Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID está no dado (`"id"`) e, na cena construída, em `data-dimension`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
 | Grafo de dimensões | Portais bidirecionais entre duas dimensões, com uma **dimensão ativa** global; dentro de cada mundo é o que resta do grafo antigo, e o **grafo de mundos** é conferido pela linha de comando (alcançabilidade a partir do portão) |
@@ -394,6 +395,16 @@ a bateria das duas salas a passar (T4, T5, T6, T9 `2 → 2` e `3 → 3`, T10/T12
 páginas com **0** erros e **0** avisos, e o editor em **35 de 35** com importar→exportar
 **byte-idêntico** — o painel do portal não reescreve a porta da câmara. As salas passam a **pedir a
 câmara** (é o preço de a mostrarem); se for recusada, a janela não tem imagem e a mensagem diz porquê.
+
+**O nome das portas e das obras (D39/D40, os B13 e B14).** Duas perguntas do autor, resolvidas no
+mesmo dia: «vamos colocar o nome nos portais» e «… isso para obras também». Com a tecla **D** cada
+porta diz `#2 · Cidade 360º ↔ Realidade → Portão` e cada obra diz
+`#0 · galeriaFoto1 · Cidade 360º · modal`, tudo tirado do dado e desenhado por **um** sprite
+partilhado (`js/modules/label.js`). Medido: **23 de 23** nas portas (0 nomes sem `D`, um por porta
+com ela, nos 4 mundos, e 10 portas com nome criadas e destruídas sem deixar textura nem nó), **21 de
+21** nas obras (idem, mais o portão sem obras e as obras re-criadas pelo editor), a bateria dos doze
+nos 5 mundos com os mesmos números, o editor em **35 de 35** e a consola com **0** erros e **0**
+avisos.
 
 Foi esta medição que apanhou um defeito no instrumento: as importações do `acceptance.mjs` eram
 absolutas a partir da raiz (`/js/scene/arrival.js`), o que funciona em `127.0.0.1:8123` e dá 404
@@ -970,7 +981,7 @@ consola e fica onde está — o editor serve para arrumar a sala, não para a vi
 ## Melhorias Planejadas
 
 - **A tradução do catálogo** (`i18n/en.json`): o conjunto de chaves estabilizou com a Fase 4
-  (**150** chaves), e é agora que traduzir não é traduzir duas vezes; até lá o `?lang=en` cai no
+  (**154** chaves), e é agora que traduzir não é traduzir duas vezes; até lá o `?lang=en` cai no
   português com **1** aviso
 - **O catálogo de assets no editor**: hoje é dado do ficheiro (o editor escolhe entre os assets que
   o mundo já tem), e um mundo novo começa com o catálogo que se lhe escrever

@@ -1815,6 +1815,11 @@ Um bloco por commit, como nas fases anteriores.
 | **B9** | Transversal: validar tudo antes de exportar (com `exists` e `imageSize` respondidos por `fetch`/descodificação), lista de problemas, desfazer, guarda de saída, e o **aviso do R9** com as avarias novas no `laws-selftest.mjs` | **R9** | as leis de §8 todas no relatório do editor; **17 → N de N** avarias detectadas; importar→exportar **0 diferenças** |
 | **B10** | Verificação e documentação: a aceitação abaixo, o README (secção do editor), a tabela de §9, as pendências de §14 e o marco **v0.0.7** | — | **1 dimensão + 2 obras + 1 portal só pelo editor**, exportar, substituir o ficheiro e correr a bateria na cena editada |
 
+Quatro blocos acrescentados depois do fecho, por achados do autor a jogar o publicado:** o
+**B11** (a chegada por uma porta não pede licença, **D37**), o **B12** (a porta do portão mostra a
+realidade ao vivo, **D38**), o **B13** (o nome de cada porta, **D39**) e o **B14** (o nome de cada
+obra, **D40**) — todos com o seu registo abaixo, na mesma ordem e com as medições.
+
 #### O que o B1 entregou e mediu (2026-10-20) — fecha o **R3**
 
 A interface deixou de ter texto escrito em código: cada rótulo é uma **chave** que o catálogo
