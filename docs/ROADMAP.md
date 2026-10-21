@@ -1708,7 +1708,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: plano registado em 2026-10-16 (B0), com o B1 ao B6 entregues em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
+**Estado: plano registado em 2026-10-16 (B0), com o B1 ao B7 entregues em 2026-10-20 — o resto por fazer.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -2037,6 +2037,37 @@ A exposição mantém os números nos dois mundos medidos: portão (T4 `0` · T5
 
 **O que ficou por fazer deste painel:** a exclusão **em lote por dimensão** (§7) não entrou — é uma
 operação destrutiva e merece a confirmação que a **D35** e o B9 vão trazer.
+
+#### O que o B7 entregou e mediu (2026-10-20) — o painel do portal
+
+| Peça | O que é |
+| --- | --- |
+| `js/editor/panels/portal.js` | A porta inteira: posição/rotação, largura/altura, caixa (`box`, `boxPosition`, `boxRotation`), gatilho, moldura, `ownedBy`, os **dois eixos**, `arrivalFrom` e excluir — mais o formulário de inserção, que também escolhe os dois eixos |
+| `preview.replacePortal(portal)` | Re-cria **uma** porta e **reutiliza** o retrato derivado que ela já tinha: as dimensões derivadas são uma por par único de retrato (D26) e não se podem multiplicar |
+
+**A L18 não se pode violar pelo painel.** As ações oferecidas são perguntadas à **mesma tabela** que a
+cena lê (`isLegalCombination`, de `portal-kinds.js`), por isso uma janela só oferece as ações que pode
+ter. E quando a janela muda, a travessia é reescrita para a primeira legal **e o painel diz qual**:
+
+> `#0` era `dimension-pair` + `enter-window`; a janela passou a `preview` e a travessia passou a
+> `navigate` (alvo `gate`), com a linha a dizer «A travessia passou a «Navegar para outro mundo»: a
+> anterior não é legal com esta janela (L18).»
+
+**O valor de stencil não é dado** — é o núcleo que atribui um por dimensão mostrada, 1…255 (lei L5).
+O painel diz isso no topo, para o campo não ser procurado onde não existe.
+
+**Medido:**
+
+| O que se pediu | Resultado |
+| --- | --- |
+| Ações oferecidas por janela | `dimension-pair` → **enter-window, none**; `preview` → **navigate, none** — e nada mais |
+| **Uma porta por cada combinação legal**, criada pelo editor | As **5** (`dimension-pair+enter-window`, `dimension-pair+none`, `preview+navigate`, `preview+none`, `none+navigate`), com o validador a **0 erros** |
+| Um erro de propósito (5 portas no mesmo sítio) | A **L4** acusou **20** vezes — o painel não esconde as leis, mostra-as ao lado do que se escreve |
+| Mudar a janela de uma porta | Travessia reescrita para a legal + a mensagem que diz qual |
+
+A exposição mantém os números (portão: T4 `0` · T5 `0/2319/0` · T9 `2→2` · T10 `183 457/28 539` com
+**0** fora · T2/T3 **0** de 84 e **0** em **24 906**; fixture: T4 `255` · **T6 sim** · T9 `4→4` · T10
+`275 425/42 903` · T2/T3 idem), e o painel do portal não tocou em código partilhado.
 
 #### Metas de sucesso
 

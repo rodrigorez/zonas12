@@ -11,6 +11,7 @@ import { SCENE } from '../scene/schema.js';
 import { startFrameDriver } from '../modules/portal.js';
 import { createDimension, removeDimension } from '../modules/dimension.js';
 import { createArtwork, removeArtwork } from '../modules/artwork.js';
+import { createPortal, removePortal } from '../modules/portal.js';
 import { createPlayerCamera } from '../modules/camera.js';
 
 let built = null;
@@ -98,5 +99,28 @@ export function replaceArtwork(artwork, catalogue) {
   data.url = addressToOpen(data, catalogue);
   const created = createArtwork(data, previewElement());
   built.elements.artworks.push(created);
+  return created;
+}
+
+// A door is found by `data-portal-id` and re-created with the same portrait dimension it had: the
+// derived dimensions are built once per world (one per unique portrait), so re-creating a door must
+// **reuse** one, not make another. A change of the window axis rebuilds the world instead — that is
+// the axis that decides which portraits exist at all.
+export function replacePortal(portal) {
+  if (!built) return null;
+  const previous = built.elements.portals.find(
+    (element) => Number(element.getAttribute('data-portal-id')) === Number(portal.id)
+  ) || null;
+  let derived = {};
+  if (previous) {
+    const component = previous.components && previous.components['stencil-portal'];
+    const id = component && component.data ? component.data.previewDimension : -1;
+    if (typeof id === 'number' && id >= 0) derived = { previewDimension: id };
+    const at = built.elements.portals.indexOf(previous);
+    if (at >= 0) built.elements.portals.splice(at, 1);
+    removePortal(previous);
+  }
+  const created = createPortal(withDefaults(portal, SCENE.portals), previewElement(), derived);
+  built.elements.portals.push(created);
   return created;
 }

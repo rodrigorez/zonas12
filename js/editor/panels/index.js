@@ -3,8 +3,9 @@
 import * as cameraPanel from './camera.js';
 import * as dimensionPanel from './dimension.js';
 import * as artworkPanel from './artwork.js';
+import * as portalPanel from './portal.js';
 
-const PANELS = [cameraPanel, dimensionPanel, artworkPanel];
+const PANELS = [cameraPanel, dimensionPanel, artworkPanel, portalPanel];
 
 // `context` is the small contract between a panel and the editor:
 //   world()                  the data being edited

@@ -111,6 +111,9 @@ function panelContext() {
       // spends its measurements avoiding.
       refreshStatus();
     },
+    // A panel may need to say something that is not a count (a door whose action had to change to stay
+    // legal, for instance). It goes to the same line, which is where the author is already looking.
+    message: (text) => setStatus(text),
     rerender: () => panels.renderAll(panelContext())
   };
 }

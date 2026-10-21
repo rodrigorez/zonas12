@@ -67,6 +67,7 @@ export function textField(host, options) {
   input.spellcheck = false;
   input.value = options.value === undefined || options.value === null ? '' : String(options.value);
   input.addEventListener('input', () => options.onChange(input.value));
+  if (options.datalist) input.setAttribute('list', options.datalist);
   const box = caption(host, options);
   box.appendChild(input);
   return {
