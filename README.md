@@ -280,7 +280,7 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 | Fundo 360º | `dimension-panorama` por dimensão (imagem ou vídeo), segue a câmara; a dimensão 0 é a câmara real (canvas transparente) |
 | Conteúdo | As obras pertencem à dimensão (o campo `dimension` de cada obra, no JSON); o clique só abre na dimensão ativa |
 | Molduras | Barra vermelha à volta do quadro, pertencente à dimensão onde o portal está; o bordo mantém-se fechado mesmo quando cruza a janela de outro portal |
-| Modo debug | Tecla `D` mostra a caixa de colisão (sempre igual à usada na deteção); tecla `R` roda o portal |
+| Modo debug | Tecla `D` mostra a caixa de colisão (sempre igual à usada na deteção) e o **nome de cada porta** — o id, o que a janela mostra e para onde leva (D39); tecla `R` roda o portal |
 
 ### Modelo de render (ler antes de mexer)
 
@@ -288,7 +288,7 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
    `renderOrder`**. Quem o fixa é o A-Frame (não o atributo: `sortObjects` não está no schema do
    `renderer`); a linha de `js/app.js` confirma-o (lei **L6**, decisão **D16**).
 2. Ordem de desenho: máscaras (1) → panoramas (2; **2.5** para os das janelas) → obras (3)
-   → molduras (4) → caixa de debug (10).
+   → molduras (4) → caixa de debug e nome da porta (10).
 3. A **máscara** de cada portal escreve o valor do stencil (`Replace`) **e profundidade** no
    plano da janela.
 4. Quem pertence à **dimensão ativa** não tem teste de stencil: a profundidade decide — o
@@ -815,7 +815,8 @@ for a **dimensão ativa**: vê-la pela janela não conta.
 
 - Pressione a tecla **R** para girar o portal 180 graus (a janela continua a funcionar
   nos dois sentidos, porque a máscara é de face dupla)
-- Pressione a tecla **D** para ativar/desativar o modo debug (mostra a caixa de colisão)
+- Pressione a tecla **D** para ativar/desativar o modo debug (mostra a caixa de colisão e o nome de
+  cada porta)
 - A moldura vermelha marca a porta; dentro dela vê-se a dimensão do outro lado
 
 ### Funcionamento do Portal
@@ -837,13 +838,21 @@ de stencil e decide o que cada material desenha, a partir da colisão com a caix
 
 ### 7. Modo Debug
 
-Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caixa de colisão do portal:
+Durante o desenvolvimento, você pode ativar o modo debug para visualizar a caixa de colisão do portal
+e o **nome de cada porta** (tecla **D**):
 
 - A caixa de debug aparece como um wireframe azul semi-transparente (nome `portal-<id>-debug-box`)
 - Tem sempre as mesmas dimensões X, Y e Z, posição e rotação que a caixa de colisão (`box`, `boxPosition` e `boxRotation`)
 - Serve para ver exatamente onde a travessia dispara (é uma caixa por portal)
 - Como o resto da geometria do portal, a caixa de debug é tapada pelas janelas que lhe
   ficam à frente, pela profundidade (não tem teste de stencil próprio)
+- Por cima da porta aparece o **nome** dela (`portal-<id>-label`, decisão **D39**): o id, o que a
+  janela mostra e para onde a travessia leva, tudo tirado do dado — por exemplo
+  `#2 · Cidade 360º ↔ Realidade → Portão` (o par de dimensões, pelos nomes delas) ou
+  `#3 · retrato-praia → praia` (o retrato e o mundo de destino, pelo *slug*, que é o nome de um
+  mundo — **D28**; o portão é a exceção e tem o nome do catálogo). O nome é um *sprite*: lê-se
+  igual dos **dois lados** da porta, o que importa a quem aterra atrás dela. No editor aparece
+  sempre, sem tecla nenhuma
 - A consola só avisa se um ID de portal estiver fora do intervalo (`[portal] ID … out of range …`)
 
 ## Tecnologias Utilizadas

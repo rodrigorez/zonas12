@@ -47,6 +47,41 @@ export function setNavigation(enabled) {
 const _worldPoint = new THREE.Vector3();
 const _boxPoint = new THREE.Vector3();
 
+// ---- o nome da porta, na vista de debug (D39) ----
+//
+// The text is drawn once, into a canvas, when the label is built — never per frame. The sizes are in
+// metres because the label lives in the scene, not on the screen.
+const LABEL_FONT = '600 48px system-ui, "Segoe UI", Roboto, sans-serif';
+const LABEL_PADDING = 22;
+const LABEL_HEIGHT = 1.1;
+const LABEL_MAX_WIDTH = 12;
+
+function paintLabel(text) {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  context.font = LABEL_FONT;
+  const width = Math.ceil(context.measureText(text).width) + LABEL_PADDING * 2;
+  const height = 48 + LABEL_PADDING * 2;
+  canvas.width = width;
+  canvas.height = height;
+  // Resizing a canvas forgets the drawing state, the font included.
+  context.font = LABEL_FONT;
+  context.textBaseline = 'middle';
+  const rounded = typeof context.roundRect === 'function';
+  if (rounded) context.roundRect(1.5, 1.5, width - 3, height - 3, 12);
+  else context.rect(1.5, 1.5, width - 3, height - 3);
+  context.fillStyle = 'rgba(10, 4, 4, 0.82)';
+  context.fill();
+  context.lineWidth = 3;
+  context.strokeStyle = 'rgba(255, 107, 107, 0.95)';
+  context.stroke();
+  context.fillStyle = '#f6eded';
+  context.fillText(text, LABEL_PADDING, height / 2 + 2);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return { texture: texture, aspect: width / height };
+}
+
 // A-Frame's vec3 in the object form of setAttribute needs { x, y, z }: an array there is read as
 // an object with no axes and falls back to the default, silently (measured in A-Frame 1.8,
 // utils/coordinates.js parse). The data writes vectors as arrays, so the factories below
@@ -89,7 +124,14 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     // (the HTML, before the builder) keeps looking the same — and the converter reads them from
     // here, which is what keeps the two from drifting.
     frameColor: { type: 'string', default: '#ff0000' },
-    frameThickness: { type: 'number', default: 0.3 }
+    frameThickness: { type: 'number', default: 0.3 },
+    // The name of the door, for the debug view (D39). It is written by the builder from the data —
+    // the names of the dimensions it links, the world it opens — so the component never reads the
+    // scene: it only draws what it is given.
+    label: { type: 'string', default: '' },
+    // Whether the name starts visible. The exhibition shows it with the debug key; the editor's
+    // preview, which has no key of its own, shows it from the start (it is a tool, D3).
+    labelAlways: { type: 'boolean', default: false }
   },
   init: function () {
     let id = this.data.id;
@@ -119,17 +161,22 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     // refreshes itself.
     this.unsubscribeStencil = on('stencil:changed', () => this.refreshWindow());
     this.refreshWindow();
+    if (this.data.labelAlways) this.showLabel(true);
   },
   remove: function () {
     if (this.unsubscribeStencil) this.unsubscribeStencil();
     unregisterPortal(this);
-    // The mask, the frame and the debug box are built here by hand, so nobody else releases
-    // them: without this the geometry and the materials of a removed portal stay alive.
+    // The mask, the frame, the debug box and the label are built here by hand, so nobody else
+    // releases them: without this the geometry and the materials of a removed portal stay alive.
     this.portalGroup.children.slice().forEach(function (child) {
-      if (child.geometry) child.geometry.dispose();
+      // A sprite shares its geometry with every other sprite in the scene (it is three's own): only
+      // the material and the texture of the label belong to this door.
+      if (!child.isSprite && child.geometry) child.geometry.dispose();
       const materials = Array.isArray(child.material) ? child.material : [child.material];
       materials.forEach(function (material) {
-        if (material) material.dispose();
+        if (!material) return;
+        if (material.map) material.map.dispose();
+        material.dispose();
       });
     });
   },
@@ -247,9 +294,12 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     if (this.debugBox) {
       this.portalGroup.remove(this.debugBox);
       this.debugBox = null;
+      // In the editor's preview the names stay: they are the reason the view exists (D39).
+      this.showLabel(this.data.labelAlways === true);
       return;
     }
     this.buildDebugBox();
+    this.showLabel(true);
   },
   buildDebugBox: function () {
     const box = this.data.box;
@@ -270,6 +320,35 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     );
     this.debugBox.renderOrder = state.drawOrder.debug;
     this.portalGroup.add(this.debugBox);
+  },
+  // The name of the door, above it, for whoever is debugging (D39). A sprite and not a plane: the
+  // visitor who arrives lands **behind** the door, and a plane would read mirrored from there —
+  // a sprite always faces the camera, so the name reads the same from either side.
+  showLabel: function (visible) {
+    if (visible && !this.labelSprite && this.data.label) this.buildLabel();
+    if (this.labelSprite) this.labelSprite.visible = visible;
+  },
+  buildLabel: function () {
+    const painted = paintLabel(this.data.label);
+    const material = new THREE.SpriteMaterial({
+      map: painted.texture,
+      transparent: true,
+      depthWrite: false
+    });
+    this.labelSprite = new THREE.Sprite(material);
+    this.labelSprite.name = this.portalName + '-label';
+    // As large as it has to be to be read from across the room, and never wider than the door: a
+    // label wider than the door would be the only thing one sees through a window.
+    let height = LABEL_HEIGHT;
+    let width = height * painted.aspect;
+    if (width > LABEL_MAX_WIDTH) {
+      width = LABEL_MAX_WIDTH;
+      height = width / painted.aspect;
+    }
+    this.labelSprite.scale.set(width, height, 1);
+    this.labelSprite.position.set(0, this.data.height + height * 0.8, 0);
+    this.labelSprite.renderOrder = state.drawOrder.debug;
+    this.portalGroup.add(this.labelSprite);
   },
   // Collision with the box, in the space of the portal (position and rotation included): there
   // is no global distance, so it works with the portal moved, rotated, in motion and with
@@ -400,6 +479,9 @@ export function createPortal(portal, parent, derived = {}) {
   // (D26), and the destination is only read when the action navigates.
   if (typeof derived.previewDimension === 'number') settings.previewDimension = derived.previewDimension;
   if (actionAxis.kind === 'navigate' && typeof actionAxis.target === 'string') settings.target = actionAxis.target;
+  // The name it shows in the debug view (D39) is written by the builder, from the world's data.
+  if (typeof derived.label === 'string' && derived.label) settings.label = derived.label;
+  if (derived.labelAlways) settings.labelAlways = true;
   if (portal.boxPosition) settings.boxPosition = vector(portal.boxPosition);
   if (portal.boxRotation) settings.boxRotation = vector(portal.boxRotation);
   if (portal.trigger) settings.trigger = portal.trigger;

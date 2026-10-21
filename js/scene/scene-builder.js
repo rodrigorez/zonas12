@@ -20,7 +20,9 @@ import { createPlayerCamera, useRealCamera } from '../modules/camera.js';
 import { createDimension, removeDimension } from '../modules/dimension.js';
 import { createArtwork, removeArtwork } from '../modules/artwork.js';
 import { createPortal, removePortal, setWorld, setNavigation } from '../modules/portal.js';
+import { ENTRY_WORLD } from '../modules/portal-kinds.js';
 import { arrivalPoint } from './arrival.js';
+import { t } from '../i18n.js';
 
 // Fills in the defaults the schema declares, so that the rest of this file — and the factories —
 // can read a field without asking whether it was written. An object that is not there stays
@@ -32,6 +34,43 @@ export function withDefaults(data, node) {
     if (out[name] === undefined && field.default !== undefined) out[name] = field.default;
   }
   return out;
+}
+
+// The name of a door, in the debug view (D39): what its window shows and where its traversal goes.
+// A dimension is named by its own name in this language (its id when the data has none), a world by
+// its **slug** — which is the name a world has (D28) — except the gate, whose name is the
+// catalogue's, because it is the entry world and not a room.
+//
+// Pure, and exported: the editor re-creates one door at a time (D33) and needs the same name the
+// builder would have given it.
+export function portalLabel(portal, dimensions, language) {
+  const windowAxis = portal.window || {};
+  const actionAxis = portal.action || {};
+  const chosen = language || ORIGIN_LANGUAGE;
+
+  let shows;
+  if (windowAxis.kind === 'dimension-pair') {
+    shows = [windowAxis.dimensionA, windowAxis.dimensionB].map((id) => {
+      const dimension = (dimensions || []).find((entry) => entry.id === id);
+      const name = dimension ? textIn(dimension.name, chosen) : '';
+      return name || '#' + id;
+    }).join(' ↔ ');
+  } else if (windowAxis.kind === 'preview') {
+    shows = windowAxis.asset || t('portal.label.noWindow');
+  } else {
+    shows = t('portal.label.noWindow');
+  }
+
+  let goes;
+  if (actionAxis.kind === 'navigate') {
+    goes = ' → ' + (actionAxis.target === ENTRY_WORLD ? t('portal.label.gate') : actionAxis.target);
+  } else if (actionAxis.kind === 'none') {
+    goes = ' · ' + t('portal.label.noPassage');
+  } else {
+    goes = ' → ' + t('portal.label.enters');
+  }
+
+  return '#' + portal.id + ' · ' + shows + goes;
 }
 
 export async function buildScene(scene, options = {}) {
@@ -120,11 +159,19 @@ export async function buildScene(scene, options = {}) {
   for (const portal of scene.portals || []) {
     const axis = portal.window || {};
     const previewDimension = axis.kind === 'preview' ? portraits.get(axis.asset + '@' + axis.radius) : undefined;
-    elements.portals.push(createPortal(withDefaults(portal, SCENE.portals), parent, { previewDimension }));
+    const data = withDefaults(portal, SCENE.portals);
+    elements.portals.push(createPortal(data, parent, {
+      previewDimension: previewDimension,
+      label: portalLabel(data, scene.dimensions, language),
+      labelAlways: options.labels === true
+    }));
   }
 
   return {
     elements,
+    // The data it was built from: the editor re-creates one door at a time (D33) and needs it to
+    // give that door the same name the build gave it (D39).
+    scene: scene,
     // The counterpart of the build: the editor (Fase 4) will want to take one scene down and put
     // another one up, and every module already knows how to release what it created (A4).
     remove() {

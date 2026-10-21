@@ -1721,7 +1721,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: FECHADA em 2026-10-20 — B0 ao B12 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
+**Estado: FECHADA em 2026-10-21 — B0 ao B13 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -2350,6 +2350,48 @@ a ser uma vez por página, não por portal.
 dimensões), `js/scene/validation.js` (uma linha, a passar as dimensões), `js/editor/panels/portal.js`
 (a porta cuja ação vem do dado mostra-a em vez de a reescrever), `data/worlds/{cidade,praia}.json`,
 `i18n/pt.json` (a nota nova) e o `laws-selftest.mjs` (a avaria nova).
+
+#### O que o B13 entregou e mediu (2026-10-21) — o nome de cada porta
+
+Pedido do autor, para facilitar o nosso debug: «vamos colocar o nome nos portais, sendo os nomes das
+dimensões, mundos ou portão». Uma porta passa a dizer o que é, **tirado do dado** e não escrito no
+código:
+
+| Porta | O que diz |
+| --- | --- |
+| `gate` 0 / 1 | `#0 · retrato-cidade → cidade` · `#1 · retrato-praia → praia` |
+| `cidade` 2 / 3 | `#2 · Cidade 360º ↔ Realidade → Portão` · `#3 · retrato-praia → praia` |
+| `praia` 4 / 5 / 6 | `#4 · retrato-cidade → cidade` · `#5 · Praia ↔ Realidade → Portão` · `#6 · retrato-ceu → ceu` |
+| `ceu` 7 | `#7 · retrato-praia → praia` |
+
+**Como está feito (D39):** o nome é escrito pelo **construtor** — é ele que lê o mundo — e chega ao
+componente como um atributo (`label`); o componente só o desenha. A função `portalLabel()` é pura e
+exportada, porque o editor re-cria **uma** porta de cada vez (D33) e tem de lhe dar o mesmo nome. As
+peças: o id (`#2`), o que a janela mostra (os **nomes** das duas dimensões do par, pela língua; ou o
+id do retrato; ou «sem janela») e para onde a travessia leva (o **slug** do mundo — que é o nome de um
+mundo, D28 — excepto o portão, que é o mundo de entrada e tem o nome do catálogo; «entra na janela»
+para `enter-window`, «sem passagem» para `none`).
+
+**Desenha-se como *sprite*, não como plano:** quem chega aterra **atrás** da porta, e um plano leria
+ao contrário desse lado. O sprite é virado à câmara por construção, com o texto pintado **uma vez**
+num canvas (nunca por frame), 1,1 m de alto e no máximo 12 m de largo — a largura da porta —, por
+cima do topo dela e com a ordem de desenho do debug (10).
+
+**Quando aparece:** na exposição com a tecla **D**, junto da caixa de colisão; no **editor** desde o
+arranque (`labels: true`), porque a ferramenta não tem teclas e é lá que se arruma.
+
+**Medido (23 de 23):**
+
+| O que | Resultado |
+| --- | --- |
+| Sem a tecla `D` | **0** sprites em cada um dos 4 mundos — a vista do visitante não mudou |
+| Com `D` | um sprite **visível** por porta, com o texto acima, nos 4 mundos; outra vez `D` esconde-os |
+| O editor | os **2** nomes da cidade à vista à chegada, iguais aos da exposição |
+| Uma porta com nome, criada e destruída ×10 | o sprite é desenhado (texturas na GPU `10 → 20`) e, ao remover, a árvore volta ao que era e as texturas também (`20 → 10`) — o `remove()` passou a libertar o `map` do material e a **não** libertar a geometria de um sprite (é partilhada, é da three) |
+| A consola | **0** erros e **0** avisos com tudo isto |
+| A bateria dos doze, nos 5 mundos | passa em todos — a T9 continua `2 → 2`, `3 → 3`, `1 → 1`, `4 → 4` com os mesmos nós (o nome não existe enquanto `D` não é carregada) |
+| O editor | **35 de 35**, importar→exportar byte-idêntico |
+| `validate.mjs` / `laws-selftest` | **0** / **21 de 21** |
 
 #### Metas de sucesso
 
@@ -3004,6 +3046,7 @@ alteram comportamento.
 | D36 | Estrutura do editor | `js/editor.js` é a **entrada** (≤100 linhas) e o resto vive em `js/editor/` (modelo, painéis, pré-visualização, exportação, problemas); a regra da D4 fica literal |
 | D37 | Chegar por uma porta e o ecrã de entrada | A chegada por uma porta (`?from=`) **arranca a exposição sozinha** — `startSession({ arrival: true })`: o botão «ATIVAR EXPOSIÇÃO» fica para a **primeira visita** e volta como **recuo** se a câmara for recusada (o gesto que o browser pode exigir). Cada mundo é uma página (D24) e a porta navega, por isso o ecrã de entrada repetia-se em cada sala mesmo sem câmara nenhuma para pedir |
 | D38 | A porta que volta ao portão mostra a realidade | A sala declara uma dimensão `kind: "camera"` e a porta para o portão um `dimension-pair` com ela; a matriz da **L18** ganha a exceção «par com a câmara + `navigate` para o mundo de entrada», porque o que a janela mostra é **exactamente** o que espera o visitante do outro lado. Uma dimensão de câmara **não desenha nada**: o rectângulo da janela fica transparente sobre o vídeo e a realidade vê-se dos **dois lados**. A sala passa a pedir a câmara (o mesmo `real.enabled` do portão), e o editor mostra a combinação como vinda do dado em vez de a reescrever |
+| D39 | O nome de cada porta | O nome vive no **dado**: o id, o que a janela mostra (os nomes das dimensões do par, ou o retrato) e para onde leva (o *slug* do mundo — o portão pelo catálogo), escrito pelo construtor num atributo do componente. Desenha-se como **sprite** (lê-se dos dois lados, o que importa a quem aterra atrás dela), com a tecla **D** na exposição e **sempre** no editor, que não tem teclas |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -3099,6 +3142,15 @@ não mente porque o que a janela mostra é o que espera o visitante. Medido com 
 lados** da porta, na cidade e na praia; `validate.mjs` **0**, `laws-selftest` **21 de 21**, a bateria
 das duas salas a passar (com os contadores de pixels a mudarem por o aspecto da câmara passar a ser
 corrigido) e o editor em **35 de 35** com o export byte-idêntico.
+
+**B13, no dia seguinte** — o **nome de cada porta** (**D39**), pedido do autor para o nosso debug:
+com a tecla `D` a exposição mostra, acima de cada porta, `#2 · Cidade 360º ↔ Realidade → Portão` ou
+`#3 · retrato-praia → praia` — o id, o que a janela mostra (os nomes das dimensões, o retrato) e para
+onde leva (o *slug* do mundo; o portão pelo catálogo), tudo tirado do dado e escrito pelo construtor.
+No editor aparece sem tecla nenhuma. Um *sprite*, para se ler dos dois lados da porta. Medido:
+**23 de 23** (0 nomes sem `D`, um por porta com ela nos 4 mundos, o editor desde o arranque, e 10
+portas com nome criadas e destruídas sem deixar textura nem nó), a bateria dos doze nos 5 mundos, o
+editor em **35 de 35** e a consola com 0 erros e 0 avisos.
 
 ### O que fica decidido, em uma frase
 

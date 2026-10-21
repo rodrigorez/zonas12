@@ -6,7 +6,7 @@
 // One scene at a time. The build is asynchronous (the assets load first), so the previous scene goes
 // down before the next one goes up: two built scenes at once would double the textures in memory for
 // no gain, since only one is ever shown.
-import { buildScene, withDefaults, addressToOpen } from '../scene/scene-builder.js';
+import { buildScene, withDefaults, addressToOpen, portalLabel } from '../scene/scene-builder.js';
 import { SCENE } from '../scene/schema.js';
 import { startFrameDriver } from '../modules/portal.js';
 import { createDimension, removeDimension } from '../modules/dimension.js';
@@ -22,7 +22,9 @@ export function previewElement() {
 
 export async function show(data) {
   clear();
-  built = await buildScene(data, { parent: previewElement(), preview: true });
+  // `labels: true` is the editor's own decision (D39): the names of the doors are part of what a
+  // tool shows, and this page has no debug key of its own.
+  built = await buildScene(data, { parent: previewElement(), preview: true, labels: true });
   // The frame driver is what asks, every frame, which dimension each window shows and hands the
   // values to the core. The exhibition starts it in its entry point; the editor has to do the same,
   // or every window in the preview is black (measured before this line: 0 stencil values and alpha 0
@@ -120,7 +122,11 @@ export function replacePortal(portal) {
     if (at >= 0) built.elements.portals.splice(at, 1);
     removePortal(previous);
   }
-  const created = createPortal(withDefaults(portal, SCENE.portals), previewElement(), derived);
+  const created = createPortal(withDefaults(portal, SCENE.portals), previewElement(), {
+    previewDimension: derived.previewDimension,
+    label: portalLabel(portal, built.scene && built.scene.dimensions),
+    labelAlways: true
+  });
   built.elements.portals.push(created);
   return created;
 }
