@@ -136,6 +136,13 @@ function hideLoading() {
   }
 }
 
+// The button is the first visit's gesture, and the fallback of an arrival whose camera was refused
+// (D37): the browser may be waiting for a gesture, and the visitor is the one who can give it.
+function showStartButton() {
+  const start = document.getElementById('btn-iniciar');
+  if (start) start.style.display = 'block';
+}
+
 export function reportCameraError(error) {
   console.error('Failed to access the camera:', error);
   hideLoading();
@@ -189,7 +196,13 @@ export function useRealCamera(enabled) {
 // What the start button does (`app.start` in the catalogue, whose key the markup carries). It was
 // the inline script of index.html until Fase 3, and it lives here because all of it is the camera's
 // business: the webcam, the loading overlay, the error message and the on-screen D-pad.
-export function startSession() {
+//
+// `options.arrival` says the visitor got here through a door (D37). Then nothing is asked of them:
+// the exhibition has already been activated in the world they came from, and a room that is entirely
+// virtual has nothing to ask either. If the camera is refused anyway — the browser may want the
+// gesture a page load cannot give it — the button comes back, with the message that says why.
+export function startSession(options) {
+  const arrival = Boolean(options && options.arrival);
   const overlay = document.getElementById('loading-overlay');
   if (overlay) overlay.style.display = 'flex';
   const start = document.getElementById('btn-iniciar');
@@ -237,5 +250,8 @@ export function startSession() {
       }, 300);
       setTimeout(hideLoading, 500);
     })
-    .catch((error) => reportCameraError(error));
+    .catch((error) => {
+      reportCameraError(error);
+      if (arrival) showStartButton();
+    });
 }

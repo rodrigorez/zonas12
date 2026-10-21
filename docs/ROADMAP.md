@@ -1721,7 +1721,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: FECHADA em 2026-10-20 — B0 ao B10 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
+**Estado: FECHADA em 2026-10-20 — B0 ao B11 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -2263,6 +2263,41 @@ manteve os mesmos números e a publicada passou a correr. É a terceira vez na f
 que o mundo vê** encontra o que medir a cópia local não encontrava.
 
 **Marco: a branch `v0.0.7`.**
+
+#### O que o B11 entregou e mediu (2026-10-20) — a chegada por uma porta não pede licença
+
+Achado **pelo autor**, a testar a versão publicada: «toda vez que entro num portal é pedido para
+acionar a câmara». Medido antes de mexer em código, com câmara falsa e permissão automática, a contar
+os pedidos a `getUserMedia` por página:
+
+| Onde | Botão «ATIVAR» | Pedidos à câmara |
+| --- | --- | --- |
+| portão, à chegada (`/`) | visível | **0** |
+| portão, depois de carregar o botão | escondido | **1** |
+| atravessar a porta 0 → `/cidade/?from=gate` | **visível outra vez** | 0 |
+| carregar «ATIVAR» na cidade | escondido | **0** — a cidade é virtual |
+| voltar ao portão por uma porta → `/?from=cidade` | **visível** | **1** ao carregar |
+| mudar de dimensão sem sair da página (fixture, `dimension-pair` + `enter-window`) | não aparece | **0** |
+
+**A conclusão:** a câmara só é pedida no **portão** (é o único mundo com `cameras.real.enabled: true`)
+e **nunca** numa mudança de dimensão; o que se repetia era o **ecrã de entrada** em cada mundo, porque
+cada mundo é uma página (D24) e a porta **navega**. Não era regressão da Fase 4: o `btn-iniciar` está
+no `index.html` desde a Fase 3 e as portas navegam desde a 3B — o atrito só apareceu agora porque a
+3B e a 4 foram publicadas no mesmo dia (acima). E na volta ao portão a câmara é pedida **outra vez**
+porque o `MediaStream` não sobrevive a uma página: isso é da plataforma, não do código.
+
+**A correção (D37):** quando a página traz `?from=` — a marca que a porta que navega escreve (D14) —,
+a exposição **arranca sozinha**: o botão desaparece, o D-pad aparece e, no portão, a câmara é pedida
+uma vez. Se o browser recusar a câmara sem gesto, o botão **volta** com a mensagem que explica (é o
+gesto que ele pode estar a exigir). Medido: **5 de 5** — a primeira visita fica com o botão à espera e
+**0** pedidos; uma sala por uma porta entra sozinha com o botão escondido e **0** pedidos; o portão por
+uma porta arranca com **1** pedido e stream; outra sala, o mesmo sem pedidos; e, com o `getUserMedia`
+a rejeitar `NotAllowedError` (a simulação de «o browser quer o gesto»), o botão volta e a mensagem
+aparece. A bateria dos doze mantém os números no portão, na cidade e no fixture.
+
+**O que mudou:** `js/modules/camera.js` (`startSession(options)` com `arrival`, e o
+`showStartButton()` que a recusa usa) e `js/app.js` (`arrivedFromADoor()` e o arranque automático
+depois do construír da cena). Nada no editor, nada no dado, nada na exposição que os testes meçam.
 
 #### Metas de sucesso
 
@@ -2915,6 +2950,7 @@ alteram comportamento.
 | D34 | A webcam no editor | Só liga por **gesto** (o botão da pré-visualização), nunca na carga da página |
 | D35 | «Desfazer» | **Instantâneos** do JSON em memória (~50), e não um registo de comandos |
 | D36 | Estrutura do editor | `js/editor.js` é a **entrada** (≤100 linhas) e o resto vive em `js/editor/` (modelo, painéis, pré-visualização, exportação, problemas); a regra da D4 fica literal |
+| D37 | Chegar por uma porta e o ecrã de entrada | A chegada por uma porta (`?from=`) **arranca a exposição sozinha** — `startSession({ arrival: true })`: o botão «ATIVAR EXPOSIÇÃO» fica para a **primeira visita** e volta como **recuo** se a câmara for recusada (o gesto que o browser pode exigir). Cada mundo é uma página (D24) e a porta navega, por isso o ecrã de entrada repetia-se em cada sala mesmo sem câmara nenhuma para pedir |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -2996,6 +3032,12 @@ T6, T9, T10/T12 e T2/T3 a passar), a bateria dos doze nas **5** páginas, o **T8
 `validate.mjs` a **0** e as **17** metas de §9 medidas uma a uma. O exercício mostrou ainda o que
 faz um mundo ser um mundo: sem a pasta (D28) e sem uma porta que o ligue ao portão, o validador
 recusa-o — e por isso o `sala-teste` foi apagado depois de medido. **Marco: a branch `v0.0.7`.**
+
+**B11, no mesmo dia, depois de o autor testar o publicado** — a **chegada por uma porta** deixou de
+pedir licença: com `?from=` na URL a exposição arranca sozinha (**D37**), o ecrã de entrada fica para
+a primeira visita e volta como recuo se a câmara for recusada. Medido antes de mexer: a câmara só é
+pedida no portão e nunca numa mudança de dimensão — o que se repetia era o ecrã de entrada, porque
+cada mundo é uma página (D24). **5 de 5** verificações e a bateria dos doze com os mesmos números.
 
 ### O que fica decidido, em uma frase
 

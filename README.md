@@ -272,7 +272,7 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 | Desfazer, «alterado» e guarda de saída | Editar → desfazer (**50** instantâneos do JSON, **D35**) → exportar; a marca «alterado» e o aviso antes de fechar com alterações que não saíram num ficheiro (**D32**); e a exportação **recusa** um mundo com erros — valida tudo antes de exportar |
 | As leis no editor | O editor corre o **mesmo** `validation.js` e responde às duas perguntas que eram só da linha de comando: o asset existe (**L9**) e a imagem mede 2:1 (**L14**). Num mundo saudável o relatório diz `Erros: 0 · Avisos: 0 · Por verificar: 0` |
 | Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**149** chaves), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` pede outra língua (cai no português, com **1** aviso, enquanto `en.json` não existir — está decidido para depois desta fase) |
-| Portas de mundo | A travessia de uma porta de mundo **navega** para o endereço do destino e o visitante aparece **atrás** da porta que lá se declara a chegada (`arrivalFrom`), na direcção em que vinha — o regresso é **um passo** (L16/L17/L19) |
+| Portas de mundo | A travessia de uma porta de mundo **navega** para o endereço do destino e o visitante aparece **atrás** da porta que lá se declara a chegada (`arrivalFrom`), na direcção em que vinha — o regresso é **um passo** (L16/L17/L19). Como cada mundo é uma **página** (D24), a chegada **arranca a exposição sozinha** (`?from=`, D37): o botão «ATIVAR EXPOSIÇÃO» fica para a primeira visita e volta se a câmara for recusada |
 | Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID está no dado (`"id"`) e, na cena construída, em `data-dimension`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
 | Grafo de dimensões | Portais bidirecionais entre duas dimensões, com uma **dimensão ativa** global; dentro de cada mundo é o que resta do grafo antigo, e o **grafo de mundos** é conferido pela linha de comando (alcançabilidade a partir do portão) |
 | Travessia | Por **colisão com a caixa** do portal (`box`, `boxPosition`, `boxRotation`), no plano do quadro ou na face da caixa (`trigger`) — nunca por distância; o que ela *faz* vem do eixo `action` (ficar, navegar ou nada — D25) |
@@ -372,6 +372,15 @@ medida no browser depois do *push*, com a cache desligada — **7 de 7**:
 - o **céu publicado**, aberto com `?from=praia`, tem as **duas** obras no primeiro plano da chegada
   — o R11 está na versão que o mundo vê
 
+**A chegada por uma porta (D37, o B11).** O autor testou o publicado e viu o ecrã de entrada a
+repetir-se em cada portal. Medido antes de mexer, com câmara falsa e a contar os pedidos a
+`getUserMedia`: **a câmara só é pedida no portão** (o único mundo com `cameras.real.enabled: true`) e
+**nunca** numa mudança de dimensão — o que voltava era o botão, porque cada mundo é uma página. Com a
+correção, e medido de novo: **5 de 5** — a primeira visita fica com o botão à espera e **0** pedidos;
+uma sala por uma porta entra sozinha (**0** pedidos); o portão por uma porta arranca sozinho com **1**
+pedido e stream; e, com a câmara a rejeitar, o botão **volta** com a mensagem. A bateria dos doze
+manteve os números no portão, na cidade e no fixture.
+
 Foi esta medição que apanhou um defeito no instrumento: as importações do `acceptance.mjs` eram
 absolutas a partir da raiz (`/js/scene/arrival.js`), o que funciona em `127.0.0.1:8123` e dá 404
 debaixo de `/zonas12/`. Passaram a relativas ao módulo, e é por isso que a bateria corre agora nos
@@ -419,7 +428,9 @@ porta para cada sala. Dentro de uma sala só se navega pelas dimensões dessa sa
 
 Como o isolamento é por endereço, **nada do outro mundo é lido** pela página de origem: só
 atravessam o *slug* do destino (na própria porta) e um parâmetro opcional `?from=<slug>`, que é o
-que faz o visitante aparecer **atrás da porta inversa** — com o regresso a um passo.
+que faz o visitante aparecer **atrás da porta inversa** — com o regresso a um passo, e sem lhe pedir
+que ative a exposição outra vez (**D37**: a chegada por uma porta arranca sozinha; o ecrã de entrada
+fica para a primeira visita, e volta se a câmara for recusada).
 `node tools/scene/validate.mjs` confere isso tudo do lado do dado: as leis dos mundos, o **grafo**
 (todas as salas alcançáveis a partir do portão e **L19** — toda a porta tem uma chegada no destino,
 que é o defeito que a praia teve até ao B7), e os quatro **arranques** (a pasta é o slug, o `<base>`

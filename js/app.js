@@ -108,6 +108,16 @@ async function buildFromData() {
   return true;
 }
 
+// Arriving through a door is not a first visit. Each world is a page of its own (D24), so the door
+// navigates and the page loads again — and until D37 that meant asking the visitor to activate the
+// exhibition in every room, even the ones with no camera to ask for. The `?from=<slug>` a door writes
+// is exactly the fact that they came through one (D14), and it is what starts the page by itself. The
+// button stays in the markup, for the first visit and as the fallback if the camera is refused.
+function arrivedFromADoor() {
+  const from = new URLSearchParams(window.location.search).get('from');
+  return typeof from === 'string' && WORLD_NAME.test(from);
+}
+
 // The frame driver starts only after the build: until then there is no portal to walk, and the
 // camera the collision asks for does not exist yet either.
 //
@@ -117,6 +127,7 @@ async function start() {
   await initI18n(languageFromUrl());
   const built = await buildFromData();
   if (built) startFrameDriver();
+  if (arrivedFromADoor()) startSession({ arrival: true });
 }
 
 start().catch((error) => console.error('[scene] the scene could not be built:', error));
