@@ -73,9 +73,9 @@
       "kind": "image",
       "asset": "praia",
       "position": [
-        -15,
+        -6,
         1.5,
-        -110
+        -131
       ],
       "rotation": [
         0,
@@ -95,9 +95,9 @@
       "kind": "image",
       "asset": "cidade-360",
       "position": [
-        15,
+        6,
         1.5,
-        -110
+        -131
       ],
       "rotation": [
         0,
