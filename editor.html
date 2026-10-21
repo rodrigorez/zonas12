@@ -35,6 +35,19 @@
       </div>
 
       <div class="grupo">
+        <button
+          type="button"
+          id="desfazer"
+          data-i18n="editor.undo"
+          data-i18n-title="editor.undo.hint"
+          title="Volta ao estado anterior (Ctrl+Z)"
+          disabled
+        >
+          Desfazer
+        </button>
+        <!-- A marca de «alterado» (D32/D35): o mundo em memória deixou de ser o ficheiro de onde veio.
+             Fica ao lado do botão que a desfaz, que é onde a mão já está. -->
+        <span id="alterado" class="marca" data-i18n="editor.dirty" hidden>alterado</span>
         <button type="button" id="validar" data-i18n="editor.validate">Validar</button>
         <button type="button" id="exportar" data-i18n="editor.export">Exportar</button>
         <!-- O input fica coberto pela etiqueta: o rato e o teclado chegam-lhe, e o texto continua a
@@ -55,10 +68,6 @@
         <h2 data-i18n="editor.problems.title">Problemas</h2>
         <p id="contagens"></p>
         <ul id="problemas"></ul>
-
-        <p class="nota" data-i18n="editor.panels.pending">
-          Faltam as ferramentas transversais do B9 (validar tudo, desfazer, guarda de saída).
-        </p>
       </section>
 
       <section id="pre-visualizacao" aria-label="Pré-visualização">

@@ -134,6 +134,36 @@ const cases = [
     inject: (copy) => { copy.portals.push(navigatingDoor({})); }
   },
   {
+    law: 'D30',
+    what: 'an artwork of a kind the scene does not build',
+    expect: 'not built',
+    level: 'warning',
+    inject: (copy) => { copy.artworks[0].kind = 'text'; }
+  },
+  {
+    law: 'D30',
+    what: 'an interaction the scene does not act on',
+    expect: 'instead of navigating',
+    level: 'warning',
+    inject: (copy) => {
+      copy.artworks[0].interaction = 'link';
+      copy.artworks[0].url = 'https://example.org/obra';
+    }
+  },
+  {
+    law: 'D30',
+    what: 'a background colour the scene does not paint',
+    expect: 'no flat background',
+    level: 'warning',
+    inject: (copy) => {
+      const dimension = copy.dimensions[0];
+      dimension.kind = 'color';
+      dimension.color = '#202020';
+      delete dimension.asset;
+      delete dimension.radius;
+    }
+  },
+  {
     law: 'L12',
     what: 'an absolute path in the data',
     expect: 'law L12',
@@ -306,7 +336,7 @@ const arranqueCases = [
   ['a room whose arranque has no <base>',
     withFiles({ 'praia/index.html': arranqueFiles['praia/index.html'].replace(/^.*<base.*$/m, '') }), 'has no <base>'],
   ['an arranque that diverged by one word',
-    withFiles({ 'cidade/index.html': arranqueFiles['cidade/index.html'].replace('<title>', '<title> ') }),
+    withFiles({ 'cidade/index.html': arranqueFiles['cidade/index.html'].replace('</title>', ' x</title>') }),
     'is not the same file as index.html']
 ];
 const arranqueChecks = arranqueCases.map(([what, read, expected]) => {

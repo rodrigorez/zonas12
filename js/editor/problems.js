@@ -4,9 +4,10 @@
 // implementation of the laws (docs/ROADMAP.md, section 8) — so this file only *renders* the report:
 // three counts and one line per problem, each carrying the law it breaks when the validator names it.
 //
-// What is still missing here (B9): the questions only the command line could answer (does the asset
-// exist on disk, what shape is the image) will be answered in the browser by `fetch` and by decoding,
-// and the export will refuse to run while there are errors.
+// Since B9 the two questions the command line used to answer alone — does the asset exist, what shape
+// is the image — are answered here too (js/editor/assets.js, `fetch` and decoding), so the third count
+// ("not verified") is 0 in a world the editor can see whole. The export refuses while the first count
+// is not 0 (js/editor/index.js).
 import { t } from '../i18n.js';
 
 const byId = (id) => document.getElementById(id);

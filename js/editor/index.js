@@ -6,7 +6,20 @@
 import { validateScene } from '../scene/validation.js';
 import { state, setActiveDimension } from '../core/index.js';
 import { t } from '../i18n.js';
-import { setWorld, currentWorld, parseWorld, exportWorld, slugOf, countsOf } from './model.js';
+import {
+  setWorld,
+  currentWorld,
+  parseWorld,
+  exportWorld,
+  slugOf,
+  countsOf,
+  remember,
+  canUndo,
+  undo,
+  isDirty,
+  markSaved
+} from './model.js';
+import * as assets from './assets.js';
 import * as preview from './preview.js';
 import * as problems from './problems.js';
 import * as panels from './panels/index.js';
@@ -62,21 +75,31 @@ function validate() {
   // `worldExists` is the answer the command line gives (L11) and the page can give too, because the
   // editor reads the files: without it the law is reported as "not verified" and a door to nowhere
   // looks fine. A slug that has not been looked for yet answers `undefined`, never a false accusation.
-  const report = validateScene(world.data, { worldExists: (slug) => worlds.exists(slug) });
+  // `exists` and `imageSize` are the same story for the files of a world (L9, L14): js/editor/assets.js
+  // asks once and answers from what it found, so the two laws stop being "not verified" in the editor.
+  const report = validateScene(world.data, {
+    worldExists: (slug) => worlds.exists(slug),
+    exists: assets.exists,
+    imageSize: assets.imageSize
+  });
   problems.show(report);
   return report;
 }
 
-// Before validating, make sure every world this one names has been looked for — that is what turns
-// L11 from "not verified" into a real answer.
-async function revalidate() {
+// Before validating, make sure every question the validator will ask has an answer: the worlds this
+// one points at (L11) and the files it names (L9, L14). `refresh` asks again the files that came back
+// missing, which is what the "Validar" button is for — the author has just put them there.
+async function revalidate(options) {
   const world = currentWorld();
   if (!world) return;
   const targets = ((world.data.portals) || [])
     .map((portal) => (portal.action || {}).target)
     .filter((target) => typeof target === 'string' && WORLD_NAME.test(target));
-  await worlds.ensure(targets);
-  validate();
+  await Promise.all([
+    worlds.ensure(targets),
+    assets.probe(world.data, { refresh: Boolean(options && options.refresh) })
+  ]);
+  return validate();
 }
 
 function refreshStatus() {
@@ -89,6 +112,39 @@ function refreshStatus() {
     artworks: counts.artworks,
     portals: counts.portals
   }));
+}
+
+// The two marks of the toolbar: «Desfazer» is only offered when there is a step to undo, and
+// «alterado» says whether the world in memory is a text the author already has (D32/D35).
+function updateToolbar() {
+  const button = byId('desfazer');
+  if (button) button.disabled = !canUndo();
+  const marker = byId('alterado');
+  if (marker) marker.hidden = !isDirty();
+}
+
+// One step back: the world is replaced by the snapshot and everything that was built from it is built
+// again. Undoing is a structural change by definition — the snapshot may have other dimensions, other
+// works — so the scene is rebuilt instead of re-created entity by entity (D33).
+async function undoLast() {
+  if (!currentWorld()) return;
+  if (!undo()) {
+    setStatus(t('editor.undo.empty'));
+    return;
+  }
+  const world = currentWorld();
+  try {
+    await preview.show(world.data);
+  } catch (error) {
+    setStatus(t('editor.error.build', { message: error.message }), 'erro');
+    return;
+  }
+  ensureActiveDimension(world.data);
+  await revalidate();
+  panels.renderAll(panelContext());
+  refreshStatus();
+  updateToolbar();
+  setStatus(t('editor.undo.done'));
 }
 
 // Where the visitor stands is a dimension id, and a world may stop having it after a deletion. The
@@ -108,6 +164,10 @@ function panelContext() {
     async change(options) {
       const world = currentWorld();
       if (!world) return;
+      // The snapshot of what the author was looking at before this change (D35). It goes in before
+      // anything else, so a change that fails to build is still a change that can be undone.
+      remember();
+      updateToolbar();
       if (options && options.rebuild) {
         try {
           await preview.show(world.data);
@@ -147,6 +207,7 @@ async function adopt(data, file) {
   await revalidate();
   panels.renderAll(panelContext());
   refreshStatus();
+  updateToolbar();
   if (window.portalDebug) window.portalDebug.world = slugOf(data, null);
 }
 
@@ -166,9 +227,19 @@ async function openWorld(slug) {
 // The export is a download, never a write: the page has no access to the repository, and the file is
 // what the author puts back in data/worlds/ and commits (D2). The name of the file is the name of the
 // world, so the export cannot quietly become `world.json`.
-function exportCurrent() {
+//
+// "Validar tudo antes de exportar" (B9): what leaves here is what gets committed, so a world with
+// errors is not offered as a download — the counts and the list are on the screen next to the refusal.
+// Warnings do not stop it: they are the things the validator knows and the author may have decided to
+// live with (D30). The files are asked again first, because the author has just put them in place.
+async function exportCurrent() {
   const world = currentWorld();
   if (!world) return;
+  const report = await revalidate({ refresh: true });
+  if (report && report.errors.length > 0) {
+    setStatus(t('editor.error.exportBlocked', { count: report.errors.length }), 'erro');
+    return;
+  }
   const text = exportWorld(world.data);
   const name = world.file.split('/').pop() || slugOf(world.data) + '.json';
   const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
@@ -179,6 +250,9 @@ function exportCurrent() {
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  // The author now has the file: the guard of D32 has nothing to warn about until the next edit.
+  markSaved();
+  updateToolbar();
   setStatus(t('editor.status.exported', { file: name }));
 }
 
@@ -220,11 +294,31 @@ export async function startEditor() {
     if (event.key === 'Enter') openWorld(input.value.trim());
   });
   bind('validar', 'click', async () => {
-    await revalidate();
+    await revalidate({ refresh: true });
     setStatus(t('editor.status.valid'));
   });
+  bind('desfazer', 'click', undoLast);
   bind('exportar', 'click', exportCurrent);
   bind('importar', 'change', (event) => importFile(event.target.files && event.target.files[0]));
+
+  // The keyboard's undo belongs to the text being typed while a field has the focus; the world's undo
+  // is what applies when the author is looking at the scene.
+  window.addEventListener('keydown', (event) => {
+    const key = (event.key || '').toLowerCase();
+    if (key !== 'z' || !(event.ctrlKey || event.metaKey) || event.shiftKey || event.altKey) return;
+    const active = document.activeElement;
+    if (active && /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName)) return;
+    event.preventDefault();
+    undoLast();
+  });
+
+  // The guard of D32: a page that is closed with changes that were never exported loses them, and the
+  // editor cannot write to the repository to have saved them (D2). The warning is all it can give.
+  window.addEventListener('beforeunload', (event) => {
+    if (!isDirty()) return;
+    event.preventDefault();
+    event.returnValue = '';
+  });
 
   await openWorld(requestedWorld());
 }

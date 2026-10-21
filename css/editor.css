@@ -79,6 +79,24 @@ button:hover,
   background-color: #3a1616;
 }
 
+/* Um botão que não tem o que fazer diz isso em vez de desaparecer: o lugar na barra fica estável e o
+   autor aprende onde é que «Desfazer» fica antes de precisar dele. */
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+button:disabled:hover {
+  background-color: #241010;
+}
+
+/* A marca de «alterado» (D32/D35), ao lado do botão que a desfaz. */
+.marca {
+  color: #ffce5c;
+  font-size: 0.8rem;
+  text-transform: lowercase;
+}
+
 /* O input de ficheiro cobre a etiqueta: continua focável e clicável, sem mostrar o cromo nativo. */
 .ficheiro {
   position: relative;

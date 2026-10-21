@@ -171,6 +171,29 @@ export function validateScene(scene, options = {}) {
     }
   }
 
+  // ---- D30: what the shape accepts and the scene does not build ----
+  //
+  // These four values validate on purpose — the format is one step ahead of the code — but a file that
+  // uses them is relying on something the builder ignores. Before D30 the validator accepted them in
+  // silence and the author was left guessing why the scene did not change; now it says so, and the
+  // editor does not offer them (docs/ROADMAP.md, D30).
+  for (const artwork of scene.artworks || []) {
+    if (artwork.kind === 'model' || artwork.kind === 'text') {
+      warn(`artworks[${artwork.id}]: kind "${artwork.kind}" is validated and not built — every artwork is ` +
+        `drawn as a textured box today (D30)`);
+    }
+    if (artwork.interaction === 'link') {
+      warn(`artworks[${artwork.id}]: interaction "link" is validated and the scene shows the address in the ` +
+        `modal instead of navigating (D30)`);
+    }
+  }
+  for (const dimension of dimensions) {
+    if (dimension.kind === 'color') {
+      warn(`dimensions[${dimension.id}]: kind "color" is validated and the scene has no flat background — ` +
+        `the dimension has no panorama to draw (D30)`);
+    }
+  }
+
   // ---- L4: arriving must not fall inside another box (chain crossings) ----
   const portals = (scene.portals || []).filter((portal) => Array.isArray(portal.position) && Array.isArray(portal.box));
   for (const from of portals) {

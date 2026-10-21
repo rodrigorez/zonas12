@@ -1708,7 +1708,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: plano registado em 2026-10-16 (B0), com o B1 ao B8 entregues em 2026-10-20 — falta o B9 e o B10.** Como nas fases anteriores, o
+**Estado: plano registado em 2026-10-16 (B0), com o B1 ao B9 entregues em 2026-10-20 — falta o B10.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -2107,6 +2107,63 @@ E uma decisão que a medição obrigou a alinhar com a linha de comando: o **fix
 (`graphScenes()`), tal como o `validate.mjs` já o deixa de fora — senão o editor acusava
 `example → praia`, uma porta que a linha de comando não conta e que existe para exercitar mecanismos.
 
+#### O que o B9 entregou e mediu (2026-10-20) — as ferramentas transversais e o **R9** fechado
+
+| Peça | O que é |
+| --- | --- |
+| `js/editor/assets.js` | As duas perguntas que só a linha de comando sabia responder — o ficheiro existe (**L9**, **L10**) e a imagem mede 2:1 (**L14**) — respondidas na página: um `Image` mede a imagem ao carregá-la (carregar também prova que está lá), e um `HEAD` responde pelos vídeos, que não se descarregam só para saber que existem. Uma resposta em cache poupa o GET por cada tecla; `refresh` volta a perguntar o que faltava |
+| `js/editor/model.js` | Desfazer por instantâneos (**D35**): `remember()` guarda o **texto** que o autor estava a ver, até **50**; `isDirty()` compara com os textos que ele **já tem** (o que abriu e os que exportou) |
+| `js/editor/index.js` | `exists`/`imageSize` no `validateScene`; o botão «Desfazer» com `Ctrl+Z` (só fora dos campos); a marca «alterado»; a guarda de saída (**D32**); e a exportação que **valida tudo antes de exportar** |
+| `js/scene/validation.js` | Os **avisos da D30** — o que o esquema aceita e a cena não constrói: `kind: model\|text` numa obra, `interaction: link`, `kind: color` numa dimensão |
+| `tools/scene/laws-selftest.mjs` | Três avarias novas, uma por valor da D30, com `level: 'warning'` |
+| `editor.html`, `css/editor.css`, `i18n/pt.json` | O botão «Desfazer», a marca «alterado» e as **5** chaves novas (**149** no catálogo); a nota que dizia «faltam as ferramentas do B9» saiu |
+
+**A bateria do editor — 35 de 35**, numa página servida por HTTP com a cache **desligada**
+(`?bust=` e `Network.setCacheDisabled`), das três leis à guarda de saída:
+
+| O que se mediu | Resultado |
+| --- | --- |
+| Os 5 mundos no editor | `Erros: 0 · Avisos: 0 · Por verificar: 0` — a **L9** e a **L14** deixaram de ser «não verificadas» no browser |
+| Importar→exportar os 5 mundos | **0 diferenças**, byte a byte: portão **2 301**, cidade **5 115**, praia **4 903**, céu **2 765**, fixture **6 879** |
+| O que o `assets.js` responde | **7** assets da cidade perguntados e todos encontrados; `cidade.jpg` = **2048×1024** (2:1, há o que comparar na L14); um `jpg` que não existe → `false`; um `mp4` que não existe → `false` |
+| A **L9** dentro do editor (asset apagado à mão) | `assets.ausente: "assets/previews/nao-existe.jpg" does not exist on disk — law L9` |
+| A **L14** dentro do editor (um retrato no lugar do panorama) | `dimensions[0]: "assets/artworks/eiffel.jpg" is 1226×855, which is not the 2:1 of an equirectangular panorama` |
+| Uma edição de verdade (a velocidade da câmara, 0,1 → 0,2) | «Desfazer» fica **activo**, a marca «alterado» aparece, e o export difere do ficheiro (mesmos 5 115 bytes, outro conteúdo) |
+| A guarda de saída (**D32**) | Com alterações, `beforeunload` é **cancelado**; depois de exportar e depois de desfazer, **não** é |
+| Desfazer | O export volta a ser **o ficheiro**, byte a byte; «Desfazer» desactiva-se e a marca desaparece |
+| O limite da pilha (**D35**) | 60 alterações → **50** instantâneos, e o último volta exactamente 50 passos atrás (`extra` 59 → **9**) |
+| Exportar com erros | Recusa: `Não exportado: 1 erro(s) no mundo…`, **0** ficheiros descarregados, e os erros na lista ao lado |
+
+**As leis na linha de comando:** `tools/scene/laws-selftest.mjs` passou de **17** a **20** casos —
+uma avaria por valor da D30 — e dá **20 de 20 detectadas**, com o controlo (nada injectado) **limpo:
+0 erros, 0 avisos**, os **5 de 5** arranques e as **20 de 20** combinações dos dois eixos. O
+`validate.mjs` continua a sair com **0**.
+
+**A exposição não se mexeu** (a bateria dos doze, medida de novo): no portão o T4 dá **alfa 0** fora
+da janela, o T5 **0** px dentro / **1 675** de controlo / **0** de ruído, o T9 **20** voltas
+`2 → 2` e o T2/T3 **0** de **84** poses cortadas; no fixture o T4 e o T5 passam com o fundo opaco, o
+T6 abre e fecha o modal, o T9 fica `4 → 4` e o T10/T12 não muda **0** px fora da moldura. Os
+contadores de *pixels mudados* (124 740 / 19 188 no T10) não são comparáveis com os da v0.0.6
+(183 457 / 28 539): dependem da janela do arnês, que aqui é 1400×900 — o que é comparável é a
+invariante («0 fora») e o passar de cada teste.
+
+**Três coisas que a medição obrigou a corrigir, e uma que ela descobriu no instrumento:**
+
+1. A primeira versão da marca «alterado» comparava só com o **último** texto guardado: exportar e
+   depois desfazer deixava o mundo marcado como alterado mesmo tendo voltado ao ficheiro aberto. Passou
+   a comparar com o **conjunto** dos textos que o autor tem na mão.
+2. O instantâneo tem de ser tirado **antes** da alteração, e os painéis escrevem no JSON antes de
+   chamarem `change()` — por isso `remember()` vive em `context.change()`, o único sítio por onde
+   todos passam (verificado: nenhum painel escreve sem chamar `change()`).
+3. O `Ctrl+Z` não pode roubar o desfazer do texto que está a ser escrito: com o foco num campo, quem
+   trata do `Ctrl+Z` é o browser — o do mundo só age fora dos campos.
+4. **O `laws-selftest.mjs` estava a falhar desde o B1 e ninguém tinha visto.** A avaria do arranque
+   injectava um espaço depois de `<title>`; o B1 pôs `data-i18n` no `<title>` dos quatro arranques, o
+   `replace` deixou de encontrar o texto, o ficheiro injectado passou a ser **igual** ao bom — e o
+   caso só se queixava com `the validator did not fail where it should` no fim da lista. Corrigido
+   para injectar em `</title>`, que é estável. Um instrumento que não injecta nada também passa: é a
+   mesma lição do B3 e do B7, agora do lado das ferramentas.
+
 #### Metas de sucesso
 
 **(a) Comportamento — nenhum número pode mudar.** Os **doze** testes de §10 na exposição, nos 5
@@ -2125,13 +2182,15 @@ mundos, com os valores da v0.0.6 (a bateria é `runAcceptance()` mais `walkDoor(
 | M6 | O editor usa os mesmos módulos | `import` de `core/`, `modules/` e `scene/` em `js/editor*` | os **3** grupos (D4/D3) |
 | M7 | A exposição não conhece o editor | `grep editor` em `js/core/`, `js/modules/`, `js/scene/` e `js/app.js` | **0** (fora de comentários) — a regra da D4, literal |
 | M8 | **R8** fechado | ciclo build/remove ×**20** no editor | registos vazios, **1** ouvinte, 0 erros. **Medido no B3 (2026-10-20)**, no portão e no fixture: **0** desvios em 20 ciclos com `tools/regression/scene-cycle.mjs`; falta **re-medir no editor** (B4) |
-| M9 | **R9** fechado | `laws-selftest.mjs` com uma avaria por valor não construído | **17 → N de N** |
+| M9 | **R9** fechado | `laws-selftest.mjs` com uma avaria por valor não construído | **17 → 20 de 20** — medido no B9, com o controlo limpo (0 erros, 0 avisos) |
 | M10 | A validação é uma só | `grep` de leis duplicadas no editor | **0** (importa `js/scene/validation.js`) |
 | M11 | O ficheiro exportado é estável | importar→exportar os 5 mundos | **0 diferenças** (2 espaços, ordem do `schema.js`, sem campos vazios) |
 | M12 | Não se pré-visualiza outro mundo | `grep` de `buildScene` com um ficheiro que não o mundo editado | **0** (L13) |
 | M13 | As 4 linhas de §7 por módulo | a tabela do editor | **5** módulos × **4** colunas |
 | M14 | Os módulos carregam em qualquer host | importar os 6 numa página sem a UI da exposição | **0** excepções (hoje: **2**) |
 | M15 | `?lang=` escolhe a língua | `/?lang=en` sem `en.json` | português, **1** aviso, 0 chaves cruas no ecrã |
+| M16 *(B9)* | As perguntas da linha de comando respondidas no browser | `Por verificar` no relatório do editor, nos 5 mundos | **0** — medido no B9 |
+| M17 *(B9)* | **Desfazer** e guarda de saída | editar, exportar, desfazer, e o `beforeunload` nos dois estados | export **byte-idêntico** depois de desfazer; **50** instantâneos; a guarda só com alterações — medido no B9 |
 
 #### Aceitação da fase
 
@@ -2815,6 +2874,15 @@ medida) e reconstruir a cena **recarrega os assets** (o que fixa a **D33**). As 
 mundo), a navegação dentro da pré-visualização, a webcam, o desfazer e a estrutura dos ficheiros.
 Nada implementado.
 
+**B9 fechado em 2026-10-20** — as ferramentas transversais do editor e, com elas, o **R9**: a
+página passou a responder às perguntas que eram só da linha de comando (**L9** e **L14**, por
+`Image` e `HEAD`), o que levou o «Por verificar» a **0** nos 5 mundos; há **desfazer** por
+instantâneos (**D35**, 50 passos, e desfazer dá o ficheiro de volta byte a byte), a marca
+«alterado» com a guarda de saída (**D32**) e a exportação que **valida tudo antes de exportar**;
+e o validador passou a **avisar** os quatro valores que o esquema aceita e a cena não constrói
+(**D30**), com o `laws-selftest.mjs` em **20 de 20**. A bateria do editor fechou em **35 de 35** e a
+exposição ficou com os mesmos invariantes (§9).
+
 ### O que fica decidido, em uma frase
 
 O código passa a **ES Modules em inglês** (núcleo + 4 módulos), a cena passa a viver em
@@ -2946,7 +3014,7 @@ só chega à interface na **Fase 4**, e é o editor o primeiro sítio que o lê.
 | R3 | **Catálogo `i18n/pt.json` incompleto** | Tem **5** chaves em `strings` (`app.title`, `app.loading`, `app.start`, `artwork.back`, `camera.error`); as strings que a interface ganhou depois — os 4 `aria-label` do D-pad, o `aria-label` do modal e o `title` do iframe — não estão lá. Nada lê o catálogo ainda (é da Fase 4), por isso é inconsistência latente | Juntar as chaves novas ao catálogo na Fase 4, quando a interface passar a usar `t('…')` (a contagem no §13 foi corrigida em 2026-10-15). **Plano registado no B0 de 2026-10-16: fecha no B1 da Fase 4 (§9)**. **FECHADO em 2026-10-20 (B1):** o catálogo tem **13** chaves, a interface lê-as por `data-i18n*`, o `?lang=en` cai no português com **1** aviso — e as duas pontes `window.iniciarCena`/`fecharObra` saíram com os `onclick`. Medido: **0** literais de interface em `js/`, **0** chaves em falta, **0** `onclick` nos 4 arranques |
 | R4 | **Feita em 2026-10-15** (decisão **D21**, §11) | O formato por língua estava documentado (§5.7 e §6) e **não instanciado**: as dimensões não tinham nome, as obras não tinham título e nenhum campo do JSON era por língua — nem o conversor nem o validador mencionavam idioma | O `{ pt, en }` entrou no esquema, no conversor e no validador e ficou **instanciado**: 4 nomes de dimensão e 6 descrições de asset (B3, §9). As **10 obras** ficam sem `title` — é opcional, e quem o lê é o editor (Fase 4) |
 | R8 | **O `remove()` do construtor de cena nunca correu** | `buildScene()` devolve um `remove()` que tira as portas, as obras, as dimensões, os assets e a câmara — e **nada o chama**: o `js/app.js` faz `await buildScene(data)` e deita fora o resultado (medido por `grep`, é a única chamada). Com ele ficam por exercitar as três funções `remove…` dos módulos e os `remove()` dos componentes que desregistam conteúdo do núcleo. O editor (Fase 4) vai ser o primeiro sítio a trocar de cena. É o mesmo tipo de risco que a **A4** teve até a Fase 2 o fechar: código de limpeza que ninguém exercita apodrece sem se notar | A Fase 4 (troca de cena no editor) ou um teste que construa e remova uma cena e confirme que o documento e os registos do núcleo ficam como estavam. **Medido no B0 de 2026-10-16: o `remove()` funciona** — 3 ciclos do portão deixam os registos vazios e a cena de volta ao que era; fecha no **B3** da Fase 4, com **20** ciclos (§9). **FECHADO em 2026-10-20 (B3):** o instrumento `tools/regression/scene-cycle.mjs` constrói e remove um mundo **20** vezes e compara portais, dimensões, entradas de conteúdo, valores de stencil, dimensão ativa, nós do `<a-scene>` e ouvintes — **0** desvios no portão (2→4→2 portais) e no fixture (4→8→4), com a navegação da exposição a continuar a funcionar (`walkDoor(0)` levou a `/cidade/?from=gate`) |
-| R9 | **O esquema declara mais do que a cena constrói** | Quatro coisas **validam** e não são construídas: `kind: "model"` e `"text"` numa obra (o `createArtwork()` ignora o `kind` e faz sempre uma `a-box` com a textura do `asset` — não há geometria de modelo nem texto 3D), `kind: "color"` numa dimensão (o `createDimension()` nunca passa o `color` ao componente — o ficheiro não menciona a palavra, medido por `grep`; o validador só avisa quando a cor **falta**, com «the background will be black») e `interaction: "link"` (o `addressToOpen()` devolve o endereço, mas o `open-artwork` mostra-o no **iframe do modal**, não navega). Medido: quatro variantes da cena da exposição, uma por campo, passam **todas** com 0 erros e 0 avisos — quem escrever um destes campos à mão vê o validador aceitar e a cena não mudar como esperava | Ou a Fase 4 os implementa (e o editor passa a oferecê-los), ou o esquema e o validador passam a **avisar** que esses valores ainda não são construídos — a categoria «aviso» já existe no validador e é onde isto encaixa (é a mesma que avisa da dimensão de cor sem cor). **Decidido no B0 de 2026-10-16 (D30, §11): o validador avisa** e o editor não oferece esses valores; fecha no **B9** da Fase 4 (§9) |
+| R9 | **O esquema declara mais do que a cena constrói** | Quatro coisas **validam** e não são construídas: `kind: "model"` e `"text"` numa obra (o `createArtwork()` ignora o `kind` e faz sempre uma `a-box` com a textura do `asset` — não há geometria de modelo nem texto 3D), `kind: "color"` numa dimensão (o `createDimension()` nunca passa o `color` ao componente — o ficheiro não menciona a palavra, medido por `grep`; o validador só avisa quando a cor **falta**, com «the background will be black») e `interaction: "link"` (o `addressToOpen()` devolve o endereço, mas o `open-artwork` mostra-o no **iframe do modal**, não navega). Medido: quatro variantes da cena da exposição, uma por campo, passam **todas** com 0 erros e 0 avisos — quem escrever um destes campos à mão vê o validador aceitar e a cena não mudar como esperava | Ou a Fase 4 os implementa (e o editor passa a oferecê-los), ou o esquema e o validador passam a **avisar** que esses valores ainda não são construídos — a categoria «aviso» já existe no validador e é onde isto encaixa (é a mesma que avisa da dimensão de cor sem cor). **Decidido no B0 de 2026-10-16 (D30, §11): o validador avisa** e o editor não oferece esses valores; fecha no **B9** da Fase 4 (§9). **FECHADO em 2026-10-20 (B9):** o validador passou a avisar — **3** avisos para os **4** valores (`kind: model\|text` numa obra é um só, `interaction: link` e `kind: color` numa dimensão são os outros dois) —, o `laws-selftest.mjs` cresceu de **17** para **20** casos, um por valor, e dá **20 de 20 avarias detectadas** com o controlo limpo, e nenhum dos quatro valores é oferecido pelo editor (§9, registo do B9) |
 | R10 | **Não há retrato do portão** | A porta da cidade para o portão é `window: none` (e, desde a D29, também a da praia), porque não existe imagem da realidade: um retrato emprestado mentiria ao visitante sobre onde a porta leva. É uma decisão do autor, tomada ao fechar o B6 e reusada no B7 | Uma imagem do portão em `assets/previews/gate.jpg` mais as três linhas do catálogo e da porta — o formato e o caminho já a aceitam, e a L19 e o T10 já a mediriam. **FECHADO em 2026-10-20, decisão do autor: aceita-se que não exista.** As duas portas para a realidade ficam `window: none` — é o único caso em que a ausência é honesta, porque um retrato emprestado mentiria sobre o destino |
 | R11 | **No céu, a chegada fica virada para o lado de onde se vem** | Medido no B9 (§9): o visitante aterra virado no sentido em que vinha — o −Z da porta —, o que é **o que faz do regresso um passo** (é o mecanismo, não um defeito). Em cada sala o que fica à frente varia: cidade **1** de 5 obras, praia **1** de 3, céu **0** de 2. O céu já vinha assim da cena anterior (nota do B6); nas outras salas há sempre alguma obra à frente | Uma decisão do autor sobre a orientação da chegada (é a rotação devolvida pelo `arrivalPoint`, em `js/scene/arrival.js`) ou um re-arranjo das obras do céu — o que ele preferir. **DECIDIDO em 2026-10-20: re-arranjar as duas obras do céu**, no **B10** e **com o próprio editor** (é o primeiro uso real que se lhe dá, e é o que permite acertar as posições na pré-visualização). É dado, não código, e o mecanismo da chegada não se toca |
 | R12 | **O T5 não foi re-medido na Fase 3B** | Precisa do rig de **dois** portais (uma janela a tapar a moldura da outra) e a ordem de desenho **não mudou** na fase: `drawOrder` e as regras de stencil são os mesmos do fecho da Fase 3. Re-medir sem mudança nenhuma não diz nada de novo; o número da v0.0.5 (0 px da moldura de trás dentro da janela da frente, com 6 768 px de controlo) continua a ser o último | **FECHADA em 2026-10-16**, na bateria dos doze testes (§9): o rig passou a viver em `tools/regression/acceptance.mjs` (`checkStackedDoors`), com duas portas de 8×10 m a 20 m e a 30 m (a de trás deslocada 5 m para o lado, para a moldura dela atravessar a janela da frente), e o resultado é **0** px dentro, **1 657** px de controlo fora e **0** de ruído — nos **5** mundos |
