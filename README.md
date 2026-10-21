@@ -205,11 +205,11 @@ contra o que o GitHub Pages serve (abaixo); fica **por testar pelo autor** no **
 como as versões anteriores foram dadas por fechadas. A versão anterior é a `v0.0.6` (o estado depois
 da Fase 3B), marcada pela branch com o mesmo nome.
 
-Resumo do que existe hoje: `index.html` (**86 linhas**) e as **3** salas com o **mesmo** ficheiro
+Resumo do que existe hoje: `index.html` (**87 linhas**) e as **3** salas com o **mesmo** ficheiro
 (`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `editor.html` (**83**),
-`js/app.js` (**155**), `js/editor.js` (**14**, a entrada do editor — D36), `js/editor/`
+`js/app.js` (**173**), `js/editor.js` (**14**, a entrada do editor — D36), `js/editor/`
 (**10** ficheiros, **2697** linhas com os painéis), `js/i18n.js` (**92**), `js/core/` (7 ficheiros,
-**219**), `js/modules/` (6 ficheiros, **1326**), `js/scene/` (5 ficheiros, **1126**),
+**219**), `js/modules/` (6 ficheiros, **1346**), `js/scene/` (5 ficheiros, **1126**),
 `css/style.css` (96) e `css/editor.css` (**313**), **5** mundos em `data/worlds/` (o portão, as três
 salas e o fixture, **1279 linhas** no total e **12** portas), `i18n/pt.json` (**154** chaves), os
 **9** assets em `assets/{panoramas,artworks,video,previews}` e as **9** ferramentas em `tools/`
@@ -439,6 +439,9 @@ dois sítios.
   um «play». Depois da primeira autorização o browser guarda-a, e a visita seguinte arranca sozinha —
   no telemóvel é o que faz o D-pad aparecer sem mais nenhum toque. Em browsers que não dizem se a
   permissão existe (Safari), o botão continua a ser o gesto que a pede.
+- **Ao atravessar um portal não se vê o botão** (**D42**): cada mundo é uma página (D24), e o botão
+  está escondido no markup — a decisão de o mostrar é tomada **antes** de a cena carregar. Enquanto os
+  assets chegam, o que se vê é «Carregando…» (com a rede de um telemóvel, alguns segundos).
 
 ## Mundos e portas de mundo (Fase 3B, fechada em 2026-10-16)
 
@@ -547,6 +550,16 @@ chegada sem permissão tenta, falha e devolve o botão com a mensagem; com a per
 visita arranca sozinha (**0** toques, botão fora, câmara ligada), tanto no portão como **numa sala**
 onde a câmara só se vê pela janela da porta; e no **telemóvel** (390×844, toque) o botão sai e o
 **D-pad entra**. Em Safari, que não responde se a permissão existe, fica a regra do gesto.
+
+**A transição entre portais (D42, o B16).** Um vídeo do autor (`.harness/imagenTeste/botão.mp4`) mostrou
+o botão «ATIVAR EXPOSIÇÃO» a aparecer sozinho sobre um ecrã preto ao atravessar um portal — porque o
+botão estava visível no markup desde a primeira pintura e só era escondido **depois** de a cena
+carregar (que espera por todos os assets). Passou a estar escondido no markup, com a decisão tomada
+**antes** do trabalho pesado: a chegada nunca o mostra e vê-se «Carregando…»; a primeira visita
+vê-lo **antes** dos assets (botão aos **357 ms**, primeira porta aos **373 ms**). Medido com uma sonda
+que anota cada mudança, numa rede de 800 kB/s: **9 de 9**. E a permissão (D41) ganhou um tempo-limite
+de **1 s** — sem ele, uma resposta que não chegasse deixava a exposição presa em «Carregando…» (foi o
+que se mediu com a rede estrangulada).
 
 ## Funcionalidades Principais
 
@@ -900,7 +913,9 @@ e o **nome de cada porta e de cada obra** (tecla **D**):
    do projeto, por exemplo: `python -m http.server 8123`, e abra
    `http://127.0.0.1:8123/`
 2. Clique no botão "ATIVAR EXPOSIÇÃO" — que **só existe enquanto não há câmara**: numa visita
-   seguinte, em que o browser já guarda a autorização, a exposição arranca sozinha (decisão **D41**)
+   seguinte, em que o browser já guarda a autorização, a exposição arranca sozinha (decisão **D41**);
+   e ao atravessar um portal o botão **não aparece** — a página carrega com a linha «Carregando…»
+   (decisão **D42**)
 3. Permita o acesso à câmera quando solicitado (é a dimensão 0, a realidade)
 4. Explore o ambiente utilizando o mouse (desktop) ou o D-pad (mobile)
 

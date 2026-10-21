@@ -12,7 +12,7 @@ import {
   setActiveDimension,
   on
 } from './core/index.js';
-import { startSession, cameraAlreadyAllowed } from './modules/camera.js';
+import { startSession, cameraAlreadyAllowed, showStartButton, showLoading } from './modules/camera.js';
 import { closeArtwork, toggleArtworkLabels } from './modules/artwork.js';
 import { startFrameDriver } from './modules/portal.js';
 import { validateScene } from './scene/validation.js';
@@ -127,18 +127,33 @@ function arrivedFromADoor() {
 //
 // The catalogue comes first: the interface is written with keys and the texts only arrive when this
 // resolves (D12). A scene that is fine still says nothing in the console (test T8).
+//
 // Two reasons for the page to start by itself, and neither of them is a first visit: the visitor came
 // through a door (D37), or they have already allowed the camera in a previous visit (D41) — the
 // browser remembers the gesture, so there is nothing to ask them again. On a browser that cannot
 // answer the second question (Safari), the button stays and the visitor gives the gesture (D34).
+//
+// The **button is decided before the scene is built** (D42): it is hidden in the markup and only
+// appears when it is the missing thing. The build waits for every asset — seconds on a phone — and a
+// button painted over a black screen while the page loads is what one used to see in the middle of a
+// portal transition (measured in the author's screen recording). While it loads, an arrival shows the
+// loading line instead of an empty screen.
 async function start() {
   await initI18n(languageFromUrl());
-  const built = await buildFromData();
+  const arriving = arrivedFromADoor();
+  if (arriving) showLoading();
+  const auto = arriving || await cameraAlreadyAllowed();
+  if (!auto) showStartButton();
+  sceneReady = buildFromData();
+  const built = await sceneReady;
   if (built) startFrameDriver();
   if (!built) return;
-  if (arrivedFromADoor()) startSession({ arrival: true });
-  else if (await cameraAlreadyAllowed()) startSession({ arrival: true });
+  if (auto) startSession({ arrival: true });
 }
+
+// The click is bound at module level, before the scene exists: a visitor who taps the button while the
+// assets load is not ignored — the session starts when there is a scene to start.
+let sceneReady = null;
 
 start().catch((error) => console.error('[scene] the scene could not be built:', error));
 
@@ -151,5 +166,8 @@ function bind(id, handler) {
   if (element) element.addEventListener('click', handler);
 }
 
-bind('btn-iniciar', startSession);
+bind('btn-iniciar', async () => {
+  if (sceneReady) await sceneReady;
+  startSession();
+});
 bind('btn-fechar-obra', closeArtwork);

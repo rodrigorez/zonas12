@@ -50,8 +50,10 @@
       <iframe id="iframe-obra" src="" tabindex="-1" data-i18n-title="artwork.frameTitle" title="Obra aberta em página externa" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 
-    <!-- Interface Inicial -->
-    <button id="btn-iniciar" data-i18n="app.start">ATIVAR EXPOSIÇÃO</button>
+    <!-- Interface Inicial. Escondido no markup (D42): o botão só aparece quando a página decide que é
+         ele que falta — a chegada por uma porta não o mostra, e a primeira visita vê-lo assim que a
+         permissão da câmara é consultada, antes de a cena carregar. -->
+    <button id="btn-iniciar" data-i18n="app.start" hidden>ATIVAR EXPOSIÇÃO</button>
 
     <!-- CONTROLOS MOBILE (Só aparecem se for smartphone/tablet).
          São <button> e não <div>: assim chegam à árvore de acessibilidade com um nome

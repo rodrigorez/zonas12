@@ -130,7 +130,13 @@ export function setupMobileControls() {
 }
 
 // The loading overlay is interface state, but it belongs here: it is only meaningful while
-// the webcam is being requested.
+// the webcam is being requested. Since D42 the entry point also shows it while the assets load, so an
+// arrival has something on the screen instead of a black page with a button on it.
+export function showLoading() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+
 function hideLoading() {
   const overlay = document.getElementById('loading-overlay');
   if (overlay) {
@@ -144,15 +150,21 @@ function hideLoading() {
 // It is also the **way to the camera**, so it follows the camera and not the click (D41): whoever has
 // a stream has nothing to activate, and the button is hidden the moment the stream exists — even when
 // the camera is not in sight (in a room, the camera is only the window of the door that goes back).
+// And it starts **hidden in the markup** (D42): it appears when the page has decided that it is what
+// is missing, and not before.
 function hideStartButton() {
   const start = document.getElementById('btn-iniciar');
-  if (start) start.style.display = 'none';
+  if (!start) return;
+  start.hidden = true;
+  start.style.display = 'none';
 }
 
-function showStartButton() {
+export function showStartButton() {
   if (isCameraActive()) return;
   const start = document.getElementById('btn-iniciar');
-  if (start) start.style.display = 'block';
+  if (!start) return;
+  start.hidden = false;
+  start.style.display = 'block';
 }
 
 // Whether the camera is on right now — the question the button asks, and the one a page can answer
@@ -166,11 +178,20 @@ export function isCameraActive() {
 // Whether the browser already has the visitor's permission for the camera, from a previous visit.
 // Then there is no gesture to ask for and the exhibition can start by itself (D41). Safari has no
 // `camera` in `permissions.query` — it throws, the answer is `false`, and the gesture rule stays.
-export async function cameraAlreadyAllowed() {
+//
+// The answer is waited for at most one second (D42, measured): the question is a convenience, and a
+// browser that does not answer it (it happened with the network throttled, and a page that is offline
+// behind a captive portal can do the same) must not hold the whole exhibition — the visitor would be
+// left with the loading line and no way in. No answer means "unknown", which is the gesture rule.
+const PERMISSION_TIMEOUT = 1000;
+
+export async function cameraAlreadyAllowed(timeoutMs) {
   if (!navigator.permissions || typeof navigator.permissions.query !== 'function') return false;
+  const limit = typeof timeoutMs === 'number' ? timeoutMs : PERMISSION_TIMEOUT;
+  const unknown = new Promise((resolve) => setTimeout(() => resolve(null), limit));
   try {
-    const status = await navigator.permissions.query({ name: 'camera' });
-    return status.state === 'granted';
+    const answer = await Promise.race([navigator.permissions.query({ name: 'camera' }), unknown]);
+    return Boolean(answer && answer.state === 'granted');
   } catch (error) {
     return false;
   }
@@ -236,8 +257,7 @@ export function useRealCamera(enabled) {
 // gesture a page load cannot give it — the button comes back, with the message that says why.
 export function startSession(options) {
   const arrival = Boolean(options && options.arrival);
-  const overlay = document.getElementById('loading-overlay');
-  if (overlay) overlay.style.display = 'flex';
+  showLoading();
   hideStartButton();
 
   // The D-pad group is the exhibition's markup; a host without it still gets the controls wired

@@ -1721,7 +1721,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: FECHADA em 2026-10-21 — B0 ao B15 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
+**Estado: FECHADA em 2026-10-21 — B0 ao B16 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -1819,7 +1819,8 @@ Quatro blocos acrescentados depois do fecho, por achados do autor a jogar o publ
 **B11** (a chegada por uma porta não pede licença, **D37**), o **B12** (a porta do portão mostra a
 realidade ao vivo, **D38**), o **B13** (o nome de cada porta, **D39**) e o **B14** (o nome de cada
 obra, **D40**) — todos com o seu registo abaixo, na mesma ordem e com as medições. O **B15** veio
-depois do teste no telemóvel (**D41**: o botão de entrada segue a câmara, não o clique).
+depois do teste no telemóvel (**D41**: o botão de entrada segue a câmara, não o clique) e o **B16**
+do vídeo do autor a mostrar o botão a meio de uma transição entre portais (**D42**).
 
 #### O que o B1 entregou e mediu (2026-10-20) — fecha o **R3**
 
@@ -2481,6 +2482,53 @@ passar no portão, na cidade e na praia, o `validate.mjs` a **0** e as metas tod
 `cameraAlreadyAllowed()`, `hideStartButton()`/`showStartButton()`) e `js/app.js` (o arranque
 automático quando a permissão já existe).
 
+#### O que o B16 entregou e mediu (2026-10-21) — o botão não aparece a meio de uma transição
+
+Achado pelo autor, num vídeo da sessão no telemóvel (`.harness/imagenTeste/botão.mp4`, 15,4 s): ao
+atravessar um portal, **o botão «ATIVAR EXPOSIÇÃO» aparecia sozinho sobre um ecrã preto**. O vídeo foi
+lido fotograma a fotograma (extraídos por um Chrome headless, sem depender de ferramentas externas) e
+o fotograma do meio da transição mostra exactamente isso: preto e o botão vermelho.
+
+**A causa, medida e não deduzida:** o botão estava **visível no markup** desde a primeira pintura, e quem
+o escondia era o arranque automático da chegada (D37) — mas só **depois** de `initI18n()` e de
+`buildFromData()`, que **espera por todos os assets** (segundos num telemóvel). Nessa janela, o
+visitante via um ecrã preto com um botão.
+
+**A correção (D42):** o botão está **escondido no markup** (`hidden`) e a decisão passou a ser tomada
+**antes** do trabalho pesado:
+
+- a chegada (`?from=`) **nunca** o mostra — e mostra a linha **«Carregando…»** enquanto a cena carrega,
+  para o ecrã não ficar vazio;
+- a primeira visita vê-o assim que a permissão é consultada, **antes de a cena carregar** (medido:
+  botão aos **357 ms**, primeira porta aos **373 ms**);
+- um clique durante o carregamento não se perde: espera pela cena (`sceneReady`) e só então arranca.
+
+**E uma armadilha encontrada pelo caminho:** a pergunta `permissions.query({name:'camera'})` da D41,
+com a rede estrangulada (CDP), **não respondeu** — e como o arranque a esperava, a exposição ficava na
+linha «Carregando…» para sempre. Passou a ser esperada no máximo **1 s**; sem resposta, a visita é
+tratada como «não sei» e o botão aparece. Medido com uma sonda que substitui a pergunta por uma
+promessa que nunca resolve: botão aos **1 488 ms** (o limite mais a rede), página utilizável.
+
+**Medido (9 de 9)**, com uma sonda instalada antes do documento que anota **cada mudança** (botão,
+«Carregando…», primeira porta) e uma rede a **800 kB/s** com 100 ms de latência, em viewport de
+390×844:
+
+| Caso | Linha do tempo |
+| --- | --- |
+| **chegada com permissão** | 888 ms botão fora · **1 516 ms «Carregando…»** · 4 461 ms primeira porta · 5 057 ms nada por cima — **o botão nunca aparece** (0 passos) |
+| **primeira visita** | botão aos **357 ms**, cena aos **373 ms** — aparece antes dos assets, e o clique esconde-o |
+| **chegada sem permissão** | «Carregando…» aos 404 ms · cena aos 691 ms · câmara recusada · botão volta aos **833 ms** com a mensagem (o recuo da D37) |
+| **permissão que nunca responde** | botão aos **1 488 ms** — a página não fica presa |
+
+Sem regressões: a bateria dos doze nos 5 mundos, a consola com **0** erros e **0** avisos nas 5
+páginas, o editor em **35 de 35**, as etiquetas em **23 de 23** e **21 de 21**, a D41 em **7 de 7**,
+`validate.mjs` **0** e `laws-selftest` **21 de 21**, e as metas todas. Os quatro arranques foram
+regenerados a partir da raiz (o `index.html` mudou).
+
+**O que mudou:** `index.html` e os três arranques (`hidden` no botão), `js/app.js` (a decisão antes do
+build, o clique que espera, o `showLoading()` na chegada), `js/modules/camera.js` (`showLoading`
+exportado, `hideStartButton`/`showStartButton` com o atributo `hidden`, e o tempo-limite da permissão).
+
 #### Metas de sucesso
 
 **(a) Comportamento — nenhum número pode mudar.** Os **doze** testes de §10 na exposição, nos 5
@@ -3137,6 +3185,7 @@ alteram comportamento.
 | D39 | O nome de cada porta | O nome vive no **dado**: o id, o que a janela mostra (os nomes das dimensões do par, ou o retrato) e para onde leva (o *slug* do mundo — o portão pelo catálogo), escrito pelo construtor num atributo do componente. Desenha-se como **sprite** (lê-se dos dois lados, o que importa a quem aterra atrás dela), com a tecla **D** na exposição e **sempre** no editor, que não tem teclas |
 | D40 | O nome de cada obra | O mesmo, com a mesma tecla: `#0 · galeriaFoto1 · Cidade 360º · modal` — o **título** quando o dado tem um (D21), senão o **id do asset** (que é o que se edita no ficheiro), a dimensão pelo **nome** e a interacção pela palavra do dado (`modal`/`none`/`link`). O desenho é um só para portas e obras — `js/modules/label.js` —, para os dois não divergirem em tamanho, cor ou tipo de letra |
 | D41 | O botão de entrada segue a câmara | O botão «ATIVAR EXPOSIÇÃO» é a **porta para a câmara**, por isso só existe enquanto não há câmara: esconde-se **no instante em que há um stream** (mesmo que a câmara não esteja à vista — numa sala ela é só a janela da porta) e nunca volta a aparecer com um stream vivo. E uma visita em que o browser **já tem a permissão** (`permissions.query`) arranca sozinha, sem gesto: a permissão *é* o registo do gesto. Em browsers que não respondem a essa pergunta (Safari), fica a regra do gesto (**D34**) |
+| D42 | O botão não aparece a meio de uma transição | O botão está **escondido no markup** e só aparece quando a página decidiu que é ele que falta — e a decisão é tomada **antes de a cena carregar**: com `?from=` (chegada) nunca aparece, e na primeira visita aparece antes dos assets. Enquanto carrega, a chegada mostra a linha «Carregando…» em vez de um ecrã preto com um botão por cima (era o que se via no vídeo do autor entre portais). A pergunta da permissão é esperada no máximo **1 s**: uma resposta que não chega não pode travar a exposição |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -3256,6 +3305,15 @@ como numa sala, onde ela é só a janela da porta) e nunca volta com um stream v
 o browser **já tem a permissão** arranca sozinha, porque a permissão é o registo do gesto. Medido:
 **7 de 7** em três instâncias (sem permissão, com permissão, e em emulação de telemóvel 390×844 — onde
 o botão sai e o D-pad entra), com a consola e a bateria nos mesmos números.
+
+**B16, a partir de um vídeo do autor** — o botão deixou de aparecer **a meio de uma transição entre
+portais** (**D42**): estava visível no markup desde a primeira pintura e só era escondido depois de a
+cena carregar. Passou a estar escondido no markup, com a decisão tomada antes do trabalho pesado, e a
+chegada mostra «Carregando…» em vez de um ecrã preto. A pergunta da permissão (D41) ganhou um
+**tempo-limite de 1 s**, porque uma resposta que não chega travava a exposição. Medido: **9 de 9** com
+uma sonda que anota cada mudança numa rede de 800 kB/s (o botão **nunca** aparece numa chegada; na
+primeira visita aparece **antes** dos assets), sem regressões na bateria, no editor, nas etiquetas e
+nas leis.
 
 ### O que fica decidido, em uma frase
 
