@@ -1721,7 +1721,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: FECHADA em 2026-10-20 — B0 ao B11 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
+**Estado: FECHADA em 2026-10-20 — B0 ao B12 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -2298,6 +2298,58 @@ aparece. A bateria dos doze mantém os números no portão, na cidade e no fixtu
 **O que mudou:** `js/modules/camera.js` (`startSession(options)` com `arrival`, e o
 `showStartButton()` que a recusa usa) e `js/app.js` (`arrivedFromADoor()` e o arranque automático
 depois do construír da cena). Nada no editor, nada no dado, nada na exposição que os testes meçam.
+
+#### O que o B12 entregou e mediu (2026-10-20) — a porta do portão mostra a realidade
+
+Achado pelo autor, a jogar o publicado: ao entrar na cidade e olhar a porta de onde veio, «aparece
+somente o pórtico, sem a imagem da câmara, como se fosse transparente». Estava certo, e o que se
+via era a **decisão do dado**: a porta de volta ao portão é `window: none` desde a **D29** (o R10
+fechou «não há retrato do portão»), porque um retrato emprestado mentiria. Mas o que o autor queria
+não é um retrato — é a **realidade ao vivo**, que é o que a porta mostrava na Fase 3, quando o mundo
+era uma página só e a dimensão 0 era a câmara.
+
+**A sonda, antes de mexer em código.** Uma cópia da cidade declarada com uma dimensão `kind:
+"camera"` (id 1) e a porta de volta com `window: dimension-pair` (0, 1): nas capturas, o interior da
+moldura mostrou o **padrão da câmara falsa do Chrome** (verde) por cima do panorama da sala — e o
+mecanismo é o que já existia: uma dimensão de câmara **não desenha nada** (`createDimension` devolve
+`null`), a máscara escreve stencil **e profundidade** no plano da janela, e o canvas — com `alpha`
+— fica transparente ali, deixando passar o `<video>` que está atrás.
+
+**A regra que faltava.** `dimension-pair + navigate` estava fora da matriz da L18 com a razão
+escrita («o que o visitante vê pela janela seria mentira»). Deixa de ser mentira quando a dimensão
+mostrada é a **câmara** e a porta leva ao **mundo de entrada**: o que se vê é o que espera o
+visitante. Ficou em `portal-kinds.js` como uma função que precisa do mundo e não só da porta —
+`showsTheCamera(window, dimensions)` e `isLegalDoor(door, dimensions)` —, lida pelo **validador**
+(o mesmo `validateDoor`, agora com as dimensões) e pelo **editor**, para que um não aceite o que o
+outro recusa.
+
+**O dado:** `cidade` e `praia` passaram a ter a dimensão **1** `kind: "camera"` e
+`cameras.real.enabled: true`, e as portas 2 e 5 (as que voltam ao portão) um `window:
+dimension-pair` (0, 1) com o `action: navigate` que já tinham. O céu não tem porta para o portão (a
+sua porta vai à praia) e ficou como estava.
+
+**Medido:**
+
+| O que | Resultado |
+| --- | --- |
+| `validate.mjs` | **0** — as duas salas com 2 dimensões, a L18 a aceitar a exceção |
+| `laws-selftest.mjs` | **21 de 21** — a avaria nova (uma janela de câmara a navegar para uma **sala**) é detectada, e o controlo continua limpo |
+| A imagem, na cidade | captura **de frente**: moldura vermelha com a câmara (verde) por dentro, sobre o panorama da cidade; **de trás**: o mesmo, visto do outro lado |
+| A imagem, na praia | captura de frente: idem, sobre o panorama da praia |
+| Bateria na cidade e na praia | T4, T5, T6, T9 (`2 → 2` e `3 → 3`, os mesmos nós — a dimensão de câmara não cria entidade), T10/T12 e T2/T3 **passam**. Os contadores de pixels mudaram (T5 `0 / 1 360 / 0`, T2/T3 `19 278` amostras) porque a sala passou a ter câmara e o `scene.resize()` que ela dispara **corrige o aspecto** da câmara: a janela do rig projecta-se 7 % mais pequena (1,72 → 1,85) — a invariante é a mesma |
+| Consola (T8), nas 5 páginas | **0** erros, **0** avisos, **0** pedidos falhados (com a câmara concedida, que é o estado de quem visita) |
+| A chegada (T7/T11) | passa nas três salas |
+| O editor | **35 de 35**: os 5 mundos com `0 / 0 / 0` e **importar→exportar byte-idêntico** — o painel do portal **não** reescreve a porta da câmara (mostra a combinação como vinda do dado, com a nota da D38) |
+
+**O custo, dito:** as salas passam a **pedir a câmara** (é o preço de a mostrarem). Como é a mesma
+origem do portão, o browser não volta a perguntar nada a quem já autorizou; e se for recusada, a
+janela não tem imagem, a mensagem do erro aparece e o botão da D37 volta. O ecrã de entrada continua
+a ser uma vez por página, não por portal.
+
+**O que mudou:** `js/modules/portal-kinds.js` (`showsTheCamera`, `isLegalDoor`, `validateDoor` com as
+dimensões), `js/scene/validation.js` (uma linha, a passar as dimensões), `js/editor/panels/portal.js`
+(a porta cuja ação vem do dado mostra-a em vez de a reescrever), `data/worlds/{cidade,praia}.json`,
+`i18n/pt.json` (a nota nova) e o `laws-selftest.mjs` (a avaria nova).
 
 #### Metas de sucesso
 
@@ -2951,6 +3003,7 @@ alteram comportamento.
 | D35 | «Desfazer» | **Instantâneos** do JSON em memória (~50), e não um registo de comandos |
 | D36 | Estrutura do editor | `js/editor.js` é a **entrada** (≤100 linhas) e o resto vive em `js/editor/` (modelo, painéis, pré-visualização, exportação, problemas); a regra da D4 fica literal |
 | D37 | Chegar por uma porta e o ecrã de entrada | A chegada por uma porta (`?from=`) **arranca a exposição sozinha** — `startSession({ arrival: true })`: o botão «ATIVAR EXPOSIÇÃO» fica para a **primeira visita** e volta como **recuo** se a câmara for recusada (o gesto que o browser pode exigir). Cada mundo é uma página (D24) e a porta navega, por isso o ecrã de entrada repetia-se em cada sala mesmo sem câmara nenhuma para pedir |
+| D38 | A porta que volta ao portão mostra a realidade | A sala declara uma dimensão `kind: "camera"` e a porta para o portão um `dimension-pair` com ela; a matriz da **L18** ganha a exceção «par com a câmara + `navigate` para o mundo de entrada», porque o que a janela mostra é **exactamente** o que espera o visitante do outro lado. Uma dimensão de câmara **não desenha nada**: o rectângulo da janela fica transparente sobre o vídeo e a realidade vê-se dos **dois lados**. A sala passa a pedir a câmara (o mesmo `real.enabled` do portão), e o editor mostra a combinação como vinda do dado em vez de a reescrever |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -3038,6 +3091,14 @@ pedir licença: com `?from=` na URL a exposição arranca sozinha (**D37**), o e
 a primeira visita e volta como recuo se a câmara for recusada. Medido antes de mexer: a câmara só é
 pedida no portão e nunca numa mudança de dimensão — o que se repetia era o ecrã de entrada, porque
 cada mundo é uma página (D24). **5 de 5** verificações e a bateria dos doze com os mesmos números.
+
+**B12, ainda no mesmo dia** — a **porta que volta ao portão** passou a mostrar a **realidade ao vivo**
+pela janela (**D38**): a sala declara uma dimensão `kind: "camera"` e a porta um `dimension-pair` com
+ela, e a matriz da L18 ganha a exceção «par com a câmara + `navigate` para o mundo de entrada», que
+não mente porque o que a janela mostra é o que espera o visitante. Medido com capturas dos **dois
+lados** da porta, na cidade e na praia; `validate.mjs` **0**, `laws-selftest` **21 de 21**, a bateria
+das duas salas a passar (com os contadores de pixels a mudarem por o aspecto da câmara passar a ser
+corrigido) e o editor em **35 de 35** com o export byte-idêntico.
 
 ### O que fica decidido, em uma frase
 
@@ -3171,7 +3232,7 @@ só chega à interface na **Fase 4**, e é o editor o primeiro sítio que o lê.
 | R4 | **Feita em 2026-10-15** (decisão **D21**, §11) | O formato por língua estava documentado (§5.7 e §6) e **não instanciado**: as dimensões não tinham nome, as obras não tinham título e nenhum campo do JSON era por língua — nem o conversor nem o validador mencionavam idioma | O `{ pt, en }` entrou no esquema, no conversor e no validador e ficou **instanciado**: 4 nomes de dimensão e 6 descrições de asset (B3, §9). As **10 obras** ficam sem `title` — é opcional, e quem o lê é o editor (Fase 4) |
 | R8 | **O `remove()` do construtor de cena nunca correu** | `buildScene()` devolve um `remove()` que tira as portas, as obras, as dimensões, os assets e a câmara — e **nada o chama**: o `js/app.js` faz `await buildScene(data)` e deita fora o resultado (medido por `grep`, é a única chamada). Com ele ficam por exercitar as três funções `remove…` dos módulos e os `remove()` dos componentes que desregistam conteúdo do núcleo. O editor (Fase 4) vai ser o primeiro sítio a trocar de cena. É o mesmo tipo de risco que a **A4** teve até a Fase 2 o fechar: código de limpeza que ninguém exercita apodrece sem se notar | A Fase 4 (troca de cena no editor) ou um teste que construa e remova uma cena e confirme que o documento e os registos do núcleo ficam como estavam. **Medido no B0 de 2026-10-16: o `remove()` funciona** — 3 ciclos do portão deixam os registos vazios e a cena de volta ao que era; fecha no **B3** da Fase 4, com **20** ciclos (§9). **FECHADO em 2026-10-20 (B3):** o instrumento `tools/regression/scene-cycle.mjs` constrói e remove um mundo **20** vezes e compara portais, dimensões, entradas de conteúdo, valores de stencil, dimensão ativa, nós do `<a-scene>` e ouvintes — **0** desvios no portão (2→4→2 portais) e no fixture (4→8→4), com a navegação da exposição a continuar a funcionar (`walkDoor(0)` levou a `/cidade/?from=gate`) |
 | R9 | **O esquema declara mais do que a cena constrói** | Quatro coisas **validam** e não são construídas: `kind: "model"` e `"text"` numa obra (o `createArtwork()` ignora o `kind` e faz sempre uma `a-box` com a textura do `asset` — não há geometria de modelo nem texto 3D), `kind: "color"` numa dimensão (o `createDimension()` nunca passa o `color` ao componente — o ficheiro não menciona a palavra, medido por `grep`; o validador só avisa quando a cor **falta**, com «the background will be black») e `interaction: "link"` (o `addressToOpen()` devolve o endereço, mas o `open-artwork` mostra-o no **iframe do modal**, não navega). Medido: quatro variantes da cena da exposição, uma por campo, passam **todas** com 0 erros e 0 avisos — quem escrever um destes campos à mão vê o validador aceitar e a cena não mudar como esperava | Ou a Fase 4 os implementa (e o editor passa a oferecê-los), ou o esquema e o validador passam a **avisar** que esses valores ainda não são construídos — a categoria «aviso» já existe no validador e é onde isto encaixa (é a mesma que avisa da dimensão de cor sem cor). **Decidido no B0 de 2026-10-16 (D30, §11): o validador avisa** e o editor não oferece esses valores; fecha no **B9** da Fase 4 (§9). **FECHADO em 2026-10-20 (B9):** o validador passou a avisar — **3** avisos para os **4** valores (`kind: model\|text` numa obra é um só, `interaction: link` e `kind: color` numa dimensão são os outros dois) —, o `laws-selftest.mjs` cresceu de **17** para **20** casos, um por valor, e dá **20 de 20 avarias detectadas** com o controlo limpo, e nenhum dos quatro valores é oferecido pelo editor (§9, registo do B9) |
-| R10 | **Não há retrato do portão** | A porta da cidade para o portão é `window: none` (e, desde a D29, também a da praia), porque não existe imagem da realidade: um retrato emprestado mentiria ao visitante sobre onde a porta leva. É uma decisão do autor, tomada ao fechar o B6 e reusada no B7 | Uma imagem do portão em `assets/previews/gate.jpg` mais as três linhas do catálogo e da porta — o formato e o caminho já a aceitam, e a L19 e o T10 já a mediriam. **FECHADO em 2026-10-20, decisão do autor: aceita-se que não exista.** As duas portas para a realidade ficam `window: none` — é o único caso em que a ausência é honesta, porque um retrato emprestado mentiria sobre o destino |
+| R10 | **Não há retrato do portão** | A porta da cidade para o portão é `window: none` (e, desde a D29, também a da praia), porque não existe imagem da realidade: um retrato emprestado mentiria ao visitante sobre onde a porta leva. É uma decisão do autor, tomada ao fechar o B6 e reusada no B7 | Uma imagem do portão em `assets/previews/gate.jpg` mais as três linhas do catálogo e da porta — o formato e o caminho já a aceitam, e a L19 e o T10 já a mediriam. **FECHADO em 2026-10-20, decisão do autor: aceita-se que não exista.** As duas portas para a realidade ficam `window: none` — é o único caso em que a ausência é honesta, porque um retrato emprestado mentiria sobre o destino. **Nota de 2026-10-20 (D38, §11):** as portas da cidade e da praia para o portão deixaram de ser `window: none` e passaram a mostrar a **câmara ao vivo** por uma janela `dimension-pair` com uma dimensão `kind: "camera"` — não é um retrato, é o que está do outro lado; o R10 continua fechado como «não há retrato do portão» |
 | R11 | **No céu, a chegada fica virada para o lado de onde se vem** | Medido no B9 (§9): o visitante aterra virado no sentido em que vinha — o −Z da porta —, o que é **o que faz do regresso um passo** (é o mecanismo, não um defeito). Em cada sala o que fica à frente varia: cidade **1** de 5 obras, praia **1** de 3, céu **0** de 2. O céu já vinha assim da cena anterior (nota do B6); nas outras salas há sempre alguma obra à frente | Uma decisão do autor sobre a orientação da chegada (é a rotação devolvida pelo `arrivalPoint`, em `js/scene/arrival.js`) ou um re-arranjo das obras do céu — o que ele preferir. **DECIDIDO em 2026-10-20: re-arranjar as duas obras do céu**, no **B10** e **com o próprio editor** (é o primeiro uso real que se lhe dá, e é o que permite acertar as posições na pré-visualização). É dado, não código, e o mecanismo da chegada não se toca. **FECHADO em 2026-10-20 (B10):** as duas obras passaram de `z = -110` para `z = -131` (em frente da chegada, que é em `z = -121`) e de `x = ±15` para `x = ±6`, movidas **no editor**, exportadas e o ficheiro substituído; medido com a câmara real e o frustum dela, o céu passou de **0** para **2** obras no primeiro plano da chegada (cidade **1** de 5 e praia **1** de 3 não mudaram), o `validate.mjs` sai com **0** e a bateria no céu dá os mesmos números (o `git diff` do ficheiro mostra só as duas posições) |
 | R12 | **O T5 não foi re-medido na Fase 3B** | Precisa do rig de **dois** portais (uma janela a tapar a moldura da outra) e a ordem de desenho **não mudou** na fase: `drawOrder` e as regras de stencil são os mesmos do fecho da Fase 3. Re-medir sem mudança nenhuma não diz nada de novo; o número da v0.0.5 (0 px da moldura de trás dentro da janela da frente, com 6 768 px de controlo) continua a ser o último | **FECHADA em 2026-10-16**, na bateria dos doze testes (§9): o rig passou a viver em `tools/regression/acceptance.mjs` (`checkStackedDoors`), com duas portas de 8×10 m a 20 m e a 30 m (a de trás deslocada 5 m para o lado, para a moldura dela atravessar a janela da frente), e o resultado é **0** px dentro, **1 657** px de controlo fora e **0** de ruído — nos **5** mundos |
 | R13 | **Os módulos exigem a UI da exposição** | Medido no **B0 da Fase 4** (§9), com páginas-sonda servidas por HTTP: importar `js/modules/artwork.js` num documento **sem** `#iframe-obra` dá excepção (`Cannot read properties of null (reading 'addEventListener')`) — e com ele o `js/scene/scene-builder.js`, que o importa —, e o `setupMobileControls()` sem o D-pad e o `reportCameraError()` sem o `#btn-iniciar` dão excepção pela mesma razão (o segundo **depois** de já ter posto a mensagem no ecrã). Ninguém notou até aqui porque **só existe um host** — a exposição — e ele tem todos esses elementos; é o mesmo tipo de risco que o R8: acoplamento que só aparece quando **um segundo host** tenta usar o código | A Fase 4 (**B2**, §9), com a meta **M14**: os 6 imports numa página sem a UI da exposição, **0** excepções. **FECHADO em 2026-10-20 (B2):** cada elemento da exposição passou a ser um **host opcional** (o modal e o `iframe`, o D-pad, o `#btn-iniciar`, o overlay e o `<video>`), o ouvinte do `iframe` passou a ligar-se na **abertura** do modal e não no import, e uma página com A-Frame e **sem** essa UI deu **16 de 16** verificações OK (os 8 imports, as 3 chamadas que rebentavam, `buildScene(gate)`, `startSession()` e `remove()`), com a exposição nos mesmos números |

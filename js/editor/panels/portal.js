@@ -15,7 +15,7 @@
 import { t, currentLanguage } from '../../i18n.js';
 import { textIn, LANGUAGES } from '../../scene/schema.js';
 import {
-  WINDOW_KINDS, ACTION_KINDS, isLegalCombination, validateDoor
+  WINDOW_KINDS, ACTION_KINDS, isLegalCombination, isLegalDoor, validateDoor
 } from '../../modules/portal-kinds.js';
 import * as preview from '../preview.js';
 import { heading, textField, numberField, selectField, button, note, vec3Field, debounce } from '../fields.js';
@@ -241,7 +241,7 @@ function card(portal, context, data) {
   });
 
   windowAxis(box, portal, context, data);
-  actionAxis(box, portal, context);
+  actionAxis(box, portal, context, data);
 
   textField(box, {
     name: 'portal.' + portal.id + '.arrivalFrom',
@@ -309,7 +309,7 @@ function windowAxis(box, portal, context, data) {
       }
 
       const windowNow = portal.window.kind;
-      const rewritten = enforceLegalAction(portal);
+      const rewritten = enforceLegalAction(portal, data.dimensions);
       const adjustment = rewritten
         ? t('editor.portal.actionAdjusted', { action: t(ACTION_LABEL[portal.action.kind]) })
         : null;
@@ -337,7 +337,7 @@ function windowAxis(box, portal, context, data) {
         })),
         onChange: async (value) => {
           axis[key] = Number(value);
-          enforceLegalAction(portal);
+          enforceLegalAction(portal, data.dimensions);
           await context.change({ rebuild: true });
           context.rerender();
         }
@@ -378,16 +378,23 @@ function windowAxis(box, portal, context, data) {
 }
 
 // The second axis. The options are the ones the table allows for this window (L18), so there is no
-// way to pick an illegal pair from the panel.
-function actionAxis(box, portal, context) {
+// way to pick an illegal pair from the panel. A door whose window shows the **camera** and whose
+// traversal leaves for the entry world is legal by D38 and not by the matrix, so its action is shown
+// as it is — with the note that says where it comes from — instead of being silently rewritten.
+function actionAxis(box, portal, context, data) {
   if (!portal.action) portal.action = { kind: 'none' };
   const windowKind = (portal.window || {}).kind || 'none';
+  const allowed = legalActions(windowKind);
+  const current = portal.action.kind;
+  const options = allowed.map((kind) => ({ value: kind, label: t(ACTION_LABEL[kind]) }));
+  const fromTheData = Boolean(current) && allowed.indexOf(current) === -1;
+  if (fromTheData) options.push({ value: current, label: t(ACTION_LABEL[current]) });
 
   selectField(box, {
     name: 'portal.' + portal.id + '.action.kind',
     labelKey: 'editor.portal.action',
     value: portal.action.kind,
-    options: legalActions(windowKind).map((kind) => ({ value: kind, label: t(ACTION_LABEL[kind]) })),
+    options: options,
     onChange: (kind) => {
       portal.action = { kind: kind };
       if (kind === 'navigate' && !portal.action.target) portal.action.target = worlds()[0];
@@ -396,6 +403,8 @@ function actionAxis(box, portal, context) {
       context.rerender();
     }
   });
+
+  if (fromTheData) note(box, t('editor.portal.cameraWindow'));
 
   if (portal.action.kind === 'navigate') {
     textField(box, {
@@ -417,10 +426,10 @@ function actionAxis(box, portal, context) {
 
 // Changing the window may leave the action illegal. The door is rewritten to the first legal one and
 // the panel says which — the alternative is a file the validator refuses a second later.
-function enforceLegalAction(portal) {
-  const windowKind = (portal.window || {}).kind || 'none';
+function enforceLegalAction(portal, dimensions) {
   const action = portal.action || {};
-  if (action.kind && isLegalCombination(windowKind, action.kind)) return false;
+  if (action.kind && isLegalDoor(portal, dimensions)) return false;
+  const windowKind = (portal.window || {}).kind || 'none';
   const allowed = legalActions(windowKind);
   portal.action = { kind: allowed[0] };
   if (portal.action.kind === 'navigate') portal.action.target = worlds()[0];

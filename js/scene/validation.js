@@ -215,7 +215,7 @@ export function validateScene(scene, options = {}) {
 
     // L18, and whatever else the table asks of a door (section 5.4): the same list the editor
     // (Fase 4) shows to whoever writes a door, so the two cannot disagree.
-    for (const problem of validateDoor(portal)) {
+    for (const problem of validateDoor(portal, dimensions)) {
       err(`${where}: ${problem.message} — ${problem.law}`);
     }
 

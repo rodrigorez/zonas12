@@ -17,7 +17,7 @@
       "speed": 0.1
     },
     "real": {
-      "enabled": false
+      "enabled": true
     }
   },
   "assets": {
@@ -88,6 +88,14 @@
         "en": "City 360º"
       },
       "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
     }
   ],
   "artworks": [
@@ -234,7 +242,9 @@
         "thickness": 0.3
       },
       "window": {
-        "kind": "none"
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
       },
       "action": {
         "kind": "navigate",

@@ -110,6 +110,7 @@
     "editor.portal.action.none": "Nada",
     "editor.portal.actionAdjusted": "A travessia passou a «{action}»: a anterior não é legal com esta janela (L18).",
     "editor.portal.windowFellBack": "A janela ficou em «{window}»: não havia com que a preencher.",
+    "editor.portal.cameraWindow": "Esta porta mostra a câmara e leva ao portão (D38): a combinação vem do dado e não é oferecida aqui.",
     "editor.portal.pairA": "Dimensão A",
     "editor.portal.pairB": "Dimensão B",
     "editor.portal.previewAsset": "Retrato (asset)",

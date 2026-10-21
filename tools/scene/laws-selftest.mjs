@@ -212,6 +212,22 @@ const cases = [
       copy.portals[0].window = { kind: 'preview', asset: 'retrato-praia', radius: 120 };
       copy.portals[0].action = { kind: 'enter-window' };
     }
+  },
+  {
+    // A exceção da D38: a janela que mostra a câmara pode navegar — mas só para o mundo de entrada,
+    // que é o único cujo fundo **é** a câmara. Para uma sala, o que a janela mostra seria outra coisa.
+    law: 'D38',
+    what: 'a camera window that navigates to a room instead of the entry world',
+    expect: 'law L18',
+    inject: (copy) => {
+      if (!copy.dimensions.some((dimension) => dimension.kind === 'camera')) {
+        copy.dimensions.push({ id: 1, kind: 'camera', name: { pt: 'Realidade', en: 'Reality' } });
+      }
+      const porta = copy.portals[0];
+      porta.window = { kind: 'dimension-pair', dimensionA: 0, dimensionB: 1 };
+      porta.action = { kind: 'navigate', target: 'praia' };
+      delete porta.arrivalFrom;
+    }
   }
 ];
 

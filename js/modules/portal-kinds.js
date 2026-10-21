@@ -61,17 +61,40 @@ export function isLegalCombination(windowKind, actionKind) {
   return (LEGAL[windowKind] || []).includes(actionKind);
 }
 
+// The one combination the matrix has to ask the world about (D38): a door whose window shows the
+// **camera** and whose traversal leaves for the entry world. The window is not a lie there — what the
+// visitor sees through it is the real world, which is exactly the background of the world the door
+// opens — and a dimension of kind `camera` draws nothing, so the rectangle stays transparent over the
+// webcam and the reality shows through it, from either side. Everything else keeps the matrix above.
+export function showsTheCamera(windowAxis, dimensions) {
+  if (!windowAxis || windowAxis.kind !== 'dimension-pair') return false;
+  const pair = [windowAxis.dimensionA, windowAxis.dimensionB];
+  return (dimensions || []).some((dimension) => dimension && pair.includes(dimension.id) &&
+    dimension.kind === 'camera');
+}
+
+// The whole legality of a door. It needs the world and not only the door, because the matrix cannot
+// see which dimension of the pair is the camera, nor where the door goes; the data validator and the
+// editor both read this, so neither can accept what the other refuses.
+export function isLegalDoor(door, dimensions) {
+  const axisWindow = (door && door.window) || {};
+  const axisAction = (door && door.action) || {};
+  if (isLegalCombination(axisWindow.kind, axisAction.kind)) return true;
+  return axisWindow.kind === 'dimension-pair' && axisAction.kind === 'navigate' &&
+    axisAction.target === ENTRY_WORLD && showsTheCamera(axisWindow, dimensions);
+}
+
 // What a door needs beyond the shape of its data — the third thing each entry of the table offers
 // (section 5.4). Each problem says what is wrong and which law it breaks, so the data validator can
 // report it as it is and the editor (Fase 4) can show the message to whoever is writing the door.
 //
 // `door` is the portal as it is written in the data (window and action included).
-export function validateDoor(door) {
+export function validateDoor(door, dimensions) {
   const problems = [];
   const axisWindow = (door && door.window) || {};
   const axisAction = (door && door.action) || {};
 
-  if (axisWindow.kind && axisAction.kind && !isLegalCombination(axisWindow.kind, axisAction.kind)) {
+  if (axisWindow.kind && axisAction.kind && !isLegalDoor(door, dimensions)) {
     problems.push({
       message: `the window "${axisWindow.kind}" with the action "${axisAction.kind}" is not one of ` +
         `the legal combinations`,
