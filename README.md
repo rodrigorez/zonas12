@@ -209,10 +209,10 @@ da Fase 3B), marcada pela branch com o mesmo nome.
 
 Resumo do que existe hoje: `index.html` (**93 linhas**) e as **3** salas com o **mesmo** ficheiro
 (`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `editor.html` (**83**),
-`js/app.js` (**179**), `js/arrival-frame.js` (**124**, a ponte de imagem entre mundos — D43),
+`js/app.js` (**185**), `js/arrival-frame.js` (**125**, a ponte de imagem entre mundos — D43),
 `js/editor.js` (**14**, a entrada do editor — D36), `js/editor/`
 (**10** ficheiros, **2697** linhas com os painéis), `js/i18n.js` (**92**), `js/core/` (7 ficheiros,
-**219**), `js/modules/` (6 ficheiros, **1351**), `js/scene/` (5 ficheiros, **1126**),
+**219**), `js/modules/` (6 ficheiros, **1425**), `js/scene/` (5 ficheiros, **1126**),
 `css/style.css` (105) e `css/editor.css` (**313**), **5** mundos em `data/worlds/` (o portão, as três
 salas e o fixture, **1279 linhas** no total e **12** portas), `i18n/pt.json` (**154** chaves), os
 **9** assets em `assets/{panoramas,artworks,video,previews}` e as **9** ferramentas em `tools/`
