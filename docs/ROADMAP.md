@@ -2889,6 +2889,28 @@ qualquer instrumento deste projeto:
   É a mesma regra do T4 (presença/ausência), aplicada à oclusão: **todo o teste que conte «zero»
   precisa de um caso em que o número devesse ser diferente de zero.**
 
+#### Os instrumentos da Fase 4 (arquivados em 2026-10-21)
+
+As seis baterias que mediram a página de edição e a travessia nasceram na pasta da sessão, e um
+número que ninguém pode voltar a medir é uma afirmação sem prova. Passaram para o repositório: são
+scripts de **Node** que se correm da raiz do projeto, cada um imprime `N of N checks pass` e sai com
+código de erro quando falha. Partilham `tools/regression/harness.mjs` — o servidor do projeto, um
+Chrome com câmara falsa e as chamadas de CDP que todas precisam (e a leitura de PNG que transforma
+«o ecrã ficou preto» num número); cada bateria tem a sua sonda e as suas verificações.
+
+| Ficheiro | Decisões | O que mede | Resultado |
+| --- | --- | --- | --- |
+| `camera-arrival.mjs` | D37 | chegar por uma porta não pede nada ao visitante, e o botão volta se a câmara for recusada | **5 de 5** |
+| `start-button.mjs` | D41 | o botão segue a câmara: sem permissão, com permissão, numa sala e no telemóvel (390×844) | **7 de 7** |
+| `transition.mjs` | D42 | o botão não aparece a meio de uma travessia, e uma permissão que nunca responde não trava a página | **9 de 9** |
+| `image-bridge.mjs` | D43, D44, D45 | a travessia: **0** fotogramas escuros, a ponte é o ecrã (**0,22**), sai num só passo, sem a linha «Carregando…» e só depois do fotograma da câmara | **9 de 9** |
+| `labels-doors.mjs` | D39 | o nome das portas: a tecla D, o editor sem teclas, e dez portas sem deixar textura nem nó | **23 de 23** |
+| `labels-artworks.mjs` | D40 | o nome das obras: a mesma tecla, acima do centro, e o editor | **21 de 21** |
+
+Correm-se com `node tools/regression/<ficheiro>` e precisam de um Chrome instalado (a variável
+`CHROME` aponta outro caminho). Não tocam na rede: cada uma levanta o seu servidor em `127.0.0.1` e o
+seu Chrome, com uma câmara falsa, e desliga a cache — que é a lição de método acima.
+
 ---
 
 ## 11. Decisões

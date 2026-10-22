@@ -215,8 +215,8 @@ Resumo do que existe hoje: `index.html` (**93 linhas**) e as **3** salas com o *
 **219**), `js/modules/` (6 ficheiros, **1425**), `js/scene/` (5 ficheiros, **1126**),
 `css/style.css` (105) e `css/editor.css` (**313**), **5** mundos em `data/worlds/` (o portão, as três
 salas e o fixture, **1279 linhas** no total e **12** portas), `i18n/pt.json` (**154** chaves), os
-**9** assets em `assets/{panoramas,artworks,video,previews}` e as **9** ferramentas em `tools/`
-(**2915** linhas).
+**9** assets em `assets/{panoramas,artworks,video,previews}` e **18** ficheiros em `tools/`
+(**4356** linhas — as ferramentas de dados e os instrumentos das fases).
 
 O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
 regras de stencil — a única parte global, porque o stencil é um recurso de toda a cena.
@@ -312,6 +312,11 @@ salas e o fixture. É a verificação final da **Fase 4** (bloco B10 de §9 do r
 instrumentos: a bateria dos **doze testes da §10** (`tools/regression/acceptance.mjs`), a bateria do
 **editor** (35 verificações, feitas na própria página) e o instrumento das **leis**
 (`tools/scene/laws-selftest.mjs`, por linha de comando).
+
+Desde **2026-10-21** as decisões da fase que dizem respeito ao que se vê — a chegada, o botão, a
+transição e a travessia (D37 a D45) — têm baterias próprias, **arquivadas** em `tools/regression/`
+com os seus resultados ao lado (§10 do roadmap): `node tools/regression/<bateria>.mjs`. Sem isso, o
+que o roadmap afirma sobre a travessia só poderia ser acreditado, não medido.
 
 **A exposição — os doze testes, nas 5 páginas**
 
