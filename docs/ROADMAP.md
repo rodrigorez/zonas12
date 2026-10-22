@@ -2669,6 +2669,40 @@ D41 em **7 de 7**, a D42 em **9 de 9**, `validate.mjs` **0** e `laws-selftest` *
 `FIRST_FRAME_TIMEOUT` de 3 s e a renderização depois do `resize`) e `js/app.js` (a ponte espera pelas
 duas coisas).
 
+#### B20 — o retrato da porta é a vista da chegada *(em curso, 2026-10-22)*
+
+**O que motiva.** A travessia deixou de ter preto, linha e fotograma de câmara (B17–B19), mas continua
+a ter **um corte**: a janela da porta mostra o **panorama** do destino e a chegada mostra o panorama
+**mais as obras e as portas dele** — o que salta é o que a fotografia não tinha. Medido com
+`tools/regression/seam.mjs`, nas seis portas com retrato (o salto no corte, e a meta de **0,50**):
+
+| porta | destino | salto no corte (hoje) |
+| --- | --- | --- |
+| gate 0 | cidade | **7,54** |
+| gate 1 | praia | **2,03** |
+| cidade 3 | praia | **2,68** |
+| praia 4 | cidade | **4,07** |
+| praia 6 | céu | **0,68** |
+| céu 7 | praia | **13,36** |
+
+**A decisão (D46).** O retrato de uma porta de mundo passa a ser **a vista da chegada**: um
+equirretangular desenhado pela própria exposição a partir do ponto onde o visitante vai aparecer
+(`?from=<origem>` e o `arrivalPoint`, uma só casa para a geometria — L16), com as obras e as portas
+do destino lá dentro.
+
+**O que já está feito e medido.** `tools/scene/portrait.mjs` (novo) desenha-o: seis faces de cubo a
+1024 a partir da câmara de chegada, convertidas para 2048×1024. Na porta 4 da praia o salto caiu de
+**4,07 para 1,56** — a melhoria existe, a meta não está atingida. O que sobra está localizado: a
+diferença por bloco é **3,6 a 3,9 na faixa de cima** e 0,2 a 2,1 no resto, ou seja, é a **projecção
+vertical** do retrato que não coincide (o céu do panorama aparece onde a chegada mostra a serra). É
+aí que o bloco seguinte pega.
+
+**O que falta.** Alinhar a projecção (o teste decisivo é passar um panorama **conhecido** pelo cubo e
+comparar o resultado com o original — se o erro estiver no conversor, vê-se nele; se não, está na
+esfera da app). Depois: os seis retratos, os dados (um asset por porta, com o id do par
+`retrato-<mundo>-de-<origem>`), a medida nas seis portas e a documentação. O retrato é um **asset
+derivado**: regera-se com a ferramenta quando a sala mudar.
+
 #### Metas de sucesso
 
 **(a) Comportamento — nenhum número pode mudar.** Os **doze** testes de §10 na exposição, nos 5
@@ -2906,6 +2940,7 @@ Chrome com câmara falsa e as chamadas de CDP que todas precisam (e a leitura de
 | `image-bridge.mjs` | D43, D44, D45 | a travessia: **0** fotogramas escuros, a ponte é o ecrã (**0,22**), sai num só passo, sem a linha «Carregando…» e só depois do fotograma da câmara | **9 de 9** |
 | `labels-doors.mjs` | D39 | o nome das portas: a tecla D, o editor sem teclas, e dez portas sem deixar textura nem nó | **23 de 23** |
 | `labels-artworks.mjs` | D40 | o nome das obras: a mesma tecla, acima do centro, e o editor | **21 de 21** |
+| `seam.mjs` | D46 | o salto no corte de cada travessia: a imagem que a ponte pintou contra a que o mundo mostrou | **em curso** — ver o B20 em §9 |
 
 Correm-se com `node tools/regression/<ficheiro>` e precisam de um Chrome instalado (a variável
 `CHROME` aponta outro caminho). Não tocam na rede: cada uma levanta o seu servidor em `127.0.0.1` e o
@@ -3351,6 +3386,7 @@ alteram comportamento.
 | D43 | A travessia entre mundos não passa pelo preto | A página que sai guarda o **último quadro** que estava a mostrar (`sessionStorage`) e a que chega pinta-o antes de tudo o resto, desvanecendo-o quando há cena. O quadro é **composto**: o `<video>` da câmara por baixo e o canvas por cima, na ordem e no enquadramento do CSS — o canvas é `alpha: true` e, sem essa composição, a ponte seria um retângulo preto nas salas onde a câmara é o chão da cena. Vive em `js/arrival-frame.js`, e é o único script **clássico** do projeto: tem de correr antes da primeira pintura, e um módulo só corre depois de carregar a sua árvore de importações (que é exactamente a janela que se quer fechar). A chave é de **uso único** (recarregar não repete a imagem) e tem um prazo de **20 s**; uma cena que não chegue ao fim vê a ponte sair na mesma ao fim de **10 s**, para uma imagem parada não esconder um erro |
 | D44 | A travessia não dá a ver que houve uma | A ponte não se **desvanece**: sai num só fotograma, quando o mundo já está a ser desenhado — uma dissolução de 240 ms entre duas fotografias do mesmo sítio lê-se como efeito, e o que se quer é que a travessia não se anuncie. E enquanto a ponte cobre o ecrã **não se mostra a linha «Carregando…»**: o ecrã nunca está vazio, e um elemento a aparecer é o sinal mais visível de todos. Medido: o quadro da ponte difere do ecrã em **0,22** (é o ecrã), o mundo difere do quadro em **3,94** — um passo de caminhada (o maior salto a caminhar é **2,69**) —, o que sobra é a obra que está em frente da chegada, que nenhuma fotografia da página anterior pode prever |
 | D45 | Nenhum fotograma de câmara dentro da travessia | Tudo o que faça o canvas não ter desenho mostra o que está por baixo dele — o `<video>` da câmara, ou o preto dele. Eram duas janelas: a ponte saía **antes** de o vídeo ter imagem (medido: **58 ms** de preto por baixo, mais num telemóvel) e o `resize` da câmara limpava o buffer do canvas. A ponte passou a esperar **também** pelo primeiro fotograma **apresentado** pela câmara (`cameraFirstFrame()` com `requestVideoFrameCallback` — `loadeddata` não chega: decodificar não é apresentar, e num portão publicado isso deu segundos de preto com o evento já disparado), no máximo **3 s**; uma câmara recusada resolve de imediato, para a chegada não ficar à espera de um fotograma que não vem. O `resize` passou a ser seguido de uma renderização imediata (o canvas fica sem desenho **0,5–5,2 ms**, dentro do mesmo fotograma) |
+| D46 | O retrato de uma porta é a vista da chegada | A janela de uma porta de mundo mostrava o **panorama** do destino, e a chegada mostra o panorama **mais as obras e as portas** — o corte era, por isso, uma troca de imagem (medido: **0,68 a 13,36** de salto nas seis portas). O retrato passa a ser um equirretangular desenhado **pela própria exposição** a partir do ponto onde o visitante vai aparecer: `?from=<origem>` deixa o `arrivalPoint` pôr a câmara (uma só casa para a geometria, L16) e a ferramenta desenha seis faces de cubo, convertidas para 2048×1024. É um **asset derivado** — regera-se quando a sala mudar — e um por porta, não um por destino: a chegada depende de onde se vem (as três portas da praia mostram três vistas) |
 
 **Roadmap aprovado em 2026-10-12.**
 

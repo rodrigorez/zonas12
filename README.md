@@ -215,8 +215,8 @@ Resumo do que existe hoje: `index.html` (**93 linhas**) e as **3** salas com o *
 **219**), `js/modules/` (6 ficheiros, **1425**), `js/scene/` (5 ficheiros, **1126**),
 `css/style.css` (105) e `css/editor.css` (**313**), **5** mundos em `data/worlds/` (o portão, as três
 salas e o fixture, **1279 linhas** no total e **12** portas), `i18n/pt.json` (**154** chaves), os
-**9** assets em `assets/{panoramas,artworks,video,previews}` e **18** ficheiros em `tools/`
-(**4356** linhas — as ferramentas de dados e os instrumentos das fases).
+**9** assets em `assets/{panoramas,artworks,video,previews}` e **20** ficheiros em `tools/`
+(**4726** linhas — as ferramentas de dados e os instrumentos das fases).
 
 O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
 regras de stencil — a única parte global, porque o stencil é um recurso de toda a cena.
