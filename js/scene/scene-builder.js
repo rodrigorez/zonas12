@@ -112,6 +112,13 @@ export async function buildScene(scene, options = {}) {
   // and a black panel on the screen.
   await Promise.all(elements.assets.map(waitForAsset));
 
+  // The height of the visitor's eye is one thing for the whole build (D47): the camera starts at it,
+  // and the portrait of a door is a sphere centred on it. Centred on the door's position instead —
+  // on the floor — the whole arrival view appears shifted down by ~11 px on a phone, and that shift
+  // was the whole of the jump measured at the cut (1,38 to 1,49 where the goal is 0,50).
+  const player = withDefaults(cameras.player || {}, SCENE.cameras.fields.player);
+  const eyeHeight = player.position[1];
+
   // The portraits of the world doors (D26): one derived dimension per pair (asset, radius), in the
   // band of ids reserved for them (L15), as a sphere that does not follow the camera and sits at the
   // door — that is what gives the parallax. Two doors that name the same portrait with the same
@@ -133,7 +140,7 @@ export async function buildScene(scene, options = {}) {
       asset: axis.asset,
       radius: axis.radius,
       followCamera: false,
-      position: portal.position
+      position: [portal.position[0], eyeHeight, portal.position[2]]
     }, parent);
     if (!el) continue;
     portraits.set(key, id);
@@ -143,7 +150,6 @@ export async function buildScene(scene, options = {}) {
   // Where the visitor starts: the data, unless they are arriving from another world, in which case
   // the place is behind that world's arrival door (D14, laws L16 and L17 — one home for the
   // geometry, js/scene/arrival.js).
-  const player = withDefaults(cameras.player || {}, SCENE.cameras.fields.player);
   const arrival = arrivalDoor(scene, options.from);
   if (arrival) {
     const point = arrivalPoint(arrival, player.position[1]);

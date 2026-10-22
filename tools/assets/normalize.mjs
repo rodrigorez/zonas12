@@ -35,7 +35,12 @@ export const JOBS = [
   // not here: it only changes folder.
   { what: 'obra (cidade)', from: 'assets/images/bryan-goff-IuyhXAia8EA-unsplash.jpg', to: 'assets/artworks/cidade-d0-bryan-goff.jpg', maxSide: ARTWORK_MAX_SIDE },
   // The portraits of the worlds, derived from the panorama of the destination (D14: what is seen
-  // through the window is what is seen after crossing).
+  // through the window is what is seen after crossing). **Since the B20 (D46/D47) this is no longer
+  // how the portraits of the world doors are made**: each door has its own, drawn from the arrival
+  // point by `tools/scene/portrait.mjs` (`assets/previews/<destino>-de-<origem>.jpg`), because the
+  // destination's panorama is not what the visitor lands in — the room, with its artworks and doors,
+  // is. These three stay: the world of example still names `praia.jpg`, and they are the record of
+  // what the door showed before.
   { what: 'retrato da cidade', from: 'assets/panoramas/cidade-d0-forest.jpg', to: 'assets/previews/cidade.jpg', ratio: 2, width: 2048 },
   { what: 'retrato da praia', from: 'assets/panoramas/praia-d0-praia.jpg', to: 'assets/previews/praia.jpg', ratio: 2, width: 1024 },
   { what: 'retrato do céu', from: 'assets/panoramas/ceu-d0-skycloud.jpg', to: 'assets/previews/ceu.jpg', ratio: 2, width: 480 }

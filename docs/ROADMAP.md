@@ -1721,7 +1721,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: FECHADA em 2026-10-21 — B0 ao B16 entregues e medidos, marco na branch `v0.0.7`.** Como nas fases anteriores, o
+**Estado: FECHADA em 2026-10-22 — B0 ao B20 entregues e medidos, marco na branch `v0.0.8`.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -1821,7 +1821,10 @@ realidade ao vivo, **D38**), o **B13** (o nome de cada porta, **D39**) e o **B14
 obra, **D40**) — todos com o seu registo abaixo, na mesma ordem e com as medições. O **B15** veio
 depois do teste no telemóvel (**D41**: o botão de entrada segue a câmara, não o clique), o **B16**
 do vídeo do autor a mostrar o botão a meio de uma transição entre portais (**D42**) e o **B17** de um
-segundo vídeo, do ecrã preto no meio da mesma travessia (**D43**).
+segundo vídeo, do ecrã preto no meio da mesma travessia (**D43**). Fecharam a fase o **B18** (a
+travessia não se anuncia, **D44**), o **B19** (nenhum fotograma de câmara dentro dela, **D45**) e o
+**B20** (o retrato da porta é a vista da chegada, **D46** e **D47**), que levou o salto no corte de
+**0,68–13,36** para **0,21–0,40** nas seis portas — contra a meta de **0,50**.
 
 #### O que o B1 entregou e mediu (2026-10-20) — fecha o **R3**
 
@@ -2669,14 +2672,14 @@ D41 em **7 de 7**, a D42 em **9 de 9**, `validate.mjs` **0** e `laws-selftest` *
 `FIRST_FRAME_TIMEOUT` de 3 s e a renderização depois do `resize`) e `js/app.js` (a ponte espera pelas
 duas coisas).
 
-#### B20 — o retrato da porta é a vista da chegada *(em curso, 2026-10-22)*
+#### B20 — o retrato da porta é a vista da chegada *(fechado, 2026-10-22)*
 
 **O que motiva.** A travessia deixou de ter preto, linha e fotograma de câmara (B17–B19), mas continua
 a ter **um corte**: a janela da porta mostra o **panorama** do destino e a chegada mostra o panorama
 **mais as obras e as portas dele** — o que salta é o que a fotografia não tinha. Medido com
 `tools/regression/seam.mjs`, nas seis portas com retrato (o salto no corte, e a meta de **0,50**):
 
-| porta | destino | salto no corte (hoje) |
+| porta | destino | salto no corte (linha de base) |
 | --- | --- | --- |
 | gate 0 | cidade | **7,54** |
 | gate 1 | praia | **2,03** |
@@ -2685,23 +2688,72 @@ a ter **um corte**: a janela da porta mostra o **panorama** do destino e a chega
 | praia 6 | céu | **0,68** |
 | céu 7 | praia | **13,36** |
 
-**A decisão (D46).** O retrato de uma porta de mundo passa a ser **a vista da chegada**: um
+**As decisões (D46 e D47).** O retrato de uma porta de mundo passa a ser **a vista da chegada**: um
 equirretangular desenhado pela própria exposição a partir do ponto onde o visitante vai aparecer
 (`?from=<origem>` e o `arrivalPoint`, uma só casa para a geometria — L16), com as obras e as portas
-do destino lá dentro.
+do destino lá dentro, e **um por porta**. A esfera onde ele é mostrado passa a estar centrada à
+**altura dos olhos** — a mesma de onde o cubo é desenhado.
 
-**O que já está feito e medido.** `tools/scene/portrait.mjs` (novo) desenha-o: seis faces de cubo a
-1024 a partir da câmara de chegada, convertidas para 2048×1024. Na porta 4 da praia o salto caiu de
-**4,07 para 1,56** — a melhoria existe, a meta não está atingida. O que sobra está localizado: a
-diferença por bloco é **3,6 a 3,9 na faixa de cima** e 0,2 a 2,1 no resto, ou seja, é a **projecção
-vertical** do retrato que não coincide (o céu do panorama aparece onde a chegada mostra a serra). É
-aí que o bloco seguinte pega.
+**O que se mediu, por ordem.**
 
-**O que falta.** Alinhar a projecção (o teste decisivo é passar um panorama **conhecido** pelo cubo e
-comparar o resultado com o original — se o erro estiver no conversor, vê-se nele; se não, está na
-esfera da app). Depois: os seis retratos, os dados (um asset por porta, com o id do par
-`retrato-<mundo>-de-<origem>`), a medida nas seis portas e a documentação. O retrato é um **asset
-derivado**: regera-se com a ferramenta quando a sala mudar.
+1. **O conversor está certo.** Um panorama conhecido passado por esfera → cubo → equirretangular
+   (`tools/regression/ida-e-volta.mjs`) volta com deslocamento de **0 colunas**, brilho 121,9 contra
+   122,4 do original e uma diferença de assinatura de **0,39**. A primeira suspeita — a codificação da
+   cor — foi afastada por medida: o instrumento não declara o `colorSpace` da textura, portanto a cor
+   entra e sai sem ser descodificada nem recodificada; aplicar o transfero do sRGB «à mão» é que
+   punha o brilho em 177,5 e a diferença em dezenas.
+2. **A ponte não custa nada.** O mesmo quadro guardado por `arrivalFrame.capture()` e mostrado por
+   cima da cena que ele fotografou difere dela em **0,00** (`tools/regression/piso-ponte.mjs`) — o
+   JPEG da ponte não é o problema.
+3. **Não é desalinhamento.** Procurar o deslocamento que melhor sobrepõe a ponte e a chegada dá
+   **dx=0, dy=0** (`tools/regression/desalinhamento.mjs`). O que sobra é conteúdo, não posição.
+4. **O centro da esfera era o defeito.** A esfera nascia no `portal.position` — no **chão**, 1,6 m
+   abaixo do olho — e o retrato inteiro aparecia deslocado para baixo (~11 px num telemóvel; a faixa
+   de cima do ecrã era a que mais sofria, e era a que estava a 3,6–3,9). Varrendo a altura do centro
+   na porta 4 da praia: **0 → 1,56**, 0,8 → 1,06, 1,2 → 0,80, 1,5 → 0,61, **1,6 → 0,54**, 1,7 →
+   0,47, 2,0 → 0,53. O raio quase não conta (500 dá 0,53 onde 120 dá 0,54) e a variante em que a
+   esfera **segue a câmara** foi medida e rejeitada: **25,30 / 7,30 / 1,17** conforme o raio.
+5. **E faltava resolução.** A obra nítida é reconstruída duas vezes (cubo → equirretangular), e o
+   retrato a 2048×1024 era o gargalo: a 3072 a porta 4 desce a **0,46** e a 4096 a **0,40**. A
+   qualidade do JPEG quase não conta (a 4096, 0,85 dá 0,39 e 0,75 dá 0,40) — quem manda é a
+   resolução.
+
+**Medido nas seis portas, com o centro à altura dos olhos e a receita do D47** (4 retratos a
+3072×1536 e 2 a 4096×2048, todos q0,70 — os dois a 4096 são as portas onde 3072 não chegava à
+margem):
+
+| porta | destino | antes (centro na porta) | depois | ficheiro |
+| --- | --- | --- | --- | --- |
+| gate 0 | cidade | 1,38 | **0,37** | `cidade-de-gate.jpg` |
+| gate 1 | praia | 0,91 | **0,38** | `praia-de-gate.jpg` |
+| cidade 3 | praia | 0,96 | **0,37** | `praia-de-cidade.jpg` |
+| praia 4 | cidade | 1,49 | **0,40** | `cidade-de-praia.jpg` (4096) |
+| praia 6 | céu | 0,70 | **0,21** | `ceu-de-praia.jpg` |
+| céu 7 | praia | 1,41 | **0,36** | `praia-de-ceu.jpg` (4096) |
+
+**12 de 12 verificações** (antes: 5 de 12, e uma porta com cinco fotogramas escuros). A meta de
+**0,50** fica cumprida com **0,10 de margem**; a referência de contexto é que um passo a caminhar
+muda a imagem em ~0,9.
+
+**O que mudou:** `js/scene/scene-builder.js` (o retrato nasce em `[x, altura do jogador, z]`, com a
+altura lida uma só vez do dado da câmara) e `tools/scene/portrait.mjs` (as constantes de tamanho, as
+duas excepções a 4096 e o modo `--todos` que desenha as seis). Nos dados mudaram **só os `path`**; os
+ids dos retratos ficaram, para as baterias que os nomeiam continuarem válidas. Os três retratos
+antigos **ficam** (`praia.jpg` ainda é o do mundo de exemplo). Total em `assets/previews/`: 2,6 MB.
+
+**O que fica escrito para o futuro.** O retrato de um mundo **contém as janelas das portas desse
+mundo**, que são retratos deles próprios: o mesmo comando deu 438, 215 e 378 kB em passagens
+seguidas. A costura não se mexe com isso (0,37 antes e depois de regenerar), mas o ficheiro sim —
+por isso a regra é gerar **duas vezes** quando uma sala muda, e está no cabeçalho da ferramenta.
+
+**A consequência que se aceita.** O retrato passou a ser maior do que o padrão de **2048×1024** da
+**L14**, e a lei passa a avisar: **5 avisos** em `tools/scene/validate.mjs` (um por retrato acima do
+padrão) e **1 por mundo** no relatório do editor. É a lei a fazer o seu trabalho — a memória de uma
+textura cresce com os pixels, e a 2048 a meta **não** se cumpria (0,54) —, e por isso o aviso fica
+**à vista**, em vez de a lei ser baixada para o silenciar. A bateria do editor passa de **35** para
+**34 de 35**: a que falha é a que exige «Avisos: 0». Se o autor quiser o relatório limpo outra vez, a
+alternativa é dar aos retratos um padrão próprio na L14 (o valor medido está no D47), e essa é uma
+decisão dele.
 
 #### Metas de sucesso
 
@@ -2940,11 +2992,20 @@ Chrome com câmara falsa e as chamadas de CDP que todas precisam (e a leitura de
 | `image-bridge.mjs` | D43, D44, D45 | a travessia: **0** fotogramas escuros, a ponte é o ecrã (**0,22**), sai num só passo, sem a linha «Carregando…» e só depois do fotograma da câmara | **9 de 9** |
 | `labels-doors.mjs` | D39 | o nome das portas: a tecla D, o editor sem teclas, e dez portas sem deixar textura nem nó | **23 de 23** |
 | `labels-artworks.mjs` | D40 | o nome das obras: a mesma tecla, acima do centro, e o editor | **21 de 21** |
-| `seam.mjs` | D46 | o salto no corte de cada travessia: a imagem que a ponte pintou contra a que o mundo mostrou | **em curso** — ver o B20 em §9 |
+| `seam.mjs` | D46, D47 | o salto no corte de cada travessia: a imagem que a ponte pintou contra a que o mundo mostrou | **12 de 12** (0,21 a 0,40 contra a meta de 0,50) |
+| `ida-e-volta.mjs` | D46 | o conversor do retrato é fiel? um panorama conhecido vai por esfera → cubo → equirretangular e é comparado com o original | **0,39** de diferença, deslocamento **0** |
+| `piso-ponte.mjs` | D43, D46 | o preço da ponte: o quadro guardado mostrado por cima da cena que ele fotografou | **0,00** |
+| `desalinhamento.mjs` | D46 | a ponte e a chegada estão na mesma posição? procura o (dx, dy) que melhor as sobrepõe | **dx=0, dy=0** |
 
 Correm-se com `node tools/regression/<ficheiro>` e precisam de um Chrome instalado (a variável
 `CHROME` aponta outro caminho). Não tocam na rede: cada uma levanta o seu servidor em `127.0.0.1` e o
 seu Chrome, com uma câmara falsa, e desliga a cache — que é a lição de método acima.
+
+**Uma flutuação conhecida do `seam.mjs`.** Na **primeira** porta de cada sessão, com o cache do
+Chrome frio, os fotogramas escuros contam **5 ou 6**; corrida isolada, a mesma porta dá **0** (medido
+duas vezes seguidas, 43 e 42 amostras). Não é do B20 nem do retrato — acontecia antes dele — e a
+hipótese é a ponte estar no `sessionStorage` antes de o `<img>` que a mostra estar descodificado: o
+que se vê por baixo é o `#container-video`. Fica registado para um bloco futuro, com o número medido.
 
 ---
 
@@ -2990,8 +3051,8 @@ seu Chrome, com uma câmara falsa, e desliga a cache — que é a lição de mé
 | D23 | A versão do formato e como se escolhe a cena | **FECHADA** (2026-10-15) | **`version: 2`** (o catálogo e o texto por língua mudam o formato) e o validador **recusa versões desconhecidas**: sem isso, um JSON do formato antigo passa a ser lido como se fosse novo, em silêncio. O construtor de cena aceita **`?scene=example`** para carregar o `data/scene-example.json`: sem porta de entrada, o fixture da D9 era uma cópia morta. **Custo aceite:** um parâmetro a mais na URL, com um só valor legal |
 | D24 | A divisão da cena de hoje em mundos | **FECHADA** (2026-10-15) | **Quatro mundos, uma dimensão cada**: `gate` (a raiz, com a câmara/AR), `cidade`, `praia` e `céu`, com as **8 portas de hoje** — todas passam a `navigate`, porque nenhuma sala tem duas dimensões. O **fixture** (`data/worlds/example.json`) passa a ser o mundo de **duas dimensões** com uma porta interna, para o `dimension-pair` + `enter-window` continuar exercitado (T1–T9). **Custo aceite:** a exposição deixa de ter janelas ao vivo — as portas mostram retratos, que é o que a D14 já previa |
 | D25 | Forma da porta no formato v3 | **FECHADA** (2026-10-15) | `version: 3`, e o par muda **para dentro do eixo**: `window {kind, dimensionA, dimensionB, asset, radius}` + `action {kind, target}` + `arrivalFrom` no portal, com **obrigatoriedade condicional** (o par só com `dimension-pair`, o `target` só com `navigate`) e os ids declarados limitados a **0…447** (L15). O `action.from` do exemplo da §6 sai: o `?from` que a porta escreve é o **slug do mundo de origem**, que o código já tem. **Custo aceite:** um leitor v2 deixa de ler o ficheiro — é a regra da D23 |
-| D26 | Como o retrato existe na cena | **FECHADA** (2026-10-15) | **Dimensão derivada** (G2-b): o construtor cria uma por par único (`asset`, `radius`), com id na banda **448…511** (L15), `followCamera: false`, a esfera centrada **na porta** (sem isso não há paralaxe) e o yaw vindo da rotação dela. Duas portas para o mesmo mundo, com o mesmo raio, partilham-na — 1 textura, 1 valor de stencil, 1 desenho, que é o que os portais 4 e 5 já provam hoje. O retrato é um **nome do catálogo**, nunca um caminho (D20), ao contrário do exemplo da §6 |
-| D27 | Divisão dos assets (D7) e nome dos retratos | **FECHADA** (2026-10-15) — **emendada ao fechar o B5** | `assets/{panoramas,artworks,video,previews}` (a divisão por tipo da D7, feita com `git mv`) e `<mundo>-d<N>-<nome>` no nome dos ficheiros. **Emenda:** os retratos são **um por mundo de destino** (`assets/previews/<destino>.jpg`) e não um por par origem→destino, porque a partilha da **D26** («duas portas para o mesmo mundo partilham 1 textura, 1 valor, 1 desenho») só acontece se as portas nomearem **o mesmo asset** — com o nome por par seriam **7** ficheiros e **7** texturas para **4** imagens. O formato continua a deixar uma porta nomear o seu próprio retrato, quando for uma escolha do autor |
+| D26 | Como o retrato existe na cena | **FECHADA** (2026-10-15) | **Dimensão derivada** (G2-b): o construtor cria uma por par único (`asset`, `radius`), com id na banda **448…511** (L15), `followCamera: false`, a esfera centrada **na porta** (sem isso não há paralaxe) e o yaw vindo da rotação dela. Duas portas para o mesmo mundo, com o mesmo raio, partilham-na — 1 textura, 1 valor de stencil, 1 desenho, que é o que os portais 4 e 5 já provam hoje. O retrato é um **nome do catálogo**, nunca um caminho (D20), ao contrário do exemplo da §6. **Emenda de 2026-10-22 (D47):** a esfera deixa de estar centrada na porta e passa a estar à **altura dos olhos** sobre ela — a paralaxe continua a existir (a esfera não segue a câmara) e a vista através da janela passa a coincidir com a chegada |
+| D27 | Divisão dos assets (D7) e nome dos retratos | **FECHADA** (2026-10-15) — **emendada ao fechar o B5** | `assets/{panoramas,artworks,video,previews}` (a divisão por tipo da D7, feita com `git mv`) e `<mundo>-d<N>-<nome>` no nome dos ficheiros. **Emenda:** os retratos são **um por mundo de destino** (`assets/previews/<destino>.jpg`) e não um por par origem→destino, porque a partilha da **D26** («duas portas para o mesmo mundo partilham 1 textura, 1 valor, 1 desenho») só acontece se as portas nomearem **o mesmo asset** — com o nome por par seriam **7** ficheiros e **7** texturas para **4** imagens. O formato continua a deixar uma porta nomear o seu próprio retrato, quando for uma escolha do autor. **Emenda de 2026-10-22 (D46):** os retratos passam a ser **um por porta** (`assets/previews/<destino>-de-<origem>.jpg`), porque a vista através da janela passou a ser a **vista da chegada** e a chegada depende de onde se vem — a partilha da D26 deixou de ser possível sem mentir. Ficam **6** ficheiros para as 6 portas com retrato; os três antigos (`cidade.jpg`, `praia.jpg`, `ceu.jpg`) mantêm-se, e `praia.jpg` continua a ser o do mundo de exemplo |
 | D28 | Como cada mundo se identifica | **FECHADA** (2026-10-15) — **emendada ao fechar o B7** | O **slug sai do caminho**: o que sobra de `location.pathname` depois de `document.baseURI` (raiz = `gate`). Assim os **4 arranques são o mesmo ficheiro copiado 4 vezes** — 1 fonte, não 4 — e a verificação das ferramentas exige que o nome da pasta e o `world.slug` do JSON coincidam. **Emenda:** idênticos **fora da linha do `<base>`** (a raiz leva `href="./"`, as salas `href="../"`), porque sem ela os caminhos relativos de uma sala resolvem para a raiz. **Custo aceite:** o nome da pasta *é* o slug, logo é implícito — e é exactamente por isso que passa a ser verificado |
 | D29 | A porta que faltava na praia | **FECHADA** (2026-10-16) | A porta **5 da praia** passa a ser o **regresso ao portão**: `window: none` + `action: navigate` com `target: gate` e `arrivalFrom: gate`, espelhando a porta 2 da cidade. **Motivo escrito:** na cena de onde a 3B nasceu os portais **4 e 5 eram a mesma porta duas vezes** (`ownedBy: 2`, par `2/1`); enquanto eram duas dimensões do mesmo ficheiro era redundância, mas com **um mundo por dimensão** passou a ser **falta de saída** — a praia não tinha porta para o portão e, ao chegar de lá, nenhuma porta podia dizer que era a chegada, logo o visitante aparecia onde a câmara dizia e o aviso do T8 disparava. **Medido:** o aviso apareceu na primeira ronda de portas do B7 (`praia?from=gate`), e a correção prova-se pelo **migrador emendado** — reposta a cena única e corrido outra vez, os 5 ficheiros saem iguais aos que estão em disco excepto a porta 5 (`1 file changed, 4 insertions(+), 5 deletions(-)`). **Custo aceite:** a praia perde a simetria esquerda/direita das duas portas para a cidade (fica uma); ganha o regresso directo ao portão, que era o que faltava |
 | D30 | **R9** — o esquema valida o que a cena não constrói (`model`/`text` de obra, `color` de dimensão, `interaction: link`) | **FECHADA** (2026-10-16) | **O validador passa a avisar e o editor não oferece o que não é construído.** Motivo escrito: implementar geometria de modelo, texto 3D e `link` a navegar é uma fase própria — nenhum deles tem arte nem caso de uso hoje —, enquanto a alternativa (o editor oferecer campos que a cena ignora) é exactamente o defeito que o **R9** mediu: quem escreve um desses campos vê o validador aceitar e a cena não mudar. O aviso entra na categoria que já existe (a mesma que avisa da dimensão de cor sem cor) e no `tools/scene/laws-selftest.mjs`, com uma avaria por valor. **Custo aceite:** o esquema continua a declarar mais do que constrói — passa a declará-lo **em voz alta** |
@@ -3386,7 +3447,8 @@ alteram comportamento.
 | D43 | A travessia entre mundos não passa pelo preto | A página que sai guarda o **último quadro** que estava a mostrar (`sessionStorage`) e a que chega pinta-o antes de tudo o resto, desvanecendo-o quando há cena. O quadro é **composto**: o `<video>` da câmara por baixo e o canvas por cima, na ordem e no enquadramento do CSS — o canvas é `alpha: true` e, sem essa composição, a ponte seria um retângulo preto nas salas onde a câmara é o chão da cena. Vive em `js/arrival-frame.js`, e é o único script **clássico** do projeto: tem de correr antes da primeira pintura, e um módulo só corre depois de carregar a sua árvore de importações (que é exactamente a janela que se quer fechar). A chave é de **uso único** (recarregar não repete a imagem) e tem um prazo de **20 s**; uma cena que não chegue ao fim vê a ponte sair na mesma ao fim de **10 s**, para uma imagem parada não esconder um erro |
 | D44 | A travessia não dá a ver que houve uma | A ponte não se **desvanece**: sai num só fotograma, quando o mundo já está a ser desenhado — uma dissolução de 240 ms entre duas fotografias do mesmo sítio lê-se como efeito, e o que se quer é que a travessia não se anuncie. E enquanto a ponte cobre o ecrã **não se mostra a linha «Carregando…»**: o ecrã nunca está vazio, e um elemento a aparecer é o sinal mais visível de todos. Medido: o quadro da ponte difere do ecrã em **0,22** (é o ecrã), o mundo difere do quadro em **3,94** — um passo de caminhada (o maior salto a caminhar é **2,69**) —, o que sobra é a obra que está em frente da chegada, que nenhuma fotografia da página anterior pode prever |
 | D45 | Nenhum fotograma de câmara dentro da travessia | Tudo o que faça o canvas não ter desenho mostra o que está por baixo dele — o `<video>` da câmara, ou o preto dele. Eram duas janelas: a ponte saía **antes** de o vídeo ter imagem (medido: **58 ms** de preto por baixo, mais num telemóvel) e o `resize` da câmara limpava o buffer do canvas. A ponte passou a esperar **também** pelo primeiro fotograma **apresentado** pela câmara (`cameraFirstFrame()` com `requestVideoFrameCallback` — `loadeddata` não chega: decodificar não é apresentar, e num portão publicado isso deu segundos de preto com o evento já disparado), no máximo **3 s**; uma câmara recusada resolve de imediato, para a chegada não ficar à espera de um fotograma que não vem. O `resize` passou a ser seguido de uma renderização imediata (o canvas fica sem desenho **0,5–5,2 ms**, dentro do mesmo fotograma) |
-| D46 | O retrato de uma porta é a vista da chegada | A janela de uma porta de mundo mostrava o **panorama** do destino, e a chegada mostra o panorama **mais as obras e as portas** — o corte era, por isso, uma troca de imagem (medido: **0,68 a 13,36** de salto nas seis portas). O retrato passa a ser um equirretangular desenhado **pela própria exposição** a partir do ponto onde o visitante vai aparecer: `?from=<origem>` deixa o `arrivalPoint` pôr a câmara (uma só casa para a geometria, L16) e a ferramenta desenha seis faces de cubo, convertidas para 2048×1024. É um **asset derivado** — regera-se quando a sala mudar — e um por porta, não um por destino: a chegada depende de onde se vem (as três portas da praia mostram três vistas) |
+| D46 | O retrato de uma porta é a vista da chegada | A janela de uma porta de mundo mostrava o **panorama** do destino, e a chegada mostra o panorama **mais as obras e as portas** — o corte era, por isso, uma troca de imagem (medido: **0,68 a 13,36** de salto nas seis portas). O retrato passa a ser um equirretangular desenhado **pela própria exposição** a partir do ponto onde o visitante vai aparecer: `?from=<origem>` deixa o `arrivalPoint` pôr a câmara (uma só casa para a geometria, L16) e a ferramenta desenha seis faces de cubo, convertidas para 3072×1536 (4096×2048 em duas portas — D47). É um **asset derivado** — regera-se quando a sala mudar — e um por porta, não um por destino: a chegada depende de onde se vem (as três portas da praia mostram três vistas). **Fechada em 2026-10-22 com o B20:** com o centro à altura dos olhos e a resolução da D47, o salto ficou em **0,21 a 0,40** nas seis portas (12 de 12 verificações), contra a meta de 0,50 |
+| D47 | O retrato nasce à altura dos olhos, e com que tamanho | A esfera do retrato nascia no `portal.position` — no **chão** — e o retrato inteiro aparecia deslocado para baixo (~11 px num telemóvel); era isso a diferença de **3,6–3,9 na faixa de cima** do ecrã. O centro passa a ser `[x, altura do jogador, z]`, com a altura lida **uma só vez** de `cameras.player.position[1]` (L16): não é um campo novo nos dados, e a paralaxe da janela mantém-se porque a esfera continua a não seguir a câmara. Medido na porta 4 da praia: **1,56** com o centro no chão, **0,54** à altura dos olhos, 0,47 a +0,1 m; o raio quase não conta (500 dá 0,53 onde 120 dá 0,54) e a esfera a **seguir a câmara** foi medida e rejeitada (**25,30 / 7,30 / 1,17** conforme o raio). O tamanho do ficheiro: **3072×1536 q0,70** é o menor que cumpre (0,46; a 2560 falha com 0,58), com **duas excepções a 4096×2048** (0,40) nas portas onde 3072 não chegava à margem — praia 4 → cidade e praia 6 → céu. A qualidade do JPEG quase não conta (a 4096, 0,85 dá 0,39 e 0,75 dá 0,40); quem manda é a resolução |
 
 **Roadmap aprovado em 2026-10-12.**
 

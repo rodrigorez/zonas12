@@ -12,28 +12,53 @@
 // imagem.
 //
 // O retrato é um **asset derivado**: regere-o quando a sala mudar (mover uma obra muda o retrato das
-// portas que a mostram).
+// portas que a mostram). E regere-o **duas vezes**: o retrato de um mundo contém as janelas das
+// portas desse mundo, que são retratos deles próprios — a primeira passagem cozinha o que lá estava,
+// a segunda o que lá ficou. Medido, o mesmo retrato saiu com 438, 215 e 378 kB em passagens seguidas;
+// a costura não se mexe com isso (0,37 antes e depois), mas o ficheiro sim.
 //
-// Uso, da raiz do projeto: node tools/scene/portrait.mjs <mundo> <origem> [ficheiro]
-import { join } from 'node:path';
+// A esfera onde o retrato é mostrado fica centrada à **altura dos olhos** (D47), que é a altura de
+// onde este cubo é desenhado — é o que faz a imagem através da porta ser a imagem da chegada.
+//
+// Uso, da raiz do projeto:
+//   node tools/scene/portrait.mjs --todos
+//   node tools/scene/portrait.mjs <mundo> <origem> [ficheiro]
+import { join, basename } from 'node:path';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { serveProject, openBrowser, ROOT, sleep } from '../regression/harness.mjs';
 
-const mundo = process.argv[2];
-const origem = process.argv[3];
-if (!mundo || !origem) {
+// O tamanho da imagem. Medido na porta mais difícil (praia 4 → cidade), com o centro do retrato já à
+// altura dos olhos (D47): 2560x1280 deixa a costura em **0,58** (falha a meta de 0,50), 3072x1536 em
+// **0,46** e 4096x2048 em **0,40**. Fica o menor que cumpre, com uma exceção medida: as duas portas
+// que a 3072 não chegavam à margem (praia 4 → cidade e praia 6 → céu) são desenhadas a 4096.
+// A qualidade quase não conta (0,85 dá 0,39 e 0,75 dá 0,40 a 4096); quem manda é a resolução.
+const TAMANHO = { largura: 3072, altura: 1536, face: 1536, qualidade: 0.7 };
+const TAMANHO_GRANDE = { largura: 4096, altura: 2048, face: 2048, qualidade: 0.7 };
+const GRANDES = ['cidade-de-praia.jpg', 'praia-de-ceu.jpg'];
+
+// As seis portas com retrato, como (mundo de destino, mundo de origem): é o par que diz de onde a
+// câmara parte para desenhar a chegada. `--todos` desenha as seis.
+const PORTAS = [
+  ['cidade', 'gate'],
+  ['praia', 'gate'],
+  ['praia', 'cidade'],
+  ['cidade', 'praia'],
+  ['ceu', 'praia'],
+  ['praia', 'ceu']
+];
+
+const todos = process.argv[2] === '--todos';
+const mundo = todos ? null : process.argv[2];
+const origem = todos ? null : process.argv[3];
+if (!todos && (!mundo || !origem)) {
   console.error('uso: node tools/scene/portrait.mjs <mundo> <origem> [ficheiro]');
+  console.error('     node tools/scene/portrait.mjs --todos');
   console.error('exemplo: node tools/scene/portrait.mjs cidade praia');
   process.exit(1);
 }
-const destino = process.argv[4] || join('assets', 'previews', mundo + '-de-' + origem + '.jpg');
-
-const LARGURA = 2048;
-const ALTURA = 1024;
-const FACE = 1024;
 
 // O desenho, dentro da página: cubo a partir da câmara de chegada, e o cubo desdobrado.
-const DESENHAR = (largura, altura, face) => `(async () => {
+const DESENHAR = (largura, altura, face, qualidade) => `(async () => {
   const cena = document.querySelector('a-scene');
   const renderer = cena.renderer;
   const camera = cena.camera;
@@ -105,10 +130,11 @@ const DESENHAR = (largura, altura, face) => `(async () => {
   }
   for (let i = 3; i < dados.data.length; i += 4) dados.data[i] = 255;
   contexto.putImageData(dados, 0, 0);
-  return { imagem: tela.toDataURL('image/jpeg', 0.85), posicao: [posicao.x, posicao.y, posicao.z] };
+  return { imagem: tela.toDataURL('image/jpeg', ${qualidade}), posicao: [posicao.x, posicao.y, posicao.z] };
 })()`;
 
-async function main() {
+async function gerar(mundo, origem, destino) {
+  const tamanho = GRANDES.includes(basename(destino)) ? TAMANHO_GRANDE : TAMANHO;
   const site = await serveProject();
   const browser = await openBrowser({ width: 1280, height: 800, camera: true });
   try {
@@ -133,19 +159,30 @@ async function main() {
     console.log('mundo ' + mundo + ' a chegar de ' + origem + ': câmara em [' +
       chegada.posicao.map((valor) => Math.round(valor * 100) / 100).join(', ') + ']');
 
-    const desenho = await browser.evaluate(DESENHAR(LARGURA, ALTURA, FACE), 120000);
+    const desenho = await browser.evaluate(
+      DESENHAR(tamanho.largura, tamanho.altura, tamanho.face, tamanho.qualidade), 120000);
     if (!desenho || !desenho.imagem) throw new Error('o desenho falhou: ' + JSON.stringify(desenho));
 
     const bytes = Buffer.from(desenho.imagem.split(',')[1], 'base64');
     const caminho = join(ROOT, destino);
     mkdirSync(join(ROOT, 'assets', 'previews'), { recursive: true });
     writeFileSync(caminho, bytes);
-    console.log('escrito ' + destino + ': ' + LARGURA + 'x' + ALTURA + ', ' +
+    console.log('escrito ' + destino + ': ' + tamanho.largura + 'x' + tamanho.altura + ', ' +
       Math.round(bytes.length / 1024) + ' kB');
   } finally {
     await browser.close();
     await site.close();
   }
+}
+
+async function main() {
+  if (todos) {
+    for (const [de, de_origem] of PORTAS) {
+      await gerar(de, de_origem, join('assets', 'previews', de + '-de-' + de_origem + '.jpg'));
+    }
+    return;
+  }
+  await gerar(mundo, origem, process.argv[4] || join('assets', 'previews', mundo + '-de-' + origem + '.jpg'));
 }
 
 main().catch((error) => {
