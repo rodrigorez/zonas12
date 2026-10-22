@@ -2632,6 +2632,43 @@ mundo) mais as duas novas (sai num só passo; a linha não aparece).
 `css/style.css` (fora a `transition`), `js/modules/camera.js` (`showLoading()` cala-se quando a ponte
 cobre o ecrã) e `js/app.js` (o comentário da ordem).
 
+#### O que o B19 entregou e medido (2026-10-21) — o fotograma de câmara dentro da travessia
+
+O autor viu, no vídeo seguinte, **um fotograma em que a câmara aparece** a meio da travessia, «tanto
+no ir como no voltar», e pediu que, se a transição não se puder eliminar, ao menos seja **ordenada**.
+
+**Onde estava, medido.** O que fica por baixo do canvas é o `<video>` da câmara, e o canvas é
+`alpha: true` — tudo o que faça o canvas não ter desenho mostra a câmara (ou o preto dela). Duas
+janelas, as duas medidas com uma sonda que embrulha `renderer.render` e `cena.resize` e anota cada
+fotograma:
+
+| Janela | Antes | Depois |
+| --- | --- | --- |
+| a ponte saía **antes** de o `<video>` ter imagem | ponte fora aos **442,5 ms**, `video playing` aos **500,1 ms** — **58 ms** com o preto do vídeo por baixo (num telemóvel, mais) | a ponte sai **no mesmo instante** que `loadeddata` (0,1–0,3 ms depois), nos três mundos |
+| o `resize` da câmara limpa o buffer do canvas | próxima renderização **6 ms** depois (sub-fotograma por sorte) | `resize` + renderização imediata no mesmo passo: **0,5 a 5,2 ms** sem desenho |
+
+**A correção (D45):**
+
+- `cameraFirstFrame()` (novo, em `js/modules/camera.js`) responde quando a câmara **apresentou** um
+  fotograma — `requestVideoFrameCallback`, não `loadeddata`: decodificar não é apresentar, e isso
+  mediu-se (numa das passagens publicadas o portão ficou preto segundos com `loadeddata` já disparado).
+  Responde também quando a câmara não conta para esta cena, quando é **recusada** (`cameraWillNotShow`,
+  para uma chegada não ficar à espera de um fotograma que não vem) ou ao fim de **3 s**. O `js/app.js`
+  só tira a ponte depois de a cena ter desenhado **e** de a câmara ter imagem;
+- o `resize` da câmara passa a ser seguido de uma renderização **imediata**, para o buffer do canvas
+  nunca estar vazio quando o compositor olha para ele.
+
+**Medido (9 de 9):** as seis verificações do B17, as duas do B18 e a nova — *a ponte só sai depois de
+a câmara ter o primeiro fotograma* (**video aos 622,3 ms, ponte sai aos 632,5 ms**), e nos três mundos
+a ponte sai no mesmo instante que `video playing` (portão **400,7 / 400,7 ms**, cidade **495,5 /
+495,3 ms**, praia **449,0 / 448,8 ms**). Sem regressões: a consola com **0** erros e **0** avisos nas
+5 páginas (com o T7/T11 a passar nas três chegadas), o editor em **35 de 35**, a D37 em **5 de 5**, a
+D41 em **7 de 7**, a D42 em **9 de 9**, `validate.mjs` **0** e `laws-selftest` **21 de 21**.
+
+**O que mudou:** `js/modules/camera.js` (`cameraFirstFrame()`, `cameraWillNotShow()`, o
+`FIRST_FRAME_TIMEOUT` de 3 s e a renderização depois do `resize`) e `js/app.js` (a ponte espera pelas
+duas coisas).
+
 #### Metas de sucesso
 
 **(a) Comportamento — nenhum número pode mudar.** Os **doze** testes de §10 na exposição, nos 5
@@ -3291,6 +3328,7 @@ alteram comportamento.
 | D42 | O botão não aparece a meio de uma transição | O botão está **escondido no markup** e só aparece quando a página decidiu que é ele que falta — e a decisão é tomada **antes de a cena carregar**: com `?from=` (chegada) nunca aparece, e na primeira visita aparece antes dos assets. Enquanto carrega, a chegada mostra a linha «Carregando…» em vez de um ecrã preto com um botão por cima (era o que se via no vídeo do autor entre portais). A pergunta da permissão é esperada no máximo **1 s**: uma resposta que não chega não pode travar a exposição |
 | D43 | A travessia entre mundos não passa pelo preto | A página que sai guarda o **último quadro** que estava a mostrar (`sessionStorage`) e a que chega pinta-o antes de tudo o resto, desvanecendo-o quando há cena. O quadro é **composto**: o `<video>` da câmara por baixo e o canvas por cima, na ordem e no enquadramento do CSS — o canvas é `alpha: true` e, sem essa composição, a ponte seria um retângulo preto nas salas onde a câmara é o chão da cena. Vive em `js/arrival-frame.js`, e é o único script **clássico** do projeto: tem de correr antes da primeira pintura, e um módulo só corre depois de carregar a sua árvore de importações (que é exactamente a janela que se quer fechar). A chave é de **uso único** (recarregar não repete a imagem) e tem um prazo de **20 s**; uma cena que não chegue ao fim vê a ponte sair na mesma ao fim de **10 s**, para uma imagem parada não esconder um erro |
 | D44 | A travessia não dá a ver que houve uma | A ponte não se **desvanece**: sai num só fotograma, quando o mundo já está a ser desenhado — uma dissolução de 240 ms entre duas fotografias do mesmo sítio lê-se como efeito, e o que se quer é que a travessia não se anuncie. E enquanto a ponte cobre o ecrã **não se mostra a linha «Carregando…»**: o ecrã nunca está vazio, e um elemento a aparecer é o sinal mais visível de todos. Medido: o quadro da ponte difere do ecrã em **0,22** (é o ecrã), o mundo difere do quadro em **3,94** — um passo de caminhada (o maior salto a caminhar é **2,69**) —, o que sobra é a obra que está em frente da chegada, que nenhuma fotografia da página anterior pode prever |
+| D45 | Nenhum fotograma de câmara dentro da travessia | Tudo o que faça o canvas não ter desenho mostra o que está por baixo dele — o `<video>` da câmara, ou o preto dele. Eram duas janelas: a ponte saía **antes** de o vídeo ter imagem (medido: **58 ms** de preto por baixo, mais num telemóvel) e o `resize` da câmara limpava o buffer do canvas. A ponte passou a esperar **também** pelo primeiro fotograma **apresentado** pela câmara (`cameraFirstFrame()` com `requestVideoFrameCallback` — `loadeddata` não chega: decodificar não é apresentar, e num portão publicado isso deu segundos de preto com o evento já disparado), no máximo **3 s**; uma câmara recusada resolve de imediato, para a chegada não ficar à espera de um fotograma que não vem. O `resize` passou a ser seguido de uma renderização imediata (o canvas fica sem desenho **0,5–5,2 ms**, dentro do mesmo fotograma) |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -3437,6 +3475,13 @@ deixou de aparecer quando há ponte. Medida a costura com uma assinatura 4×4 de
 a amostra: a ponte é o ecrã (**0,22** de diferença), o mundo difere dela em **3,94** — o tamanho de um
 passo (o maior a caminhar é **2,69**) —, e o que resta é a obra que está em frente da chegada, que uma
 fotografia da página anterior não pode adivinhar. **8 de 8**.
+
+**B19, no mesmo dia, com o segundo vídeo** — o autor viu **um fotograma com a câmara** a meio da
+travessia, no ir e no voltar (**D45**). Eram duas janelas para o vídeo aparecer: a ponte saía **58 ms
+antes** de o `<video>` ter imagem, e o `resize` da câmara limpava o buffer do canvas. A ponte passou a
+esperar também pelo primeiro fotograma **apresentado** pela câmara (no máximo 3 s; recusada resolve
+logo) e o `resize` passou a ser seguido de uma renderização imediata — o canvas fica sem desenho **0,5 a
+5,2 ms**, dentro do mesmo fotograma. **9 de 9**.
 
 ### O que fica decidido, em uma frase
 

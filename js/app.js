@@ -12,7 +12,7 @@ import {
   setActiveDimension,
   on
 } from './core/index.js';
-import { startSession, cameraAlreadyAllowed, showStartButton, showLoading } from './modules/camera.js';
+import { startSession, cameraAlreadyAllowed, cameraFirstFrame, showStartButton, showLoading } from './modules/camera.js';
 import { closeArtwork, toggleArtworkLabels } from './modules/artwork.js';
 import { startFrameDriver } from './modules/portal.js';
 import { validateScene } from './scene/validation.js';
@@ -152,9 +152,14 @@ async function start() {
   // The image bridge has done its work once there is a scene to look at (D43): what the visitor sees
   // from here on is the world, and the frame that was covering the wait goes in the same frame — no
   // fade, because a cross-dissolve between two pictures of the same place is seen as an effect (D44).
-  // Two frames, not one: the canvas has to be on the screen before the picture over it is taken away.
+  //
+  // It waits for **both** things: two frames drawn (the canvas has to be on the screen before the
+  // picture over it goes) and the camera's first frame when the world shows the camera (D45) — taking
+  // the picture away first left the black of the empty `<video>` showing, which is the frame of camera
+  // the author saw in the middle of a crossing.
   if (window.arrivalFrame) {
-    requestAnimationFrame(() => requestAnimationFrame(() => window.arrivalFrame.hide()));
+    const drawn = new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    drawn.then(cameraFirstFrame).then(() => window.arrivalFrame.hide());
   }
 }
 

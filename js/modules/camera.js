@@ -191,6 +191,64 @@ export function isCameraActive() {
 // left with the loading line and no way in. No answer means "unknown", which is the gesture rule.
 const PERMISSION_TIMEOUT = 1000;
 
+// How long an arrival waits for the camera's first frame before showing the world anyway (D45). The
+// image bridge stays up meanwhile, so this is the most a visitor can be left looking at the picture
+// they already had — and a camera that is refused, or that errors, does not wait at all: the refusal
+// resolves it and the world appears with the message.
+const FIRST_FRAME_TIMEOUT = 3000;
+
+// Whether the camera has **presented** a frame — not merely decoded one. `loadeddata` says a frame
+// exists; `requestVideoFrameCallback` says one reached the compositor, and it is the difference
+// between a world that shows the camera and a world that shows the black of an empty `<video>`
+// (measured: with `loadeddata` alone the gate was black for seconds in one run).
+//
+// A world whose floor is the camera (the gate) shows that black over the whole screen; a camera
+// window shows it in a smaller rectangle. Either way it is a frame of camera inside a crossing, which
+// is what the image bridge exists to avoid (D43/D45).
+let firstFrame = null;
+let finishFirstFrame = null;
+
+export function cameraFirstFrame() {
+  if (!realCameraEnabled) return Promise.resolve('no camera in this world');
+  if (cameraGaveUp) return Promise.resolve('camera will not show: ' + cameraGaveUp);
+  const video = document.getElementById('webcam-video');
+  if (!video) return Promise.resolve('no surface for the camera');
+  if (video.readyState >= 2 && video.videoWidth > 0 && !video.paused) {
+    // Already running: one frame presented is what the asking page needs, and it is already past.
+    return Promise.resolve('already there');
+  }
+  if (firstFrame) return firstFrame;
+  firstFrame = new Promise((resolve) => {
+    const done = (why) => {
+      if (!finishFirstFrame) return;
+      clearTimeout(limit);
+      const finish = finishFirstFrame;
+      finishFirstFrame = null;
+      finish(why);
+    };
+    const limit = setTimeout(() => done('timeout'), FIRST_FRAME_TIMEOUT);
+    finishFirstFrame = resolve;
+    if (typeof video.requestVideoFrameCallback === 'function') {
+      video.requestVideoFrameCallback(() => done('frame presented'));
+    }
+    video.addEventListener('playing', () => done('playing'), { once: true });
+    video.addEventListener('error', () => done('error'), { once: true });
+  });
+  return firstFrame;
+}
+
+// A camera that is refused has no frame coming: the arrival must not stay on the picture waiting for
+// one (D45).
+let cameraGaveUp = null;
+
+function cameraWillNotShow(why) {
+  cameraGaveUp = why;
+  if (!finishFirstFrame) return;
+  const finish = finishFirstFrame;
+  finishFirstFrame = null;
+  finish(why);
+}
+
 export async function cameraAlreadyAllowed(timeoutMs) {
   if (!navigator.permissions || typeof navigator.permissions.query !== 'function') return false;
   const limit = typeof timeoutMs === 'number' ? timeoutMs : PERMISSION_TIMEOUT;
@@ -206,6 +264,8 @@ export async function cameraAlreadyAllowed(timeoutMs) {
 export function reportCameraError(error) {
   console.error('Failed to access the camera:', error);
   hideLoading();
+  // No frame is coming, so an arrival waiting for one gives up here (D45).
+  cameraWillNotShow(String((error && error.name) || error || 'error'));
   // One warning at a time: this function can run more than once (permission denied and, later,
   // an error in the middle) and without this the messages piled up on the screen.
   const previous = document.getElementById('erro-camera');
@@ -307,7 +367,15 @@ export function startSession(options) {
       // are squeezed into the size the page had before the camera started.
       setTimeout(() => {
         const scene = document.querySelector('a-scene');
-        if (scene && scene.resize) scene.resize();
+        if (scene && scene.resize) {
+          scene.resize();
+          // A `resize` limpa o buffer do canvas e o canvas é `alpha: true`: até à renderização
+          // seguinte o compositor só tem o <video> por baixo para mostrar — e é isso que se vê como um
+          // fotograma da câmara a meio de uma travessia (D45). Desenhar já fecha essa janela.
+          if (scene.renderer && scene.object3D && scene.camera) {
+            scene.renderer.render(scene.object3D, scene.camera);
+          }
+        }
       }, 300);
       setTimeout(hideLoading, 500);
     })

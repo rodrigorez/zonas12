@@ -447,8 +447,8 @@ dois sítios.
   assets chegam, o que se vê é «Carregando…» (com a rede de um telemóvel, alguns segundos).
 - **Ao atravessar um portal também não se vê um ecrã preto** (**D43**): a página que sai deixa o
   **último quadro** que estava a mostrar e a que chega pinta-o como primeira coisa, antes de ter cena;
-  quando o mundo está construído, o quadro sai **de uma vez**, num só fotograma (**D44**). O que se vê
-  é uma travessia contínua, e não uma ida ao preto e volta.
+  quando o mundo está construído, o quadro sai **de uma vez**, num só fotograma (**D44**), e só depois
+  de a câmara ter imagem — porque o que está por baixo da cena é o vídeo dela (**D45**).
 
 ## Mundos e portas de mundo (Fase 3B, fechada em 2026-10-16)
 
@@ -588,6 +588,12 @@ diziam que algo tinha acontecido (medido: **0** desvanecimentos e **0** linhas n
 O que sobra é o que a sala de destino tem e o retrato dela não tinha — as obras que estão em frente da
 chegada —, e isso mede-se: **3,94** de diferença entre o quadro e o mundo, contra **2,69** do maior
 salto de um passo a caminhar.
+
+E não aparece nenhum fotograma da câmara dentro da travessia (**D45**): o que está por baixo da cena é
+o vídeo dela, e duas coisas o mostravam — a ponte saía **58 ms antes** de o `<video>` ter imagem, e o
+`resize` da câmara limpava o buffer do canvas. A ponte espera agora também pelo primeiro fotograma
+**apresentado** pela câmara (no máximo **3 s**; uma câmara recusada resolve logo), e o `resize` é seguido
+de uma renderização imediata (**0,5 a 5,2 ms** sem desenho, dentro do mesmo fotograma).
 
 ## Funcionalidades Principais
 
