@@ -35,7 +35,45 @@ function doorData(index, door) {
   }, SCENE.portals);
 }
 
-const engine = createEngine({ fps });
+// Faixa do pixelRatio: nunca acima de PR_MAX (ganho pequeno, custo alto) nem abaixo de PR_MIN (borrado).
+const PR_MAX = 2;
+const PR_MIN = 1;
+const MEMORY_DAYS = 30;
+const fixedRatio = Number(params.get('pr')) > 0;
+const adaptive = !fixedRatio && params.get('adapt') !== '0';
+
+function sceneEl() { return document.querySelector('a-scene'); }
+
+function memoryKey() {
+  const gl = document.createElement('canvas').getContext('webgl');
+  const ext = gl && gl.getExtension('WEBGL_debug_renderer_info');
+  return 'zonas-pr:' + (ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : '?') + '|' + screen.width + 'x' + screen.height;
+}
+
+// O que este aparelho já mostrou aguentar, de uma visita anterior (vale MEMORY_DAYS dias).
+function readMemory() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(memoryKey()));
+    if (saved && Date.now() - saved.at < MEMORY_DAYS * 86400000) return saved;
+  } catch (error) { /* sem memória */ }
+  return null;
+}
+
+const memory = adaptive && params.get('memoria') !== '0' ? readMemory() : null;
+const clampRatio = (value) => Math.min(PR_MAX, Math.max(PR_MIN, value));
+
+const resolution = adaptive ? {
+  min: PR_MIN,
+  max: Math.min(PR_MAX, devicePixelRatio),
+  badAt: memory ? memory.badAt : 0,
+  get: () => sceneEl().renderer.getPixelRatio(),
+  set: (value) => { sceneEl().renderer.setPixelRatio(value); sceneEl().resize(); },
+  save: (state) => {
+    try { localStorage.setItem(memoryKey(), JSON.stringify({ ...state, at: Date.now() })); } catch (error) { /* ignora */ }
+  }
+} : null;
+
+const engine = createEngine({ fps, resolution });
 window.testeEngine = engine;
 
 function renderRatio() {
@@ -55,7 +93,8 @@ function deviceInfo() {
     resolucaoCamera: video && video.videoWidth ? video.videoWidth + '×' + video.videoHeight : null,
     tipoFundo: 'shader',
     pixelRatioAplicado: renderRatio(),
-    antialias: params.get('aa') !== '0'
+    antialias: params.get('aa') !== '0',
+    ajusteAutomatico: adaptive, faixaPixelRatio: [PR_MIN, PR_MAX], memoria: memory
   };
 }
 
@@ -75,7 +114,7 @@ function setupHud() {
   setInterval(() => {
     const c = engine.current;
     hud.textContent = 'modo ' + c.mode + ' | fps ' + c.fps.toFixed(0) + ' | p95 ' + c.p95.toFixed(1) + ' ms | animados ' +
-      c.animated + '/' + c.visible + ' visíveis | desenho ' + c.drawMs.toFixed(1) + ' ms | pr ' + renderRatio() + ' | aa ' + (params.get('aa') !== '0' ? 'on' : 'off');
+      c.animated + '/' + c.visible + ' visíveis | desenho ' + c.drawMs.toFixed(1) + ' ms | pr ' + renderRatio().toFixed(2) + (adaptive ? ' auto' : ' fixo') + ' | aa ' + (params.get('aa') !== '0' ? 'on' : 'off');
   }, 500);
 }
 
@@ -89,10 +128,12 @@ async function start() {
   const parent = document.querySelector('a-scene');
   if (!parent.hasLoaded) await new Promise((resolve) => parent.addEventListener('loaded', resolve, { once: true }));
 
-  // ?pr= fixa o pixelRatio (padrão: o do aparelho, como a exposição); ?aa=0 desliga o antialias
+  // ?pr= fixa o pixelRatio e desliga o ajuste; ?adapt=0 desliga o ajuste; ?aa=0 desliga o antialias.
+  // Sem parâmetros: começa na memória do aparelho ou no máximo permitido, e o motor ajusta.
   const requestedRatio = Number(params.get('pr'));
-  if (requestedRatio > 0) {
-    parent.renderer.setPixelRatio(requestedRatio);
+  const initial = fixedRatio ? requestedRatio : adaptive ? clampRatio(memory ? memory.ratio : Math.min(PR_MAX, devicePixelRatio)) : 0;
+  if (initial > 0) {
+    parent.renderer.setPixelRatio(initial);
     parent.resize();
   }
 

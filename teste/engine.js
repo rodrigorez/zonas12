@@ -23,7 +23,12 @@ const BACKOFF_MAX = 120000;
 const SAMPLE_MS = 2000;      // intervalo do registo de amostras
 const MAX_LOG = 600;
 
-export function createEngine({ fps = 30 } = {}) {
+// `resolution` (opcional): { get, set, min, max, badAt, save } liga o ajuste gradual do pixelRatio.
+// A resolução é a primeira alavanca; só no mínimo é que as animações recuam.
+export function createEngine({ fps = 30, resolution = null } = {}) {
+  let badAt = resolution && resolution.badAt ? resolution.badAt : 0;
+  let badWindows = 0;
+  let goodWindows = 0;
   const interval = 1000 / fps;
   const times = [];
   const samples = [];
@@ -61,10 +66,51 @@ export function createEngine({ fps = 30 } = {}) {
     }, extra));
   }
 
+  // Resolução gradual: desce em passos proporcionais ao excesso, só sobe depois de várias janelas
+  // boas e nunca volta ao valor que já deu problema (`badAt`).
+  function adjustResolution(now, stats, visible) {
+    const r = resolution;
+    const ratio = r.get();
+    if (stats.p95 > LIMITS.p95Bad) {
+      badWindows++;
+      goodWindows = 0;
+      if (badWindows < 2 || ratio <= r.min + 0.001) return false;
+      const excess = Math.min(1, (stats.p95 - LIMITS.p95Bad) / LIMITS.p95Bad);
+      const next = Math.max(r.min, ratio * (1 - (0.05 + 0.10 * excess)));
+      badAt = ratio;
+      badWindows = 0;
+      apply(next, now, stats, 'desceu pr');
+      return true;
+    }
+    badWindows = 0;
+    if (stats.p95 > LIMITS.p95Ok) { goodWindows = 0; return false; }
+    goodWindows++;
+    const ceiling = Math.min(r.max, badAt ? badAt * 0.95 : r.max);
+    if (level >= visible.length && goodWindows >= 3 && ratio < ceiling - 0.001) {
+      goodWindows = 0;
+      apply(Math.min(ceiling, ratio * 1.05), now, stats, 'subiu pr');
+      return true;
+    }
+    return false;
+  }
+
+  function apply(next, now, stats, what) {
+    resolution.set(next);
+    times.length = 0;
+    note(what, stats, { pixelRatio: +next.toFixed(3) });
+    if (resolution.save) resolution.save({ ratio: next, badAt });
+  }
+
   function govern(now, stats, visible) {
     lastStep = now;
     if (!stats) return;
     if (level > visible.length) level = visible.length;
+
+    if (resolution && stats.p95 > LIMITS.p95Bad && resolution.get() > resolution.min + 0.001) {
+      adjustResolution(now, stats, visible);
+      return;
+    }
+    if (resolution && stats.p95 <= LIMITS.p95Bad && adjustResolution(now, stats, visible)) return;
 
     if (level > 0 && stats.p95 > LIMITS.p95Bad) {
       level--;
@@ -117,7 +163,8 @@ export function createEngine({ fps = 30 } = {}) {
       lastSample = now;
       samples.push({
         t: +((now - startedAt) / 1000).toFixed(1), mode, animados: current.animated, visiveis: visible.length,
-        fps: +stats.fps.toFixed(1), p95: +stats.p95.toFixed(1), desenhoMs: +drawCost.toFixed(2)
+        fps: +stats.fps.toFixed(1), p95: +stats.p95.toFixed(1), desenhoMs: +drawCost.toFixed(2),
+        pr: resolution ? +resolution.get().toFixed(3) : undefined
       });
       if (samples.length > MAX_LOG) samples.shift();
     }
