@@ -35,8 +35,8 @@ function doorData(index, door) {
   }, SCENE.portals);
 }
 
-// Faixa do pixelRatio: nunca acima de PR_MAX (ganho pequeno, custo alto) nem abaixo de PR_MIN (borrado).
-const PR_MAX = 2;
+// Faixa do pixelRatio: o máximo é o do próprio aparelho; o mínimo é PR_MIN (abaixo disso fica borrado).
+const PR_MAX = Math.max(1, devicePixelRatio);
 const PR_MIN = 1;
 const MEMORY_DAYS = 30;
 const fixedRatio = Number(params.get('pr')) > 0;
@@ -64,7 +64,7 @@ const clampRatio = (value) => Math.min(PR_MAX, Math.max(PR_MIN, value));
 
 const resolution = adaptive ? {
   min: PR_MIN,
-  max: Math.min(PR_MAX, devicePixelRatio),
+  max: PR_MAX,
   badAt: memory ? memory.badAt : 0,
   get: () => sceneEl().renderer.getPixelRatio(),
   set: (value) => { sceneEl().renderer.setPixelRatio(value); sceneEl().resize(); },
@@ -140,7 +140,7 @@ async function start() {
   // ?pr= fixa o pixelRatio e desliga o ajuste; ?adapt=0 desliga o ajuste; ?aa=0 desliga o antialias.
   // Sem parâmetros: começa na memória do aparelho ou no máximo permitido, e o motor ajusta.
   const requestedRatio = Number(params.get('pr'));
-  const initial = fixedRatio ? requestedRatio : adaptive ? clampRatio(memory ? memory.ratio : Math.min(PR_MAX, devicePixelRatio)) : 0;
+  const initial = fixedRatio ? requestedRatio : adaptive ? clampRatio(memory ? memory.ratio : PR_MAX) : 0;
   if (initial > 0) {
     parent.renderer.setPixelRatio(initial);
     parent.resize();
