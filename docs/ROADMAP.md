@@ -4,6 +4,14 @@
 > secção [11](#11-decisões) com data. Nada de código foi implementado: este documento é o
 > guia de desenvolvimento, e o `README.md` descreve o que **já** existe.
 >
+> **Atualização (2026-10-23, Fase 5 — plano):** a fase seguinte foi planeada **antes** de mexer em
+> código, como as anteriores: a **gravação direta** (§9) — um servidor local que serve a publicação
+> **e** grava `data/worlds/<slug>.json`, com cópia de segurança antes de gravar. Fecha-se com
+> **D48–D51** (§11) e o plano tem o ponto de partida **medido** no B0, **4** blocos (B1–B4), **6**
+> metas e a aceitação. A fase existe porque a fricção de exportar incomodou (era a condição escrita
+> na Fase 4); a D2 é **emendada**, não revogada: quem escreve é a ferramenta, e o editor continua a
+> não escrever sozinho. **Nada implementado.**
+>
 > **Atualização (2026-10-20, Fase 4 — fechada):** a **página de edição** correu **bloco a bloco**
 > (B0–B10, um commit por bloco) e cada bloco foi dado por **medido** — browser e linha de comando —,
 > nunca por estimativa: o plano e as sete decisões (**D30–D36**) na §9 e na §11, e «o que o Bn
@@ -2818,10 +2826,86 @@ dependem da janela do arnês, e o que se compara é o «0 fora da moldura» e o 
 | Exportar por cima do ficheiro errado | Baixa | o nome do ficheiro é o `world.slug`, e o validador já exige que a pasta seja o slug |
 | Uma sala inalcançável que o editor não vê | Baixa | fica na linha de comando (sem listagem de pasta por HTTP — nota da §7) |
 
-### Fase 5 — Gravação direta *(só se a fricção de 2A incomodar)*
-- **Entregável:** servidor local mínimo que lê/grava `data/scene.json`, **fora** do que se
-  publica; endpoint de exportar; cópia de segurança antes de gravar.
+### Fase 5 — Gravação direta (2026-10-23)
+
+> **O plano foi escrito antes de mexer em código** (B0), como nas fases anteriores. A fase estava
+> condicionada a «a fricção de exportar incomodar»; o autor decidiu em **2026-10-23** que incomoda, e
+> por isso ela arranca com as suas próprias decisões (**D48–D51**, §11) e com o ponto de partida
+> **medido** — não estimado.
+
+- **Entregável:** um servidor local mínimo, `tools/server/serve.mjs` (Node, sem dependências), que
+  serve a publicação **e** grava `data/worlds/<slug>.json` — **fora** do que se publica —, com
+  **cópia de segurança antes de gravar** e o botão «Gravar» no editor, que só existe quando o
+  servidor responde.
 - **Verificação:** editar, gravar, recarregar a exposição e ver a alteração.
+
+#### O que existe hoje (medido em 2026-10-23, no B0)
+
+| # | Pergunta | Medição |
+| --- | --- | --- |
+| 1 | Onde se grava um mundo hoje | **um** sítio: `js/editor/index.js` (`Blob` + `<a download>`, linha 245); o ficheiro é substituído à mão (D2) |
+| 2 | Quem escreve em disco no `js/` | **0** — os **9** acertos de armazenamento são todos `sessionStorage` da ponte da D43 (`js/arrival-frame.js`) |
+| 3 | O servidor de hoje | `python -m http.server 8123`, citado **1** vez no README: serve ficheiros e **não** aceita escrita |
+| 4 | Como o editor lê um mundo | `fetch('data/worlds/<slug>.json')` em **2** sítios (`js/editor/index.js` e `js/editor/worlds.js`) |
+| 5 | A barra do editor | **4** botões (Abrir, Desfazer, Validar, Exportar) mais o Importar em etiqueta |
+| 6 | O que há para gravar | **5** mundos, **1279** linhas de JSON (**22 454** bytes) |
+| 7 | O `tools/` | **24** ficheiros, **5256** linhas (o README dizia 23 e 5098 — ver o B4) |
+
+#### As decisões (D48–D51, §11)
+
+**D48** é o servidor: **um só**, em `tools/server/`, que serve a publicação e grava. **D49** é o
+botão: o «Exportar» **fica** (é o caminho que funciona em qualquer host) e o «Gravar» aparece **só**
+quando há servidor. **D50** é a recusa: o servidor valida com o **mesmo** `js/scene/validation.js` e
+o disco, e não escreve nada quando o mundo tem erros. **D51** é a cópia de segurança: uma por
+gravação, em `.harness/backups/worlds/<slug>/`, fora do repositório e da publicação.
+
+#### Blocos de execução
+
+| Bloco | O que entrega | Como se mede |
+| --- | --- | --- |
+| **B0** | este plano e as **D48–D51** | nada de código |
+| **B1** | `tools/server/serve.mjs`: serve a publicação como o `python -m http.server` (com `/` e `/sala/` a resolverem o `index.html`), responde a `GET /api/ping` com os mundos do disco, recusa `.harness/`, `.git/` e caminhos com `..`, e escuta **só** em `127.0.0.1` | `tools/server/selftest.mjs`: as **5** páginas, os **0** erros de consola das mesmas, os **3** pedidos perigosos recusados e o `ping` a listar os **5** mundos |
+| **B2** | `PUT /api/worlds/<slug>`: valida com o **mesmo** validador e o disco, recusa versão e slug trocados, recusa erros (**422**) e mundos que não existem (**404**), copia antes de gravar e escreve de forma atómica (`*.tmp` + `rename`) | o `selftest`: **6** recusas com **0** bytes escritos e **2** gravações — ficheiro **byte-idêntico** ao enviado e **2** cópias com o conteúdo **anterior** |
+| **B3** | o «Gravar» no editor, ao lado do «Exportar» e **só** com servidor (`GET /api/ping`), com o estado a dizer o ficheiro e a cópia; depois de gravar, a marca «alterado» sai e a guarda de saída (D32) cala-se | no browser: com servidor o botão existe, grava e a marca sai; sem servidor (`python -m http.server`) o botão **não** existe, o «Exportar» fica igual e a consola não diz nada |
+| **B4** | a aceitação (§ abaixo), o README e o fecho | editar → gravar → recarregar a exposição; `validate.mjs` **0**; a bateria dos doze **35 de 35** |
+
+#### Metas de sucesso
+
+**(a) Comportamento — nenhum número pode mudar.** A bateria dos **doze** (§10) nas **5** páginas e a
+do editor (**35** verificações) ficam com os valores da `v0.0.9`. O que se acrescenta não pode custar
+nada ao que já existe.
+
+**(b) Arquitetura — metas novas, todas mensuráveis.**
+
+| # | Meta | Como se mede | Alvo |
+| --- | --- | --- | --- |
+| M1 | O servidor não publica o que não se publica | `GET /.harness/…`, `/../…` e `/.git/…` | **403** nos três |
+| M2 | O servidor não escreve fora de `data/worlds/` | um slug com `..` ou com maiúsculas | **0** ficheiros escritos |
+| M3 | Gravar não muda um byte do que não se editou | o texto que o editor exporta contra o ficheiro gravado | **0** diferenças |
+| M4 | O servidor recusa o que o editor recusa | mundo com erro, `version: 2`, slug trocado | **3 de 3** recusas, **0** escrita |
+| M5 | A cópia de segurança existe antes de gravar | duas gravações seguidas | **2** cópias, a primeira com o conteúdo **anterior** |
+| M6 | O editor não regride sem servidor | `python -m http.server 8123` | botão **ausente**, export igual, **0** erros na consola |
+
+#### Aceitação da fase
+
+1. **Só pelo editor e pelo servidor:** abrir o fixture, mudar uma posição, «Gravar», recarregar a
+   exposição — a alteração está lá.
+2. **O ficheiro:** `node tools/scene/validate.mjs` com **0** e o `git diff` a mostrar **só** a linha
+   editada (o texto gravado é o exportado, byte a byte).
+3. **A cópia de segurança:** existe uma em `.harness/backups/worlds/<slug>/` com o conteúdo anterior.
+4. **Sem servidor:** o editor faz o que fazia na Fase 4 — «Exportar» descarrega e o «Gravar» não
+   existe —, com **0** erros na consola.
+5. **O que não mudou:** a bateria dos doze nas 5 páginas (**35 de 35**) e a do editor.
+
+#### Riscos da fase
+
+| Risco | Gravidade | Mitigação |
+| --- | --- | --- |
+| O servidor ficar acessível na rede | Alta | escuta em `127.0.0.1`; `Host` e `Origin` conferidos; o `selftest` prova a recusa |
+| Gravar por cima do mundo errado | Média | o slug do URL tem de bater com o `world.slug`, e o ficheiro tem de **já existir** (criar um mundo continua a ser da ferramenta, D31) |
+| Perder trabalho com uma escrita a meio | Média | cópia de segurança antes e escrita atómica (`*.tmp` + `rename`) |
+| O editor ganhar um caminho que só existe em casa | Média | o botão depende do `ping`; a bateria do editor corre sem servidor (M6) |
+| Duas implementações do validador | Baixa | o servidor **importa** `js/scene/validation.js`: **0** cópias |
 
 ### Fase 6 — Testes e limpeza
 - **Entregável:** os testes de §10 automatizados (o mesmo script que já usamos no browser).
@@ -3413,7 +3497,7 @@ alteram comportamento.
 
 ---
 
-## 13. Resumo — todas as decisões fechadas (2026-10-12 a 2026-10-16)
+## 13. Resumo — todas as decisões fechadas (2026-10-12 a 2026-10-23)
 
 | # | Decisão | Escolha |
 | --- | --- | --- |
@@ -3464,6 +3548,19 @@ alteram comportamento.
 | D45 | Nenhum fotograma de câmara dentro da travessia | Tudo o que faça o canvas não ter desenho mostra o que está por baixo dele — o `<video>` da câmara, ou o preto dele. Eram duas janelas: a ponte saía **antes** de o vídeo ter imagem (medido: **58 ms** de preto por baixo, mais num telemóvel) e o `resize` da câmara limpava o buffer do canvas. A ponte passou a esperar **também** pelo primeiro fotograma **apresentado** pela câmara (`cameraFirstFrame()` com `requestVideoFrameCallback` — `loadeddata` não chega: decodificar não é apresentar, e num portão publicado isso deu segundos de preto com o evento já disparado), no máximo **3 s**; uma câmara recusada resolve de imediato, para a chegada não ficar à espera de um fotograma que não vem. O `resize` passou a ser seguido de uma renderização imediata (o canvas fica sem desenho **0,5–5,2 ms**, dentro do mesmo fotograma) |
 | D46 | O retrato de uma porta é a vista da chegada | A janela de uma porta de mundo mostrava o **panorama** do destino, e a chegada mostra o panorama **mais as obras e as portas** — o corte era, por isso, uma troca de imagem (medido: **0,68 a 13,36** de salto nas seis portas). O retrato passa a ser um equirretangular desenhado **pela própria exposição** a partir do ponto onde o visitante vai aparecer: `?from=<origem>` deixa o `arrivalPoint` pôr a câmara (uma só casa para a geometria, L16) e a ferramenta desenha seis faces de cubo, convertidas para 3072×1536 (4096×2048 em duas portas — D47). É um **asset derivado** — regera-se quando a sala mudar — e um por porta, não um por destino: a chegada depende de onde se vem (as três portas da praia mostram três vistas). **Fechada em 2026-10-22 com o B20:** com o centro à altura dos olhos e a resolução da D47, o salto ficou em **0,21 a 0,40** nas seis portas (12 de 12 verificações), contra a meta de 0,50 |
 | D47 | O retrato nasce à altura dos olhos, e com que tamanho | A esfera do retrato nascia no `portal.position` — no **chão** — e o retrato inteiro aparecia deslocado para baixo (~11 px num telemóvel); era isso a diferença de **3,6–3,9 na faixa de cima** do ecrã. O centro passa a ser `[x, altura do jogador, z]`, com a altura lida **uma só vez** de `cameras.player.position[1]` (L16): não é um campo novo nos dados, e a paralaxe da janela mantém-se porque a esfera continua a não seguir a câmara. Medido na porta 4 da praia: **1,56** com o centro no chão, **0,54** à altura dos olhos, 0,47 a +0,1 m; o raio quase não conta (500 dá 0,53 onde 120 dá 0,54) e a esfera a **seguir a câmara** foi medida e rejeitada (**25,30 / 7,30 / 1,17** conforme o raio). O tamanho do ficheiro (emenda de 2026-10-23, aprovada pelo autor ao fechar a fase): **3072×1536 q0,70 nos seis retratos** — 2560 falha com 0,58, 3072 fica em **0,17 a 0,41** e 4096 daria 0,40; a resolução a mais comprava 0,01 a 0,07 de margem e custava **32 MiB** de textura por retrato em vez de 18 MiB (a praia ia a **52 MiB**), contra o orçamento de imagem do ensaio **R14** (`1024×512` no telemóvel; 4096 «não recomendado para móvel»). A qualidade do JPEG quase não conta (a 4096, 0,85 dá 0,39 e 0,75 dá 0,40); quem manda é a resolução. A consequência aceita é a **L14** a avisar 6 vezes — ver o registo do B20 |
+| D48 | A gravação direta, e onde ela vive (**emenda da D2**) | **Um servidor local, `tools/server/serve.mjs`**, que serve a publicação **e** as rotas `/api/…`: Node sem dependências, a escutar **só** em `127.0.0.1:8123`, e a substituir o `python -m http.server` no dia-a-dia. **Não entra na publicação** (o GitHub Pages não corre Node) e **não serve** `.harness/`, `.git/` nem caminhos com `..` — o que não se publica não se serve. **Emenda da D2, não revogação:** o editor continua a **não** escrever sozinho; quem escreve é a ferramenta, e só quando o pedido vem de uma página servida por ela (o `Host` e o `Origin` são conferidos) |
+| D49 | Gravar é um verbo novo, não um substituto | O «Exportar» da **D2 fica**: é o caminho que funciona em qualquer host, e é o que o GitHub Pages permite. O «Gravar» é um **botão ao lado**, que só existe quando `GET /api/ping` responde — uma página publicada não o mostra, e nada no editor muda por isso. O que sai por um lado sai igual pelo outro: gravar escreve o **mesmo texto** do export (2 espaços e `\n` final, ordem do ficheiro), para o `git diff` continuar a ser a prova de cada alteração |
+| D50 | O servidor recusa o que o editor recusaria | Valida com o **mesmo** `js/scene/validation.js` (uma só implementação) e com o disco (`exists`, `imageSize`, `worldExists`), pela mesma regra do export: **erros travam, avisos não**. Respostas: JSON inválido → **400**; `world.slug` diferente do slug do URL → **400**; `version` diferente da do esquema → **400**; mundo que não existe em `data/worlds/` → **404** (gravar é **substituir**; criar um mundo continua a ser da ferramenta, **D31**); erros de validação → **422** com a lista; em nenhum destes casos se escreve um byte. A escrita é **atómica** (`*.tmp` + `rename`), para uma falha a meio não deixar um ficheiro truncado |
+| D51 | Cópia de segurança antes de gravar | Uma por gravação, em `.harness/backups/worlds/<slug>/<AAAAMMDD-HHMMSS-mmm>.json` — **fora** do repositório (`.gitignore`) e da publicação, com o conteúdo **anterior**. A cópia é escrita **antes** do ficheiro do mundo e a resposta devolve-lhe o caminho, que o editor mostra na linha de estado: quem grava sabe sempre de onde pode voltar atrás, e não é o Git a ter de o lembrar |
+
+**D48 a D51 fechadas em 2026-10-23** — a **Fase 5** (a gravação direta), que a Fase 4 tinha deixado
+condicionada à fricção de exportar. O que se decidiu, e o que se recusou: **um** servidor de
+ferramenta (D48) que serve a publicação e grava, em vez de um serviço à parte; o **«Exportar» fica**
+(D49) e o «Gravar» é um botão que só existe com servidor, porque a página publicada tem de continuar
+a funcionar inteira; o servidor **recusa com o mesmo validador e a mesma regra do export** (D50) —
+e não cria mundos, porque criar um mundo é da ferramenta da D31; e **cada gravação deixa uma cópia**
+(D51) em `.harness/backups/worlds/`, fora do repositório e da publicação. A D2 passa a ter data de
+emenda: o editor não escreve, a ferramenta escreve. **Nada implementado** — o plano está em §9.
 
 **Roadmap aprovado em 2026-10-12.**
 
