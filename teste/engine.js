@@ -102,7 +102,7 @@ export function createEngine({ fps = 30 } = {}) {
     visible.slice(0, allowed).forEach((scene) => {
       scene.animating = true;
       drawCost += scene.avgDrawMs;
-      if (now - scene.lastDraw >= interval - 1) {
+      if (scene.continuous || now - scene.lastDraw >= interval - 1) {
         scene.lastDraw = now;
         scene.redraw(now / 1000);
       }

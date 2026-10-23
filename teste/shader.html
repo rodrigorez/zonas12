@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <base href="../" />
+    <title>Teste adaptativo – 5 fundos em shader</title>
+    <link rel="icon" href="data:,">
+    <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+    
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+      #hud { position: fixed; top: 0; left: 0; right: 0; z-index: 10000; padding: 6px 8px; font: 12px/1.35 monospace;
+             color: #fff; background: rgba(0, 0, 0, 0.6); pointer-events: none; }
+      #hud-botoes { position: fixed; bottom: 8px; left: 8px; z-index: 10000; display: flex; gap: 6px; flex-wrap: wrap; max-width: 60%; }
+      #hud-botoes button { font: 13px sans-serif; padding: 8px 10px; border-radius: 6px; border: 1px solid #fff; background: rgba(0,0,0,0.7); color: #fff; }
+      #hud-botoes button.on { background: #1b8a3b; }
+    </style>
+  </head>
+  <body>
+    <div class="loading-overlay" id="loading-overlay" role="status" aria-live="polite" data-i18n="app.loading">Carregando...</div>
+    <button id="btn-iniciar" data-i18n="app.start" hidden>ATIVAR EXPOSIÇÃO</button>
+
+    <div id="controles-mobile" role="group" data-i18n-label="controls.group" aria-label="Controlos de movimento">
+      <button type="button" id="btn-frente" class="dpad-btn" data-i18n-label="controls.forward" aria-label="Avançar">▲</button>
+      <button type="button" id="btn-tras" class="dpad-btn" data-i18n-label="controls.backward" aria-label="Recuar">▼</button>
+      <button type="button" id="btn-esq" class="dpad-btn" data-i18n-label="controls.left" aria-label="Esquerda">◄</button>
+      <button type="button" id="btn-dir" class="dpad-btn" data-i18n-label="controls.right" aria-label="Direita">►</button>
+    </div>
+
+    <div id="hud">iniciando…</div>
+    <div id="hud-botoes">
+      <button data-mode="auto" class="on">Auto</button>
+      <button data-mode="estatico">Estático</button>
+      <button data-mode="tudo">Animar tudo</button>
+      <button id="btn-copiar">Copiar log</button>
+    </div>
+
+    <div id="container-video">
+      <video id="webcam-video" autoplay playsinline muted aria-hidden="true"></video>
+    </div>
+
+    <div id="container-3d">
+      <a-scene ar-config renderer="alpha: true; antialias: true; stencil: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable">
+        <a-assets></a-assets>
+      </a-scene>
+    </div>
+
+    <script type="module" src="teste/shader-app.js"></script>
+  </body>
+</html>
