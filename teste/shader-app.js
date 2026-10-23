@@ -38,6 +38,11 @@ function doorData(index, door) {
 const engine = createEngine({ fps });
 window.testeEngine = engine;
 
+function renderRatio() {
+  const scene = document.querySelector('a-scene');
+  return scene && scene.renderer ? scene.renderer.getPixelRatio() : null;
+}
+
 function deviceInfo() {
   const gl = document.createElement('canvas').getContext('webgl');
   const ext = gl && gl.getExtension('WEBGL_debug_renderer_info');
@@ -48,7 +53,9 @@ function deviceInfo() {
     gpu: ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : 'desconhecida',
     camera: video && video.videoWidth ? 'ligada' : 'desligada',
     resolucaoCamera: video && video.videoWidth ? video.videoWidth + '×' + video.videoHeight : null,
-    tipoFundo: 'shader'
+    tipoFundo: 'shader',
+    pixelRatioAplicado: renderRatio(),
+    antialias: params.get('aa') !== '0'
   };
 }
 
@@ -68,7 +75,7 @@ function setupHud() {
   setInterval(() => {
     const c = engine.current;
     hud.textContent = 'modo ' + c.mode + ' | fps ' + c.fps.toFixed(0) + ' | p95 ' + c.p95.toFixed(1) + ' ms | animados ' +
-      c.animated + '/' + c.visible + ' visíveis | desenho ' + c.drawMs.toFixed(1) + ' ms | dim ' + state.activeDimension;
+      c.animated + '/' + c.visible + ' visíveis | desenho ' + c.drawMs.toFixed(1) + ' ms | pr ' + renderRatio() + ' | aa ' + (params.get('aa') !== '0' ? 'on' : 'off');
   }, 500);
 }
 
@@ -81,6 +88,13 @@ async function start() {
   setNavigation(false);
   const parent = document.querySelector('a-scene');
   if (!parent.hasLoaded) await new Promise((resolve) => parent.addEventListener('loaded', resolve, { once: true }));
+
+  // ?pr= fixa o pixelRatio (padrão: o do aparelho, como a exposição); ?aa=0 desliga o antialias
+  const requestedRatio = Number(params.get('pr'));
+  if (requestedRatio > 0) {
+    parent.renderer.setPixelRatio(requestedRatio);
+    parent.resize();
+  }
 
   createPlayerCamera({ position: [0, 1.6, 0], speed: 0.1 }, parent);
   useRealCamera(true);

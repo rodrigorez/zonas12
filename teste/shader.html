@@ -41,9 +41,11 @@
     </div>
 
     <div id="container-3d">
-      <a-scene ar-config renderer="alpha: true; antialias: true; stencil: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable">
-        <a-assets></a-assets>
-      </a-scene>
+      <!-- O antialias é decidido na criação do contexto WebGL, por isso a tag é escrita aqui, já com ?aa=0 ou ?aa=1 -->
+      <script>
+        var aa = new URLSearchParams(location.search).get('aa') !== '0';
+        document.write('<a-scene ar-config renderer="alpha: true; antialias: ' + aa + '; stencil: true;" cursor="rayOrigin: mouse" raycaster="objects: .interactable"><a-assets></a-assets></a-scene>');
+      </script>
     </div>
 
     <script type="module" src="teste/shader-app.js"></script>
