@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <base href="../" />
+    <title>Medição: imagem estática x p5.js</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
+    <script src="teste/bench.js" defer></script>
+    <style>
+      #painel {
+        position: fixed; z-index: 10000; left: 0; right: 0; bottom: 0;
+        max-height: 40%; overflow: auto; box-sizing: border-box;
+        padding: 12px; background: rgba(0, 0, 0, 0.82); color: #fff;
+        font: 14px/1.45 sans-serif; touch-action: pan-y;
+      }
+      #painel button {
+        margin: 0 6px 8px 0; padding: 10px 14px; border: 1px solid #fff; border-radius: 6px;
+        background: transparent; color: #fff; font: inherit; font-weight: bold;
+      }
+      #painel button:disabled { opacity: 0.4; }
+      #estado { margin: 0 0 8px; font-weight: bold; }
+      #painel table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+      #painel th, #painel td { padding: 4px 6px; border-bottom: 1px solid #555; text-align: right; white-space: nowrap; }
+      #painel th:first-child, #painel td:first-child { text-align: left; white-space: normal; }
+      #resultado-texto { width: 100%; height: 90px; box-sizing: border-box; font: 11px monospace; }
+    </style>
+  </head>
+  <body>
+    <div id="container-video">
+      <video id="webcam-video" autoplay playsinline muted aria-hidden="true"></video>
+    </div>
+    <div id="container-3d">
+      <a-scene renderer="alpha: true; antialias: true; stencil: true;" vr-mode-ui="enabled: false" embedded>
+        <a-entity position="0 1.6 0"><a-camera look-controls wasd-controls="enabled: false"></a-camera></a-entity>
+      </a-scene>
+    </div>
+    <div id="painel">
+      <p id="estado">Pronto. Ligue a câmera (opcional) e inicie o teste.</p>
+      <button id="btn-camera">Ligar câmera</button>
+      <button id="btn-iniciar-teste">Iniciar teste</button>
+      <button id="btn-copiar" disabled>Copiar resultados</button>
+      <table id="tabela" hidden>
+        <thead><tr><th>Cenário</th><th>FPS</th><th>ms médio</th><th>ms p95</th><th>ms máx</th><th>% lentos</th><th>desenho p5 (ms)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <textarea id="resultado-texto" readonly hidden></textarea>
+    </div>
+  </body>
+</html>
