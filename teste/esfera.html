@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <base href="../" />
+    <title>Teste de fundo esférico com p5.js</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
+    <script src="teste/panorama.js"></script>
+    <style>
+      #teste-info {
+        position: fixed;
+        z-index: 10000;
+        top: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: calc(100% - 32px);
+        padding: 10px 16px;
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.65);
+        color: white;
+        font: 14px/1.4 sans-serif;
+        text-align: center;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="sr-only">Teste de fundo esférico gerado com p5.js</h1>
+    <div id="teste-info" role="status" aria-live="polite">Preparando o panorama p5.js…</div>
+    <div id="container-3d">
+      <a-scene
+        renderer="alpha: true; antialias: true; stencil: true;"
+        vr-mode-ui="enabled: false"
+        embedded
+      >
+        <a-entity id="panorama-p5" p5-panorama></a-entity>
+        <a-entity position="0 1.6 0">
+          <a-camera look-controls wasd-controls="acceleration: 30"></a-camera>
+        </a-entity>
+      </a-scene>
+    </div>
+  </body>
+</html>
