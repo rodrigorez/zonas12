@@ -74,9 +74,10 @@ export function createEngine({ fps = 30, resolution = null } = {}) {
     if (stats.p95 > LIMITS.p95Bad) {
       badWindows++;
       goodWindows = 0;
-      if (badWindows < 2 || ratio <= r.min + 0.001) return false;
+      const severe = stats.p95 > LIMITS.p95Bad * 1.6;
+      if ((badWindows < 2 && !severe) || ratio <= r.min + 0.001) return false;
       const excess = Math.min(1, (stats.p95 - LIMITS.p95Bad) / LIMITS.p95Bad);
-      const next = Math.max(r.min, ratio * (1 - (0.05 + 0.10 * excess)));
+      const next = Math.max(r.min, ratio * (1 - (0.08 + 0.17 * excess)));
       badAt = ratio;
       badWindows = 0;
       apply(next, now, stats, 'desceu pr');
