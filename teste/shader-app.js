@@ -146,6 +146,7 @@ async function start() {
   setActiveDimension(0);
   startFrameDriver();
   if (auto) startSession({ arrival: true });
+  document.getElementById('btn-iniciar').addEventListener('click', () => startSession());
   setupHud();
   engine.start();
 }

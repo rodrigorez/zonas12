@@ -1,4 +1,4 @@
-// Arranque do ambiente de teste: a mesma arquitetura da exposição (câmera real atrás, cena com
+﻿// Arranque do ambiente de teste: a mesma arquitetura da exposição (câmera real atrás, cena com
 // stencil, portais entre dimensões), mas com 5 fundos esféricos desenhados pelo p5.js e um motor
 // que decide sozinho quantos deles animar.
 //
@@ -93,6 +93,7 @@ async function start() {
   setActiveDimension(0);
   startFrameDriver();
   if (auto) startSession({ arrival: true });
+  document.getElementById('btn-iniciar').addEventListener('click', () => startSession());
   setupHud();
   engine.start();
 }
