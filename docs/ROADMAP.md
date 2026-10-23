@@ -3704,6 +3704,77 @@ da chegada no céu) e um teste que ficou por re-medir por não haver mudança qu
 como instrumento. **R13 nasceu do plano da Fase 4** (§9), medido **antes** de mexer em código: os
 módulos **não** carregam numa página sem a UI da exposição.
 
+### R14 — Fundos esféricos procedurais e governor de resolução (ensaio, 2026-10-23)
+
+O ensaio em `teste/` compara a arquitetura existente de panoramas com fundos gerados por shader
+GLSL. É **protótipo de medição**, não integração de produção: `data/worlds/*.json` continua a
+declarar fundos de imagem, e `js/modules/dimension.js` continua a usar `dimension-panorama`.
+O resumo de implementação, tamanhos e medições também está no README, em «Fundos esféricos: imagem
+e shader».
+
+**Formato e orçamento de imagem**
+
+- O panorama equiretangular deve manter a proporção **2:1** (lei L14). Os arquivos atuais medidos
+  são: céu `480 × 240`, **18,6 KiB**; praia `1024 × 512`, **620,5 KiB**; cidade `2048 × 1024`,
+  **528,1 KiB**.
+- O peso do JPEG/WebP é o peso de transferência, não a memória da textura descodificada: em RGBA,
+  estimar aproximadamente **2 MiB** para `1024 × 512` e **8 MiB** para `2048 × 1024`, sem overhead
+  do driver/renderer; contar também quantas dimensões ficam carregadas.
+- Para novos panoramas, usar **`1024 × 512` como ponto de partida para celular** e passar a
+  `2048 × 1024` se o detalhe realmente justificar. Não adotar `4096 × 2048` como padrão móvel sem
+  nova medição.
+- Orçamentos de compressão sugeridos, não limites rígidos: até **500 KiB** para `1024 × 512` e até
+  **1,5 MiB** para `2048 × 1024`, em JPEG/WebP após inspeção visual. O peso é dependente do conteúdo;
+  os valores encontrados nos assets existentes mostram que dimensões, sozinhas, não predizem bytes.
+- A produção usa `THREE.LinearFilter` e `generateMipmaps = false` em `js/modules/dimension.js`;
+  manter a decisão coerente com esse material e conferir a imagem no dispositivo antes de mudar.
+
+**Shader: saída e limites medidos**
+
+Shader não usa uma imagem panorâmica 2:1: calcula a cor dos pixels no renderer, cuja saída segue a
+área da tela multiplicada pelo pixelRatio aplicado. Não há dimensão de textura fixa recomendada; o
+custo cresce aproximadamente com o quadrado do pixelRatio e também depende do shader, da câmera e
+da sobreposição/stencil. O protótipo limita o pixelRatio ao intervalo **[1, DPR nativo]**, começa na
+memória aprendida ou no DPR nativo e guarda o estado por GPU + dimensões de tela durante **30 dias**.
+
+Parâmetros atuais em `teste/engine.js`: aquecimento de **3 s**, estatística de p95 numa janela de
+**2,5 s**, decisão a cada **3 s**, avanço com p95 **≤ 20 ms**, desempenho ruim acima de **25 ms**,
+passo de descida de **8%–25%** (p95 > **40 ms** pode causar descida após uma janela; caso contrário,
+duas janelas ruins), subida de **5%** após três janelas boas, limitada a **95%** de `badAt`; no
+pixelRatio mínimo, o governor recua as animações. `drawMax: 6 ms` é o limite do desenho CPU de p5.js
+e não deve ser interpretado como limite do shader.
+
+**Resultados de aparelhos (medidos em outubro de 2026)**
+
+| Dispositivo | Imagem / shader | Resultado |
+| --- | --- | --- |
+| PowerVR GE8320, `411 × 748`, DPR `2,625`, câmera 720p, antialias ligado | Shader, primeira visita | Partiu de `2,625`; o p95 chegou a `49,6 ms`. O governor baixou para `2,051` em ~12 s; depois manteve cinco fundos animados perto de 59–60 fps, p95 `16,6 ms`. |
+| PowerVR GE8320 | Shader, com memória na visita seguinte | Começou em `1,711`, chegou a `1,879`; p95 `16,6 ms` na maioria das amostras e picos curtos de `33 ms` em transições. |
+| Adreno 630, `411 × 804`, DPR `2,625`, câmera ligada, antialias ligado | Shader | Manteve DPR nativo `2,625`, cinco fundos, ~60 fps e p95 `16,7 ms`. |
+| PowerVR GE8320 | p5.js animado, ensaio anterior | Aproximadamente 4–7 fps; canvas e upload de textura por quadro foram o gargalo observado. |
+
+Os valores do shader são **p95 de quadro da cena inteira**, não tempo isolado da GPU. `desenhoMs: 0`
+quer dizer que o protótipo não mede desenho p5.js nesses fundos; não é custo GPU zero. O benchmark
+`teste/bench.js` inclui imagem estática e p5.js, mas ainda não tem shader como cenário A/B; as
+medições acima foram feitas em execuções/aparelhos reais e não são uma comparação controlada na
+mesma sessão. Portanto, a conclusão limitada é que, neste cenário, GLSL animado funcionou muito
+melhor que p5.js no aparelho fraco e que o Adreno sustentou DPR nativo; não se conclui que qualquer
+shader será sempre mais rápido que qualquer imagem estática.
+
+**Comparativo controlado preparado:** `teste/shader/index01.htm`, `teste/img/index01.htm` e
+`teste/p5js.htm` partilham esfera, geometria, visual de referência 2:1 de `1024 × 512`, renderer,
+camera fixa, antialias/pixelRatio configuráveis e protocolo de 3 × (5 s aquecimento + 15 s medição).
+Há cenário estático para comparação direta e cenário animado, no qual imagem fica como linha de
+base. Os logs incluem hora, URL, identificação do aparelho, GPU e características que o browser
+expõe. As instruções completas estão no README, § «Comparativo controlado».
+
+**Para fechar R14 antes da produção:** executar as páginas nos três celulares, guardar os JSONs e
+comparar as três repetições de cada modo. Repetir com a mesma câmera, pixelRatio e antialias; a
+ordem entre tecnologias deve alternar para reduzir o efeito de aquecimento. O benchmark mede o
+tempo do quadro total e o desenho CPU p5.js, não tempo GPU isolado. Só depois de revisar os
+resultados e os orçamentos de imagem/shader decidir se o modelo de produção aceitará dimensões
+`kind: "shader"` e como o editor as configurará.
+
 **R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
 apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o
 «Correções incluídas» da Fase 2 (§9), e o «Próximo passo» (§13). Passaram a apontar o estado

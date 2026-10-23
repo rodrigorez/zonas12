@@ -305,6 +305,132 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 7. O raio do panorama de uma dimensão tem de ser maior do que a distância a qualquer
    portal (`radius: 500` em `data/worlds/<mundo>.json`); sem isso o fundo aparece dentro da janela.
 
+### Fundos esféricos: imagem e shader (ensaio em `teste/`)
+
+O fundo 360º de produção continua a ser uma imagem (`dimension-panorama`, `kind: "image"`). A
+alternativa por código foi testada separadamente em [`teste/shader.html`](teste/shader.html), com
+cinco fundos GLSL, câmera real, portais com stencil e ajuste automático do pixelRatio. O protótipo
+não altera ainda o formato das cenas de produção.
+
+#### Formato e tamanho das imagens
+
+- O panorama é equiretangular, com proporção **2:1**; a validação do projeto recusa dimensões que
+  não respeitem essa proporção.
+- Resoluções encontradas no catálogo atual: `480 × 240` (céu, **18,6 KiB**),
+  `1024 × 512` (praia, **620,5 KiB**) e `2048 × 1024` (cidade, **528,1 KiB**). Os tamanhos em
+  bytes variam com o conteúdo e a compressão; não se deve inferir qualidade apenas pelo peso.
+- O arquivo comprimido não representa toda a memória de renderização: uma textura RGBA expandida
+  ocupa aproximadamente **2 MiB** em `1024 × 512` e **8 MiB** em `2048 × 1024` (estimativa de
+  `largura × altura × 4`, sem contar overhead do driver/renderer). Para várias esferas, considerar
+  também o número de dimensões mantidas carregadas.
+- **Ponto de partida recomendado para novos panoramas: `1024 × 512`**, JPEG ou WebP, com qualidade
+  visual verificada no headset/celular. Subir para `2048 × 1024` quando o detalhe visível justificar
+  o aumento de memória e transferência. `4096 × 2048` não foi testado nesta exposição e não é o
+  padrão recomendado para celular.
+- Como orçamento inicial, procurar ficar até **500 KiB** em `1024 × 512` e até **1,5 MiB** em
+  `2048 × 1024`; são metas de compressão, não limites do validador. Se a imagem apresentar blocos,
+  banding ou perda de detalhe, priorizar qualidade visual e medir o carregamento real.
+- A produção configura `THREE.LinearFilter` e desativa mipmaps em
+  `js/modules/dimension.js`; manter isso consistente ao trocar ou otimizar a textura e validar a
+  qualidade visual antes de alterar o filtro.
+
+#### Resolução e tamanho dos shaders
+
+Um shader não precisa de arquivo panorâmico nem de uma textura equiretangular de 2:1: o fragment
+shader calcula a cor por pixel na esfera, em tempo de renderização. O custo depende da quantidade
+de pixels do framebuffer (que cresce aproximadamente com o quadrado do pixelRatio), da complexidade
+do shader, da câmera e da sobreposição das janelas/objetos. Portanto, sua resolução de saída é a do
+renderer — tela × pixelRatio aplicado —, não uma resolução fixa como `1024 × 512`.
+
+No teste, o pixelRatio automático fica entre **1** e o `devicePixelRatio` reportado pelo aparelho.
+Começa na memória do dispositivo (se disponível) ou no máximo nativo. O limite aprendido é guardado
+por GPU e dimensões da tela por **30 dias**. O parâmetro `?memoria=0` ignora a memória apenas para
+ensaios; `?pr=1.5` fixa o valor, `?adapt=0` desliga o ajuste e `?aa=0` desliga antialias antes da
+criação do renderer.
+
+| Regra do protótipo | Valor |
+| --- | ---: |
+| p95 considerado bom para avançar | ≤ 20 ms |
+| p95 considerado ruim | > 25 ms |
+| Aquecimento inicial | 3 s |
+| Janela para estatística de quadros | 2,5 s |
+| Intervalo entre decisões | 3 s |
+| Descida do pixelRatio | 8%–25%; p95 > 40 ms pode recuar após uma janela, senão exige duas ruins |
+| Subida do pixelRatio | +5% após 3 janelas boas, limitada a 95% do último valor que deu problema |
+| Desenho por fundo para o governor p5.js | máximo de 6 ms |
+| Piso do pixelRatio | 1 |
+| Teto do pixelRatio | pixelRatio nativo do aparelho |
+
+Quando o pixelRatio chega a 1, o governor passa a reduzir o número de fundos animados. Em modo
+automático, ele ativa fundos visíveis um a um; os modos de teste `estatico` e `tudo` servem para
+comparação, não são a política da exposição. O limite `drawMax: 6 ms` é relevante para a variante
+p5.js: não mede o custo interno de GPU do shader.
+
+#### Comparação observada de desempenho
+
+| Aparelho e cenário | Resultado observado |
+| --- | --- |
+| Fraco — PowerVR Rogue GE8320, `411 × 748`, DPR nativo `2,625`, câmera 720p, antialias ligado, shader | Começou em `2,625`, com amostras iniciais de **34–44 fps** e p95 de **33–50 ms**. O ajuste chegou a `2,051` em cerca de 12 s; depois, com cinco fundos animados, ficou em aproximadamente **59–60 fps** e p95 de **16,6 ms**. |
+| Mesmo aparelho, visita seguinte com memória | Começou em `1,711` (valor previamente aprendido), chegou a `1,879` e manteve p95 de **16,6 ms** na maioria das amostras, com picos curtos de **33 ms** em mudanças de estado/resolução. |
+| Médio — Adreno 630, `411 × 804`, DPR nativo `2,625`, câmera ligada, antialias ligado, shader | Manteve o pixelRatio nativo **2,625**, com cinco fundos animados, cerca de **60 fps** e p95 de **16,7 ms** (uma amostra inicial de 55,7 fps durante o carregamento). |
+| Fraco, panorama p5.js animado | Em ensaios anteriores, aproximadamente **4–7 fps**; a geração em canvas e a atualização da textura acrescentavam custo de CPU e transferência para a GPU. |
+
+**Como interpretar os tempos:** os resultados de shader são tempos de quadro da cena inteira, não uma
+medição isolada do tempo de execução da GPU. O campo `desenhoMs: 0` dos shaders significa que não
+há desenho p5.js medido no CPU; **não** significa que o shader custe zero. Imagens estáticas não
+redesenham nem transferem uma nova textura a cada quadro, enquanto shaders calculam os pixels na
+GPU durante a renderização. O instrumento [`teste/bench.js`](teste/bench.js) compara imagem estática
+com p5.js, mas não inclui um cenário shader equivalente; por isso, os números acima são evidência
+prática em aparelhos reais, não um A/B controlado imagem × shader na mesma sessão.
+
+**Decisão atual:** manter imagens como opção de produção e shaders como alternativa para fundos
+procedurais/animados. A medição indica que shaders GLSL são muito mais adequados que p5.js para
+animação neste caso, mas não prova que todo shader será mais rápido que toda imagem: a complexidade
+do shader e a resolução continuam a importar. Antes de integrar em produção, adicionar uma
+comparação controlada imagem × shader no mesmo aparelho, cena, câmera, pixelRatio e duração, e
+validar a qualidade visual nas resoluções recomendadas.
+
+#### Comparativo controlado: imagem, shader e p5.js
+
+As páginas da bateria comum são:
+
+- [`teste/shader/index01.htm`](teste/shader/index01.htm)
+- [`teste/img/index01.htm`](teste/img/index01.htm)
+- [`teste/p5js.htm`](teste/p5js.htm)
+
+Todas usam uma esfera 360º de raio 500 com geometria 64 × 48, uma cena A-Frame transparente,
+renderer com stencil, câmera fixa, visual sintético de pôr do sol, resolução de conteúdo
+`1024 × 512`, filtragem linear sem mipmaps e o mesmo pixelRatio explícito (por padrão, o DPR nativo;
+`?pr=1.5` fixa o mesmo valor em cada página). O antialias também é comum e fica ligado por padrão;
+`?aa=0` desliga-o em todas. Não há governor adaptativo nesta bateria: ele poderia escolher valores
+diferentes em cada tecnologia e invalidar a comparação. A imagem é um JPEG RGB de **108 476 bytes**;
+após descodificação, a textura WebGL usa RGBA. p5.js desenha no canvas RGBA `1024 × 512` e atualiza
+a textura a 30 fps. O shader não usa textura de panorama e atualiza `uTime` a 30 fps. O conteúdo
+visual é equivalente em tema e paleta, não uma comparação pixel a pixel.
+
+Cada botão executa **3 repetições**; cada repetição aquece por **5 s** e mede **15 s**. Há dois modos:
+estático (comparação direta das três formas) e animado (shader/p5.js animam; a imagem permanece
+estática como linha de base). Para cada celular:
+
+1. Use a mesma versão/URL base e o mesmo `?pr=` e `?aa=` nas três páginas.
+2. Informe uma identificação curta, por exemplo `V3 GE8320`; ligue ou desligue a câmera e mantenha
+   essa condição em todos os testes. HTTPS é necessário para a câmera em hospedagem remota.
+3. Faça as três repetições do modo **estático** em cada tecnologia; depois repita no modo **animado**.
+   Mantenha a página visível, não caminhe, não mude de app e evite tocar na tela durante a medição.
+4. Copie o JSON ou baixe o arquivo. O log inclui URL completa, hora local/UTC de início e fim,
+   navegador, modelo reportado quando disponível, GPU, núcleos, memória aproximada, dimensões de
+   tela, DPR, pixelRatio aplicado, antialias e dados da câmera. O navegador pode ocultar modelo/GPU;
+   o campo de identificação manual é o rótulo confiável do aparelho.
+5. Compare mediana e dispersão das três repetições; anote quedas térmicas/bateria e não misture
+   rodadas com câmera, resolução ou pixelRatio diferentes.
+
+O benchmark mede FPS, quadro médio, p95, máximo e percentagem de quadros acima de 33,4 ms. Também
+regista preparação/compilação de materiais, bytes e dimensões da imagem e o tempo CPU de p5.js.
+Não mede tempo GPU isolado: `p95` inclui renderer, câmera e composição. Os parâmetros de URL não controlam Android/Chrome, carga térmica, brilho ou
+política de energia; por isso, alternar a ordem dos três testes entre aparelhos ajuda a reduzir
+viés. Uma rodada leva aproximadamente **1 minuto por página e modo**, contando aquecimento e três
+repetições (cerca de 6 minutos por celular para as três tecnologias nos dois modos).
+
 ### Verificado nesta versão (medido no browser)
 
 Medido a **2026-10-22**, com **a cache desligada** (medir com uma versão antiga em cache é medir o

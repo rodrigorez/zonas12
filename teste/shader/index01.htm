@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <base href="../../">
+    <title>Comparativo de fundo 360º — shader</title>
+    <link rel="stylesheet" href="teste/comparativo.css">
+    <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+  </head>
+  <body data-tech="shader">
+    <div id="container-video"><video id="camera" autoplay playsinline muted></video></div>
+    <div id="container-3d">
+      <script>
+        const aa = new URLSearchParams(location.search).get('aa') !== '0';
+        document.write('<a-scene embedded vr-mode-ui="enabled: false" renderer="alpha: true; antialias: ' +
+          aa + '; stencil: true;"><a-entity position="0 1.6 0"><a-camera look-controls="enabled: false"></a-camera></a-entity></a-scene>');
+      </script>
+    </div>
+    <section id="panel">
+      <h1>Comparativo 360º — <span id="tech"></span></h1>
+      <p>Ensaios com o mesmo renderizador, esfera, visual de pôr do sol e pixelRatio fixo. Não caminhe nem altere a orientação durante as medições.</p>
+      <p><a href="teste/shader/index01.htm">Shader</a> · <a href="teste/img/index01.htm">Imagem</a> · <a href="teste/p5js.htm">p5.js</a></p>
+      <label>Aparelho / identificação <input id="device-label" placeholder="ex.: V3 - celular fraco"></label>
+      <button id="camera-button">Ligar câmera</button>
+      <button id="run-static" disabled>Medir fundo estático × 3</button>
+      <button id="run-animated" disabled>Medir modo animado × 3</button>
+      <button id="copy" disabled>Copiar log</button>
+      <button id="save">Baixar JSON</button>
+      <p class="note">Imagem: no teste animado permanece estática e funciona como controle de base. Cada repetição aquece 5 s e mede 15 s. Câmera opcional: mantenha ligada ou desligada nos três endereços.</p>
+      <p id="status" role="status">Carregando cenário…</p>
+      <p id="page-url"></p>
+      <textarea id="log" readonly aria-label="Resultados JSON"></textarea>
+    </section>
+    <script type="module" src="teste/comparativo.js?v=1"></script>
+  </body>
+</html>
