@@ -197,15 +197,15 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.8)
+## Estado atual do código (v0.0.9)
 
-Marcado pela branch `v0.0.8`. É o estado depois da **Fase 4** do roadmap — a **página de edição**
+Marcado pela branch `v0.0.9`. É o estado depois da **Fase 4** do roadmap — a **página de edição**
 (`editor.html`) e a **travessia entre mundos**, ambas fechadas bloco a bloco com o que cada um
 entregou e mediu em [docs/ROADMAP.md](docs/ROADMAP.md) §9. Tudo o que está nesta secção foi medido a
 **2026-10-22** na versão local (as baterias estão em §10) e, no mesmo dia, **na publicada** — as
 verificações no browser contra o que o GitHub Pages serve (abaixo); fica **por testar pelo autor** no
 **telemóvel**, que é como as versões anteriores foram dadas por fechadas. A versão anterior é a
-`v0.0.7` (o estado depois da Fase 4), marcada pela branch com o mesmo nome.
+`v0.0.8` (o fecho da Fase 4, com os retratos ainda a 4096 nas duas portas mais difíceis), marcada pela branch com o mesmo nome.
 
 Resumo do que existe hoje: `index.html` (**93 linhas**) e as **3** salas com o **mesmo** ficheiro
 (`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `editor.html` (**83**),
@@ -330,6 +330,14 @@ não altera ainda o formato das cenas de produção.
 - Como orçamento inicial, procurar ficar até **500 KiB** em `1024 × 512` e até **1,5 MiB** em
   `2048 × 1024`; são metas de compressão, não limites do validador. Se a imagem apresentar blocos,
   banding ou perda de detalhe, priorizar qualidade visual e medir o carregamento real.
+- **Os retratos das portas são a exceção medida (D47).** Um retrato não é um panorama: é a **vista da
+  chegada** desenhada pela exposição (D46), e o que ele tem de mostrar é a obra nítida lá dentro. A
+  `2048 × 1024` a costura no corte ficava em **0,54** — acima da meta de **0,50** —, e a
+  `3072 × 1536` fica em **0,17 a 0,41**. São **6** ficheiros, **2,0 MB** no total, **18 MiB** de
+  textura cada: a praia carrega **38 MiB** (dois retratos e o panorama) e o portão **36 MiB**. É por
+  isso que o `validate.mjs` avisa **5** vezes da **L14** e o editor **1 a 2 vezes por mundo** — a lei
+  a fazer o seu trabalho, com a excepção registada e não silenciada. Quando o fundo passar a ser um
+  shader, o retrato deixa de ter de carregar o céu e o mar e pode descer de resolução.
 - A produção configura `THREE.LinearFilter` e desativa mipmaps em
   `js/modules/dimension.js`; manter isso consistente ao trocar ou otimizar a textura e validar a
   qualidade visual antes de alterar o filtro.
@@ -389,6 +397,77 @@ animação neste caso, mas não prova que todo shader será mais rápido que tod
 do shader e a resolução continuam a importar. Antes de integrar em produção, adicionar uma
 comparação controlada imagem × shader no mesmo aparelho, cena, câmera, pixelRatio e duração, e
 validar a qualidade visual nas resoluções recomendadas.
+
+#### Política proposta para fundo shader em produção (a validar)
+
+A política não está implementada na exposição. A integração deve ser gradual e manter o panorama
+de imagem como fallback explícito de cada fundo. O shader começa num quadro estático (`uTime`
+fixo), mede a cena e só então tenta animar; “estático” significa congelar a saída do shader, não
+renderizar uma cena sem fundo.
+
+| Estado | Política proposta |
+| --- | --- |
+| Inicialização | Carregar/compilar o shader e preparar a imagem fallback. Renderizar um quadro estático e recolher uma linha de base antes de animar. |
+| Animação normal | Tentar no máximo **20 atualizações/renderizações por segundo** (intervalo-alvo de 50 ms). Não executar a animação em cadência maior. |
+| Sobrecarga persistente | Reduzir primeiro o pixelRatio em passos limitados, mantendo o teto no DPR nativo e o piso inicial em `1`; reavaliar após cada alteração. |
+| Ainda sobrecarregado | Reduzir para **15 FPS** (intervalo-alvo de 66,7 ms), sem descer a uma cadência menor. |
+| Ainda instável | Parar a animação e manter o último quadro shader estável; se o shader falhar, mostrar a imagem fallback. |
+
+Os 20/15 FPS e o piso 1 são **valores iniciais de ensaio**, não garantias de fluidez nem limites já
+aprovados para todos os aparelhos. No protótipo anterior, reduzir o pixelRatio no PowerVR GE8320
+coincidiu com melhora de p95; isso justifica testar a redução antes de baixar a cadência, mas não
+prova causalidade nem qualidade visual aceitável em qualquer cena. Não subir automaticamente acima
+de 20 FPS. Uma eventual recuperação de resolução deve ser gradual, após várias janelas estáveis,
+com teto no último valor conhecido como problemático; guardar uma estimativa local não deve ser
+requisito para funcionar.
+
+**Medição correta:** distinguir a cadência-alvo da perda de desempenho. Um intervalo de 50 ms é
+esperado a 20 FPS e não deve, sozinho, ser contado como quadro perdido. Medir atualizações entregues,
+atrasos em relação ao prazo configurado e janelas consecutivas fora do orçamento. O custo do shader
+não pode ser inferido do `drawMs` de p5.js. A validação deve incluir carregamento, compilação,
+transições, sobreposição de portais, câmera ligada/desligada e aparelhos fracos; comparar também
+com o modo estático sob as mesmas condições. Se o runtime não permitir medir de forma fiável a
+entrega do quadro, registar essa limitação em vez de apresentar a cadência solicitada como FPS real.
+
+**Configuração segura a considerar** (proposta de esquema; não é o formato de cena atual):
+
+```json
+{
+  "kind": "shader",
+  "shaderId": "por-do-sol",
+  "fallbackAsset": "por-do-sol-1024x512.jpg",
+  "animation": {
+    "enabled": true,
+    "targetFps": 20,
+    "fallbackFps": 15
+  },
+  "quality": {
+    "minPixelRatio": 1,
+    "maxPixelRatio": "device"
+  }
+}
+```
+
+O projeto deve resolver `shaderId` por uma lista interna conhecida; não aceitar GLSL, URLs,
+expressões ou código fornecidos por cenas/conteúdo. Validar enumerações, tipos e faixas numéricas
+na fronteira de carregamento, rejeitar configuração inválida com erro visível e preservar o fundo
+de imagem válido como fallback. O asset fallback deve ser validado/carregado antes de substituir
+o fundo existente. Capturar falhas de compilação, perda do contexto WebGL e erros de configuração
+para trocar para o fallback e registrar diagnóstico; não ocultar a falha com um fundo vazio.
+
+Respeitar `prefers-reduced-motion` iniciando e permanecendo estático, suspender trabalho quando a
+página/documento estiver oculto e retomar em estado estático antes de reavaliar. Limitar o pixelRatio
+ao intervalo validado `[1, DPR nativo]`, não elevar resolução para além do valor solicitado pelo
+aparelho, evitar alocações por quadro e validar a qualidade visual em cada degrau de resolução.
+Qualquer memória adaptativa local deve ser validada, expirar, ser apenas uma sugestão inicial e nunca
+impedir o fallback ou a inicialização.
+
+**Critério antes de produção:** implementar primeiro atrás de uma opção/feature flag e numa página
+de teste; validar em aparelhos reais que a animação não ultrapassa 20 FPS, que a queda para 15 FPS e
+o congelamento ocorrem só após degradação persistente, que o retorno estático/fallback funciona e
+que imagem, shader e p5.js foram comparados com a mesma câmera, pixelRatio, cena e ordem alternada.
+Até esses testes passarem, manter `kind: "image"` como padrão de produção e não alterar os dados
+atuais das dimensões.
 
 #### Comparativo controlado: imagem, shader e p5.js
 
@@ -456,13 +535,19 @@ transição, a travessia e o retrato das portas (D37 a D47) — têm baterias pr
 ser acreditado, não medido.
 
 **A travessia — o salto no corte, nas 6 portas com retrato** (`tools/regression/seam.mjs`, meta
-**0,50**, e a referência é que um passo a caminhar muda a imagem em ~0,9): gate 0 **0,37**, gate 1
-**0,38**, cidade 3 **0,37**, praia 4 **0,40**, praia 6 **0,21**, céu 7 **0,36** — **12 de 12**
+**0,50**, e a referência é que um passo a caminhar muda a imagem em ~0,9): gate 0 **0,31**, gate 1
+**0,32**, cidade 3 **0,30**, praia 4 **0,41**, praia 6 **0,17**, céu 7 **0,39** — **12 de 12**
 verificações, contra **5 de 12** com a geometria anterior (0,70 a 1,49). Os três instrumentos que
 dizem **porque** está certo também ficaram no repositório: o conversor do retrato volta do cubo com
 **0,39** de diferença e deslocamento **0** (`ida-e-volta.mjs`), a ponte a mostrar o mesmo conteúdo
 custa **0,00** (`piso-ponte.mjs`) e a ponte e a chegada estão sobrepostas a **dx=0, dy=0**
 (`desalinhamento.mjs`).
+
+**A aceitação numa só bateria** (`tools/regression/twelve-tests.mjs`, novo): as cinco páginas, cada
+uma com os seis grupos de testes que correm sem interação — **35 de 35** verificações. Sem ele, os
+doze testes só se mediam a partir de um script de sessão, e a aceitação da fase não era reproduzível
+por quem chegasse depois; a sonda `acceptance.mjs` continua a ser o que corre **dentro** da página, e
+o runner é o que a vai lá buscar.
 
 **A exposição — os doze testes, nas 5 páginas**
 
@@ -493,10 +578,10 @@ custa **0,00** (`piso-ponte.mjs`) e a ponte e a chegada estão sobrepostas a **d
 a que não passa é a que exige «Avisos: 0» num mundo, e o aviso que lá está é o da **L14** sobre o
 retrato maior do **D47** (explicado no ponto seguinte), não um erro
 
-- Os **5** mundos validam com `Erros: 0 · Avisos: 5 · Por verificar: 0` — a **L9** e a **L14**
-  deixaram de ser «não verificadas» no browser (o asset existe; a imagem mede 2:1). Os **5 avisos**
+- Os **5** mundos validam com `Erros: 0 · Avisos: 6 · Por verificar: 0` — a **L9** e a **L14**
+  deixaram de ser «não verificadas» no browser (o asset existe; a imagem mede 2:1). Os **6 avisos**
   são a **L14** a fazer o seu trabalho: desde o B20 os retratos das portas são maiores do que o
-  padrão de 2048×1024 (4 a 3072×1536 e 2 a 4096×2048) porque a 2048 o salto no corte ficava em
+  padrão de 2048×1024 (**3072×1536**, um por porta) porque a 2048 o salto no corte ficava em
   **0,54**, acima da meta — é uma excepção **medida** e registada no **D47**, não um defeito
 - **Importar→exportar** os 5 mundos sem tocar em nada: **0 diferenças**, byte a byte
 - Uma avaria injectada de cada vez: um asset que não existe acusa a **L9** e um retrato no lugar do
@@ -639,7 +724,7 @@ aponta para a raiz e os quatro são o mesmo ficheiro fora dessa linha — D28). 
 leis (L9–L19), os testes (T10–T12) e o estado de cada bloco estão em
 [docs/ROADMAP.md](docs/ROADMAP.md).
 
-**O que falta na fase:** nada — a fase fechou no B20, com a documentação e o marco `v0.0.8`.
+**O que falta na fase:** nada — a fase fechou no B20, com a documentação, o instrumento da aceitação e o marco `v0.0.9`.
 
 **A divisão decidida (D24)** são **quatro mundos**: o portão na raiz (`gate`, com a câmara/AR) e as
 salas `cidade`, `praia` e `ceu`, uma dimensão cada, com as **8 portas de hoje** a passarem a
@@ -660,7 +745,7 @@ ganhou o regresso ao portão (**D29**). A tabela de correspondência da migraç�
 
 > A fase correu **bloco a bloco** — de B0 (o plano) a B10 (esta documentação) — e cada bloco está em
 > [docs/ROADMAP.md](docs/ROADMAP.md) §9 com o que entregou e **mediu**; as decisões que a fecharam
-> (D30–D47) estão em §11. O marco é a branch `v0.0.8`.
+> (D30–D47) estão em §11. O marco é a branch `v0.0.9`.
 
 `editor.html` é uma **ferramenta**, não um mundo: não tem slug, não se publica, e a exposição não a
 conhece (a regra da D4, verificada dos dois lados — o editor importa o núcleo, os módulos e a cena, e

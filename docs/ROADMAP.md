@@ -1721,7 +1721,7 @@ T10/T12 pela varredura).
 
 ### Fase 4 — Página de edição
 
-**Estado: FECHADA em 2026-10-22 — B0 ao B20 entregues e medidos, marco na branch `v0.0.8`.** Como nas fases anteriores, o
+**Estado: FECHADA em 2026-10-23 — B0 ao B20 entregues e medidos, marco na branch `v0.0.9`.** Como nas fases anteriores, o
 plano foi escrito **depois** de medir o que existe e **antes** de mexer em código: a linha de base
 está verde (5 mundos, 12 portas, `validate.mjs` exit **0**), o que falta está na tabela abaixo,
 **três medições novas** mudaram o plano — uma delas acrescentou um bloco — e as sete decisões que
@@ -2718,42 +2718,51 @@ do destino lá dentro, e **um por porta**. A esfera onde ele é mostrado passa a
    qualidade do JPEG quase não conta (a 4096, 0,85 dá 0,39 e 0,75 dá 0,40) — quem manda é a
    resolução.
 
-**Medido nas seis portas, com o centro à altura dos olhos e a receita do D47** (4 retratos a
-3072×1536 e 2 a 4096×2048, todos q0,70 — os dois a 4096 são as portas onde 3072 não chegava à
-margem):
+**Medido nas seis portas, com o centro à altura dos olhos e um retrato por porta a 3072×1536 q0,70**
+(a resolução do **D47**, revista para 3072: ver abaixo):
 
 | porta | destino | antes (centro na porta) | depois | ficheiro |
 | --- | --- | --- | --- | --- |
-| gate 0 | cidade | 1,38 | **0,37** | `cidade-de-gate.jpg` |
-| gate 1 | praia | 0,91 | **0,38** | `praia-de-gate.jpg` |
-| cidade 3 | praia | 0,96 | **0,37** | `praia-de-cidade.jpg` |
-| praia 4 | cidade | 1,49 | **0,40** | `cidade-de-praia.jpg` (4096) |
-| praia 6 | céu | 0,70 | **0,21** | `ceu-de-praia.jpg` |
-| céu 7 | praia | 1,41 | **0,36** | `praia-de-ceu.jpg` (4096) |
+| gate 0 | cidade | 1,38 | **0,31** | `cidade-de-gate.jpg` |
+| gate 1 | praia | 0,91 | **0,32** | `praia-de-gate.jpg` |
+| cidade 3 | praia | 0,96 | **0,30** | `praia-de-cidade.jpg` |
+| praia 4 | cidade | 1,49 | **0,41** | `cidade-de-praia.jpg` |
+| praia 6 | céu | 0,70 | **0,17** | `ceu-de-praia.jpg` |
+| céu 7 | praia | 1,41 | **0,39** | `praia-de-ceu.jpg` |
 
 **12 de 12 verificações** (antes: 5 de 12, e uma porta com cinco fotogramas escuros). A meta de
-**0,50** fica cumprida com **0,10 de margem**; a referência de contexto é que um passo a caminhar
+**0,50** fica cumprida com **0,09 de margem**; a referência de contexto é que um passo a caminhar
 muda a imagem em ~0,9.
 
+**A resolução foi revista no fecho da fase (D47, emenda de 2026-10-23).** A primeira versão do bloco
+usava **4096×2048** nas duas portas onde 3072 não chegava à margem (praia 4 e praia 6), com o salto
+em 0,40. O ensaio de fundos procedurais que o autor fez em paralelo (**R14**) fixou um orçamento de
+imagem para telemóvel — `1024×512` como ponto de partida e **4096×2048 «não recomendado para móvel»
+sem nova medição** —, e o retrato a 4096 custa **32 MiB** de textura em vez de 18 MiB: num PowerVR
+GE8320 a página da praia ia a **52 MiB** de texturas. Ficou **3072×1536 nos seis**, medido de novo em
+duas passagens: **0,17 a 0,41** (o pior salto desceu de 0,41, com mais margem do que os 0,47 medidos
+no bloco), o repositório perdeu **~600 kB** e a praia perdeu **14 MiB** de textura.
+
 **O que mudou:** `js/scene/scene-builder.js` (o retrato nasce em `[x, altura do jogador, z]`, com a
-altura lida uma só vez do dado da câmara) e `tools/scene/portrait.mjs` (as constantes de tamanho, as
-duas excepções a 4096 e o modo `--todos` que desenha as seis). Nos dados mudaram **só os `path`**; os
+altura lida uma só vez do dado da câmara) e `tools/scene/portrait.mjs` (o tamanho, a regra das duas
+passagens e o modo `--todos` que desenha as seis). Nos dados mudaram **só os `path`**; os
 ids dos retratos ficaram, para as baterias que os nomeiam continuarem válidas. Os três retratos
-antigos **ficam** (`praia.jpg` ainda é o do mundo de exemplo). Total em `assets/previews/`: 2,6 MB.
+antigos **ficam** (`praia.jpg` ainda é o do mundo de exemplo). Total em `assets/previews/`: 2,8 MB
+(2,0 MB dos seis retratos novos).
 
 **O que fica escrito para o futuro.** O retrato de um mundo **contém as janelas das portas desse
 mundo**, que são retratos deles próprios: o mesmo comando deu 438, 215 e 378 kB em passagens
 seguidas. A costura não se mexe com isso (0,37 antes e depois de regenerar), mas o ficheiro sim —
 por isso a regra é gerar **duas vezes** quando uma sala muda, e está no cabeçalho da ferramenta.
 
-**A consequência que se aceita.** O retrato passou a ser maior do que o padrão de **2048×1024** da
-**L14**, e a lei passa a avisar: **5 avisos** em `tools/scene/validate.mjs` (um por retrato acima do
-padrão) e **1 por mundo** no relatório do editor. É a lei a fazer o seu trabalho — a memória de uma
-textura cresce com os pixels, e a 2048 a meta **não** se cumpria (0,54) —, e por isso o aviso fica
-**à vista**, em vez de a lei ser baixada para o silenciar. A bateria do editor passa de **35** para
-**34 de 35**: a que falha é a que exige «Avisos: 0». Se o autor quiser o relatório limpo outra vez, a
-alternativa é dar aos retratos um padrão próprio na L14 (o valor medido está no D47), e essa é uma
-decisão dele.
+**A consequência que se aceita.** Como o retrato ficou a **3072×1536**, acima do padrão de
+**2048×1024** da **L14**, a lei passa a avisar: **6 avisos** em `tools/scene/validate.mjs` (um por
+retrato acima do padrão) e **1 a 2 por mundo** no relatório do editor. É a lei a fazer o seu trabalho
+— a memória de uma textura cresce com os pixels, e a 2048 a meta **não** se cumpria (0,54) —, e por
+isso o aviso fica **à vista**, em vez de a lei ser baixada para o silenciar. A bateria do editor passa
+de **35** para **34 de 35**: a que falha é a que exige «Avisos: 0». **Decisão do autor em
+2026-10-23: fica assim** — sem padrão próprio na lei; se um dia o shader substituir o fundo, os
+retratos voltam a poder ser pequenos e o aviso desaparece por si.
 
 #### Metas de sucesso
 
@@ -2774,7 +2783,7 @@ dependem da janela do arnês, e o que se compara é o «0 fora da moldura» e o 
 | M5 | O editor não escreve em disco | `grep` de `fs`/`localStorage`/`writeFile` em `js/` | **0** (D2) |
 | M6 | O editor usa os mesmos módulos | `import` de `core/`, `modules/` e `scene/` em `js/editor*` | os **3** grupos (D4/D3) |
 | M7 | A exposição não conhece o editor | `grep editor` em `js/core/`, `js/modules/`, `js/scene/` e `js/app.js` | **0** (fora de comentários) — a regra da D4, literal |
-| M8 | **R8** fechado | ciclo build/remove ×**20** no editor | registos vazios, **1** ouvinte, 0 erros. **Medido no B3 (2026-10-20)**, no portão e no fixture: **0** desvios em 20 ciclos com `tools/regression/scene-cycle.mjs`; falta **re-medir no editor** (B4) |
+| M8 | **R8** fechado | ciclo build/remove ×**20** no editor | registos vazios, **1** ouvinte, 0 erros. **Medido no B3 (2026-10-20)**, no portão e no fixture: **0** desvios em 20 ciclos com `tools/regression/scene-cycle.mjs`, e **re-medido no editor no B4** (ver o registo do B4: `runSceneCycle()` com 20 ciclos, 0 desvios) |
 | M9 | **R9** fechado | `laws-selftest.mjs` com uma avaria por valor não construído | **17 → 20 de 20** — medido no B9, com o controlo limpo (0 erros, 0 avisos) |
 | M10 | A validação é uma só | `grep` de leis duplicadas no editor | **0** (importa `js/scene/validation.js`) |
 | M11 | O ficheiro exportado é estável | importar→exportar os 5 mundos | **0 diferenças** (2 espaços, ordem do `schema.js`, sem campos vazios) |
@@ -2817,8 +2826,13 @@ dependem da janela do arnês, e o que se compara é o «0 fora da moldura» e o 
 ### Fase 6 — Testes e limpeza
 - **Entregável:** os testes de §10 automatizados (o mesmo script que já usamos no browser).
   **Parcialmente feito em 2026-10-15:** o T2 e o T3 (a moldura) estão automatizados em
-  `tools/regression/pose-sweep.mjs`, com prova de que o instrumento falha quando deve (§10). Ficam
-  por automatizar o T1 e o T7 (travessias), o T6 (clique) e o T4 e o T5 (conteúdo das janelas).
+  `tools/regression/pose-sweep.mjs`, com prova de que o instrumento falha quando deve (§10).
+  **Em 2026-10-23, ao fechar a Fase 4, o que faltava deixou de faltar em grande parte:**
+  `tools/regression/twelve-tests.mjs` corre nas **5 páginas** e verifica o **T8** (consola), o **T4**
+  (a janela), o **T5** (a oclusão, com controlo positivo), o **T6** (o clique), o **T9** (20 ciclos),
+  o **T10/T12** (o retrato) e o **T2/T3** (a moldura) — **35 de 35**. Ficam por automatizar o **T1**
+  (a construção da cena a partir do dado) e o **T7/T11** (a chegada), que hoje se medem por
+  `camera-arrival.mjs` para o caso da D37; o resto dos doze já não depende de uma sessão de trabalho.
 - **Limpeza de skills — feita em 2026-10-13** (§3, D15). Apagados: o esqueleto Cline (88 pastas,
   0 ficheiros), as 3 falsas "junções" de descoberta e o `__pycache__`. Mantidos de propósito: os
   **5 repos `.git`** dos vendors (**funcionais** — o `sync-all-vendors.ps1` faz `git pull`
@@ -2992,7 +3006,8 @@ Chrome com câmara falsa e as chamadas de CDP que todas precisam (e a leitura de
 | `image-bridge.mjs` | D43, D44, D45 | a travessia: **0** fotogramas escuros, a ponte é o ecrã (**0,22**), sai num só passo, sem a linha «Carregando…» e só depois do fotograma da câmara | **9 de 9** |
 | `labels-doors.mjs` | D39 | o nome das portas: a tecla D, o editor sem teclas, e dez portas sem deixar textura nem nó | **23 de 23** |
 | `labels-artworks.mjs` | D40 | o nome das obras: a mesma tecla, acima do centro, e o editor | **21 de 21** |
-| `seam.mjs` | D46, D47 | o salto no corte de cada travessia: a imagem que a ponte pintou contra a que o mundo mostrou | **12 de 12** (0,21 a 0,40 contra a meta de 0,50) |
+| `seam.mjs` | D46, D47 | o salto no corte de cada travessia: a imagem que a ponte pintou contra a que o mundo mostrou | **12 de 12** (0,17 a 0,41 contra a meta de 0,50) |
+| `twelve-tests.mjs` | T1–T12 (§10) | a bateria dos doze testes nas cinco páginas, a partir da sonda `acceptance.mjs`: consola, janela, oclusão com controlo positivo, clique, 20 ciclos, o retrato e a varredura de poses | **35 de 35** (7 verificações × 5 páginas) |
 | `ida-e-volta.mjs` | D46 | o conversor do retrato é fiel? um panorama conhecido vai por esfera → cubo → equirretangular e é comparado com o original | **0,39** de diferença, deslocamento **0** |
 | `piso-ponte.mjs` | D43, D46 | o preço da ponte: o quadro guardado mostrado por cima da cena que ele fotografou | **0,00** |
 | `desalinhamento.mjs` | D46 | a ponte e a chegada estão na mesma posição? procura o (dx, dy) que melhor as sobrepõe | **dx=0, dy=0** |
@@ -3448,7 +3463,7 @@ alteram comportamento.
 | D44 | A travessia não dá a ver que houve uma | A ponte não se **desvanece**: sai num só fotograma, quando o mundo já está a ser desenhado — uma dissolução de 240 ms entre duas fotografias do mesmo sítio lê-se como efeito, e o que se quer é que a travessia não se anuncie. E enquanto a ponte cobre o ecrã **não se mostra a linha «Carregando…»**: o ecrã nunca está vazio, e um elemento a aparecer é o sinal mais visível de todos. Medido: o quadro da ponte difere do ecrã em **0,22** (é o ecrã), o mundo difere do quadro em **3,94** — um passo de caminhada (o maior salto a caminhar é **2,69**) —, o que sobra é a obra que está em frente da chegada, que nenhuma fotografia da página anterior pode prever |
 | D45 | Nenhum fotograma de câmara dentro da travessia | Tudo o que faça o canvas não ter desenho mostra o que está por baixo dele — o `<video>` da câmara, ou o preto dele. Eram duas janelas: a ponte saía **antes** de o vídeo ter imagem (medido: **58 ms** de preto por baixo, mais num telemóvel) e o `resize` da câmara limpava o buffer do canvas. A ponte passou a esperar **também** pelo primeiro fotograma **apresentado** pela câmara (`cameraFirstFrame()` com `requestVideoFrameCallback` — `loadeddata` não chega: decodificar não é apresentar, e num portão publicado isso deu segundos de preto com o evento já disparado), no máximo **3 s**; uma câmara recusada resolve de imediato, para a chegada não ficar à espera de um fotograma que não vem. O `resize` passou a ser seguido de uma renderização imediata (o canvas fica sem desenho **0,5–5,2 ms**, dentro do mesmo fotograma) |
 | D46 | O retrato de uma porta é a vista da chegada | A janela de uma porta de mundo mostrava o **panorama** do destino, e a chegada mostra o panorama **mais as obras e as portas** — o corte era, por isso, uma troca de imagem (medido: **0,68 a 13,36** de salto nas seis portas). O retrato passa a ser um equirretangular desenhado **pela própria exposição** a partir do ponto onde o visitante vai aparecer: `?from=<origem>` deixa o `arrivalPoint` pôr a câmara (uma só casa para a geometria, L16) e a ferramenta desenha seis faces de cubo, convertidas para 3072×1536 (4096×2048 em duas portas — D47). É um **asset derivado** — regera-se quando a sala mudar — e um por porta, não um por destino: a chegada depende de onde se vem (as três portas da praia mostram três vistas). **Fechada em 2026-10-22 com o B20:** com o centro à altura dos olhos e a resolução da D47, o salto ficou em **0,21 a 0,40** nas seis portas (12 de 12 verificações), contra a meta de 0,50 |
-| D47 | O retrato nasce à altura dos olhos, e com que tamanho | A esfera do retrato nascia no `portal.position` — no **chão** — e o retrato inteiro aparecia deslocado para baixo (~11 px num telemóvel); era isso a diferença de **3,6–3,9 na faixa de cima** do ecrã. O centro passa a ser `[x, altura do jogador, z]`, com a altura lida **uma só vez** de `cameras.player.position[1]` (L16): não é um campo novo nos dados, e a paralaxe da janela mantém-se porque a esfera continua a não seguir a câmara. Medido na porta 4 da praia: **1,56** com o centro no chão, **0,54** à altura dos olhos, 0,47 a +0,1 m; o raio quase não conta (500 dá 0,53 onde 120 dá 0,54) e a esfera a **seguir a câmara** foi medida e rejeitada (**25,30 / 7,30 / 1,17** conforme o raio). O tamanho do ficheiro: **3072×1536 q0,70** é o menor que cumpre (0,46; a 2560 falha com 0,58), com **duas excepções a 4096×2048** (0,40) nas portas onde 3072 não chegava à margem — praia 4 → cidade e praia 6 → céu. A qualidade do JPEG quase não conta (a 4096, 0,85 dá 0,39 e 0,75 dá 0,40); quem manda é a resolução |
+| D47 | O retrato nasce à altura dos olhos, e com que tamanho | A esfera do retrato nascia no `portal.position` — no **chão** — e o retrato inteiro aparecia deslocado para baixo (~11 px num telemóvel); era isso a diferença de **3,6–3,9 na faixa de cima** do ecrã. O centro passa a ser `[x, altura do jogador, z]`, com a altura lida **uma só vez** de `cameras.player.position[1]` (L16): não é um campo novo nos dados, e a paralaxe da janela mantém-se porque a esfera continua a não seguir a câmara. Medido na porta 4 da praia: **1,56** com o centro no chão, **0,54** à altura dos olhos, 0,47 a +0,1 m; o raio quase não conta (500 dá 0,53 onde 120 dá 0,54) e a esfera a **seguir a câmara** foi medida e rejeitada (**25,30 / 7,30 / 1,17** conforme o raio). O tamanho do ficheiro (emenda de 2026-10-23, aprovada pelo autor ao fechar a fase): **3072×1536 q0,70 nos seis retratos** — 2560 falha com 0,58, 3072 fica em **0,17 a 0,41** e 4096 daria 0,40; a resolução a mais comprava 0,01 a 0,07 de margem e custava **32 MiB** de textura por retrato em vez de 18 MiB (a praia ia a **52 MiB**), contra o orçamento de imagem do ensaio **R14** (`1024×512` no telemóvel; 4096 «não recomendado para móvel»). A qualidade do JPEG quase não conta (a 4096, 0,85 dá 0,39 e 0,75 dá 0,40); quem manda é a resolução. A consequência aceita é a **L14** a avisar 6 vezes — ver o registo do B20 |
 
 **Roadmap aprovado em 2026-10-12.**
 
@@ -3777,6 +3792,80 @@ ordem entre tecnologias deve alternar para reduzir o efeito de aquecimento. O be
 tempo do quadro total e o desenho CPU p5.js, não tempo GPU isolado. Só depois de revisar os
 resultados e os orçamentos de imagem/shader decidir se o modelo de produção aceitará dimensões
 `kind: "shader"` e como o editor as configurará.
+
+### R15 — Política adaptativa segura para fundos shader (proposta, 2026-10-23)
+
+**Estado:** especificação para ensaio; não implementada. A produção continua a usar `kind: "image"`.
+Detalhes e esquema ilustrativo estão no README, em «Política proposta para fundo shader em
+produção».
+
+**Comportamento pretendido**
+
+1. Manter um asset de imagem válido como fallback de cada fundo shader e prepará-lo antes de trocar
+   o fundo existente.
+2. Renderizar inicialmente um quadro shader estático (`uTime` fixo), recolher uma linha de base e
+   só então tentar animação. Com `prefers-reduced-motion`, manter o fundo estático.
+3. Limitar a animação a 20 FPS (50 ms entre atualizações). Diante de degradação persistente, reduzir
+   primeiro o pixelRatio em passos medidos, dentro de `[1, DPR nativo]`; reavaliar após cada mudança.
+4. Se a degradação persistir no piso de resolução, usar 15 FPS (66,7 ms); se ainda não sustentar o
+   orçamento, parar a animação e reter o quadro estável.
+5. Em erro de compilação, perda de contexto ou configuração inválida, apresentar a imagem fallback,
+   manter um diagnóstico e nunca deixar a dimensão vazia. Ao voltar de uma página oculta, retomar
+   inicialmente em estado estático e reavaliar.
+
+Os valores **20 FPS, 15 FPS e pixelRatio mínimo 1** são parâmetros iniciais a validar, não
+compromissos de qualidade já demonstrados. A redução do pixelRatio tem evidência promissora no
+PowerVR GE8320, mas não isolamos causalidade. O governor não deve confundir a cadência pretendida
+com quadros perdidos: a 20 FPS, 50 ms é o intervalo esperado. Instrumentar atualizações entregues
+e atrasos contra o prazo; reportar claramente se o browser não permitir medir a entrega real.
+`drawMs` de p5.js não mede o custo GPU de shader.
+
+**Fronteiras de segurança e confiabilidade:** selecionar shaders por ID de uma lista interna; nunca
+aceitar GLSL/código/URL arbitrário em dados de cena. Validar tipos e limites de todos os parâmetros
+ao carregar, com erro visível para configuração inválida. Validar estado salvo localmente, aplicar
+expiração e tratá-lo apenas como sugestão inicial. Limitar recursos e alocações por quadro; suspender
+trabalho em documentos ocultos. Manter imagem como fallback real carregado, e não como fallback
+silencioso para configurações inválidas.
+
+**Critérios de aceite antes de produção**
+
+- Ensaio atrás de feature flag, sem alterar as dimensões atuais nem tornar shader o padrão.
+- Testes em aparelhos fraco, médio e forte, com ordem alternada entre tecnologias e mesmas condições
+  de câmera, resolução, antialias, cena e duração.
+- Confirmar que a cadência animada não excede 20 FPS, que a transição para 15 FPS e para estático
+  exige degradação persistente e não oscila, e que a saída estática permanece visível.
+- Exercitar fallback para erro de compilação, WebGL/contexto perdido, configuração fora dos limites,
+  bloqueio de armazenamento e `prefers-reduced-motion`.
+- Verificar qualidade visual nos degraus de pixelRatio, bateria/temperatura e retomada após ocultar
+  a página; documentar medições e limites observados antes de propor formato final no schema/editor.
+
+### R16 — A medida do T10/T12 pode sangrar fora da moldura (aberta, 2026-10-23)
+
+O **T10/T12** tinge a dimensão derivada de um retrato e conta os pixels que mudaram: os que mudam
+**dentro** da janela são a prova de que a janela mostra o destino, e os que mudam **fora** da moldura
+são um defeito. Na **porta 1 do fixture a 30 m** (`example`), duas corridas de **2026-10-22**
+contaram **3 759 px** fora da moldura — iguais com e sem o B20, com a janela e a moldura nas mesmas
+coordenadas (`[613,280,771,469]`). Em **2026-10-23** a mesma medida deu **0** em **cinco** corridas,
+tanto na árvore do B20 como na anterior: não é um defeito estável e **não é regressão de nenhum
+bloco**.
+
+**Hipótese:** a captura apanha uma textura ainda a assentar entre as duas fotografias que o teste
+compara — o que muda o ecrã inteiro, não só a janela. **O que a fecha:** esperar que todas as texturas
+da cena estejam descodificadas (e um fotograma desenhado com elas) antes de tirar as duas capturas, e
+repetir a bateria com as 3 salas e os 2 mundos de fixture várias vezes para provar que o zero é
+estável. Até lá, `tools/regression/twelve-tests.mjs` verifica **estritamente** («0 px fora da
+moldura»): se o número voltar, é para investigar, não para tolerar.
+
+### R17 — A primeira porta de uma sessão fria conta fotogramas escuros (aberta, 2026-10-23)
+
+No `tools/regression/seam.mjs`, a **primeira** porta medida em cada sessão, com o Chrome acabado de
+arrancar e a cache fria, conta **5 ou 6** fotogramas escuros na travessia; a mesma porta, medida
+isolada e a seguir, conta **0** (medido em 2026-10-22: 0 escuros em 43 e em 42 amostras, duas vezes
+seguidas). Não é do retrato nem do B20 — já acontecia antes dele — e a hipótese é a mesma forma da
+D45: a ponte está no `sessionStorage` antes de o `<img>` que a mostra estar descodificado, e o que se
+vê por baixo é o `#container-video`. **O que a fecha:** a ponte esperar pela descodificação da imagem
+(`img.decode()`) antes de se dar por posta, com um teto de tempo — e a bateria passa a poder medir as
+seis portas numa só sessão sem a primeira mentir.
 
 **R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
 apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o

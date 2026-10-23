@@ -23,18 +23,24 @@
 // Uso, da raiz do projeto:
 //   node tools/scene/portrait.mjs --todos
 //   node tools/scene/portrait.mjs <mundo> <origem> [ficheiro]
-import { join, basename } from 'node:path';
+import { join } from 'node:path';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { serveProject, openBrowser, ROOT, sleep } from '../regression/harness.mjs';
 
 // O tamanho da imagem. Medido na porta mais difícil (praia 4 → cidade), com o centro do retrato já à
 // altura dos olhos (D47): 2560x1280 deixa a costura em **0,58** (falha a meta de 0,50), 3072x1536 em
-// **0,46** e 4096x2048 em **0,40**. Fica o menor que cumpre, com uma exceção medida: as duas portas
-// que a 3072 não chegavam à margem (praia 4 → cidade e praia 6 → céu) são desenhadas a 4096.
-// A qualidade quase não conta (0,85 dá 0,39 e 0,75 dá 0,40 a 4096); quem manda é a resolução.
+// **0,41 a 0,47** e 4096x2048 em **0,40**. A faixa do 3072 é real: o ficheiro não é estável entre
+// passagens (ver acima), e o que a costura herda é o que lá estava.
+//
+// Fica **3072x1536**, e não 4096: a resolução a mais comprava 0,01 a 0,07 de margem e custava 32 MiB
+// de textura por retrato em vez de 18 MiB — num PowerVR GE8320 (o aparelho fraco que o ensaio de
+// 2026-10 mediu) a praia ia a **52 MiB** de texturas. O orçamento de imagem do ensaio (1024x512 no
+// telemóvel, 4096 «não recomendado para móvel») aponta no mesmo sentido. Com o shader como fundo,
+// esta decisão deixa de existir: a costura do céu e do mar passa a ser exata e o retrato só carrega
+// as obras e as portas.
+//
+// A qualidade do JPEG quase não conta (0,85 dá 0,39 e 0,75 dá 0,40 a 4096); quem manda é a resolução.
 const TAMANHO = { largura: 3072, altura: 1536, face: 1536, qualidade: 0.7 };
-const TAMANHO_GRANDE = { largura: 4096, altura: 2048, face: 2048, qualidade: 0.7 };
-const GRANDES = ['cidade-de-praia.jpg', 'praia-de-ceu.jpg'];
 
 // As seis portas com retrato, como (mundo de destino, mundo de origem): é o par que diz de onde a
 // câmara parte para desenhar a chegada. `--todos` desenha as seis.
@@ -134,7 +140,7 @@ const DESENHAR = (largura, altura, face, qualidade) => `(async () => {
 })()`;
 
 async function gerar(mundo, origem, destino) {
-  const tamanho = GRANDES.includes(basename(destino)) ? TAMANHO_GRANDE : TAMANHO;
+  const tamanho = TAMANHO;
   const site = await serveProject();
   const browser = await openBrowser({ width: 1280, height: 800, camera: true });
   try {
