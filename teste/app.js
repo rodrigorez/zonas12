@@ -73,6 +73,15 @@ function setupHud() {
   }, 500);
 }
 
+// Ligado antes de qualquer espera: um toque durante o carregamento não se perde.
+let sceneReady = null;
+document.getElementById('btn-iniciar').addEventListener('click', async () => {
+  const hud = document.getElementById('hud');
+  hud.textContent = 'botão tocado, aguardando a cena…';
+  try { if (sceneReady) await sceneReady; startSession(); hud.textContent = 'sessão iniciada'; }
+  catch (error) { hud.textContent = 'erro ao iniciar: ' + error.message; }
+});
+
 async function start() {
   await initI18n(languageFromUrl());
   const auto = await cameraAlreadyAllowed();
@@ -93,12 +102,11 @@ async function start() {
   setActiveDimension(0);
   startFrameDriver();
   if (auto) startSession({ arrival: true });
-  document.getElementById('btn-iniciar').addEventListener('click', () => startSession());
   setupHud();
   engine.start();
 }
 
-start().catch((error) => {
+sceneReady = start().catch((error) => {
   console.error(error);
   document.getElementById('hud').textContent = 'erro: ' + error.message;
 });
