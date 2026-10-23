@@ -2864,10 +2864,25 @@ gravação, em `.harness/backups/worlds/<slug>/`, fora do repositório e da publ
 | Bloco | O que entrega | Como se mede |
 | --- | --- | --- |
 | **B0** | este plano e as **D48–D51** | nada de código |
-| **B1** | `tools/server/serve.mjs`: serve a publicação como o `python -m http.server` (com `/` e `/sala/` a resolverem o `index.html`), responde a `GET /api/ping` com os mundos do disco, recusa `.harness/`, `.git/` e caminhos com `..`, e escuta **só** em `127.0.0.1` | `tools/server/selftest.mjs`: as **5** páginas, os **0** erros de consola das mesmas, os **3** pedidos perigosos recusados e o `ping` a listar os **5** mundos |
-| **B2** | `PUT /api/worlds/<slug>`: valida com o **mesmo** validador e o disco, recusa versão e slug trocados, recusa erros (**422**) e mundos que não existem (**404**), copia antes de gravar e escreve de forma atómica (`*.tmp` + `rename`) | o `selftest`: **6** recusas com **0** bytes escritos e **2** gravações — ficheiro **byte-idêntico** ao enviado e **2** cópias com o conteúdo **anterior** |
+| **B1 · B2** | `tools/server/serve.mjs`: serve a publicação como o `python -m http.server` (com `/` e `/sala/` a resolverem o `index.html`), responde a `GET /api/ping` com os mundos do disco, recusa `.harness/`, `.git/`, `node_modules/` e caminhos com `..`, escuta **só** em `127.0.0.1`; e `PUT /api/worlds/<slug>` valida com o **mesmo** validador e o disco, recusa versão e slug trocados, recusa erros (**422**) e mundos que não existem (**404**), copia antes de gravar e escreve de forma atómica (`*.tmp` + `rename`) | `tools/server/selftest.mjs`: **34 de 34** — as **5** páginas, os **3** pedidos perigosos, o `ping` com os **5** mundos, **8** recusas de escrita com **0** bytes e **0** cópias, e **2** gravações com o ficheiro **byte-idêntico** ao enviado e **2** cópias com o conteúdo anterior. *(Os dois blocos correram num commit só: a rota de escrita vive no mesmo ficheiro e mede-se com o mesmo instrumento — §9, nota do B1.)* |
 | **B3** | o «Gravar» no editor, ao lado do «Exportar» e **só** com servidor (`GET /api/ping`), com o estado a dizer o ficheiro e a cópia; depois de gravar, a marca «alterado» sai e a guarda de saída (D32) cala-se | no browser: com servidor o botão existe, grava e a marca sai; sem servidor (`python -m http.server`) o botão **não** existe, o «Exportar» fica igual e a consola não diz nada |
 | **B4** | a aceitação (§ abaixo), o README e o fecho | editar → gravar → recarregar a exposição; `validate.mjs` **0**; a bateria dos doze **35 de 35** |
+
+#### O que o B1 entregou e mediu (2026-10-23)
+
+`tools/server/serve.mjs` (**~330** linhas) e o seu instrumento, `tools/server/selftest.mjs`, a correr
+contra uma **raiz temporária** — o instrumento cria um mundo mínimo e as pastas que não se publicam,
+mede, e apaga tudo. **34 de 34**, com as recusas medidas pelo caminho **cru** (um `fetch` normaliza
+`..` antes de o enviar, e o que se quer medir é o pedido tal como chega). E duas coisas que a medição
+obrigou, e que ficam registadas:
+
+- **uma só leitura de imagens.** O `imageSize` da lei **L14** vivia dentro do `tools/scene/validate.mjs`
+  e o servidor precisa dele para validar como a linha de comando. Passou a `tools/scene/disk.mjs`
+  (`diskQuestions(root)`), importado pelos **dois** — 0 cópias, e o `validate.mjs` continuou a dar o
+  mesmo relatório nos 5 mundos (**0** erros, os 6 avisos da L14 da D47 no mesmo sítio);
+- **o servidor na exposição a sério**, medido à parte com a raiz verdadeira: `/`, `/cidade/`,
+  `/editor.html`, `/js/app.js`, `/data/worlds/praia.json` e um retrato respondem **200** com o tipo
+  certo, o `/.harness/dev/package.json` responde **403** e o `ping` lista os **5** mundos.
 
 #### Metas de sucesso
 
