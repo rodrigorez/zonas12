@@ -133,29 +133,27 @@ async function main() {
     const cru = await ask(port, '/../index.html');
     result.check('um .. literal não sai da raiz', cru.status === 403, 'HTTP ' + cru.status);
 
-    // ---- a pergunta do editor (D49) ----
-    const ping = await ask(port, '/api/ping');
-    let resposta = null;
-    try { resposta = JSON.parse(ping.body); } catch { resposta = null; }
-    result.check('GET /api/ping responde que pode gravar e lista os mundos',
-      ping.status === 200 && resposta && resposta.canWrite === true &&
-      JSON.stringify(resposta.worlds) === '["teste"]',
-      'HTTP ' + ping.status + ', worlds=' + (resposta ? JSON.stringify(resposta.worlds) : '?'));
+    // ---- a marca da ferramenta (D49) ----
+    result.check('a resposta diz que é a ferramenta (o cabeçalho que o editor lê)',
+      raiz.headers['x-zonas12-serve'] === '1', 'X-Zonas12-Serve: ' + raiz.headers['x-zonas12-serve']);
+    const cabecalho = await ask(port, '/', { method: 'HEAD' });
+    result.check('a pergunta do editor (HEAD na raiz) responde 200 com a marca',
+      cabecalho.status === 200 && cabecalho.headers['x-zonas12-serve'] === '1',
+      'HTTP ' + cabecalho.status + ', ' + (cabecalho.body === '' ? 'sem corpo' : 'com corpo'));
+    result.check('um ficheiro que não existe também leva a marca (a pergunta nunca dá 404)',
+      faltando.headers['x-zonas12-serve'] === '1', 'HTTP ' + faltando.status + ' com a marca');
 
     // ---- o que a mesma origem impede ----
-    const outroHost = await ask(port, '/api/ping', { headers: { Host: 'evil.example' } });
+    const outroHost = await ask(port, '/api/worlds/teste', { method: 'PUT', headers: { Host: 'evil.example' } });
     result.check('um Host que não é da máquina é recusado',
       outroHost.status === 403, 'HTTP ' + outroHost.status);
-    const outraOrigem = await ask(port, '/api/ping', { headers: { Origin: 'http://evil.example' } });
+    const outraOrigem = await ask(port, '/api/worlds/teste', {
+      method: 'PUT', headers: { Origin: 'http://evil.example' }, body: text(MUNDO)
+    });
     result.check('um Origin de outro sítio é recusado',
       outraOrigem.status === 403, 'HTTP ' + outraOrigem.status);
-    const mesmaOrigem = await ask(port, '/api/ping', { headers: { Origin: 'http://127.0.0.1:' + port } });
-    result.check('o Origin da própria página é aceite', mesmaOrigem.status === 200,
-      'HTTP ' + mesmaOrigem.status);
 
     // ---- o que não é um pedido ----
-    const metodo = await ask(port, '/api/ping', { method: 'POST' });
-    result.check('POST numa rota de leitura é 405', metodo.status === 405, 'HTTP ' + metodo.status);
     const paginaPost = await ask(port, '/', { method: 'POST' });
     result.check('POST num ficheiro é 405', paginaPost.status === 405, 'HTTP ' + paginaPost.status);
     const rota = await ask(port, '/api/outra');

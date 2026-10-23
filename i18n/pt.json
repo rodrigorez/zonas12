@@ -20,6 +20,8 @@
     "editor.world.open": "Abrir",
     "editor.world.hint": "O slug de um mundo é o nome do ficheiro em data/worlds/",
     "editor.validate": "Validar",
+    "editor.save": "Gravar",
+    "editor.save.hint": "Grava o mundo em data/worlds/ (só existe com o servidor da ferramenta)",
     "editor.export": "Exportar",
     "editor.import": "Importar JSON",
     "editor.undo": "Desfazer",
@@ -150,10 +152,14 @@
     "editor.problems.clean": "Sem problemas.",
     "editor.status.loaded": "{slug} — dimensões: {dimensions} · obras: {artworks} · portais: {portals}",
     "editor.status.exported": "Exportado {file}",
+    "editor.status.saved": "Gravado {file} — cópia em {backup}",
     "editor.status.valid": "Validação corrida.",
     "editor.error.load": "Não foi possível abrir {file}: {message}",
     "editor.error.parse": "O ficheiro não é JSON válido: {message}",
     "editor.error.build": "A cena não pôde ser construída: {message}",
-    "editor.error.exportBlocked": "Não exportado: {count} erro(s) no mundo. O ficheiro exportado é o que se commita, e um mundo com erros não passa no validador."
+    "editor.error.exportBlocked": "Não exportado: {count} erro(s) no mundo. O ficheiro exportado é o que se commita, e um mundo com erros não passa no validador.",
+    "editor.error.saveBlocked": "Não gravado: {count} erro(s) no mundo. É a mesma regra do exportar — o que se grava é o que se commita.",
+    "editor.error.saveFailed": "Não foi possível gravar {file}: {message}",
+    "editor.error.saveNotFromDisk": "Gravar só substitui um mundo que veio de data/worlds/ — exporte este e ponha-o lá (D31)."
   }
 }

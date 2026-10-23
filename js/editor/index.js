@@ -23,6 +23,7 @@ import * as assets from './assets.js';
 import * as preview from './preview.js';
 import * as problems from './problems.js';
 import * as panels from './panels/index.js';
+import * as server from './server.js';
 import * as worlds from './worlds.js';
 
 // The gate is the world the exhibition starts in (D24), so it is the one the editor opens with.
@@ -116,11 +117,23 @@ function refreshStatus() {
 
 // The two marks of the toolbar: «Desfazer» is only offered when there is a step to undo, and
 // «alterado» says whether the world in memory is a text the author already has (D32/D35).
+//
+// «Gravar» (Fase 5) has two conditions and both are about what it can honestly do: there has to be a
+// server answering (D49) and the world has to have come from `data/worlds/` (D50) — saving
+// **replaces** a file, and a world opened from a dropped file has nowhere to be replaced.
+function saveableSlug() {
+  const world = currentWorld();
+  if (!world || !world.file || !world.file.startsWith('data/worlds/')) return null;
+  return world.file.split('/').pop().replace(/\.json$/i, '');
+}
+
 function updateToolbar() {
   const button = byId('desfazer');
   if (button) button.disabled = !canUndo();
   const marker = byId('alterado');
   if (marker) marker.hidden = !isDirty();
+  const save = byId('gravar');
+  if (save) save.disabled = !server.canSave() || saveableSlug() === null;
 }
 
 // One step back: the world is replaced by the snapshot and everything that was built from it is built
@@ -256,6 +269,35 @@ async function exportCurrent() {
   setStatus(t('editor.status.exported', { file: name }));
 }
 
+// Gravar é o irmão do exportar (Fase 5, D48/D49): sai o **mesmo** texto — o `exportWorld` — e o que
+// decide é o mesmo juízo, porque um mundo com erros não sai por nenhum dos dois caminhos. O servidor
+// repete a validação do lado dele (D50) e deixa uma cópia antes de gravar (D51); o caminho da cópia
+// vai para a linha de estado, que é onde o autor a vai procurar se precisar de voltar atrás.
+async function saveCurrent() {
+  const world = currentWorld();
+  if (!world) return;
+  const slug = saveableSlug();
+  if (slug === null) {
+    setStatus(t('editor.error.saveNotFromDisk'), 'erro');
+    return;
+  }
+  const report = await revalidate({ refresh: true });
+  if (report && report.errors.length > 0) {
+    setStatus(t('editor.error.saveBlocked', { count: report.errors.length }), 'erro');
+    return;
+  }
+  try {
+    const answer = await server.save(slug, exportWorld(world.data));
+    // The world is now the file the exhibition reads: the guard of D32 has nothing to warn about
+    // until the next edit, exactly as after an export.
+    markSaved();
+    updateToolbar();
+    setStatus(t('editor.status.saved', { file: answer.file, backup: answer.backup }));
+  } catch (error) {
+    setStatus(t('editor.error.saveFailed', { file: world.file, message: error.message }), 'erro');
+  }
+}
+
 async function importFile(file) {
   if (!file) return;
   let data;
@@ -284,7 +326,11 @@ export async function startEditor() {
   // an instrument that builds a scene here does not turn it back on (D32).
   window.portalDebug = { state: state, world: null, preview: true };
 
-  await fillWorldList();
+  // A pergunta da D49, antes de a barra mostrar o que quer que seja: uma página servida por um host
+  // estático recebe **404** e o «Gravar» nunca aparece — o «Exportar» que sempre existiu fica igual.
+  await Promise.all([server.probe(), fillWorldList()]);
+  const gravar = byId('gravar');
+  if (gravar) gravar.hidden = !server.canSave();
 
   const input = byId('mundo');
   if (input) input.value = requestedWorld();
@@ -298,6 +344,7 @@ export async function startEditor() {
     setStatus(t('editor.status.valid'));
   });
   bind('desfazer', 'click', undoLast);
+  bind('gravar', 'click', saveCurrent);
   bind('exportar', 'click', exportCurrent);
   bind('importar', 'change', (event) => importFile(event.target.files && event.target.files[0]));
 

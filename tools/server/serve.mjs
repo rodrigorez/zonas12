@@ -13,7 +13,9 @@
 //     pode ficar à vista da rede;
 //   · **não serve** o que não se publica — `.harness/` (fora do repositório), `.git/`, o que começa
 //     por ponto e `node_modules/` — nem um caminho que saia da raiz;
-//   · `GET /api/ping` é a pergunta que o editor faz para saber se pode oferecer o «Gravar»;
+//   · **diz o que é** em cada resposta, no cabeçalho `X-Zonas12-Serve` — é assim que o editor sabe
+//     se pode oferecer o «Gravar» (D49). Perguntar por um endereço que só existe aqui daria um 404
+//     na consola de uma página publicada, e uma consola limpa é uma regra do projeto (T8);
 //   · `PUT /api/worlds/<slug>` grava o mundo — com o **mesmo** validador do `validate.mjs` e do
 //     browser (D50), uma **cópia de segurança** antes (D51) e uma escrita atómica. Um mundo com
 //     erros não é gravado; um mundo que não existe não é criado (quem cria mundos é a ferramenta da
@@ -95,8 +97,8 @@ const sendJson = (response, status, value) =>
   send(response, status, JSON.stringify(value, null, 2) + '\n',
     { 'Content-Type': 'application/json; charset=utf-8' });
 
-// Os mundos que existem no disco (D24: um ficheiro por mundo). É o que o `ping` responde, e é o que
-// a rota de escrita confere antes de aceitar um slug.
+// Os mundos que existem no disco (D24: um ficheiro por mundo). É o que a lei L11 pergunta ao
+// validar uma porta (o destino existe?) e é o que a rota de escrita confere antes de aceitar um slug.
 export function worldsIn(root) {
   const directory = join(root, 'data', 'worlds');
   if (!existsSync(directory)) return [];
@@ -283,25 +285,14 @@ async function saveWorld(request, response, context, slug) {
   });
 }
 
+// O cabeçalho que responde «sou a ferramenta, posso gravar» (D49). Vai em **todas** as respostas,
+// incluindo os erros: quem pergunta é `HEAD` na raiz da publicação, e o que se lê é o cabeçalho —
+// assim uma página publicada não apanha um 404 por perguntar (T8).
+export const MARK = 'X-Zonas12-Serve';
+
 // Devolve `true` quando a rota era da API e a resposta já foi dada.
 async function handleApi(request, response, context) {
-  const { root, port, urlPath, method } = context;
-
-  if (urlPath === '/api/ping') {
-    if (method !== 'GET' && method !== 'HEAD') {
-      send(response, 405, 'method not allowed\n',
-        { 'Content-Type': 'text/plain; charset=utf-8', Allow: 'GET, HEAD' });
-      return true;
-    }
-    if (!sameOrigin(request, port)) {
-      sendJson(response, 403, { error: 'not the same origin as the server' });
-      return true;
-    }
-    // A pergunta que o editor faz é esta: posso oferecer o «Gravar»? Uma página publicada recebe
-    // 404 e não mostra botão nenhum (D49).
-    sendJson(response, 200, { name: 'zonas12-serve', canWrite: true, worlds: worldsIn(root) });
-    return true;
-  }
+  const { root, urlPath, method } = context;
 
   const addressed = /^\/api\/worlds\/([^/]+)$/.exec(urlPath);
   if (addressed) {
@@ -337,6 +328,10 @@ async function handleApi(request, response, context) {
 async function handle(request, response, state) {
   const urlPath = String(request.url || '/').split('?')[0].split('#')[0];
   const method = request.method || 'GET';
+  // A marca da ferramenta (D49): uma linha, e vale para tudo o que sai daqui — páginas, ficheiros,
+  // erros e a mudança de endereço.
+  response.setHeader(MARK, '1');
+
   const context = { root: state.root, backups: state.backups, port: state.port, urlPath, method };
 
   if (await handleApi(request, response, context)) return;
@@ -406,7 +401,7 @@ async function main() {
   console.log(`zonas12: serving ${server.root}`);
   console.log(`         ${server.url}/                          (a exposição, o portão)`);
   console.log(`         ${server.url}/editor.html?world=gate    (o editor)`);
-  console.log(`         ${server.url}/api/ping                  (o editor pergunta por aqui se pode gravar)`);
+  console.log(`         ${server.url}/api/worlds/<slug>         (PUT: é aqui que o editor grava)`);
   console.log(`         gravações: ${server.backups}`);
   console.log('         Ctrl+C para parar.');
 }

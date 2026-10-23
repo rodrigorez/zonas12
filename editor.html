@@ -49,6 +49,18 @@
              Fica ao lado do botão que a desfaz, que é onde a mão já está. -->
         <span id="alterado" class="marca" data-i18n="editor.dirty" hidden>alterado</span>
         <button type="button" id="validar" data-i18n="editor.validate">Validar</button>
+        <!-- O «Gravar» da Fase 5 (D49): só existe quando o servidor da ferramenta responde a
+             `GET /api/ping` — numa página publicada ele nunca aparece e o «Exportar» fica igual. -->
+        <button
+          type="button"
+          id="gravar"
+          data-i18n="editor.save"
+          data-i18n-title="editor.save.hint"
+          title="Grava o mundo em data/worlds/ (só existe com o servidor da ferramenta)"
+          hidden
+        >
+          Gravar
+        </button>
         <button type="button" id="exportar" data-i18n="editor.export">Exportar</button>
         <!-- O input fica coberto pela etiqueta: o rato e o teclado chegam-lhe, e o texto continua a
              ser uma chave do catálogo (D12). `display: none` tirá-lo-ia da ordem de foco. -->
