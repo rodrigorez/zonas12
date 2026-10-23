@@ -3765,8 +3765,11 @@ shader será sempre mais rápido que qualquer imagem estática.
 `teste/p5js.htm` partilham esfera, geometria, visual de referência 2:1 de `1024 × 512`, renderer,
 camera fixa, antialias/pixelRatio configuráveis e protocolo de 3 × (5 s aquecimento + 15 s medição).
 Há cenário estático para comparação direta e cenário animado, no qual imagem fica como linha de
-base. Os logs incluem hora, URL, identificação do aparelho, GPU e características que o browser
-expõe. As instruções completas estão no README, § «Comparativo controlado».
+base. A interface reutiliza o nome do aparelho entre as páginas via `localStorage`, ordena as ações
+em ligar câmera → teste estático → teste animado → copiar, mostra análise das medianas e compara
+resultados anteriores com condições equivalentes. Os logs incluem hora, URL, identificação do
+aparelho, GPU e características que o browser expõe. As instruções completas estão no README,
+§ «Comparativo controlado».
 
 **Para fechar R14 antes da produção:** executar as páginas nos três celulares, guardar os JSONs e
 comparar as três repetições de cada modo. Repetir com a mesma câmera, pixelRatio e antialias; a

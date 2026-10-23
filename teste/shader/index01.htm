@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <base href="../../">
     <title>Comparativo de fundo 360º — shader</title>
-    <link rel="stylesheet" href="teste/comparativo.css">
+    <link rel="stylesheet" href="teste/comparativo.css?v=2">
     <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
   </head>
   <body data-tech="shader">
@@ -19,19 +19,27 @@
     </div>
     <section id="panel">
       <h1>Comparativo 360º — <span id="tech"></span></h1>
-      <p>Ensaios com o mesmo renderizador, esfera, visual de pôr do sol e pixelRatio fixo. Não caminhe nem altere a orientação durante as medições.</p>
       <p><a href="teste/shader/index01.htm">Shader</a> · <a href="teste/img/index01.htm">Imagem</a> · <a href="teste/p5js.htm">p5.js</a></p>
-      <label>Aparelho / identificação <input id="device-label" placeholder="ex.: V3 - celular fraco"></label>
-      <button id="camera-button">Ligar câmera</button>
-      <button id="run-static" disabled>Medir fundo estático × 3</button>
-      <button id="run-animated" disabled>Medir modo animado × 3</button>
-      <button id="copy" disabled>Copiar log</button>
-      <button id="save">Baixar JSON</button>
-      <p class="note">Imagem: no teste animado permanece estática e funciona como controle de base. Cada repetição aquece 5 s e mede 15 s. Câmera opcional: mantenha ligada ou desligada nos três endereços.</p>
+      <label>Celular <input id="device-label" placeholder="Informe uma vez: ex. V3 - GE8320"></label>
+      <div class="actions">
+        <button id="camera-button">1. Ligar câmera</button>
+        <button id="run-static" disabled>2. Teste 1 — estático</button>
+        <button id="run-animated" disabled>3. Teste 2 — animado</button>
+        <button id="copy" disabled>4. Copiar dados</button>
+      </div>
+      <p class="note">Use o mesmo celular, câmera, pixelRatio e antialias nas três tecnologias. Cada teste faz 3 medições.</p>
       <p id="status" role="status">Carregando cenário…</p>
       <p id="page-url"></p>
-      <textarea id="log" readonly aria-label="Resultados JSON"></textarea>
+      <section id="analysis" aria-live="polite">
+        <h2>Análise dos resultados</h2>
+        <p id="analysis-current"></p>
+        <p id="analysis-history"></p>
+      </section>
+      <details>
+        <summary>Ver log JSON</summary>
+        <textarea id="log" readonly aria-label="Resultados JSON"></textarea>
+      </details>
     </section>
-    <script type="module" src="teste/comparativo.js?v=1"></script>
+    <script type="module" src="teste/comparativo.js?v=2"></script>
   </body>
 </html>

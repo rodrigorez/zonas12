@@ -4,6 +4,9 @@ const WARMUP_MS = 5000;
 const MEASURE_MS = 15000;
 const RUNS = 3;
 const FRAME_LIMIT_MS = 33.4;
+const DEVICE_NAME_KEY = 'zonas12-comparativo-device-name';
+const RUN_HISTORY_KEY = 'zonas12-comparativo-history-v1';
+const TECHNOLOGIES = ['image', 'shader', 'p5'];
 const SHADER_VERTEX = `
   varying vec2 vUv;
   void main() {
@@ -69,6 +72,7 @@ let p5InitialDrawMs = 0;
 let p5InitialDrawCount = 0;
 let lastShaderUpdate = 0;
 let preparationMetrics = null;
+let latestPayload = null;
 
 function status(text) {
   $('status').textContent = text;
@@ -335,10 +339,12 @@ function measureOnce(requestedMode, mode, runIndex) {
   });
 }
 
-async function renderResults() {
-  const payload = {
+async function renderResults(deviceName, mode) {
+  latestPayload = {
     teste: {
       tecnologia: TECH,
+      nomeAparelho: deviceName,
+      modoAtual: mode,
       horaInicioLocal: new Date(startedAt).toLocaleString(),
       horaInicioUTC: startedAt,
       horaFimLocal: new Date().toLocaleString(),
@@ -350,8 +356,124 @@ async function renderResults() {
       resultados: results
     }
   };
-  $('log').value = JSON.stringify(payload, null, 2);
+  saveHistory(latestPayload.teste);
+  renderAnalysis();
+  $('log').value = JSON.stringify({
+    teste: latestPayload.teste,
+    comparacao: getComparisonSummary(latestPayload.teste)
+  }, null, 2);
   $('copy').disabled = false;
+}
+
+function median(values) {
+  const sorted = values.slice().sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+}
+
+function conditionKey(test) {
+  const device = test.dispositivo;
+  return [
+    test.nomeAparelho.trim().toLowerCase(),
+    device.gpu,
+    device.telaCSS,
+    device.pixelRatioAplicado,
+    device.antialiasSolicitado,
+    device.camera,
+    device.cameraResolucao || 'sem-camera'
+  ].join('|');
+}
+
+function readHistory() {
+  try {
+    const history = JSON.parse(localStorage.getItem(RUN_HISTORY_KEY) || '{}');
+    return history && typeof history === 'object' && !Array.isArray(history) ? history : {};
+  } catch (error) {
+    console.warn('Não foi possível ler o histórico comparativo salvo.', error);
+    return {};
+  }
+}
+
+function saveHistory(test) {
+  const history = readHistory();
+  const key = conditionKey(test);
+  const testSummary = {
+    tecnologia: TECH,
+    nomeAparelho: test.nomeAparelho,
+    modo: test.modoAtual,
+    fpsMediano: +median(results.map((item) => item.fpsMedio)).toFixed(2),
+    p95MedianoMs: +median(results.map((item) => item.p95Ms)).toFixed(2),
+    quadrosLentosMedianoPct: +median(results.map((item) => item.quadrosAcima33_4msPct)).toFixed(2),
+    horaLocal: new Date().toLocaleString()
+  };
+  history[key] = history[key] || {};
+  history[key][test.modoAtual] = history[key][test.modoAtual] || {};
+  history[key][test.modoAtual][TECH] = testSummary;
+  try {
+    localStorage.setItem(RUN_HISTORY_KEY, JSON.stringify(history));
+  } catch (error) {
+    console.warn('Não foi possível guardar o histórico comparativo neste navegador.', error);
+    status('Resultados calculados, mas o navegador não permitiu guardar o histórico entre páginas.');
+  }
+}
+
+function getComparisonSummary(test) {
+  const history = readHistory();
+  const modeHistory = history[conditionKey(test)] && history[conditionKey(test)][test.modoAtual] || {};
+  return {
+    modo: test.modoAtual,
+    comparacao: TECHNOLOGIES.map((tech) => modeHistory[tech] || null).filter(Boolean)
+  };
+}
+
+function analysisFor(modeHistory) {
+  const entries = TECHNOLOGIES.map((tech) => modeHistory[tech]).filter(Boolean);
+  if (!entries.length) return 'Execute um teste para ver a análise.';
+
+  const lines = entries.map((entry) =>
+    `${techLabel(entry.tecnologia)}: mediana ${entry.fpsMediano} fps, p95 ${entry.p95MedianoMs} ms, quadros lentos ${entry.quadrosLentosMedianoPct}%.`
+  );
+  if (entries.length > 1) {
+    const fpsValues = entries.map((entry) => entry.fpsMediano);
+    const p95Values = entries.map((entry) => entry.p95MedianoMs);
+    const fpsSpread = Math.max(...fpsValues) - Math.min(...fpsValues);
+    const p95Spread = Math.max(...p95Values) - Math.min(...p95Values);
+    if (fpsSpread > 15 || p95Spread > 5) {
+      lines.push('A diferença entre tecnologias é relevante; interprete junto com a variação das três repetições.');
+    } else {
+      lines.push('Resultados próximos nesta condição; a variação entre repetições pode explicar parte da diferença.');
+    }
+  }
+  const complete = TECHNOLOGIES.every((tech) => modeHistory[tech]);
+  if (complete) {
+    const ordered = entries.slice().sort((a, b) => a.p95MedianoMs - b.p95MedianoMs);
+    lines.push(`Menor p95 nesta condição: ${techLabel(ordered[0].tecnologia)}.`);
+  } else {
+    lines.push('A comparação entre tecnologias aparece quando os resultados deste modo forem coletados nas três páginas com as mesmas condições.');
+  }
+  return lines.join('\n');
+}
+
+function techLabel(tech) {
+  return tech === 'p5' ? 'p5.js' : tech === 'image' ? 'Imagem' : 'Shader';
+}
+
+function renderAnalysis() {
+  const history = readHistory();
+  const key = latestPayload ? conditionKey(latestPayload.teste) : null;
+  const saved = key && history[key] || {};
+  const modeHistory = latestPayload ? saved[latestPayload.teste.modoAtual] || {} : {};
+  const fps = median(results.map((item) => item.fpsMedio));
+  const p95 = median(results.map((item) => item.p95Ms));
+  const slow = median(results.map((item) => item.quadrosAcima33_4msPct));
+  const quality = p95 <= 20 ? 'Fluidez boa nesta rodada.' : p95 <= 33.4
+    ? 'Atenção: p95 acima de 20 ms; confira as repetições e compare com as outras tecnologias.'
+    : 'Desempenho baixo: muitas entregas de quadro podem ultrapassar 30 fps.';
+  $('analysis-current').textContent =
+    `${latestPayload.teste.modoAtual === 'static' ? 'Teste 1 — estático' : 'Teste 2 — animado'}: ` +
+    `FPS mediano ${fps.toFixed(2)}; p95 mediano ${p95.toFixed(2)} ms; ` +
+    `${slow.toFixed(2)}% dos quadros acima de ${FRAME_LIMIT_MS} ms. ${quality}`;
+  $('analysis-history').textContent = analysisFor(modeHistory);
 }
 
 async function run(mode) {
@@ -359,10 +481,16 @@ async function run(mode) {
     status('Aguardando o renderer...');
     return;
   }
-  if (!$('device-label').value.trim()) {
-    status('Informe uma identificação do aparelho antes de medir (por exemplo, V3 GE8320).');
+  const deviceName = $('device-label').value.trim();
+  if (!deviceName) {
+    status('Informe o nome do aparelho uma vez; ele será reutilizado nas outras páginas.');
     $('device-label').focus();
     return;
+  }
+  try {
+    localStorage.setItem(DEVICE_NAME_KEY, deviceName);
+  } catch (error) {
+    console.warn('Não foi possível guardar o nome do aparelho.', error);
   }
   results.length = 0;
   startedAt = new Date().toISOString();
@@ -372,12 +500,15 @@ async function run(mode) {
   $('run-animated').disabled = true;
   const effectiveMode = TECH === 'image' ? 'static' : mode;
   const note = TECH === 'image' && mode === 'animated' ? ' (imagem mantida estática: referência)' : '';
+  $('copy').disabled = true;
+  $('analysis-current').textContent = 'Medição em andamento…';
+  $('analysis-history').textContent = '';
   for (let index = 0; index < RUNS; index++) {
     status(`Modo ${mode}${note}: aquecimento/medição ${index + 1}/${RUNS}…`);
     results.push(await measureOnce(mode, effectiveMode, index));
   }
   status(`Concluído: ${RUNS} repetições no modo ${mode}${note}.`);
-  await renderResults();
+  await renderResults(deviceName, mode);
   $('run-static').disabled = false;
   $('run-animated').disabled = false;
 }
@@ -405,31 +536,63 @@ async function toggleCamera() {
 }
 
 async function copyLog() {
+  const text = $('log').value;
+  if (!text) {
+    status('Rode pelo menos um teste antes de copiar os resultados.');
+    return;
+  }
   try {
-    await navigator.clipboard.writeText($('log').value);
-    status('Log copiado.');
+    if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('Clipboard API indisponível.');
+    await navigator.clipboard.writeText(text);
+    status('Dados e análise copiados para a área de transferência.');
   } catch (error) {
-    $('log').focus();
-    $('log').select();
-    status('Não foi possível copiar automaticamente. Selecione e copie o log.');
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const copied = document.execCommand('copy');
+      textarea.remove();
+      if (copied) status('Dados e análise copiados para a área de transferência.');
+      else {
+        $('log').focus();
+        $('log').select();
+        status('Cópia automática bloqueada pelo navegador. O texto está selecionado para copiar manualmente.');
+      }
+    } catch (fallbackError) {
+      console.error('Falha ao copiar os resultados.', error, fallbackError);
+      $('log').focus();
+      $('log').select();
+      status('Não foi possível copiar automaticamente. O texto está selecionado para copiar manualmente.');
+    }
   }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   $('tech').textContent = TECH === 'p5' ? 'p5.js' : TECH === 'image' ? 'Imagem estática' : 'Fragment shader GLSL';
   $('page-url').textContent = location.href;
+  try {
+    const savedName = localStorage.getItem(DEVICE_NAME_KEY);
+    if (savedName) $('device-label').value = savedName;
+  } catch (error) {
+    console.warn('Não foi possível recuperar o nome do aparelho salvo.', error);
+  }
+  $('device-label').addEventListener('input', () => {
+    try {
+      localStorage.setItem(DEVICE_NAME_KEY, $('device-label').value.trim());
+    } catch (error) {
+      console.warn('Não foi possível guardar o nome do aparelho.', error);
+    }
+  });
   $('run-static').addEventListener('click', () => run('static'));
   $('run-animated').addEventListener('click', () => run('animated'));
   $('camera-button').addEventListener('click', toggleCamera);
   $('copy').addEventListener('click', copyLog);
-  $('save').addEventListener('click', () => {
-    const blob = new Blob([$('log').value], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `${TECH}-${new Date().toISOString().replaceAll(':', '-')}.json`;
-    link.click();
-    URL.revokeObjectURL(link.href);
-  });
+  $('analysis-current').textContent = 'Execute um teste para ver a análise desta página.';
+  $('analysis-history').textContent = 'Resultados salvos de outros testes aparecem aqui quando as condições coincidem.';
 
   try {
     if (!sceneEl.hasLoaded) await new Promise((resolve) => sceneEl.addEventListener('loaded', resolve, { once: true }));

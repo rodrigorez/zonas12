@@ -408,20 +408,29 @@ após descodificação, a textura WebGL usa RGBA. p5.js desenha no canvas RGBA `
 a textura a 30 fps. O shader não usa textura de panorama e atualiza `uTime` a 30 fps. O conteúdo
 visual é equivalente em tema e paleta, não uma comparação pixel a pixel.
 
-Cada botão executa **3 repetições**; cada repetição aquece por **5 s** e mede **15 s**. Há dois modos:
-estático (comparação direta das três formas) e animado (shader/p5.js animam; a imagem permanece
-estática como linha de base). Para cada celular:
+O painel usa a mesma sequência em cada página: **1. Ligar câmera**, **2. Teste 1 — estático**,
+**3. Teste 2 — animado** e **4. Copiar dados**. O nome do celular é informado na primeira página e
+reutilizado nas outras pelo `localStorage` da mesma origem; se o browser não permitir armazenamento,
+será preciso informá-lo de novo. O texto da interface usa cinza RGB **127, 127, 127**.
+
+Cada teste executa **3 repetições**; cada repetição aquece por **5 s** e mede **15 s**. No Teste 1,
+as três tecnologias são estáticas. No Teste 2, shader/p5.js animam e a imagem permanece estática
+como linha de base. Para cada celular:
 
 1. Use a mesma versão/URL base e o mesmo `?pr=` e `?aa=` nas três páginas.
-2. Informe uma identificação curta, por exemplo `V3 GE8320`; ligue ou desligue a câmera e mantenha
-   essa condição em todos os testes. HTTPS é necessário para a câmera em hospedagem remota.
-3. Faça as três repetições do modo **estático** em cada tecnologia; depois repita no modo **animado**.
-   Mantenha a página visível, não caminhe, não mude de app e evite tocar na tela durante a medição.
-4. Copie o JSON ou baixe o arquivo. O log inclui URL completa, hora local/UTC de início e fim,
+2. Informe uma identificação curta, por exemplo `V3 GE8320`; a página a salva para as outras
+   tecnologias. Ligue a câmera em cada página e mantenha essa condição nos três testes. HTTPS é
+   necessário para a câmera em hospedagem remota.
+3. Faça o **Teste 1** nas três páginas e depois o **Teste 2** nas três. Mantenha cada página visível,
+   não caminhe, não mude de app e evite tocar na tela durante a medição.
+4. A análise na própria página mostra a mediana de FPS, p95 e quadros lentos. Ao testar mais de uma
+   tecnologia, o histórico local compara automaticamente os resultados do mesmo celular, modo,
+   GPU, tamanho de tela, câmera, antialias e pixelRatio. O botão **Copiar dados** copia o JSON e a
+   comparação; se o browser bloquear a cópia, seleciona o texto para copiar manualmente. O log inclui URL completa, hora local/UTC de início e fim,
    navegador, modelo reportado quando disponível, GPU, núcleos, memória aproximada, dimensões de
    tela, DPR, pixelRatio aplicado, antialias e dados da câmera. O navegador pode ocultar modelo/GPU;
    o campo de identificação manual é o rótulo confiável do aparelho.
-5. Compare mediana e dispersão das três repetições; anote quedas térmicas/bateria e não misture
+5. Confira a mediana e a dispersão das três repetições; anote quedas térmicas/bateria e não misture
    rodadas com câmera, resolução ou pixelRatio diferentes.
 
 O benchmark mede FPS, quadro médio, p95, máximo e percentagem de quadros acima de 33,4 ms. Também
