@@ -4,13 +4,17 @@
 > secção [11](#11-decisões) com data. Nada de código foi implementado: este documento é o
 > guia de desenvolvimento, e o `README.md` descreve o que **já** existe.
 >
-> **Atualização (2026-10-23, Fase 5 — plano):** a fase seguinte foi planeada **antes** de mexer em
-> código, como as anteriores: a **gravação direta** (§9) — um servidor local que serve a publicação
-> **e** grava `data/worlds/<slug>.json`, com cópia de segurança antes de gravar. Fecha-se com
-> **D48–D51** (§11) e o plano tem o ponto de partida **medido** no B0, **4** blocos (B1–B4), **6**
-> metas e a aceitação. A fase existe porque a fricção de exportar incomodou (era a condição escrita
-> na Fase 4); a D2 é **emendada**, não revogada: quem escreve é a ferramenta, e o editor continua a
-> não escrever sozinho. **Nada implementado.**
+> **Atualização (2026-10-23, Fase 5 — fechada):** a **gravação direta** correu **bloco a bloco** e
+> cada bloco foi dado por **medido**, como nas fases anteriores. O que a fase entregou: o **servidor
+> da ferramenta** (`tools/server/serve.mjs`) que serve a publicação **e** grava
+> `data/worlds/<slug>.json`, com o **mesmo** validador (as **mesmas** recusas: erros, versão, slug
+> trocado, mundo que não existe), **cópia de segurança** antes de cada gravação e escrita atómica; e
+> o botão **«Gravar»** no editor, que só existe quando o servidor responde (o cabeçalho
+> `X-Zonas12-Serve`). O «Exportar» da D2 **fica** — é o caminho de qualquer host —, e a D2 passa a
+> ter data de emenda: o editor não escreve, a ferramenta escreve. Decisões **D48–D51** (§11); o
+> plano, os blocos e o que cada um mediu em §9. **Aceitação medida:** `validate.mjs` **0**, as leis
+> **21 de 21**, a bateria dos doze **35 de 35** nos 5 mundos, o servidor **34 de 34**, e o
+> `git diff` de uma gravação a mostrar **uma** linha. O passo seguinte é a **Fase 6**.
 >
 > **Atualização (2026-10-20, Fase 4 — fechada):** a **página de edição** correu **bloco a bloco**
 > (B0–B10, um commit por bloco) e cada bloco foi dado por **medido** — browser e linha de comando —,
@@ -2826,7 +2830,7 @@ dependem da janela do arnês, e o que se compara é o «0 fora da moldura» e o 
 | Exportar por cima do ficheiro errado | Baixa | o nome do ficheiro é o `world.slug`, e o validador já exige que a pasta seja o slug |
 | Uma sala inalcançável que o editor não vê | Baixa | fica na linha de comando (sem listagem de pasta por HTTP — nota da §7) |
 
-### Fase 5 — Gravação direta (2026-10-23)
+### Fase 5 — Gravação direta (2026-10-23, **fechada**)
 
 > **O plano foi escrito antes de mexer em código** (B0), como nas fases anteriores. A fase estava
 > condicionada a «a fricção de exportar incomodar»; o autor decidiu em **2026-10-23** que incomoda, e
@@ -2943,6 +2947,26 @@ nada ao que já existe.
 | Perder trabalho com uma escrita a meio | Média | cópia de segurança antes e escrita atómica (`*.tmp` + `rename`) |
 | O editor ganhar um caminho que só existe em casa | Média | o botão depende do `ping`; a bateria do editor corre sem servidor (M6) |
 | Duas implementações do validador | Baixa | o servidor **importa** `js/scene/validation.js`: **0** cópias |
+
+#### Fecho da fase (2026-10-23)
+
+A aceitação correu item a item, no mesmo dia:
+
+1. **Só pelo editor e pelo servidor** — o fixture aberto em `editor.html?world=example`, a posição da
+   câmara mudada de `0` para `0,5`, «Gravar», a exposição recarregada: a câmara do jogador fica em
+   **x = 0,5**. A linha de estado diz o ficheiro e a cópia, e a marca «alterado» sai.
+2. **O ficheiro** — `node tools/scene/validate.mjs` a **0** e o `git diff` com **uma** linha
+   (`0` → `0.5`): o texto gravado é o exportado, byte a byte (**M3**).
+3. **A cópia de segurança** — em `.harness/backups/worlds/example/…` com o conteúdo anterior
+   (a posição ainda a `0`), escrita antes do ficheiro (**M5**).
+4. **Sem servidor** — o mesmo editor servido por `python -m http.server`: o «Gravar» **não aparece**,
+   o «Exportar» fica igual e a consola da página tem **0** mensagens (**M6**).
+5. **O que não mudou** — a bateria dos doze nas 5 páginas **35 de 35** (T8 a **0** em todas), as leis
+   **21 de 21**, o `selftest` do servidor **34 de 34** e o validador a **0** nos 5 mundos.
+
+Depois de medido, o fixture voltou ao que era (`git checkout`) e as cópias da medição foram apagadas.
+**Fica por testar pelo autor no telemóvel**, que é como as fases anteriores foram dadas por fechadas —
+e é o único item que a fase não pode medir sozinha.
 
 ### Fase 6 — Testes e limpeza
 - **Entregável:** os testes de §10 automatizados (o mesmo script que já usamos no browser).

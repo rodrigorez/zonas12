@@ -31,13 +31,14 @@ zonas12/
 │   │                   nome das coisas na vista de debug (`label.js`, Fase 4)
 │   ├── scene/          a cena em dados: schema, validação, construtor e as regras de desenho
 │   └── editor/         o editor (Fase 4): modelo, painéis, pré-visualização, problemas, os
-│                       controlos partilhados e as respostas que a página pode dar sobre os ficheiros
+│                       controlos partilhados, as respostas que a página pode dar sobre os
+│                       ficheiros e a ponte com o servidor da ferramenta (Fase 5)
 ├── data/
 │   └── worlds/         uma cena por mundo (D24): gate, cidade, praia, ceu e o fixture `example`
 │                       (o mundo sai do **endereço**: `/` é o portão, `/cidade/` é a cidade; o
 │                       `?scene=<mundo>` continua a forçar um deles, para os testes)
 ├── i18n/
-│   └── pt.json         textos da interface: 154 chaves (137 delas do editor), lidas por js/i18n.js
+│   └── pt.json         textos da interface: 160 chaves (143 delas do editor), lidas por js/i18n.js
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos, mundos e página de edição)
 ├── assets/
@@ -48,20 +49,24 @@ zonas12/
 ├── tools/
 │   ├── scene/               validador dos ficheiros de cena (corre a mesma validação que o browser,
 │   │                        mais o grafo dos mundos e os arranques), o instrumento das leis
-│   │                        (avarias injetadas, uma por lei), o verificador dos arranques (D28) e a
-│   │                        ferramenta que cria a pasta e o arranque de um mundo novo (D31)
+│   │                        (avarias injetadas, uma por lei), o verificador dos arranques (D28), a
+│   │                        ferramenta que cria a pasta e o arranque de um mundo novo (D31) e as
+│   │                        perguntas ao disco (`disk.mjs`): o asset existe e a imagem mede 2:1
+│   ├── server/              o servidor da ferramenta (Fase 5, D48): serve a publicação **e** grava
+│   │                        `data/worlds/<slug>.json`, com cópia de segurança; e o seu instrumento
 │   ├── migration/           o conversor HTML→JSON da Fase 0 e a migração para o formato v3, ambos
 │   │                        com guarda: são o registo das migrações
 │   ├── assets/              normalização das imagens (2:1 e teto de 2048 px — lei L14)
 │   └── regression/          a varredura de poses T2/T3, a bateria dos doze testes e o ciclo
 │                            build/remove de portais (correm na consola do browser, com uma página
-│                            da exposição aberta)
+│                            da exposição aberta) e as baterias de linha de comando da Fase 4
 ├── .harness/           fora do repositório (está no .gitignore)
 │   ├── dev/            ferramentas retiradas da raiz (não são precisas para o app)
 │   │   ├── package.json, package-lock.json   dependências npm (A-Frame vem do CDN)
 │   │   ├── node_modules/
 │   │   ├── favicon.ico                       vazio, sem uso
 │   │   └── vscode-config/settings.json       configuração do editor
+│   ├── backups/worlds/  a cópia de cada gravação do editor (Fase 5, D51) — uma por gravação
 │   ├── imagenTeste/    capturas de ecrã usadas para diagnosticar problemas
 │   └── skills/         harness de skills para IA — índice em .agent/skills_index.md (regra 5)
 └── .gitignore
@@ -197,27 +202,28 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.9)
+## Estado atual do código (2026-10-23, depois da Fase 5)
 
-Marcado pela branch `v0.0.9`. É o estado depois da **Fase 4** do roadmap — a **página de edição**
-(`editor.html`) e a **travessia entre mundos**, ambas fechadas bloco a bloco com o que cada um
-entregou e mediu em [docs/ROADMAP.md](docs/ROADMAP.md) §9. Tudo o que está nesta secção foi medido a
-**2026-10-22** na versão local (as baterias estão em §10) e, no mesmo dia, **na publicada** — as
-verificações no browser contra o que o GitHub Pages serve (abaixo); fica **por testar pelo autor** no
-**telemóvel**, que é como as versões anteriores foram dadas por fechadas. A versão anterior é a
-`v0.0.8` (o fecho da Fase 4, com os retratos ainda a 4096 nas duas portas mais difíceis), marcada pela branch com o mesmo nome.
+É o estado depois da **Fase 5** do roadmap — a **gravação direta**: o servidor da ferramenta
+(`tools/server/serve.mjs`) e o botão «Gravar» no editor. As decisões são a **D48–D51** e o que cada
+bloco entregou e mediu está em [docs/ROADMAP.md](docs/ROADMAP.md) §9. Tudo o que está nesta secção
+foi medido a **2026-10-23** na versão local (as baterias estão em §10): `validate.mjs` a **0**, as
+leis **21 de 21**, a bateria dos doze **35 de 35** nos 5 mundos, a chegada **5 de 5**, o servidor
+**34 de 34** e o editor medido no browser com a consola instrumentada. Fica **por testar pelo autor**
+no **telemóvel**, que é como as versões anteriores foram dadas por fechadas. O marco anterior é a
+`v0.0.9` (o fecho da Fase 4), marcada pela branch com o mesmo nome.
 
 Resumo do que existe hoje: `index.html` (**93 linhas**) e as **3** salas com o **mesmo** ficheiro
-(`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `editor.html` (**83**),
+(`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `editor.html` (**95**),
 `js/app.js` (**185**), `js/arrival-frame.js` (**125**, a ponte de imagem entre mundos — D43),
 `js/editor.js` (**14**, a entrada do editor — D36), `js/editor/`
-(**10** ficheiros, **2697** linhas com os painéis), `js/i18n.js` (**92**), `js/core/` (7 ficheiros,
-**219**), `js/modules/` (6 ficheiros, **1425**), `js/scene/` (5 ficheiros, **1132**),
-`css/style.css` (105) e `css/editor.css` (**313**), **5** mundos em `data/worlds/` (o portão, as três
-salas e o fixture, **1279 linhas** no total e **12** portas), `i18n/pt.json` (**154** chaves), os
-**15** assets em `assets/{panoramas,artworks,video,previews}` (**6** deles retratos das portas, um
-por porta — D46) e **23** ficheiros em `tools/`
-(**5098** linhas — as ferramentas de dados e os instrumentos das fases).
+(**14** ficheiros, **2789** linhas com os painéis e a ponte com o servidor), `js/i18n.js` (**92**),
+`js/core/` (7 ficheiros, **219**), `js/modules/` (6 ficheiros, **1425**), `js/scene/` (5 ficheiros,
+**1132**), `css/style.css` (105) e `css/editor.css` (**313**), **5** mundos em `data/worlds/` (o
+portão, as três salas e o fixture, **1279 linhas** no total e **12** portas), `i18n/pt.json` (**160**
+chaves), os **15** assets em `assets/{panoramas,artworks,video,previews}` (**6** deles retratos das
+portas, um por porta — D46) e **27** ficheiros em `tools/`
+(**5958** linhas — as ferramentas de dados, o servidor da ferramenta e os instrumentos das fases).
 
 O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
 regras de stencil — a única parte global, porque o stencil é um recurso de toda a cena.
@@ -253,7 +259,7 @@ O **`js/editor/`** é o editor (Fase 4), e a entrada é `js/editor.js`:
 
 | Ficheiro | O que é |
 | --- | --- |
-| `js/editor/index.js` | A composição: a barra (mundo, validar, desfazer, exportar, importar), o `validateScene` com as respostas que a página pode dar, a marca «alterado», a guarda de saída e o desfazer |
+| `js/editor/index.js` | A composição: a barra (mundo, validar, desfazer, gravar, exportar, importar), o `validateScene` com as respostas que a página pode dar, a marca «alterado», a guarda de saída e o desfazer |
 | `js/editor/model.js` | O mundo em memória, o **export byte-estável** (2 espaços e `\n`), os instantâneos do desfazer (**D35**) e o «alterado» |
 | `js/editor/panels/` | Os **cinco** painéis — mundo, dimensão, obra, portal e câmara —, cada um com o que §7 do roadmap pede e um formulário de inserção |
 | `js/editor/preview.js` | A cena de pré-visualização: `buildScene` mais os `replace…` que re-criam **a entidade** editada (D33) |
@@ -261,6 +267,7 @@ O **`js/editor/`** é o editor (Fase 4), e a entrada é `js/editor.js`:
 | `js/editor/worlds.js` | O **único** sítio que lê um mundo que não se está a editar — para a **L11** e o mapa da casa; lê e guarda, nunca constrói (L13) |
 | `js/editor/assets.js` | As respostas que a página pode dar sobre os ficheiros: o asset existe (**L9**) e a imagem mede 2:1 (**L14**), por `Image` e por `HEAD` |
 | `js/editor/problems.js` | Os três números (erros, avisos, por verificar) e uma linha por problema |
+| `js/editor/server.js` | A ponte com o servidor da ferramenta (Fase 5): um `HEAD` na raiz lê o cabeçalho `X-Zonas12-Serve` e diz se há quem grave (**D49**); o `PUT` grava o mundo (**D50**) |
 
 A cena está em **`data/worlds/<mundo>.json`** (formato **v3**, descrito no roadmap §6): um catálogo
 `assets` onde cada caminho aparece **uma vez**, as dimensões e as obras a apontarem para ele pelo
@@ -276,7 +283,8 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 | Página de edição | `editor.html` (`?world=<slug>`) é uma **ferramenta separada** (D4) que usa os **mesmos** módulos: abre um mundo, edita-o por **cinco painéis** (câmara, dimensão, obra, portal, mundo), mostra a **pré-visualização** com a mesma cena da exposição e exporta o JSON — sem nada escrever em disco (D2). A pasta de um mundo novo é da ferramenta `tools/scene/new-world.mjs` (**D31**) |
 | Desfazer, «alterado» e guarda de saída | Editar → desfazer (**50** instantâneos do JSON, **D35**) → exportar; a marca «alterado» e o aviso antes de fechar com alterações que não saíram num ficheiro (**D32**); e a exportação **recusa** um mundo com erros — valida tudo antes de exportar |
 | As leis no editor | O editor corre o **mesmo** `validation.js` e responde às duas perguntas que eram só da linha de comando: o asset existe (**L9**) e a imagem mede 2:1 (**L14**). Num mundo saudável o relatório diz `Erros: 0 · Avisos: 0 · Por verificar: 0` |
-| Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**154** chaves), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` pede outra língua (cai no português, com **1** aviso, enquanto `en.json` não existir — está decidido para depois desta fase) |
+| Gravação direta | Com o **servidor da ferramenta** (`node tools/server/serve.mjs`) o editor ganha o botão «Gravar»: escreve o mundo em `data/worlds/` com o **mesmo** validador, uma cópia de segurança antes e escrita atómica (**D48–D51**); sem servidor o botão não aparece e o «Exportar» fica como estava |
+| Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**160** chaves), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` pede outra língua (cai no português, com **1** aviso, enquanto `en.json` não existir — está decidido para depois desta fase) |
 | Portas de mundo | A travessia de uma porta de mundo **navega** para o endereço do destino e o visitante aparece **atrás** da porta que lá se declara a chegada (`arrivalFrom`), na direcção em que vinha — o regresso é **um passo** (L16/L17/L19). Como cada mundo é uma **página** (D24), a chegada **arranca a exposição sozinha** (`?from=`, D37): o botão «ATIVAR EXPOSIÇÃO» fica para a primeira visita e volta se a câmara for recusada. E a porta que volta ao portão mostra a **realidade ao vivo** pela janela (**D38**): a sala declara uma dimensão `kind: "camera"`, que não desenha nada, e o rectângulo fica transparente sobre o vídeo — vê-se a câmara dos **dois lados**, que é o que a porta mostrava na Fase 3 |
 | Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID está no dado (`"id"`) e, na cena construída, em `data-dimension`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
 | Grafo de dimensões | Portais bidirecionais entre duas dimensões, com uma **dimensão ativa** global; dentro de cada mundo é o que resta do grafo antigo, e o **grafo de mundos** é conferido pela linha de comando (alcançabilidade a partir do portão) |
@@ -838,6 +846,41 @@ o vídeo dela, e duas coisas o mostravam — a ponte saía **58 ms antes** de o 
 **apresentado** pela câmara (no máximo **3 s**; uma câmara recusada resolve logo), e o `resize` é seguido
 de uma renderização imediata (**0,5 a 5,2 ms** sem desenho, dentro do mesmo fotograma).
 
+## A gravação direta (Fase 5, fechada em 2026-10-23)
+
+> O plano, as decisões (**D48–D51**) e o que cada bloco entregou e mediu estão em
+> [docs/ROADMAP.md](docs/ROADMAP.md) §9 e §11.
+
+`tools/server/serve.mjs` é o **servidor da ferramenta**: serve a pasta do projeto (o que antes era o
+`python -m http.server`) e aceita gravar um mundo. É uma ferramenta, **não** a publicação — o GitHub
+Pages não corre Node —, e por isso nada disto muda o que se publica.
+
+```
+node tools/server/serve.mjs                  a exposição em http://127.0.0.1:8123/
+node tools/server/serve.mjs --port 9000      noutra porta
+```
+
+- **Só escuta em `127.0.0.1`** e recusa arrancar noutro endereço: um servidor com uma porta de
+  escrita não pode ficar à vista da rede. Confere `Host` e `Origin` em cada pedido de gravação.
+- **Não serve o que não se publica**: `.harness/` (onde ficam as cópias de segurança), `.git/`,
+  `node_modules/` e o que começa por ponto respondem **403**, e um caminho com `..` também.
+- **O editor pergunta-lhe se pode gravar** com um `HEAD` na raiz e o cabeçalho `X-Zonas12-Serve`;
+  sem esse cabeçalho (GitHub Pages, `python -m http.server`) o botão «Gravar» **não aparece** e o
+  «Exportar» fica exactamente como estava (**D49**).
+- **O servidor recusa o que o editor recusaria** (**D50**): valida com o **mesmo**
+  `js/scene/validation.js` e o disco, e não escreve nada quando o mundo tem erros (**422**), quando o
+  `world.slug` não é o do endereço (**400**), quando a `version` não é a do esquema (**400**) ou
+  quando o mundo não existe em `data/worlds/` (**404** — gravar **substitui**, não cria: criar um
+  mundo continua a ser `node tools/scene/new-world.mjs`, **D31**).
+- **Cada gravação deixa uma cópia** do conteúdo anterior em
+  `.harness/backups/worlds/<slug>/<AAAAMMDD-HHMMSS-mmm>.json` (**D51**), e a linha de estado do
+  editor diz onde ela está. A escrita é atómica (`*.tmp` + `rename`).
+- **O que é gravado é o que se exportaria**: o mesmo texto do «Exportar» (2 espaços e `\n` no fim),
+  e por isso o `git diff` mostra só o que foi editado.
+
+O instrumento é `node tools/server/selftest.mjs`: **34** verificações contra uma raiz temporária — o
+que ele serve, o que recusa servir, o que recusa gravar e o que faz quando grava.
+
 ## Funcionalidades Principais
 
 ### 1. Dimensões e Portais (arquitetura modular)
@@ -1189,9 +1232,11 @@ e o **nome de cada porta e de cada obra** (tecla **D**):
 ### 1. Executar o Projeto
 
 1. **Sirva a pasta por HTTP** — abrir o `index.html` com duplo clique **já não funciona**:
-   a entrada é um módulo ES (`js/app.js`) e os módulos não carregam por `file://`. Na raiz
-   do projeto, por exemplo: `python -m http.server 8123`, e abra
-   `http://127.0.0.1:8123/`
+   a entrada é um módulo ES (`js/app.js`) e os módulos não carregam por `file://`. Na raiz do
+   projeto: `node tools/server/serve.mjs` e abra `http://127.0.0.1:8123/`. É o servidor da
+   ferramenta (§ «A gravação direta»): serve como o `python -m http.server 8123` e acrescenta o
+   «Gravar» ao editor. Sem Node, o `python -m http.server 8123` continua a servir a exposição e o
+   editor — só não grava.
 2. Clique no botão "ATIVAR EXPOSIÇÃO" — que **só existe enquanto não há câmara**: numa visita
    seguinte, em que o browser já guarda a autorização, a exposição arranca sozinha (decisão **D41**);
    e ao atravessar um portal o botão **não aparece** — a página carrega com a linha «Carregando…»
@@ -1217,8 +1262,8 @@ de chegada: `/praia/?from=cidade`.
   catálogo é a única parte que o editor não edita: as dimensões, as obras e as portas editam-se
   nos painéis (passo 5)
 - Para acrescentar um **mundo**: `node tools/scene/new-world.mjs <slug>` cria a pasta e o arranque
-  (D31), o editor exporta o `data/worlds/<slug>.json`, e a porta que o liga ao portão cria-se no
-  painel «Mundo» — com o retrato do destino em `assets/previews/` e o `radius` do retrato
+  (D31), o editor grava (ou exporta) o `data/worlds/<slug>.json`, e a porta que o liga ao portão
+  cria-se no painel «Mundo» — com o retrato do destino em `assets/previews/` e o `radius` do retrato
 - As imagens têm de ser **2:1** e ficam melhor com 2048 de largura (lei L14); a ferramenta
   `tools/assets/normalize.mjs` corta e reduz sem ampliar
 - Valide antes de publicar: `node tools/scene/validate.mjs` (confere todos os mundos e o grafo)
@@ -1279,8 +1324,11 @@ Com a pasta servida por HTTP (o mesmo servidor do passo 1), abra por exemplo
 3. `Ctrl+Z` (ou o botão «Desfazer») volta atrás — até 50 passos; a marca «alterado» diz se o mundo
    ainda não saiu num ficheiro, e a página avisa antes de fechar nesse estado
 4. «Validar» volta a perguntar tudo — é o que se usa depois de pôr um ficheiro novo em `assets/`
-5. «Exportar» descarrega `<slug>.json` (**recusa** enquanto houver erros). Ponha-o em `data/worlds/`
-   e corra `node tools/scene/validate.mjs`; o `git diff` deve mostrar só o que editou
+5. «Gravar» (só existe com o servidor da ferramenta, § «A gravação direta») escreve o mundo em
+   `data/worlds/` e diz na linha de estado onde ficou a cópia da versão anterior; «Exportar»
+   descarrega `<slug>.json` (**recusa** enquanto houver erros) e é o caminho quando não há servidor —
+   ponha-o em `data/worlds/` e corra `node tools/scene/validate.mjs`; o `git diff` deve mostrar só o
+   que editou
 6. «Importar JSON» faz o mesmo caminho ao contrário: um ficheiro de fora é tratado como um mundo
    aberto (D2/D3)
 
@@ -1290,8 +1338,8 @@ consola e fica onde está — o editor serve para arrumar a sala, não para a vi
 ## Melhorias Planejadas
 
 - **A tradução do catálogo** (`i18n/en.json`): o conjunto de chaves estabilizou com a Fase 4
-  (**154** chaves), e é agora que traduzir não é traduzir duas vezes; até lá o `?lang=en` cai no
-  português com **1** aviso
+  (**154**) e a Fase 5 acrescentou **6** (**160**), e é agora que traduzir não é traduzir duas vezes;
+  até lá o `?lang=en` cai no português com **1** aviso
 - **O catálogo de assets no editor**: hoje é dado do ficheiro (o editor escolhe entre os assets que
   o mundo já tem), e um mundo novo começa com o catálogo que se lhe escrever
 - **Portais com movimento e rotação animados**, definidos na cena
