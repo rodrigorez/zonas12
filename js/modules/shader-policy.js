@@ -3,7 +3,9 @@
 // What it promises, in the order the README documents: the animation never runs faster than 20
 // updates per second; under **persistent** degradation the pixelRatio comes down first, inside
 // `[1, the device's own]`; only at the floor does the cadence fall to 15 and then to a still frame.
-// It never goes back up on its own — no oscillation — and `prefers-reduced-motion` keeps it still
+// The cadence never goes back up on its own, and the pixelRatio **stops** once it has found the
+// device's ceiling: between the best value that held and the lowest that failed, it probes the middle
+// and stops as soon as the interval is small — no oscillation. `prefers-reduced-motion` keeps it still
 // from the start.
 //
 // Why a separate file: the decisions are a function of samples, so the instrument drives them with
@@ -27,17 +29,18 @@ export const SHADER_POLICY = {
   lateToleranceMs: 20,     // an update later than its deadline by this much is a late update
   lateFraction: 0.25,      // more late updates than this in a step is degradation
   badToStepDown: 2,        // persistent means two consecutive bad steps
-  goodToStepUp: 3,         // three good steps before the pixelRatio is allowed back up
-  ratioStep: 0.2,          // a reduction of 20% of the current ratio, towards the floor of 1
-  ratioRecovery: 0.05,     // and 5% back, never reaching the value that already went badly
+  goodToStepUp: 3,         // three good steps before the pixelRatio is allowed to move up
+  ratioStep: 0.2,          // when the value we trusted fails, trust falls by 20% towards the floor of 1
   // The first frame never asks the device for more than this (measured on the weak phone: at the
   // native 2.625 the page drew 38.7 frames/s with a third of the updates late; at 1.945 it drew 57.3).
   // The ladder climbs from here up to the device's own DPR, so the ceiling is still the device's.
   firstRatio: 2,
-  // While nothing has ever gone badly, the climb is quick (20% per three good steps) — the ceiling is
-  // unknown and there is no reason to take a minute and a half to find it. After the first bad step the
-  // cautious 5% applies, under the value that failed.
-  ratioClimb: 0.2
+  // While no value has ever failed the ceiling is unknown, and there is no reason to take a minute and
+  // a half to find it: explore upwards 20% per three good steps.
+  ratioClimb: 0.2,
+  // After a failure the search is a bisection between what held and what failed; it stops when the two
+  // are closer than this (2% of the lower), and that stop is the promise of no oscillation.
+  bisectionStop: 0.02
 };
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -55,9 +58,12 @@ export function createPolicy(options) {
     : defaults.minPixelRatio;
   // The first frame has to be the one the policy says it is: the renderer is born at the device's DPR.
   if (resolution && Math.abs(resolution.get() - ratio) > 0.001) resolution.set(ratio);
-  let badAt = 0;
   let badSteps = 0;
   let goodSteps = 0;
+  // The two bounds of the search for the device's ceiling: `low` is the best pixelRatio that held a
+  // whole window, `high` the lowest that failed. While `high` is infinite the ceiling is unknown.
+  let low = ratio;
+  let high = Infinity;
   let hidden = false;
   let frozen = settings.reducedMotion === true;
   let started = false;
@@ -111,10 +117,18 @@ export function createPolicy(options) {
     if (!bad) {
       badSteps = 0;
       goodSteps += 1;
-      if (resolution && goodSteps >= defaults.goodToStepUp && ratio < resolution.max - 0.001) {
-        const ceiling = badAt ? Math.min(resolution.max, badAt * 0.95) : resolution.max;
-        if (ratio < ceiling - 0.001) {
-          ratio = Math.min(ceiling, ratio * (1 + (badAt ? defaults.ratioRecovery : defaults.ratioClimb)));
+      if (resolution && goodSteps >= defaults.goodToStepUp) {
+        low = Math.max(low, ratio);
+        let next = null;
+        if (Number.isFinite(high)) {
+          // Bisection: the middle of what held and what failed is the only value that repeats neither.
+          const meio = clamp((low + high) / 2, resolution.min, resolution.max);
+          if (meio > ratio * (1 + defaults.bisectionStop)) next = meio;
+        } else if (ratio < resolution.max - 0.001) {
+          next = Math.min(resolution.max, ratio * (1 + defaults.ratioClimb));
+        }
+        if (next !== null && next > ratio + 0.0005) {
+          ratio = next;
           resolution.set(ratio);
           goodSteps = 0;
           note('subiu pr', { pixelRatio: +ratio.toFixed(3), p95: +stats.p95.toFixed(1) });
@@ -129,8 +143,15 @@ export function createPolicy(options) {
     badSteps = 0;
 
     if (resolution && ratio > resolution.min + 0.001) {
-      badAt = ratio;
-      ratio = Math.max(resolution.min, ratio * (1 - defaults.ratioStep));
+      high = Math.min(high, ratio);
+      if (ratio <= low + 0.001) {
+        // The value we trusted failed: trust moves a step down, and the search restarts from there.
+        low = Math.max(resolution.min, ratio * (1 - defaults.ratioStep));
+        ratio = low;
+      } else {
+        // A value that held is below and this one failed: the ceiling is in between.
+        ratio = clamp((low + high) / 2, resolution.min, resolution.max);
+      }
       resolution.set(ratio);
       note('desceu pr', { pixelRatio: +ratio.toFixed(3), p95: +stats.p95.toFixed(1) });
       return;

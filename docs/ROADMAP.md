@@ -4369,13 +4369,22 @@ imagem de reserva em qualquer sala. Detalhes e o formato real estão no README, 
 shader em produção».
 
 **Emenda de 2026-10-24 (medida num telemóvel fraco, Android 10, DPR 2,63):** o primeiro fotograma
-passou a pedir **`min(DPR nativo, 2)`** em vez do DPR nativo, e a escada sobe a partir daí (20% a cada
-três janelas boas enquanto nada falhou, 5% sob o último valor que falhou, teto no DPR do aparelho). O
-motivo está medido: a **2,625** a mesma página desenhava **38,7 quadros/s** com **73 atrasos em 228
+passou a pedir **`min(DPR nativo, 2)`** em vez do DPR nativo, e a escada sobe a partir daí. O motivo
+está medido: a **2,625** a mesma página desenhava **38,7 quadros/s** com **73 atrasos em 228
 atualizações**; a **1,945** desenhava **57,3** — e o custo era só o arranque, porque a escada só
 reagia depois de duas janelas de 3 s. Começar em 2 tira esse arranque e não limita ninguém: um
 aparelho que aguente sobe até ao nativo em ~30 s (`shader.mjs` verifica as três coisas — arranca em
 2 num DPR 3, chega a 3 em 60 s sem degradação, e fica no nativo num DPR 1,17).
+
+**A procura do teto passou a ser uma bissecção (mesma data).** A primeira versão descia 20% e voltava
+a subir 5% de cada vez, e por isso continuava a apalpar o teto indefinidamente: no telemóvel, 5
+eventos em 117 s, 1,6 → 1,68 → 1,764 → 1,852 (cada evento é um `setPixelRatio`, ou seja uma mudança
+de nitidez). Agora a política guarda **o maior valor que aguentou uma janela inteira** e **o menor que
+falhou**, e testa o meio: no mesmo perfil de aparelho converge em **27 s** — 2 → 1,6 → 1,8 → 1,9
+(falhou) → **1,85** — e cala-se (o `shader.mjs` simula exactamente esse aparelho e exige ≤ 6 eventos,
+o último antes dos 60 s, e o valor final entre 1,8 e 1,9). Quando o valor em que se confiava falha, a
+confiança desce 20% e a busca recomeça — é o que garante que um aparelho péssimo continua a chegar ao
+piso 1 e à cadência de 15 (a escada inteira, sem mudar).
 
 **Comportamento pretendido**
 

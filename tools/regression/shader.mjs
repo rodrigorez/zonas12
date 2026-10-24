@@ -78,6 +78,30 @@ function policyChecks() {
   check.check('num ecrã de DPR 1,17 o primeiro fotograma fica no nativo',
     low.status().pixelRatio === 1.17, String(low.status().pixelRatio));
 
+  // A procura do teto **para**: um aparelho que aguenta abaixo de 1,9 e falha a partir daí converge em
+  // poucos movimentos e cala-se — é a promessa «sem oscilação» medida, e não afirmada.
+  let tetoAtual = 2.625;
+  const tetoSets = [];
+  const tetoResolution = {
+    min: 1,
+    max: 2.625,
+    get: () => tetoAtual,
+    set: (value) => { tetoAtual = +value.toFixed(3); tetoSets.push(tetoAtual); }
+  };
+  const tetoClock = { now: 0 };
+  const teto = createPolicy({ resolution: tetoResolution, clock: () => tetoClock.now });
+  let tetoNow = 0;
+  while (tetoNow <= 240000) {
+    tetoClock.now = tetoNow;
+    teto.frame(tetoNow);
+    tetoNow += 1000 / (tetoAtual >= 1.9 ? 8 : 60);
+  }
+  const tetoStatus = teto.status();
+  const ultimoEvento = tetoStatus.events.length ? tetoStatus.events[tetoStatus.events.length - 1].t : 0;
+  check.check('a procura do teto converge e cala-se (sem oscilar)',
+    tetoStatus.events.length <= 6 && tetoStatus.pixelRatio >= 1.8 && tetoStatus.pixelRatio < 1.9 && ultimoEvento < 60,
+    JSON.stringify(tetoStatus.events.map((evento) => evento.what + ' ' + evento.pixelRatio + '@' + evento.t)));
+
   // A mesma política, com atualizações medidas de 5 em 5 segundos: a taxa nunca passa de 20/s.
   const rateClock = { now: 0 };
   const rate = createPolicy({ clock: () => rateClock.now });
