@@ -124,6 +124,15 @@ export function validateScene(scene, options = {}) {
     } else if (dimension.kind === 'image' || dimension.kind === 'video') {
       if (!dimension.asset) err(`${where}: kind "${dimension.kind}" needs an asset`);
       if (typeof dimension.radius !== 'number') err(`${where}: a background needs a radius — law L1`);
+    } else if (dimension.kind === 'shader') {
+      // The trial of R14/R15: the shader comes from the internal list (the schema has the enum) and
+      // the image fallback is what stands in for it while the flag is closed — so it has to be an
+      // image that exists, not a video and not a promise.
+      if (typeof dimension.radius !== 'number') err(`${where}: a background needs a radius — law L1`);
+      const fallback = dimension.fallbackAsset ? assets[dimension.fallbackAsset] : null;
+      if (fallback && fallback.type !== 'image') {
+        err(`${where}: the fallback of a shader has to be an image, not "${fallback.type}"`);
+      }
     }
     if (dimension.kind === 'color' && !dimension.color) {
       warn(`${where}: kind "color" without a colour — the background will be black`);
@@ -278,6 +287,11 @@ export function validateScene(scene, options = {}) {
     ...dimensions
       .filter((dimension) => dimension.asset && (dimension.kind === 'image' || dimension.kind === 'video'))
       .map((dimension) => ({ what: `dimensions[${dimension.id}]`, asset: dimension.asset })),
+    // The fallback of a shader is a panorama too: it is what the visitor sees when the shader is not
+    // built, so it carries the same 2:1 rule (L14).
+    ...dimensions
+      .filter((dimension) => dimension.kind === 'shader' && dimension.fallbackAsset)
+      .map((dimension) => ({ what: `dimensions[${dimension.id}].fallbackAsset`, asset: dimension.fallbackAsset })),
     ...(scene.portals || [])
       .filter((portal) => (portal.window || {}).kind === 'preview' && portal.window.asset)
       .map((portal) => ({ what: `portals[${portal.id}].window`, asset: portal.window.asset }))

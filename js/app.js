@@ -15,6 +15,7 @@ import {
 import { startSession, cameraAlreadyAllowed, cameraFirstFrame, showStartButton, showLoading } from './modules/camera.js';
 import { closeArtwork, toggleArtworkLabels } from './modules/artwork.js';
 import { startFrameDriver } from './modules/portal.js';
+import { shaderStatus } from './modules/dimension.js';
 import { validateScene } from './scene/validation.js';
 import { buildScene } from './scene/scene-builder.js';
 import { initI18n, languageFromUrl } from './i18n.js';
@@ -35,7 +36,10 @@ window.portalDebug = {
   setActiveDimension: setActiveDimension,
   applyStencilState: applyStencilState,
   syncStencilValues: syncStencilValues,
-  on: on
+  on: on,
+  // Which backgrounds were built and how the shader cadence is going (R14/R15) — what the shader
+  // battery reads instead of guessing from pixels.
+  shader: () => shaderStatus()
 };
 
 // Development keyboard shortcuts: one listener for the whole scene, walking the portal

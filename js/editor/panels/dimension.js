@@ -5,11 +5,15 @@
 // built by the scene, so the panel does not offer it; and the id is only asked for on insert, because
 // changing it would leave every artwork and door pointing at a dimension that no longer has that name.
 //
+// `kind: "shader"` **is** offered (Fase 7, R14/R15): the scene builds it behind the trial's flag, and
+// the panel edits what the format carries — the shader of the internal list and the image fallback.
+//
 // Every edit writes the model first and then applies it: a geometry change re-creates **that entity**
 // (D33), and a change of structure (insert, delete) rebuilds the scene, because the ids in the rest of
 // the file stop matching.
 import { t } from '../../i18n.js';
 import { LANGUAGES } from '../../scene/schema.js';
+import { SHADERS } from '../../modules/shaders.js';
 import * as preview from '../preview.js';
 import { heading, textField, numberField, selectField, button, note, debounce } from '../fields.js';
 
@@ -17,10 +21,11 @@ import { heading, textField, numberField, selectField, button, note, debounce } 
 // them — the camera would end up inside a portrait.
 const DECLARED_MAX = 447;
 
-const KINDS = ['image', 'video', 'camera'];
+const KINDS = ['image', 'video', 'shader', 'camera'];
 const KIND_LABEL = {
   image: 'editor.dimension.kind.image',
   video: 'editor.dimension.kind.video',
+  shader: 'editor.dimension.kind.shader',
   camera: 'editor.dimension.kind.camera'
 };
 
@@ -146,12 +151,50 @@ function card(dimension, context, data, artworks, portals) {
     onChange: (value) => { dimension.radius = value; geometry(); }
   });
 
+  // The two fields of a shader background (R14/R15). The shader is chosen by id from the internal
+  // list — GLSL never comes from the file — and the fallback is an image of the catalogue: what the
+  // visitor sees while the trial's flag is closed.
+  const shaderField = selectField(box, {
+    name: 'dimension.' + dimension.id + '.shaderId',
+    labelKey: 'editor.dimension.shader',
+    value: dimension.shaderId || '',
+    options: [{ value: '', label: t('editor.field.none') }].concat(
+      SHADERS.map((entry) => ({ value: entry.id, label: entry.name }))
+    ),
+    onChange: (value) => {
+      if (value) dimension.shaderId = value;
+      else delete dimension.shaderId;
+      geometry();
+    }
+  });
+
+  const fallbackField = selectField(box, {
+    name: 'dimension.' + dimension.id + '.fallbackAsset',
+    labelKey: 'editor.dimension.fallback',
+    value: dimension.fallbackAsset || '',
+    options: [{ value: '', label: t('editor.field.none') }].concat(
+      catalogueFor(data, 'image').concat(dimension.fallbackAsset ? [dimension.fallbackAsset] : [])
+        .filter((id, at, all) => all.indexOf(id) === at)
+        .map((id) => ({ value: id, label: id }))
+    ),
+    onChange: (value) => {
+      if (value) dimension.fallbackAsset = value;
+      else delete dimension.fallbackAsset;
+      geometry();
+    }
+  });
+
   const assetBox = assetField.element;
   const radiusBox = radiusField.element;
+  const shaderBox = shaderField.element;
+  const fallbackBox = fallbackField.element;
   const onlyWhenBackground = () => {
-    const visible = dimension.kind !== 'camera';
-    assetBox.hidden = !visible;
-    radiusBox.hidden = !visible;
+    const shader = dimension.kind === 'shader';
+    const camera = dimension.kind === 'camera';
+    assetBox.hidden = camera || shader;
+    radiusBox.hidden = camera;
+    shaderBox.hidden = !shader;
+    fallbackBox.hidden = !shader;
   };
   onlyWhenBackground();
 
@@ -230,6 +273,37 @@ function insertForm(context, data) {
     onChange: () => {}
   });
 
+  const shader = selectField(box, {
+    name: 'dimension.new.shaderId',
+    labelKey: 'editor.dimension.shader',
+    value: '',
+    options: [{ value: '', label: t('editor.field.none') }].concat(
+      SHADERS.map((entry) => ({ value: entry.id, label: entry.name }))
+    ),
+    onChange: () => {}
+  });
+
+  const fallback = selectField(box, {
+    name: 'dimension.new.fallbackAsset',
+    labelKey: 'editor.dimension.fallback',
+    value: '',
+    options: [{ value: '', label: t('editor.field.none') }].concat(
+      catalogueFor(data, 'image').map((id) => ({ value: id, label: id }))
+    ),
+    onChange: () => {}
+  });
+
+  // What a kind needs changes what is asked: one background per kind (the rules of the format say the
+  // same, so the panel is not inventing a rule of its own).
+  const syncFields = () => {
+    const isShader = kind.input.value === 'shader';
+    const isCamera = kind.input.value === 'camera';
+    asset.element.hidden = isShader || isCamera;
+    shader.element.hidden = !isShader;
+    fallback.element.hidden = !isShader;
+    radius.element.hidden = isCamera;
+  };
+
   const radius = numberField(box, {
     name: 'dimension.new.radius',
     labelKey: 'editor.dimension.radius',
@@ -238,6 +312,9 @@ function insertForm(context, data) {
     step: 1,
     onChange: () => {}
   });
+
+  kind.input.addEventListener('change', syncFields);
+  syncFields();
 
   for (const language of LANGUAGES) {
     textField(box, {
@@ -268,10 +345,14 @@ function insertForm(context, data) {
 
       const dimension = { id: id, kind: kind.input.value };
       if (dimension.kind !== 'camera') {
-        const assetId = asset.input.value;
         const metres = Number(radius.input.value);
-        if (assetId) dimension.asset = assetId;
         if (Number.isFinite(metres) && metres > 0) dimension.radius = metres;
+      }
+      if (dimension.kind === 'shader') {
+        if (shader.input.value) dimension.shaderId = shader.input.value;
+        if (fallback.input.value) dimension.fallbackAsset = fallback.input.value;
+      } else if (dimension.kind !== 'camera') {
+        if (asset.input.value) dimension.asset = asset.input.value;
       }
       const name = {};
       for (const language of LANGUAGES) {

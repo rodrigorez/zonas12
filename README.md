@@ -415,10 +415,17 @@ validar a qualidade visual nas resoluções recomendadas.
 
 #### Política proposta para fundo shader em produção (a validar)
 
-A política não está implementada na exposição. A integração deve ser gradual e manter o panorama
-de imagem como fallback explícito de cada fundo. O shader começa num quadro estático (`uTime`
-fixo), mede a cena e só então tenta animar; “estático” significa congelar a saída do shader, não
-renderizar uma cena sem fundo.
+A política **está implementada** desde a Fase 7 (bloco **B9**), mas atrás de uma flag e sem trocar
+nenhum mundo de produção: `?shader=1` liga o ensaio e, sem ela, um fundo `kind: "shader"` mostra a
+sua **imagem de reserva**, exatamente como um fundo de imagem. O mundo de ensaio é
+`?scene=shader` (`data/worlds/shader.json`, um fixture fora do grafo) e o instrumento é
+`node tools/regression/shader.mjs` (entra em `all.mjs --full`): mede a política sem GPU, a taxa
+entregue (≤ 20 atualizações/s), o `?shader=1`, o `prefers-reduced-motion` e o painel do editor. O
+que **falta** — e é o que mantém o R14/R15 abertos — é o A/B controlado nos três aparelhos.
+
+A integração deve ser gradual e manter o panorama de imagem como fallback explícito de cada fundo.
+O shader começa num quadro estático (`uTime` fixo), mede a cena e só então tenta animar; “estático”
+significa congelar a saída do shader, não renderizar uma cena sem fundo.
 
 | Estado | Política proposta |
 | --- | --- |
@@ -477,12 +484,12 @@ aparelho, evitar alocações por quadro e validar a qualidade visual em cada deg
 Qualquer memória adaptativa local deve ser validada, expirar, ser apenas uma sugestão inicial e nunca
 impedir o fallback ou a inicialização.
 
-**Critério antes de produção:** implementar primeiro atrás de uma opção/feature flag e numa página
-de teste; validar em aparelhos reais que a animação não ultrapassa 20 FPS, que a queda para 15 FPS e
-o congelamento ocorrem só após degradação persistente, que o retorno estático/fallback funciona e
-que imagem, shader e p5.js foram comparados com a mesma câmera, pixelRatio, cena e ordem alternada.
-Até esses testes passarem, manter `kind: "image"` como padrão de produção e não alterar os dados
-atuais das dimensões.
+**Critério antes de produção:** o ensaio corre atrás de uma opção/feature flag (`?shader=1`) e numa
+página de teste; falta validar em aparelhos reais que a animação não ultrapassa 20 FPS, que a queda
+para 15 FPS e o congelamento ocorrem só após degradação persistente, que o retorno estático/fallback
+funciona e que imagem, shader e p5.js foram comparados com a mesma câmera, pixelRatio, cena e ordem
+alternada. Até esses testes passarem, manter `kind: "image"` como padrão de produção e não alterar os
+dados atuais das dimensões.
 
 #### Comparativo controlado: imagem, shader e p5.js
 
@@ -1279,7 +1286,8 @@ Quem quiser experimentar sem mexer na exposição pode forçar um mundo com `?sc
 (`http://127.0.0.1:8123/?scene=example`): carrega o `data/worlds/example.json`, o mundo de ensaio
 com duas dimensões e **duas portas de cada tipo** (o par de dimensões ao vivo, atravessável, e o retrato que navega) — `?scene=cidade`, `?scene=praia` e `?scene=ceu` também
 funcionam. E `&from=<mundo>` diz de que mundo se vem, o que faz o visitante aparecer atrás da porta
-de chegada: `/praia/?from=cidade`.
+de chegada: `/praia/?from=cidade`. O ensaio do fundo shader (Fase 7, **R14**/**R15**) é
+`?scene=shader&shader=1`; sem `shader=1` o mesmo mundo mostra a imagem de reserva.
 
 ### 2. Personalizar Conteúdo
 
@@ -1314,8 +1322,9 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 | `tools/regression/traversal-tests.mjs` | **T1** (as 12 portas) e **T7/T11** (as 8 chegadas) |
 
 `--full` acrescenta as baterias arquivadas das Fases 4 e 5 (a costura das travessias, a ponte de
-imagem, a chegada por uma porta, os rótulos, o botão, a transição) — cada uma abre um Chrome e
-juntas somam minutos, por isso não são o `default`.
+imagem, a chegada por uma porta, os rótulos, o botão, a transição) e a da **Fase 7** (o fundo shader,
+que mede a política e as duas páginas com uma) — cada uma abre um Chrome e juntas somam minutos, por
+isso não são o `default`.
 
 Cada bateria continua a poder correr sozinha, com os argumentos que ela própria documenta — é o que
 se usa quando se está a investigar um número.
@@ -1394,18 +1403,20 @@ consola e fica onde está — o editor serve para arrumar a sala, não para a vi
 ## Melhorias Planejadas
 
 Desde 2026-10-24 estas melhorias têm fase e blocos no roadmap: a **Fase 7** (§9 de
-[docs/ROADMAP.md](docs/ROADMAP.md)) — nenhum bloco está implementado, excepto o **B1** (só
-documentação).
+[docs/ROADMAP.md](docs/ROADMAP.md)) — está implementado o **B1** (só documentação) e o **B9** (o
+ensaio do shader, atrás de flag); os restantes blocos não.
 
-- **Fundos shader** (**R14**/**R15**, bloco **B9**): o ensaio está em `teste/` e a política
-  20 → 15 FPS → estático ainda não corre na exposição; a produção continua `kind: "image"`
+- **Fundos shader** (**R14**/**R15**, bloco **B9**): o ensaio corre agora **na exposição**, atrás de
+  `?shader=1` — política 20 → 15 FPS → estático, imagem de reserva, fixture `?scene=shader`; a
+  produção continua `kind: "image"` e o **A/B nos três aparelhos** é a medição que ainda falta
 - **O que o esquema promete e a cena não constrói** (**R9**/**D30**, blocos **B5**–**B7**): obra
   `kind: "model"` e `"text"`, dimensão `kind: "color"` e `interaction: "link"` a navegar
 - **O catálogo de assets no editor** (bloco **B4**): hoje é dado do ficheiro — o editor escolhe
   entre os assets que o mundo já tem e não cria nenhum
 - **A exclusão em lote por dimensão** (bloco **B3**): os painéis só excluem individualmente
 - **A tradução do catálogo** (bloco **B2**): `i18n/en.json` não existe; `?lang=en` cai no português
-  com **1** aviso, e o `pt.json` tem **160** chaves
+  com **1** aviso, e o `pt.json` tem **163** chaves (as **160** do inventário mais as três do painel
+  do shader que a Fase 7 acrescentou)
 - **Portais com movimento e rotação animados**, definidos na cena (bloco **B8**)
 - **Um fundo 360º em vídeo**: a capacidade **já existe** (`kind: "video"` anima com
   `THREE.VideoTexture`), mas nenhum mundo a usa — falta o asset, não o código

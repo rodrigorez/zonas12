@@ -11,9 +11,11 @@ import { textIn } from '../scene/schema.js';
 
 const NAME = /^[a-z0-9-]+$/;
 const ENTRY_WORLD = 'gate';
-// The fixture of D9 is not a room anybody reaches, but it is a world file worth opening.
+// The fixtures are not rooms anybody reaches, but they are world files worth opening: the D9 scene of
+// two dimensions, and the shader trial of Fase 7 (R14/R15).
 const FIXTURE_WORLD = 'example';
-const FIXTURES = [FIXTURE_WORLD];
+const SHADER_WORLD = 'shader';
+const FIXTURES = [FIXTURE_WORLD, SHADER_WORLD];
 
 const cache = new Map();
 let order = [];
@@ -40,7 +42,7 @@ function targetsOf(scene) {
 
 export async function refresh() {
   const gate = await read(ENTRY_WORLD);
-  const found = new Set([ENTRY_WORLD, FIXTURE_WORLD]);
+  const found = new Set([ENTRY_WORLD, ...FIXTURES]);
   for (const slug of targetsOf(gate)) found.add(slug);
   for (const slug of [...found]) {
     const scene = cache.has(slug) ? cache.get(slug) : await read(slug);

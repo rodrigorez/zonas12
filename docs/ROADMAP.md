@@ -3244,6 +3244,14 @@ fechada dos dois lados: o que os instrumentos medem e o que quem usa vê. **Marc
 | **B9** | Fundos shader: o A/B controlado fecha o **R14**; a política **20 → 15 FPS → estático** atrás de flag fecha o **R15**; `kind: "shader"` no esquema com `shaderId` de lista interna, `fallbackAsset` validado e piso de pixelRatio **1** | **R14** e **R15** |
 | **B10** | README, §14 e o fecho com o que cada bloco mediu | a verificação da fase |
 
+**Estado a 2026-10-24:** **B1** e **B9** estão feitos. O B9 entregou o ensaio **atrás de flag**
+(`?shader=1`), o `kind: "shader"` com `shaderId` de lista interna e `fallbackAsset` validado, a
+política `20 → 15 FPS → estático` (piso de pixelRatio **1**), o fixture `?scene=shader` e o
+instrumento `tools/regression/shader.mjs` — mas o **A/B nos três aparelhos não foi medido**, logo
+**R14/R15 continuam abertos** e a produção continua `kind: "image"`. Os restantes blocos não
+começaram. O `pt.json` tem agora **163** chaves (as três do painel da dimensão), o que o **B2** tem
+de traduzir: a meta M2 passa a ser «todas as chaves», não as 160 do inventário de 2026-10-24.
+
 #### Metas de sucesso
 
 | # | Meta | Como se mede | Alvo |
@@ -4189,9 +4197,16 @@ módulos **não** carregam numa página sem a UI da exposição.
 **Plano:** entra na **Fase 7**, bloco **B9** (§9). O que a fecha é o A/B controlado nos três
 aparelhos; até lá a produção continua `kind: "image"`.
 
-O ensaio em `teste/` compara a arquitetura existente de panoramas com fundos gerados por shader
-GLSL. É **protótipo de medição**, não integração de produção: `data/worlds/*.json` continua a
-declarar fundos de imagem, e `js/modules/dimension.js` continua a usar `dimension-panorama`.
+**Estado a 2026-10-24 (B9):** o ensaio passou a correr **na exposição**, por `?shader=1`, e o A/B
+continua por medir — a pendência é essa, não o código. O `kind: "shader"` está no esquema
+(`shaderId` de lista interna, `fallbackAsset` validado), o fixture abre-se com `?scene=shader` e o
+instrumento `tools/regression/shader.mjs` mede a política e as páginas (entra em `all.mjs --full`).
+Sem a flag, o mesmo mundo mostra a imagem de reserva; nenhum mundo de `data/worlds/` mudou de fundo.
+
+O ensaio em `teste/` continua a comparar a arquitetura existente de panoramas com fundos gerados por
+shader GLSL. É **protótipo de medição**, não integração de produção: `data/worlds/*.json` continua a
+declarar fundos de imagem nos mundos que se visitam, e `js/modules/dimension.js` continua a usar
+`dimension-panorama` para eles.
 O resumo de implementação, tamanhos e medições também está no README, em «Fundos esféricos: imagem
 e shader».
 
@@ -4266,9 +4281,13 @@ resultados e os orçamentos de imagem/shader decidir se o modelo de produção a
 **Plano:** entra na **Fase 7**, bloco **B9** (§9), **depois** do **R14** — a escada 20 → 15 FPS →
 estático só vale com o A/B medido, e entra atrás de feature flag.
 
-**Estado:** especificação para ensaio; não implementada. A produção continua a usar `kind: "image"`.
-Detalhes e esquema ilustrativo estão no README, em «Política proposta para fundo shader em
-produção».
+**Estado a 2026-10-24 (B9):** a política **está implementada** em `js/modules/shader-policy.js`, atrás
+de `?shader=1`; o que falta é a validação nos aparelhos (R14), e por isso a pendência fica aberta. A
+produção continua a usar `kind: "image"` e nenhum mundo mudou de fundo. As decisões da escada — duas
+janelas más para descer, pixelRatio antes da cadência, piso 1, 15 FPS e depois estático, sem subir a
+cadência sozinha — estão medidas pelo `tools/regression/shader.mjs` (relógio em vez de GPU) e pela
+página com `?shader=1`. Detalhes e esquema ilustrativo estão no README, em «Política proposta para
+fundo shader em produção».
 
 **Comportamento pretendido**
 

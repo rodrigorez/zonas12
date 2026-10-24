@@ -1,0 +1,48 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "shader",
+    "name": {
+      "pt": "Ensaio do fundo shader",
+      "en": "Shader background trial"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": false
+    }
+  },
+  "assets": {
+    "ceu-shader": {
+      "path": "assets/panoramas/ceu-d0-skycloud.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Céu com nuvens, a imagem que fica no lugar do shader",
+        "en": "Sky with clouds, the image that stands in for the shader"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "por-do-sol",
+      "fallbackAsset": "ceu-shader",
+      "radius": 100,
+      "name": {
+        "pt": "Pôr do sol de ensaio",
+        "en": "Trial sunset"
+      }
+    }
+  ],
+  "artworks": [],
+  "portals": []
+}

@@ -11,8 +11,9 @@
 //   · a cena — os doze testes (T2–T12) nas 5 páginas;
 //   · as portas — o T1 e o T7/T11, que precisam de navegações de página.
 //
-// As baterias arquivadas da Fase 4/5 (a costura, a ponte, os rótulos, o botão, a transição) abrem um
-// Chrome cada uma e somam minutos: ficam atrás de `--full`, que é o que se corre antes de publicar.
+// As baterias arquivadas (a costura, a ponte, os rótulos, o botão, a transição — Fases 4 e 5 — e o
+// fundo shader da Fase 7) abrem um Chrome cada uma e somam minutos: ficam atrás de `--full`, que é o
+// que se corre antes de publicar.
 //
 // Uso, da raiz do projeto:
 //
@@ -34,6 +35,9 @@ const CENA = [
 ];
 
 const ARQUIVADAS = [
+  // Fase 7 (B9): a política do shader sem GPU e as duas páginas com uma. Abre um Chrome, como as
+  // outras desta lista.
+  { nome: 'o fundo shader (R14/R15)', script: 'tools/regression/shader.mjs' },
   { nome: 'a costura das travessias (D46)', script: 'tools/regression/seam.mjs' },
   { nome: 'a chegada por uma porta (D37)', script: 'tools/regression/camera-arrival.mjs' },
   { nome: 'a ponte de imagem (D43)', script: 'tools/regression/image-bridge.mjs' },
@@ -70,7 +74,7 @@ function main() {
   const baterias = completo ? [...NUCLEO, ...CENA, ...ARQUIVADAS] : [...NUCLEO, ...CENA];
   console.log('zonas12 — a verificação' + (completo ? ' (com as baterias arquivadas)' : '') +
     ': ' + baterias.length + ' bateria(s)');
-  if (!completo) console.log('  (as baterias arquivadas da Fase 4/5 ficam atrás de --full)');
+  if (!completo) console.log('  (as baterias arquivadas das Fases 4, 5 e 7 ficam atrás de --full)');
 
   const resultados = [];
   for (const bateria of baterias) resultados.push(correr(bateria));

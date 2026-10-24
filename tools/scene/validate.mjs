@@ -31,8 +31,10 @@ const root = resolve(here, '..', '..');
 // caminho. O nome vem da tabela dos eixos, que é onde ele já vive para a porta de mundo navegar.
 //
 // O fixture (D9) não é uma sala: é um ficheiro de ensaio que se abre com `?scene=example`, e ninguém
-// chega a ele por uma porta — por isso fica fora do grafo, e não é reportado como inalcançável.
-const FIXTURES = ['example'];
+// chega a ele por uma porta — por isso fica fora do grafo, e não é reportado como inalcançável. O
+// `shader` é o ensaio da Fase 7 (R14/R15): abre-se com `?scene=shader` e mede a cadência do fundo,
+// não é um mundo que se visite.
+const FIXTURES = ['example', 'shader'];
 
 // Um caminho absoluto já é erro de L12; não vale a pena perguntar ao disco por ele.
 const exists = (assetPath) => (/^([a-zA-Z]:[\\/]|[\\/])/.test(assetPath) ? undefined : existsSync(join(root, assetPath)));
