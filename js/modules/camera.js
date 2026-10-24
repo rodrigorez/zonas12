@@ -13,6 +13,7 @@
 // Nothing here knows about dimensions, portals, stencil or draw order.
 
 import { t } from '../i18n.js';
+import { startOrientationWatch } from './orientation.js';
 
 // Step of the on-screen D-pad, in metres per frame. It is the fallback: the value comes from the
 // data (cameras.player.speed) and `createPlayerCamera` replaces it. The converter reads this
@@ -304,6 +305,11 @@ export function createPlayerCamera(player, parent) {
   parent.appendChild(el);
   playerEl = el;
   if (player && typeof player.speed === 'number' && player.speed > 0) mobileSpeed = player.speed;
+  // A orientação do telemóvel (D52): o `look-controls` só existe depois de a entidade carregar, e é
+  // aí que se mede o ruído do sensor — um aparelho sem giroscópio faz a sala tremer.
+  const vigiar = () => startOrientationWatch(el);
+  if (el.hasLoaded) vigiar();
+  else el.addEventListener('loaded', vigiar, { once: true });
   return el;
 }
 

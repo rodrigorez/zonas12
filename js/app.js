@@ -19,6 +19,7 @@ import { shaderStatus, freezeShaders } from './modules/dimension.js';
 // A sonda de campo (R14): só desenha alguma coisa com `?sonda=1`, e é o que permite ler os números
 // num telemóvel, onde não há consola.
 import { startSonda } from './modules/sonda.js';
+import { orientationStatus } from './modules/orientation.js';
 import { validateScene } from './scene/validation.js';
 import { buildScene } from './scene/scene-builder.js';
 import { initI18n, languageFromUrl } from './i18n.js';
@@ -43,6 +44,9 @@ window.portalDebug = {
   // Which backgrounds were built and how the shader cadence is going (R14/R15) — what the shader
   // battery reads instead of guessing from pixels.
   shader: () => shaderStatus(),
+  // How the phone's orientation sensor was judged (D52): whether the magic-window stayed on, and the
+  // noise floor that decided it.
+  orientation: () => orientationStatus(),
   // The tests compare captures of the same scene (R16): a background that animates changes every
   // pixel between them. This is the lever that stops it, and it is the visitor's own
   // `prefers-reduced-motion` mechanism.

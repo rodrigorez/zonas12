@@ -39,6 +39,7 @@ const ARQUIVADAS = [
   // outras desta lista.
   { nome: 'o fundo shader (R14/R15)', script: 'tools/regression/shader.mjs' },
   { nome: 'a costura das travessias (D46)', script: 'tools/regression/seam.mjs' },
+  { nome: 'a orientação do telemóvel (D52)', script: 'tools/regression/orientation.mjs' },
   { nome: 'a chegada por uma porta (D37)', script: 'tools/regression/camera-arrival.mjs' },
   { nome: 'a ponte de imagem (D43)', script: 'tools/regression/image-bridge.mjs' },
   { nome: 'os rótulos das obras (D40)', script: 'tools/regression/labels-artworks.mjs' },

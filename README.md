@@ -1483,6 +1483,23 @@ se escrever à mão quando copiar do telemóvel é difícil. Sem o parâmetro n�
 exposição não sabe que a sonda existe. O painel não é interface (não sai do catálogo `i18n`): é um
 instrumento, como as baterias de `tools/`.
 
+### 9. No telemóvel, o sensor de orientação
+
+O `look-controls` do A-Frame faz do telemóvel uma janela para a cena: rodar o aparelho roda a vista.
+Num aparelho **sem giroscópio** esse sinal vem do acelerómetro e do magnetómetro, com ruído, e a sala
+**treme** — foi medido no telemóvel fraco do autor. O `js/modules/orientation.js` mede o ruído nos
+primeiros 6 s (o **segundo mais quieto**, para não confundir mão a mexer com sensor mau) e desliga o
+magic-window **só onde ele não presta**; a visita continua a poder olhar a arrastar. Num aparelho com
+giroscópio nada muda.
+
+```
+http://127.0.0.1:8123/scene1/?giroscopio=0     desliga à força (escape, para qualquer aparelho)
+```
+
+O que se lê no painel da sonda, na linha `giroscópio`: `ligado · tremor 0.04` num sensor bom,
+`desligado · tremor 45.4` num ruidoso. O limite é **0,5** (graus por amostra²) e está em
+`ORIENTATION.jitterLimit`.
+
 ## Melhorias Planejadas
 
 Desde 2026-10-24 estas melhorias têm fase e blocos no roadmap: a **Fase 7** (§9 de

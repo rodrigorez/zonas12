@@ -39,6 +39,19 @@ function eventos(policy) {
     .join(' · ');
 }
 
+// A orientação do telemóvel (D52): se o magic-window ficou ligado e qual foi o piso de ruído que o
+// decidiu. É o número que diz se o tremor que o visitante vê é do sensor ou de outra coisa.
+function orientacao() {
+  const estado = window.portalDebug.orientation ? window.portalDebug.orientation() : null;
+  if (!estado) return '—';
+  if (estado.jitter === null || estado.jitter === undefined) {
+    return (estado.tracking === false ? 'desligado' : 'a medir') + ' · ' + (estado.reason || '');
+  }
+  return (estado.tracking ? 'ligado' : 'desligado') +
+    ' · tremor ' + estado.jitter.toFixed(2) +
+    ' (' + estado.samples + ' amostras)';
+}
+
 function relatorio(estado, taxa, fps) {
   const fundo = (estado.backgrounds || []).find((item) => item.dimension === 0) || {};
   const policy = estado.policy;
@@ -56,6 +69,7 @@ function relatorio(estado, taxa, fps) {
     // que se compara entre `?shader=0` e o shader no mesmo aparelho e na mesma sala.
     linha('quadros', fps === null ? '— (a medir)' : fps.toFixed(1) + '/s'),
     linha('atrasos', policy ? String(policy.late) : '—'),
+    linha('giroscópio', orientacao()),
     linha('eventos', eventos(policy)),
     linha('ecrã', innerWidth + '×' + innerHeight + ' · dpr ' + (Math.round(devicePixelRatio * 100) / 100)),
     linha('reduzido', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'sim' : 'não'),
