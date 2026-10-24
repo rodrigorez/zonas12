@@ -202,16 +202,16 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (2026-10-23, depois da Fase 5)
+## Estado atual do código (v0.0.10)
 
-É o estado depois da **Fase 5** do roadmap — a **gravação direta**: o servidor da ferramenta
-(`tools/server/serve.mjs`) e o botão «Gravar» no editor. As decisões são a **D48–D51** e o que cada
-bloco entregou e mediu está em [docs/ROADMAP.md](docs/ROADMAP.md) §9. Tudo o que está nesta secção
-foi medido a **2026-10-23** na versão local (as baterias estão em §10): `validate.mjs` a **0**, as
-leis **21 de 21**, a bateria dos doze **35 de 35** nos 5 mundos, a chegada **5 de 5**, o servidor
-**34 de 34** e o editor medido no browser com a consola instrumentada. Fica **por testar pelo autor**
-no **telemóvel**, que é como as versões anteriores foram dadas por fechadas. O marco anterior é a
-`v0.0.9` (o fecho da Fase 4), marcada pela branch com o mesmo nome.
+Marcado pela branch `v0.0.10`. É o estado depois da **Fase 5** do roadmap — a **gravação direta**: o
+servidor da ferramenta (`tools/server/serve.mjs`) e o botão «Gravar» no editor. As decisões são a
+**D48–D51** e o que cada bloco entregou e mediu está em [docs/ROADMAP.md](docs/ROADMAP.md) §9. Tudo o
+que está nesta secção foi medido a **2026-10-23** na versão local (as baterias estão em §10) e a
+**2026-10-24** no **telemóvel**, na versão publicada, com os **oito** itens do aceite a passar —
+portão, travessia entre as três salas sem preto, retratos a casar com a chegada, D-pad, modal da
+obra, regresso e desempenho. A versão anterior é a `v0.0.9` (o fecho da Fase 4), marcada pela branch
+com o mesmo nome.
 
 Resumo do que existe hoje: `index.html` (**93 linhas**) e as **3** salas com o **mesmo** ficheiro
 (`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `editor.html` (**95**),

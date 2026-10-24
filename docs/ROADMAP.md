@@ -14,7 +14,8 @@
 > ter data de emenda: o editor não escreve, a ferramenta escreve. Decisões **D48–D51** (§11); o
 > plano, os blocos e o que cada um mediu em §9. **Aceitação medida:** `validate.mjs` **0**, as leis
 > **21 de 21**, a bateria dos doze **35 de 35** nos 5 mundos, o servidor **34 de 34**, e o
-> `git diff` de uma gravação a mostrar **uma** linha. O passo seguinte é a **Fase 6**.
+> `git diff` de uma gravação a mostrar **uma** linha. **Aceite no telemóvel a 2026-10-24**, na versão
+> publicada: os **8** itens passaram. **Marco: a branch `v0.0.10`.** O passo seguinte é a **Fase 6**.
 >
 > **Atualização (2026-10-20, Fase 4 — fechada):** a **página de edição** correu **bloco a bloco**
 > (B0–B10, um commit por bloco) e cada bloco foi dado por **medido** — browser e linha de comando —,
@@ -2974,8 +2975,9 @@ A aceitação correu item a item, no mesmo dia:
    **21 de 21**, o `selftest` do servidor **34 de 34** e o validador a **0** nos 5 mundos.
 
 Depois de medido, o fixture voltou ao que era (`git checkout`) e as cópias da medição foram apagadas.
-**Fica por testar pelo autor no telemóvel**, que é como as fases anteriores foram dadas por fechadas —
-e é o único item que a fase não pode medir sozinha.
+**No telemóvel, a 2026-10-24**, na versão publicada: os **8** itens do aceite passaram — o portão, a
+travessia entre as três salas sem preto, os retratos a casar com a chegada, o D-pad, o modal da obra,
+o regresso pela porta e o desempenho. **Marco: a branch `v0.0.10`.**
 
 ### Fase 6 — Testes e limpeza
 - **Entregável:** os testes de §10 automatizados (o mesmo script que já usamos no browser).
@@ -3630,7 +3632,7 @@ ferramenta (D48) que serve a publicação e grava, em vez de um serviço à part
 a funcionar inteira; o servidor **recusa com o mesmo validador e a mesma regra do export** (D50) —
 e não cria mundos, porque criar um mundo é da ferramenta da D31; e **cada gravação deixa uma cópia**
 (D51) em `.harness/backups/worlds/`, fora do repositório e da publicação. A D2 passa a ter data de
-emenda: o editor não escreve, a ferramenta escreve. **Nada implementado** — o plano está em §9.
+emenda: o editor não escreve, a ferramenta escreve. **Executada e medida de B1 a B4** — ver §9.
 
 **Roadmap aprovado em 2026-10-12.**
 
