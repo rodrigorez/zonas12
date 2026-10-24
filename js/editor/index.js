@@ -118,9 +118,12 @@ function refreshStatus() {
 // The two marks of the toolbar: «Desfazer» is only offered when there is a step to undo, and
 // «alterado» says whether the world in memory is a text the author already has (D32/D35).
 //
-// «Gravar» (Fase 5) has two conditions and both are about what it can honestly do: there has to be a
-// server answering (D49) and the world has to have come from `data/worlds/` (D50) — saving
-// **replaces** a file, and a world opened from a dropped file has nowhere to be replaced.
+// «Gravar» (Fase 5) has three conditions and all are about what it can honestly do: there has to be
+// a server answering (D49), the world has to have come from `data/worlds/` (D50) — saving
+// **replaces** a file, and a world opened from a dropped file has nowhere to be replaced — and there
+// has to be something to save. Without the last one, clicking it twice writes the same text twice
+// and leaves a second backup for nothing; it is the same rule as «Desfazer», which is only offered
+// when there is a step to undo (D35).
 function saveableSlug() {
   const world = currentWorld();
   if (!world || !world.file || !world.file.startsWith('data/worlds/')) return null;
@@ -133,7 +136,7 @@ function updateToolbar() {
   const marker = byId('alterado');
   if (marker) marker.hidden = !isDirty();
   const save = byId('gravar');
-  if (save) save.disabled = !server.canSave() || saveableSlug() === null;
+  if (save) save.disabled = !server.canSave() || saveableSlug() === null || !isDirty();
 }
 
 // One step back: the world is replaced by the snapshot and everything that was built from it is built

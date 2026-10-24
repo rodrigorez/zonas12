@@ -866,7 +866,8 @@ node tools/server/serve.mjs --port 9000      noutra porta
   `node_modules/` e o que começa por ponto respondem **403**, e um caminho com `..` também.
 - **O editor pergunta-lhe se pode gravar** com um `HEAD` na raiz e o cabeçalho `X-Zonas12-Serve`;
   sem esse cabeçalho (GitHub Pages, `python -m http.server`) o botão «Gravar» **não aparece** e o
-  «Exportar» fica exactamente como estava (**D49**).
+  «Exportar» fica exactamente como estava (**D49**). E, como o «Desfazer», o «Gravar» só acende
+  quando há o que gravar: gravar duas vezes o mesmo texto deixaria cópias de segurança a mais.
 - **O servidor recusa o que o editor recusaria** (**D50**): valida com o **mesmo**
   `js/scene/validation.js` e o disco, e não escreve nada quando o mundo tem erros (**422**), quando o
   `world.slug` não é o do endereço (**400**), quando a `version` não é a do esquema (**400**) ou

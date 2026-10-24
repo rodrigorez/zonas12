@@ -2869,7 +2869,7 @@ gravação, em `.harness/backups/worlds/<slug>/`, fora do repositório e da publ
 | --- | --- | --- |
 | **B0** | este plano e as **D48–D51** | nada de código |
 | **B1 · B2** | `tools/server/serve.mjs`: serve a publicação como o `python -m http.server` (com `/` e `/sala/` a resolverem o `index.html`), diz o que é no cabeçalho `X-Zonas12-Serve` (a resposta à pergunta do editor), recusa `.harness/`, `.git/`, `node_modules/` e caminhos com `..`, escuta **só** em `127.0.0.1`; e `PUT /api/worlds/<slug>` valida com o **mesmo** validador e o disco, recusa versão e slug trocados, recusa erros (**422**) e mundos que não existem (**404**), copia antes de gravar e escreve de forma atómica (`*.tmp` + `rename`) | `tools/server/selftest.mjs`: **34 de 34** — as **5** páginas, os **3** pedidos perigosos, a marca nas respostas e no `HEAD` da raiz, **8** recusas de escrita com **0** bytes e **0** cópias, e **2** gravações com o ficheiro **byte-idêntico** ao enviado e **2** cópias com o conteúdo anterior. *(Os dois blocos correram num commit só: a rota de escrita vive no mesmo ficheiro e mede-se com o mesmo instrumento — ver a nota do B1.)* |
-| **B3** | o «Gravar» no editor, ao lado do «Exportar» e **só** com servidor (pelo cabeçalho `X-Zonas12-Serve`), com o estado a dizer o ficheiro e a cópia; depois de gravar, a marca «alterado» sai e a guarda de saída (D32) cala-se | no browser: com servidor o botão existe, grava e a marca sai; sem servidor (`python -m http.server`) o botão **não** aparece, o «Exportar» fica igual e a consola não diz nada |
+| **B3** | o «Gravar» no editor, ao lado do «Exportar», **só** com servidor (pelo cabeçalho `X-Zonas12-Serve`) e **só quando há alterações**, com o estado a dizer o ficheiro e a cópia; depois de gravar, a marca «alterado» sai e a guarda de saída (D32) cala-se | no browser: com servidor o botão existe, acende quando há o que gravar, grava e a marca sai; sem servidor (`python -m http.server`) o botão **não** aparece, o «Exportar» fica igual e a consola não diz nada |
 | **B4** | a aceitação (§ abaixo), o README e o fecho | editar → gravar → recarregar a exposição; `validate.mjs` **0**; a bateria dos doze **35 de 35** |
 
 #### O que o B1 entregou e mediu (2026-10-23)
@@ -2909,6 +2909,15 @@ o browser instrumentado a contar `console.error`/`console.warn` **antes** da car
 
 Depois de medido, o fixture voltou ao que era (`git checkout`) e as cópias da medição foram apagadas:
 a pasta `.harness/backups/` nasce na primeira gravação a sério.
+
+**A emenda de 2026-10-24 (a aceitação do autor, à mão).** Nas três gravações que o autor fez no
+browser, a **terceira não mudava nada** — o ficheiro ficou igual à sua própria cópia (6900 bytes) e
+mesmo assim levou mais uma cópia de segurança: **4** cópias para **1** alteração. O botão passou a ser
+como o «Desfazer» (D35), que só existe quando há um passo para desfazer: fica **desactivado** quando
+o mundo em memória é o que já está no ficheiro (`!isDirty()`). Medido no browser: ao abrir
+**inactivo**, depois de uma edição **activo**, depois de gravar **inactivo** outra vez. Custo aceite:
+um ficheiro mudado por fora do editor mantém o botão desactivado até haver uma edição — que é a
+mesma condição da marca «alterado», e não uma segunda regra a aprender.
 
 #### Metas de sucesso
 
