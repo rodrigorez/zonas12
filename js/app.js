@@ -64,7 +64,7 @@ document.addEventListener('keydown', (event) => {
 // One file per world (D24) and one arranque per world: the gate is the root page and a room is a
 // folder of its own (D28). The arranque is the same file everywhere — it only differs in the `<base>`
 // that says how deep it is — and the world it serves is what is left of the path after that base:
-// `/praia/` is the world `praia`, and the root is the gate. `?scene=<slug>` overrides it, for the
+// `/scene2/` is the world `scene2`, and the root is the gate. `?scene=<slug>` overrides it, for the
 // fixture of D9 and for opening a room before its folder exists.
 const DEFAULT_WORLD = 'gate';
 const WORLD_NAME = /^[a-z0-9-]+$/;

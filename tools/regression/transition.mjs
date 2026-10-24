@@ -93,7 +93,7 @@ async function main() {
   });
   try {
     await browser.grantCamera(site.base);
-    const linha = await timeline(browser, site.base + '/praia/?from=cidade&' + bust.slice(1),
+    const linha = await timeline(browser, site.base + '/scene2/?from=scene1&' + bust.slice(1),
       'chegada à praia, com permissão, 800 kB/s');
     result.check('na transição para uma sala o botão nunca aparece',
       linha.every((passo) => passo.botao !== true),
@@ -131,7 +131,7 @@ async function main() {
   // ---- 3. a chegada sem permissão: tenta, falha e devolve o botão ----
   browser = await openBrowser({ width: LARGURA, height: ALTURA, dpr: 2, mobile: true, camera: false, probe: SONDA });
   try {
-    const linha = await timeline(browser, site.base + '/cidade/?from=gate&' + bust.slice(1),
+    const linha = await timeline(browser, site.base + '/scene1/?from=gate&' + bust.slice(1),
       'chegada à cidade, sem permissão');
     const comBotao = linha.filter((passo) => passo.botao === true);
     result.check('sem permissão, o botão só aparece depois de a câmara ser recusada',

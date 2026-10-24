@@ -25,7 +25,7 @@ import { join } from 'node:path';
 import { ROOT } from './harness.mjs';
 
 const NUCLEO = [
-  { nome: 'o dado: os 5 mundos, as leis, o grafo e os arranques', script: 'tools/scene/validate.mjs' },
+  { nome: 'o dado: os 6 mundos, as leis, o grafo e os arranques', script: 'tools/scene/validate.mjs' },
   { nome: 'as leis: 21 avarias injectadas e o controlo limpo', script: 'tools/scene/laws-selftest.mjs' }
 ];
 

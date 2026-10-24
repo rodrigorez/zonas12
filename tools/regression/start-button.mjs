@@ -71,7 +71,7 @@ async function main() {
       primeira.botao === 'block' && primeira.pedidos === 0 && primeira.stream === false,
       JSON.stringify(primeira));
 
-    const recusada = await open(browser, site.base + '/?from=cidade&' + bust);
+    const recusada = await open(browser, site.base + '/?from=scene1&' + bust);
     result.check('a chegada tenta a câmara, falha sem permissão e devolve o botão com a mensagem',
       recusada.pedidos === 1 && recusada.botao === 'block' && recusada.erro === true && recusada.stream === false,
       JSON.stringify(recusada));
@@ -91,7 +91,7 @@ async function main() {
       JSON.stringify(portao));
 
     // Numa sala a câmara só se vê pela janela da porta: o botão tem de desaparecer à mesma.
-    const sala = await open(browser, site.base + '/?scene=cidade&' + bust);
+    const sala = await open(browser, site.base + '/?scene=scene1&' + bust);
     result.check('numa sala, com a câmara fora da vista, o botão também desaparece',
       sala.botao === 'none' && sala.stream === true && sala.pedidos === 1, JSON.stringify(sala));
 
@@ -122,7 +122,7 @@ async function main() {
     });
     await browser.grantCamera(site.base);
 
-    const telemovel = await open(browser, site.base + '/?scene=praia&' + bust);
+    const telemovel = await open(browser, site.base + '/?scene=scene2&' + bust);
     result.check('no telemóvel, com permissão: botão fora e D-pad dentro',
       telemovel.botao === 'none' && telemovel.stream === true && telemovel.dpad === 'block',
       JSON.stringify(telemovel));

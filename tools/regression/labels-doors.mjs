@@ -55,13 +55,13 @@ async function main() {
   try {
     // ---- 1. a exposição, sem e com a tecla D ----
     const esperado = {
-      gate: ['#0 · retrato-cidade → cidade', '#1 · retrato-praia → praia'],
-      cidade: ['#2 · Cidade 360º ↔ Realidade → Portão', '#3 · retrato-praia → praia'],
-      praia: ['#4 · retrato-cidade → cidade', '#5 · Praia ↔ Realidade → Portão', '#6 · retrato-ceu → ceu'],
-      ceu: ['#7 · retrato-praia → praia']
+      gate: ['#0 · retrato-cidade → scene1', '#1 · retrato-praia → scene2'],
+      scene1: ['#2 · Cidade 360º ↔ Realidade → Portão', '#3 · retrato-praia → scene2'],
+      scene2: ['#4 · retrato-cidade → scene1', '#5 · Praia ↔ Realidade → Portão', '#6 · retrato-ceu → scene3'],
+      scene3: ['#7 · retrato-praia → scene2']
     };
 
-    for (const slug of ['gate', 'cidade', 'praia', 'ceu']) {
+    for (const slug of ['gate', 'scene1', 'scene2', 'scene3']) {
       const url = slug === 'gate' ? '/?bust=' : '/?scene=' + slug + '&bust=';
       await open(site.base + url + bust + Math.random());
       const antes = await evaluate(NOMES);
@@ -83,12 +83,12 @@ async function main() {
     }
 
     // ---- 2. o editor: os nomes sem tecla nenhuma ----
-    await open(site.base + '/editor.html?world=cidade&bust=' + bust);
+    await open(site.base + '/editor.html?world=scene1&bust=' + bust);
     const editor = await evaluate(NOMES);
     check('editor: os nomes estão à vista desde o início',
       editor.length === 2 && editor.every((entry) => entry.sprite && entry.visible === true), JSON.stringify(editor));
     check('editor: os nomes são os mesmos da exposição',
-      JSON.stringify(editor.map((entry) => entry.label)) === JSON.stringify(esperado.cidade),
+      JSON.stringify(editor.map((entry) => entry.label)) === JSON.stringify(esperado.scene1),
       JSON.stringify(editor.map((entry) => entry.label)));
 
     // ---- 3. uma porta com nome não deixa textura nem nó atrás ----

@@ -129,11 +129,11 @@ async function serveFile(request, response, root, urlPath) {
   }
 
   let file = join(root, ...segments);
-  // A raiz e cada sala são pastas com o seu `index.html` (D28): `/` e `/cidade/` são páginas.
+  // A raiz e cada sala são pastas com o seu `index.html` (D28): `/` e `/scene1/` são páginas.
   if (segments.length === 0 || urlPath.endsWith('/')) {
     file = join(file, 'index.html');
   } else if (existsSync(file) && statSync(file).isDirectory()) {
-    // `/cidade` sem a barra: o `index.html` procura os seus ficheiros a partir de `/cidade/`, e o
+    // `/scene1` sem a barra: o `index.html` procura os seus ficheiros a partir de `/scene1/`, e o
     // `<base href="../">` resolveria a partir de `/`. Muda-se o endereço.
     response.writeHead(301, { Location: urlPath + '/' });
     response.end();

@@ -87,9 +87,9 @@
       },
       "action": {
         "kind": "navigate",
-        "target": "cidade"
+        "target": "scene1"
       },
-      "arrivalFrom": "cidade"
+      "arrivalFrom": "scene1"
     },
     {
       "id": 1,
@@ -128,9 +128,9 @@
       },
       "action": {
         "kind": "navigate",
-        "target": "praia"
+        "target": "scene2"
       },
-      "arrivalFrom": "praia"
+      "arrivalFrom": "scene2"
     }
   ]
 }

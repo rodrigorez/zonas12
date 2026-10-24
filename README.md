@@ -10,11 +10,11 @@ Este projeto é uma galeria imersiva de realidade aumentada/virtual utilizando A
 zonas12/
 ├── index.html          o portão: o arranque da raiz (a cena vem de data/worlds/)
 ├── editor.html         a página de edição (Fase 4): outra entrada, os mesmos módulos (D4)
-├── cidade/             sala: o mesmo index.html com <base href="../"> (Fase 3B, B7)
+├── scene1/             sala (a cidade): o mesmo index.html com <base href="../"> (Fase 3B, B7)
 │   └── index.html
-├── praia/
+├── scene2/             sala (a praia)
 │   └── index.html
-├── ceu/
+├── scene3/             sala (o céu)
 │   └── index.html
 ├── README.md           documentação principal (fica sempre na raiz)
 ├── css/
@@ -34,9 +34,9 @@ zonas12/
 │                       controlos partilhados, as respostas que a página pode dar sobre os
 │                       ficheiros e a ponte com o servidor da ferramenta (Fase 5)
 ├── data/
-│   └── worlds/         uma cena por mundo (D24): gate, cidade, praia, ceu e o fixture `example`
-│                       (o mundo sai do **endereço**: `/` é o portão, `/cidade/` é a cidade; o
-│                       `?scene=<mundo>` continua a forçar um deles, para os testes)
+│   └── worlds/         uma cena por mundo (D24): gate, scene1, scene2, scene3 e o fixture
+│                       `example` (o mundo sai do **endereço**: `/` é o portão, `/scene1/` é a
+│                       primeira sala; o `?scene=<mundo>` continua a forçar um deles, para os testes)
 ├── i18n/
 │   └── pt.json         textos da interface: 160 chaves (143 delas do editor), lidas por js/i18n.js
 ├── docs/
@@ -79,7 +79,7 @@ zonas12/
 
 - A raiz tem só o que é preciso para o projeto funcionar: `index.html`, `editor.html` (a página de
   edição, Fase 4), as pastas dos mundos
-  (`cidade/`, `praia/` e `ceu/`, cada uma com o seu `index.html` — Fase 3B), `css/`, `js/`,
+  (`scene1/`, `scene2/` e `scene3/`, cada uma com o seu `index.html` — Fase 3B), `css/`, `js/`,
   `data/`, `i18n/`, `assets/`, `README.md` e `.gitignore`.
 - Documentação de planeamento (roadmap, decisões) fica em `docs/`; ferramentas de
   construção (o validador da cena, o conversor e a varredura de regressão) em `tools/`.
@@ -95,8 +95,8 @@ zonas12/
 
 ### 2. Arquivos HTML
 
-- O projeto tem **um** `index.html`, e um por mundo: a raiz (o portão) e as pastas `cidade/`,
-  `praia/` e `ceu/` (Fase 3B, D28). Os quatro são o **mesmo ficheiro fora da linha do `<base>`**
+- O projeto tem **um** `index.html`, e um por mundo: a raiz (o portão) e as pastas `scene1/`,
+  `scene2/` e `scene3/` (Fase 3B, D28; a cidade, a praia e o céu). Os quatro são o **mesmo ficheiro fora da linha do `<base>`**
   — a raiz aponta `href="./"` e as salas `href="../"` — e **não podem divergir**: quem edita um
   edita os quatro, e o verificador do B8 exige que sejam iguais fora dela.
 - O `editor.html` é a **outra** entrada do projeto (Fase 4): não é um mundo, não tem slug nem
@@ -205,6 +205,14 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 
 ## Estado atual do código (v0.0.11)
 
+> **Atualização (2026-10-24, Fase 7 — B9 e o rename):** depois da v0.0.11, o **B9** pôs o fundo
+> shader na exposição **atrás de `?shader=1`** (a produção continua `kind: "image"`, e o A/B nos
+> três aparelhos está por medir — R14/R15 abertos), e as salas passaram a chamar-se **`scene1`**
+> (a cidade), **`scene2`** (a praia) e **`scene3`** (o céu): o nome de conteúdo e as imagens não
+> mudaram, o endereço é que sim. Os números desta secção são os da **v0.0.11**; o que o B9 mediu
+> está na §9 do roadmap. As secções históricas deste README continuam a citar os nomes e endereços
+> antigos, que é onde foram medidos.
+
 Marcado pela branch `v0.0.11`. É o estado depois da **Fase 6** do roadmap — **testes e limpeza** —,
 medida em 2026-10-24 e **aceite no telemóvel** no mesmo dia: a automação dos **doze testes** num
 comando (`node tools/regression/all.mjs`), a **recusa** da varredura de poses quando a câmara se
@@ -220,8 +228,8 @@ e a **2026-10-24** no **telemóvel**, na versão publicada, com os **oito** iten
 fase a passar — portão, travessia entre as três salas sem preto, retratos a casar com a chegada,
 D-pad, modal da obra, regresso e desempenho.
 
-Resumo do que existe hoje: `index.html` (**93 linhas**) e as **3** salas com o **mesmo** ficheiro
-(`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `editor.html` (**95**),
+Resumo do que existia na v0.0.11: `index.html` (**93 linhas**) e as **3** salas com o **mesmo** ficheiro
+(`scene1/`, `scene2/`, `scene3/`, iguais fora da linha do `<base>` — D28), `editor.html` (**95**),
 `js/app.js` (**185**), `js/arrival-frame.js` (**144**, a ponte de imagem entre mundos — D43),
 `js/editor.js` (**14**, a entrada do editor — D36), `js/editor/`
 (**14** ficheiros, **2789** linhas com os painéis e a ponte com o servidor), `js/i18n.js` (**92**),
@@ -286,7 +294,7 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 
 | Área | Estado |
 | --- | --- |
-| Mundos e endereços | **Um ficheiro por mundo** em `data/worlds/` (D24) e um endereço por sala: a raiz é o portão e `/cidade/`, `/praia/` e `/ceu/` são as salas, todas servindo o **mesmo** `index.html` (D28). O mundo sai do caminho e o `?scene=<mundo>` força um, para os testes; o validador exige que a pasta seja o `world.slug` |
+| Mundos e endereços | **Um ficheiro por mundo** em `data/worlds/` (D24) e um endereço por sala: a raiz é o portão e `/scene1/`, `/scene2/` e `/scene3/` são as salas, todas servindo o **mesmo** `index.html` (D28). O mundo sai do caminho e o `?scene=<mundo>` força um, para os testes; o validador exige que a pasta seja o `world.slug` |
 | Página de edição | `editor.html` (`?world=<slug>`) é uma **ferramenta separada** (D4) que usa os **mesmos** módulos: abre um mundo, edita-o por **cinco painéis** (câmara, dimensão, obra, portal, mundo), mostra a **pré-visualização** com a mesma cena da exposição e exporta o JSON — sem nada escrever em disco (D2). A pasta de um mundo novo é da ferramenta `tools/scene/new-world.mjs` (**D31**) |
 | Desfazer, «alterado» e guarda de saída | Editar → desfazer (**50** instantâneos do JSON, **D35**) → exportar; a marca «alterado» e o aviso antes de fechar com alterações que não saíram num ficheiro (**D32**); e a exportação **recusa** um mundo com erros — valida tudo antes de exportar |
 | As leis no editor | O editor corre o **mesmo** `validation.js` e responde às duas perguntas que eram só da linha de comando: o asset existe (**L9**) e a imagem mede 2:1 (**L14**). Num mundo saudável o relatório diz `Erros: 0 · Avisos: 0 · Por verificar: 0` |
@@ -653,7 +661,7 @@ medida no browser depois do *push*, com a cache desligada — **7 de 7**:
 - o **portão publicado** passa o **T4** (alfa **0** fora da janela), o **T5** e o **T9** (`2 → 2`,
   12 nós), o **T10/T12** (as **4** portas de retrato, 0 px fora da moldura) e o **T2/T3**
   (**84** poses, **0** falhas)
-- o **céu publicado**, aberto com `?from=praia`, tem as **duas** obras no primeiro plano da chegada
+- o **céu publicado**, aberto com `?from=scene2`, tem as **duas** obras no primeiro plano da chegada
   — o R11 está na versão que o mundo vê
 
 **A chegada por uma porta (D37, o B11).** O autor testou o publicado e viu o ecrã de entrada a
@@ -745,7 +753,7 @@ porta para cada sala. Dentro de uma sala só se navega pelas dimensões dessa sa
 
 | Antes (Fase 3) | Agora (Fase 3B) |
 | --- | --- |
-| Uma página, uma cena, quatro dimensões | **Uma cena por mundo**, com o seu ficheiro (`data/worlds/`) e o seu endereço: a raiz é o portão e `/cidade/`, `/praia/` e `/ceu/` são as salas — o **mesmo `index.html`**, com o `<base>` a apontar um nível acima |
+| Uma página, uma cena, quatro dimensões | **Uma cena por mundo**, com o seu ficheiro (`data/worlds/`) e o seu endereço: a raiz é o portão e `/scene1/`, `/scene2/` e `/scene3/` são as salas — o **mesmo `index.html`**, com o `<base>` a apontar um nível acima |
 | O portal ligava duas dimensões (`dimensionA`/`dimensionB`) | O portal tem **dois eixos**: `window` (o que a janela mostra: o par, um retrato ou nada) e `action` (o que a travessia faz: ficar, navegar ou nada) |
 | A travessia mudava a dimensão ativa | A **porta de mundo** mostra um **retrato** do destino (uma dimensão derivada, com paralaxe porque a esfera não segue a câmara) e a travessia **navega** para a URL do outro mundo |
 | Técnica do stencil | **Igual dentro de cada sala** — as leis L1–L8 e os testes T1–T9 continuam a valer, e a porta de mundo entra na mesma máquina (máscara, moldura, valor de stencil) |
@@ -768,7 +776,7 @@ leis (L9–L19), os testes (T10–T12) e o estado de cada bloco estão em
 **O que falta na fase:** nada — a fase fechou no B20, com a documentação, o instrumento da aceitação e o marco `v0.0.9`.
 
 **A divisão decidida (D24)** são **quatro mundos**: o portão na raiz (`gate`, com a câmara/AR) e as
-salas `cidade`, `praia` e `ceu`, uma dimensão cada, com as **8 portas de hoje** a passarem a
+salas `scene1`, `scene2` e `scene3` (a cidade, a praia e o céu), uma dimensão cada, com as **8 portas de hoje** a passarem a
 navegar — seis com retrato e as duas que voltam para o portão sem janela (não há imagem do portão, e
 um retrato emprestado mentiria). O formato **v3** (**D25**) tem os dois eixos na própria porta
 (`window {kind, dimensionA, dimensionB, asset, radius}` e `action {kind, target}`); o retrato é uma
@@ -793,7 +801,7 @@ conhece (a regra da D4, verificada dos dois lados — o editor importa o núcleo
 nenhum desses ficheiros importa o editor). Abre-se com `?world=<slug>`:
 
 ```
-http://127.0.0.1:8123/editor.html?world=cidade
+http://127.0.0.1:8123/editor.html?world=scene1
 ```
 
 **O que faz, por painel** (o que §7 do roadmap pede, coluna a coluna):
@@ -1008,10 +1016,10 @@ portas que dele saem; o portão não tem conteúdo 3D — vê-se a câmara.
 
 | Mundo | Dimensão | Conteúdo | Portas (id: para onde) |
 | --- | --- | --- | --- |
-| `gate` (o portão, na raiz) | 0 — realidade | Vê-se a câmara | `0 → cidade`, `1 → praia` — em `x = ∓6`, `z = -8` |
-| `cidade` | 0 — cidade 360º | `cidade-360` + 5 obras | `2 → gate`, `3 → praia` — em `x = ∓25`, `z = -45` |
-| `praia` | 0 — praia | `praia` + 3 obras | `4 → cidade`, `5 → gate`, `6 → céu` — em `x = -25`, `x = 25` e `x = 0`, `z = -80` |
-| `ceu` | 0 — céu 360º | `skycloud` + 2 obras | `7 → praia` — em `x = 0`, `z = -120` |
+| `gate` (o portão, na raiz) | 0 — realidade | Vê-se a câmara | `0 → scene1`, `1 → scene2` — em `x = ∓6`, `z = -8` |
+| `scene1` (a cidade) | 0 — cidade 360º | `cidade-360` + 5 obras | `2 → gate`, `3 → scene2` — em `x = ∓25`, `z = -45` |
+| `scene2` (a praia) | 0 — praia | `praia` + 3 obras | `4 → scene1`, `5 → gate`, `6 → scene3` — em `x = -25`, `x = 25` e `x = 0`, `z = -80` |
+| `scene3` (o céu) | 0 — céu 360º | `skycloud` + 2 obras | `7 → scene2` — em `x = 0`, `z = -120` |
 
 O grafo das portas é o que era — as oito, nos mesmos sítios —, mas cada uma leva agora a um
 **mundo**, e não a uma dimensão do mesmo ficheiro (excepto a porta 5, trocada no B7 — ver abaixo):
@@ -1162,9 +1170,9 @@ for a **dimensão ativa**: vê-la pela janela não conta.
   `{ "pt": "…", "en": "…" }` — acrescentar uma língua é acrescentar um campo
 - **Validação da Cena**: o mesmo módulo (`js/scene/validation.js`) corre na consola ao arrancar,
   na linha de comando (`node tools/scene/validate.mjs`) e que o editor corre a cada tecla (Fase 4)
-- **Um endereço por mundo** (Fase 3B, B7): a raiz é o portão e as salas são pastas — `/cidade/`,
-  `/praia/`, `/ceu/` — servindo todas o **mesmo `index.html`**; o mundo sai do caminho
-- **`?scene=<mundo>`**: força um mundo (`cidade`, `praia`, `ceu` ou o fixture `example`), para
+- **Um endereço por mundo** (Fase 3B, B7): a raiz é o portão e as salas são pastas — `/scene1/`,
+  `/scene2/`, `/scene3/` — servindo todas o **mesmo `index.html`**; o mundo sai do caminho
+- **`?scene=<mundo>`**: força um mundo (`scene1`, `scene2`, `scene3` ou o fixture `example`), para
   experimentar sem tocar no portão da exposição; `&from=<mundo>` diz de que mundo se vem
 - **Grafo de Dimensões**: portais bidirecionais entre duas dimensões (qualquer par), com
   uma dimensão ativa global — permite a central que dá acesso a todas
@@ -1279,14 +1287,14 @@ e o **nome de cada porta e de cada obra** (tecla **D**):
 4. Explore o ambiente utilizando o mouse (desktop) ou o D-pad (mobile)
 
 O **endereço escolhe o mundo**: a raiz é o **portão** e cada sala tem a sua pasta —
-`http://127.0.0.1:8123/cidade/`, `/praia/` e `/ceu/`. As três salas servem o **mesmo `index.html`**
+`http://127.0.0.1:8123/scene1/`, `/scene2/` e `/scene3/`. As três salas servem o **mesmo `index.html`**
 da raiz (o `<base>` é que muda), e atravessar uma porta de mundo navega para a pasta do destino.
 
 Quem quiser experimentar sem mexer na exposição pode forçar um mundo com `?scene=`
 (`http://127.0.0.1:8123/?scene=example`): carrega o `data/worlds/example.json`, o mundo de ensaio
-com duas dimensões e **duas portas de cada tipo** (o par de dimensões ao vivo, atravessável, e o retrato que navega) — `?scene=cidade`, `?scene=praia` e `?scene=ceu` também
+com duas dimensões e **duas portas de cada tipo** (o par de dimensões ao vivo, atravessável, e o retrato que navega) — `?scene=scene1`, `?scene=scene2` e `?scene=scene3` também
 funcionam. E `&from=<mundo>` diz de que mundo se vem, o que faz o visitante aparecer atrás da porta
-de chegada: `/praia/?from=cidade`. O ensaio do fundo shader (Fase 7, **R14**/**R15**) é
+de chegada: `/scene2/?from=scene1`. O ensaio do fundo shader (Fase 7, **R14**/**R15**) é
 `?scene=shader&shader=1`; sem `shader=1` o mesmo mundo mostra a imagem de reserva.
 
 ### 2. Personalizar Conteúdo
@@ -1316,7 +1324,7 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 
 | Bateria | O que responde |
 | --- | --- |
-| `tools/scene/validate.mjs` | os 5 mundos, as leis, o grafo das portas e os arranques |
+| `tools/scene/validate.mjs` | os 6 mundos, as leis, o grafo das portas e os arranques |
 | `tools/scene/laws-selftest.mjs` | 21 avarias injectadas, todas detectadas, com o controlo limpo |
 | `tools/regression/twelve-tests.mjs` | **T2–T12** nas 5 páginas (**35** verificações) |
 | `tools/regression/traversal-tests.mjs` | **T1** (as 12 portas) e **T7/T11** (as 8 chegadas) |
@@ -1379,7 +1387,7 @@ próprio instrumento cometeu primeiro (e as lições) estão na §10.
 ### 6. Editar um mundo no editor
 
 Com a pasta servida por HTTP (o mesmo servidor do passo 1), abra por exemplo
-`http://127.0.0.1:8123/editor.html?world=cidade`:
+`http://127.0.0.1:8123/editor.html?world=scene1`:
 
 1. o campo «Mundo» tem a lista derivada do portão (mais o fixture) e o botão «Abrir» carrega o mundo;
    qualquer outro slug pode ser escrito à mão

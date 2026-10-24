@@ -34,7 +34,7 @@ const root = resolve(here, '..', '..');
 // assets the rules talk about (the video, a photo, a portrait), two doors, five artworks and the
 // dimensions. The scene of the exhibition is no longer one file (D24): it is four worlds and a
 // fixture, and any of them can be the subject of a fault.
-const scene = JSON.parse(readFileSync(join(root, 'data', 'worlds', 'cidade.json'), 'utf8'));
+const scene = JSON.parse(readFileSync(join(root, 'data', 'worlds', 'scene1.json'), 'utf8'));
 
 // What the command line answers by default: the files are where the paths say, and every panorama
 // has the standard shape (the shapes themselves are checked by the layout of the disk, in B8).
@@ -47,7 +47,7 @@ const options = {
 // action `navigate`).
 const navigatingDoor = (overrides) => Object.assign({
   id: 30, ownedBy: 0, position: [0, 0, -400], width: 4, height: 5,
-  box: [4, 5, 1], window: { kind: 'none' }, action: { kind: 'navigate', target: 'ceu' }
+  box: [4, 5, 1], window: { kind: 'none' }, action: { kind: 'navigate', target: 'scene3' }
 }, overrides);
 
 // A scene that is the same as the exhibition but with 256 different windows: the stencil has 8
@@ -196,13 +196,13 @@ const cases = [
     law: 'L16',
     what: 'a box the arrival point falls inside',
     expect: 'law L16',
-    inject: (copy) => { copy.portals[0].arrivalFrom = 'ceu'; copy.portals[0].boxRotation = [0, 90, 0]; }
+    inject: (copy) => { copy.portals[0].arrivalFrom = 'scene3'; copy.portals[0].boxRotation = [0, 90, 0]; }
   },
   {
     law: 'L17',
     what: 'two arrival doors for the same world of origin',
     expect: 'law L17',
-    inject: (copy) => { copy.portals[0].arrivalFrom = 'ceu'; copy.portals[1].arrivalFrom = 'ceu'; }
+    inject: (copy) => { copy.portals[0].arrivalFrom = 'scene3'; copy.portals[1].arrivalFrom = 'scene3'; }
   },
   {
     law: 'L18',
@@ -225,7 +225,7 @@ const cases = [
       }
       const porta = copy.portals[0];
       porta.window = { kind: 'dimension-pair', dimensionA: 0, dimensionB: 1 };
-      porta.action = { kind: 'navigate', target: 'praia' };
+      porta.action = { kind: 'navigate', target: 'scene2' };
       delete porta.arrivalFrom;
     }
   }
@@ -268,14 +268,14 @@ const reachable = unreachableWorlds([scene, orphan], scene.world.slug);
 // lands them wherever the camera says. The exhibition answers every one of its doors — the beach did
 // not, until the B7 walked it and the D29 fixed it — so the case is made both ways: the whole
 // exhibition, and a world the doors point at with every `arrivalFrom` stripped.
-const exhibition = ['gate', 'cidade', 'praia', 'ceu']
+const exhibition = ['gate', 'scene1', 'scene2', 'scene3']
   .map((slug) => JSON.parse(readFileSync(join(root, 'data', 'worlds', slug + '.json'), 'utf8')));
 const answered = missingArrivals(exhibition);
 
 // The fault is the one the B7 found, put back: the beach's door 5 stripped of `arrivalFrom`, which
 // is what left the visitor from the gate landing wherever the camera says (D29).
 const withGap = exhibition.map((copy) => JSON.parse(JSON.stringify(copy)));
-withGap.find((copy) => copy.world.slug === 'praia').portals
+withGap.find((copy) => copy.world.slug === 'scene2').portals
   .forEach((portal) => { if (portal.id === 5) delete portal.arrivalFrom; });
 const gaps = missingArrivals(withGap);
 const arrivals = {
@@ -314,7 +314,7 @@ for (const windowKind of WINDOW_KINDS) {
 }
 const base = 'http://example.test/zonas12/';
 check('the address of the gate is the root of the deployment (D24)', worldHref('gate', base) === base);
-check('the address of a room is its own folder (D28)', worldHref('praia', base) === base + 'praia/');
+check('the address of a room is its own folder (D28)', worldHref('scene2', base) === base + 'scene2/');
 check('a pair that links a dimension to itself is refused',
   validateDoor({ window: { kind: 'dimension-pair', dimensionA: 1, dimensionB: 1 }, action: { kind: 'enter-window' } }).length === 1);
 check('a door that is fine has nothing to report',
@@ -330,7 +330,7 @@ console.log(`control (nothing injected): ${control.ok ? 'clean' : 'FAILED'} — 
   `${control.errors} errors, ${control.warnings} warnings`);
 console.log(`world graph: an unreachable world is ${reachable.length === 1 && reachable[0] === 'orfao' ? 'detected' : 'NOT detected'}`);
 const arrivalsAsExpected = arrivals.answered === 0 && arrivals.gaps.length === 1 &&
-  arrivals.gaps[0] === 'gate -> praia' && arrivals.doors.length === 1 && arrivals.doors[0] === 1;
+  arrivals.gaps[0] === 'gate -> scene2' && arrivals.doors.length === 1 && arrivals.doors[0] === 1;
 console.log(`arrivals (L19): the exhibition answers every door (${arrivals.answered} gaps), and a door ` +
   `with no arrival at the destination is ${arrivalsAsExpected ? 'detected' : 'NOT detected'}` +
   (arrivals.gaps.length ? ` (${arrivals.gaps.join(', ')}, doors ${arrivals.doors.join(', ')})` : ''));
@@ -339,20 +339,20 @@ console.log(`arrivals (L19): the exhibition answers every door (${arrivals.answe
 // disk is a map in memory, so a case can lie about it on purpose — which is the only way to know
 // that a room with no arranque, or a room whose arranque kept the root's `<base>`, would be caught.
 const arranqueFiles = {};
-for (const relative of ['index.html', 'cidade/index.html', 'praia/index.html', 'ceu/index.html']) {
+for (const relative of ['index.html', 'scene1/index.html', 'scene2/index.html', 'scene3/index.html']) {
   arranqueFiles[relative] = readFileSync(join(root, relative), 'utf8');
 }
-const arranqueSlugs = ['gate', 'cidade', 'praia', 'ceu'];
+const arranqueSlugs = ['gate', 'scene1', 'scene2', 'scene3'];
 const withFiles = (changes) => (relative) => (relative in changes ? changes[relative] : arranqueFiles[relative]);
 const arranqueCases = [
   ['the exhibition as it is', withFiles({}), 0],
-  ['a room with no arranque at all', withFiles({ 'praia/index.html': null }), 'praia/index.html is not there'],
+  ['a room with no arranque at all', withFiles({ 'scene2/index.html': null }), 'scene2/index.html is not there'],
   ['a room whose arranque kept the root\'s <base>',
-    withFiles({ 'praia/index.html': arranqueFiles['index.html'] }), 'needs href="../"'],
+    withFiles({ 'scene2/index.html': arranqueFiles['index.html'] }), 'needs href="../"'],
   ['a room whose arranque has no <base>',
-    withFiles({ 'praia/index.html': arranqueFiles['praia/index.html'].replace(/^.*<base.*$/m, '') }), 'has no <base>'],
+    withFiles({ 'scene2/index.html': arranqueFiles['scene2/index.html'].replace(/^.*<base.*$/m, '') }), 'has no <base>'],
   ['an arranque that diverged by one word',
-    withFiles({ 'cidade/index.html': arranqueFiles['cidade/index.html'].replace('</title>', ' x</title>') }),
+    withFiles({ 'scene1/index.html': arranqueFiles['scene1/index.html'].replace('</title>', ' x</title>') }),
     'is not the same file as index.html']
 ];
 const arranqueChecks = arranqueCases.map(([what, read, expected]) => {

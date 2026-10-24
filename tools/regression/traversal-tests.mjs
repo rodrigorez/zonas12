@@ -21,7 +21,7 @@
 // Uso, da raiz do projeto:
 //
 //   node tools/regression/traversal-tests.mjs                    as 5 páginas, todas as portas
-//   node tools/regression/traversal-tests.mjs cidade             só as portas de um mundo
+//   node tools/regression/traversal-tests.mjs scene1             só as portas de um mundo
 //
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -32,9 +32,9 @@ import { ROOT, serveProject, openBrowser, checks, sleep } from './harness.mjs';
 // exposição que o visitante abre.
 const MUNDOS = [
   { slug: 'gate', rota: '/' },
-  { slug: 'cidade', rota: '/cidade/' },
-  { slug: 'praia', rota: '/praia/' },
-  { slug: 'ceu', rota: '/ceu/' },
+  { slug: 'scene1', rota: '/scene1/' },
+  { slug: 'scene2', rota: '/scene2/' },
+  { slug: 'scene3', rota: '/scene3/' },
   { slug: 'example', rota: '/', cena: 'example' }
 ];
 

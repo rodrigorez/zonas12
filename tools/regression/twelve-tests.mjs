@@ -30,9 +30,9 @@ import { serveProject, openBrowser, checks, sleep } from './harness.mjs';
 
 const PAGINAS = [
   { slug: 'gate', from: null },
-  { slug: 'cidade', from: 'gate' },
-  { slug: 'praia', from: 'cidade' },
-  { slug: 'ceu', from: 'praia' },
+  { slug: 'scene1', from: 'gate' },
+  { slug: 'scene2', from: 'scene1' },
+  { slug: 'scene3', from: 'scene2' },
   { slug: 'example', from: null }
 ];
 

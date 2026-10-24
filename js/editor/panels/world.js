@@ -71,7 +71,7 @@ export function render(host, context) {
     });
   }
 
-  // D28: the folder is the slug. A file opened as `praia.json` that says it is `beach` is a mistake the
+  // D28: the folder is the slug. A file opened as `scene2.json` that says it is `beach` is a mistake the
   // command line reports; the panel says it where the two can be seen together.
   const openedAs = ((context.file() || '').split('/').pop() || '').replace(/\.json$/i, '');
   const declared = data.world && data.world.slug;

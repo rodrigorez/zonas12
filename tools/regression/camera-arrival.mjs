@@ -79,17 +79,17 @@ async function main() {
     result.check('primeira visita com a permissão dada: arranca sozinha e não mostra o botão (D41)',
       portao.botao === 'none' && portao.pedidos === 1 && portao.video === 'com stream', JSON.stringify(portao));
 
-    const cidade = await open(browser, site.base + '/cidade/?from=gate&' + bust);
+    const cidade = await open(browser, site.base + '/scene1/?from=gate&' + bust);
     // Uma sala com dimensão `camera` mostra a realidade (D38), por isso pede a câmara na mesma — o que
     // a D37 garante é que ninguém tem de carregar num botão para entrar.
     result.check('chegar a uma sala por uma porta: entra sozinha, sem botão, e a câmara é pedida (D38)',
       cidade.botao === 'none' && cidade.pedidos === 1 && cidade.erro === false, JSON.stringify(cidade));
 
-    const volta = await open(browser, site.base + '/?from=cidade&' + bust);
+    const volta = await open(browser, site.base + '/?from=scene1&' + bust);
     result.check('voltar ao portão por uma porta: arranca sozinho e pede a câmara uma vez',
       volta.botao === 'none' && volta.pedidos === 1 && volta.video === 'com stream', JSON.stringify(volta));
 
-    const ceu = await open(browser, site.base + '/ceu/?from=praia&' + bust);
+    const ceu = await open(browser, site.base + '/scene3/?from=scene2&' + bust);
     result.check('outra sala, sem câmara nos dados: arranca sozinha e não faz pedido nenhum',
       ceu.botao === 'none' && ceu.pedidos === 0, JSON.stringify(ceu));
   } finally {
@@ -100,7 +100,7 @@ async function main() {
   console.log('== câmara recusada (o browser quer o gesto) ==');
   browser = await openBrowser({ camera: false, probe: RECUSA });
   try {
-    const recusada = await open(browser, site.base + '/?from=cidade&' + bust);
+    const recusada = await open(browser, site.base + '/?from=scene1&' + bust);
     result.check('se a câmara for recusada, o botão volta com a mensagem (o recuo da D37)',
       recusada.botao === 'block' && recusada.erro === true, JSON.stringify(recusada));
   } finally {

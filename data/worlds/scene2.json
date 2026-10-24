@@ -1,10 +1,10 @@
 {
   "version": 3,
   "world": {
-    "slug": "cidade",
+    "slug": "scene2",
     "name": {
-      "pt": "Cidade 360º",
-      "en": "City 360º"
+      "pt": "Praia",
+      "en": "Beach"
     }
   },
   "cameras": {
@@ -21,38 +21,6 @@
     }
   },
   "assets": {
-    "cidade-360": {
-      "path": "assets/panoramas/cidade-d0-forest.jpg",
-      "type": "image",
-      "alt": {
-        "pt": "Panorama 360º da dimensão 1 (cidade)",
-        "en": "360º panorama of dimension 1 (city)"
-      }
-    },
-    "galeriaFoto1": {
-      "path": "assets/artworks/cidade-d0-bryan-goff.jpg",
-      "type": "image",
-      "alt": {
-        "pt": "Fotografia usada como obra nas dimensões 1 e 2",
-        "en": "Photograph used as an artwork in dimensions 1 and 2"
-      }
-    },
-    "galeriaFoto2": {
-      "path": "assets/artworks/eiffel.jpg",
-      "type": "image",
-      "alt": {
-        "pt": "Fotografia da Torre Eiffel usada como obra nas dimensões 1 e 2",
-        "en": "Photograph of the Eiffel Tower used as an artwork in dimensions 1 and 2"
-      }
-    },
-    "video": {
-      "path": "assets/video/cidade-d0-compequicolor.mp4",
-      "type": "video",
-      "alt": {
-        "pt": "Vídeo usado como obra na dimensão 1",
-        "en": "Video used as an artwork in dimension 1"
-      }
-    },
     "praia": {
       "path": "assets/panoramas/praia-d0-praia.jpg",
       "type": "image",
@@ -69,12 +37,36 @@
         "en": "360º panorama of dimension 3 (sky)"
       }
     },
-    "retrato-praia": {
-      "path": "assets/previews/praia-de-cidade.jpg",
+    "galeriaFoto2": {
+      "path": "assets/artworks/eiffel.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo Praia, visto da porta",
-        "en": "Portrait of the Beach world, seen from the door"
+        "pt": "Fotografia da Torre Eiffel usada como obra nas dimensões 1 e 2",
+        "en": "Photograph of the Eiffel Tower used as an artwork in dimensions 1 and 2"
+      }
+    },
+    "galeriaFoto1": {
+      "path": "assets/artworks/cidade-d0-bryan-goff.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Fotografia usada como obra nas dimensões 1 e 2",
+        "en": "Photograph used as an artwork in dimensions 1 and 2"
+      }
+    },
+    "retrato-cidade": {
+      "path": "assets/previews/cidade-de-praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta",
+        "en": "Portrait of the City 360º world, seen from the door"
+      }
+    },
+    "retrato-ceu": {
+      "path": "assets/previews/ceu-de-praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Céu 360º, visto da porta",
+        "en": "Portrait of the Sky 360º world, seen from the door"
       }
     }
   },
@@ -82,10 +74,10 @@
     {
       "id": 0,
       "kind": "image",
-      "asset": "cidade-360",
+      "asset": "praia",
       "name": {
-        "pt": "Cidade 360º",
-        "en": "City 360º"
+        "pt": "Praia",
+        "en": "Beach"
       },
       "radius": 500
     },
@@ -100,102 +92,58 @@
   ],
   "artworks": [
     {
-      "id": 0,
-      "dimension": 0,
-      "kind": "image",
-      "asset": "galeriaFoto1",
-      "position": [
-        -44,
-        1.5,
-        -55
-      ],
-      "rotation": [
-        0,
-        15,
-        0
-      ],
-      "size": [
-        4,
-        3,
-        0.1
-      ],
-      "interaction": "modal"
-    },
-    {
-      "id": 1,
-      "dimension": 0,
-      "kind": "image",
-      "asset": "galeriaFoto2",
-      "position": [
-        -24,
-        1.5,
-        -55
-      ],
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "size": [
-        4,
-        3,
-        0.1
-      ],
-      "interaction": "modal"
-    },
-    {
-      "id": 2,
-      "dimension": 0,
-      "kind": "video",
-      "asset": "video",
-      "position": [
-        4,
-        1.5,
-        -55
-      ],
-      "rotation": [
-        0,
-        -15,
-        0
-      ],
-      "size": [
-        4,
-        3,
-        0.1
-      ],
-      "interaction": "modal"
-    },
-    {
-      "id": 3,
-      "dimension": 0,
-      "kind": "image",
-      "asset": "praia",
-      "position": [
-        24,
-        1.5,
-        -55
-      ],
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "size": [
-        4,
-        3,
-        0.1
-      ],
-      "interaction": "modal"
-    },
-    {
-      "id": 4,
+      "id": 5,
       "dimension": 0,
       "kind": "image",
       "asset": "skycloud",
       "position": [
-        44,
+        -20,
         1.5,
-        -55
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal"
+    },
+    {
+      "id": 6,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "galeriaFoto2",
+      "position": [
+        0,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "modal"
+    },
+    {
+      "id": 7,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "galeriaFoto1",
+      "position": [
+        20,
+        1.5,
+        -90
       ],
       "rotation": [
         0,
@@ -212,12 +160,53 @@
   ],
   "portals": [
     {
-      "id": 2,
+      "id": 4,
       "ownedBy": 0,
       "position": [
         -25,
         0,
-        -45
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-cidade",
+        "radius": 120
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene1"
+      },
+      "arrivalFrom": "scene1"
+    },
+    {
+      "id": 5,
+      "ownedBy": 0,
+      "position": [
+        25,
+        0,
+        -80
       ],
       "width": 10,
       "height": 12,
@@ -253,12 +242,12 @@
       "arrivalFrom": "gate"
     },
     {
-      "id": 3,
+      "id": 6,
       "ownedBy": 0,
       "position": [
-        25,
         0,
-        -45
+        0,
+        -80
       ],
       "width": 10,
       "height": 12,
@@ -284,14 +273,14 @@
       },
       "window": {
         "kind": "preview",
-        "asset": "retrato-praia",
+        "asset": "retrato-ceu",
         "radius": 120
       },
       "action": {
         "kind": "navigate",
-        "target": "praia"
+        "target": "scene3"
       },
-      "arrivalFrom": "praia"
+      "arrivalFrom": "scene3"
     }
   ]
 }

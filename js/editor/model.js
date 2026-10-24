@@ -19,7 +19,7 @@ let lastText = null;
 const known = new Set();
 
 // What was opened: the parsed world and the name of the file it came from. The name is what the
-// export downloads, so a file opened as `praia.json` does not come back as `world.json`.
+// export downloads, so a file opened as `scene2.json` does not come back as `world.json`.
 export function setWorld(data, file) {
   current = { data: data, file: file };
   history = [];

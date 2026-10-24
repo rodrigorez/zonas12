@@ -11,9 +11,19 @@
 > `color` e `link` a navegar), a **exclusão em lote** por dimensão, o **`i18n/en.json`** (**160**
 > chaves), o **catálogo de assets** no editor e os **portais animados** (§1) — mais o saneamento das
 > três afirmações que a documentação deixou para trás. O plano, os blocos **B1–B10**, as metas e a
-> aceitação estão em §9. **Nada implementado** — o **B1**, que é só documentação, veio com o plano.
-> A produção continua a declarar `kind: "image"` até o
+> aceitação estão em §9. **B1** e **B9** implementados (o B1 veio com o plano); os restantes blocos
+> não começaram. A produção continua a declarar `kind: "image"` até o
 > **B9** fechar o A/B nos três aparelhos.
+>
+> **Atualização (2026-10-24, Fase 7 — B9 e o rename):** o **B9** está implementado: o
+> `kind: "shader"` entrou no esquema (`shaderId` de lista interna, `fallbackAsset` validado), a
+> política **20 → 15 FPS → estático** corre em `js/modules/shader-policy.js` atrás de `?shader=1`,
+> o fixture é `?scene=shader` e o instrumento é `tools/regression/shader.mjs` (**26** verificações).
+> O **A/B nos três aparelhos não foi medido**, por isso o **R14/R15 continuam abertos** e a produção
+> continua `kind: "image"`. Na mesma data as salas passaram a chamar-se **`scene1`** (a cidade),
+> **`scene2`** (a praia) e **`scene3`** (o céu): o nome de conteúdo e as imagens não mudaram, o
+> endereço é que sim — as secções históricas (§9, §11, §13, §14) continuam a citar os nomes e
+> endereços antigos, que é onde foram medidos.
 >
 > **Atualização (2026-10-24, Fase 6 — FECHADA):** a **Fase 6 (testes e limpeza)** correu
 > **bloco a bloco** (B0–B7) e fechou com a verificação medida, não estimada. O **T1** e o
@@ -844,7 +854,7 @@ O que a **Fase 3B** acrescenta ao modelo (nada disto existe ainda):
 ```json
 {
   "version": 3,
-  "world": { "slug": "praia", "name": { "pt": "Praia", "en": "Beach" } },
+  "world": { "slug": "scene2", "name": { "pt": "Praia", "en": "Beach" } },
   "assets": {
     "praia-360": { "path": "assets/panoramas/praia-d0-praia.jpg", "type": "image", "alt": { "pt": "…", "en": "…" } },
     "retrato-cidade": { "path": "assets/previews/praia-to-cidade.jpg", "type": "image", "alt": { "pt": "…", "en": "…" } }
@@ -858,8 +868,8 @@ O que a **Fase 3B** acrescenta ao modelo (nada disto existe ainda):
       "position": [0, 0, -20], "width": 10, "height": 12,
       "box": [12, 16, 1], "boxPosition": [0, 8, 0], "trigger": "plane",
       "window": { "kind": "preview", "asset": "retrato-cidade", "radius": 120 },
-      "action": { "kind": "navigate", "target": "cidade" },
-      "arrivalFrom": "cidade" }
+      "action": { "kind": "navigate", "target": "scene1" },
+      "arrivalFrom": "scene1" }
   ]
 }
 ```
@@ -4164,7 +4174,7 @@ testadas pelo autor em 2026-10-15** — local, a publicada e no telemóvel. Marc
 **A fase está feita e medida, bloco a bloco.** A **D14** (§11) foi decidida em 2026-10-13 e o
 contrato que faltava fechou-se a 2026-10-15 com **D24–D28**, mais a **D29** que a execução obrigou
 (a porta que faltava na praia). O que ficou entregue: **quatro mundos** — `gate` na raiz, com a
-câmara/AR, e as salas `cidade`, `praia` e `céu`, uma dimensão cada — mais o **fixture** de duas
+câmara/AR, e as salas `scene1`, `scene2` e `scene3` (a cidade, a praia e o céu), uma dimensão cada — mais o **fixture** de duas
 dimensões; cada mundo com o seu ficheiro (`data/worlds/<slug>.json`, formato **v3**), o seu
 **endereço** e o seu arranque (o mesmo `index.html` fora da linha do `<base>`); as **8 portas de
 hoje** (mais a quarta do fixture) a **navegar**, seis com retrato e duas sem janela; o retrato como

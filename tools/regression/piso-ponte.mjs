@@ -8,7 +8,7 @@ import { writeFileSync } from 'node:fs';
 
 import { serveProject, openBrowser, difference, sleep } from './harness.mjs';
 
-const mundo = process.argv[2] || 'cidade';
+const mundo = process.argv[2] || 'scene1';
 const ESCALA = 0.5;
 
 const MOSTRAR = `(async () => {

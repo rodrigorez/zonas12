@@ -130,7 +130,7 @@ async function main() {
 
   try {
     // ---- o quadro que a ponte guarda é a imagem do ecrã ----
-    await browser.goto(site.base + '/praia/?' + bust);
+    await browser.goto(site.base + '/scene2/?' + bust);
     await sleep(3000);
     const quadro = await browser.evaluate(`(async () => {
       const brilho = (fonte, largura, altura) => {
@@ -190,7 +190,7 @@ async function main() {
       ' amostra(s) — antes da ponte eram 2');
 
     const mundo = await browser.evaluate('window.portalDebug && window.portalDebug.world');
-    result.check('e chegou ao outro mundo', mundo === 'cidade', 'mundo=' + mundo);
+    result.check('e chegou ao outro mundo', mundo === 'scene1', 'mundo=' + mundo);
 
     const ponte = await browser.evaluate(ASSINATURA).catch(() => null);
     const trace = JSON.parse(await browser.evaluate('JSON.stringify(window.__trace || [])'));
@@ -225,7 +225,7 @@ async function main() {
     }
 
     // ---- a chave é de uso único ----
-    await browser.goto(site.base + '/cidade/?' + bust);
+    await browser.goto(site.base + '/scene1/?' + bust);
     await sleep(1500);
     const repetida = await browser.evaluate(`({
       ponte: Boolean(document.querySelector('.ultimo-quadro')),
@@ -251,7 +251,7 @@ async function main() {
         };
       `
     });
-    await guarded.page.send('Page.navigate', { url: site.base + '/praia/?' + bust });
+    await guarded.page.send('Page.navigate', { url: site.base + '/scene2/?' + bust });
     await sleep(2500);
     // Uma ponte semeada à mão: aqui não interessa a imagem, interessa que ela saia.
     await guarded.evaluate(`(() => {
@@ -263,7 +263,7 @@ async function main() {
       sessionStorage.setItem('zonas12.ultimoQuadro', canvas.toDataURL('image/jpeg', 0.5));
       sessionStorage.setItem('zonas12.ultimoQuadroEm', String(Date.now()));
     })()`);
-    await guarded.page.send('Page.navigate', { url: site.base + '/cidade/?' + bust });
+    await guarded.page.send('Page.navigate', { url: site.base + '/scene1/?' + bust });
     await sleep(1800);
     const posted = await guarded.evaluate(`Boolean(document.querySelector('.ultimo-quadro'))`);
     await sleep(10500);

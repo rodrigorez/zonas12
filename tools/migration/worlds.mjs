@@ -21,8 +21,11 @@
 // by artwork — and the tests (T10, T11, §10).
 //
 // Reads:  data/scene.json (the single world of format 3)
-// Writes: data/worlds/{gate,cidade,praia,ceu,example}.json
+// Writes: data/worlds/{gate,scene1,scene2,scene3,example}.json
 // Usage:  node tools/migration/worlds.mjs [--check]
+//
+// As salas passaram a chamar-se `scene1`, `scene2` e `scene3` na Fase 7 (a cidade, a praia e o céu,
+// pela ordem da visita): o nome de conteúdo mantém-se, o endereço é que mudou.
 //
 // After the migration the file it read stops existing: the worlds are the scene from here on, and
 // the tool refuses to run twice (there is no data/scene.json any more).
@@ -44,18 +47,18 @@ const PORTRAIT_RADIUS = 120;
 // language (content, written here because this script is the record of the migration).
 const WORLDS = [
   { slug: 'gate', from: [0], name: { pt: 'Portão', en: 'Gate' } },
-  { slug: 'cidade', from: [1], name: { pt: 'Cidade 360º', en: 'City 360º' } },
-  { slug: 'praia', from: [2], name: { pt: 'Praia', en: 'Beach' } },
-  { slug: 'ceu', from: [3], name: { pt: 'Céu 360º', en: 'Sky 360º' } }
+  { slug: 'scene1', from: [1], name: { pt: 'Cidade 360º', en: 'City 360º' } },
+  { slug: 'scene2', from: [2], name: { pt: 'Praia', en: 'Beach' } },
+  { slug: 'scene3', from: [3], name: { pt: 'Céu 360º', en: 'Sky 360º' } }
 ];
 
 // Which door of the destination world the visitor appears behind, per world of origin (law L17: one
 // per origin). The doors are the old portals, by id.
 const ARRIVAL = {
-  gate: { cidade: 0, praia: 1 },
-  cidade: { gate: 2, praia: 3 },
-  praia: { gate: 5, cidade: 4, ceu: 6 },
-  ceu: { praia: 7 }
+  gate: { scene1: 0, scene2: 1 },
+  scene1: { gate: 2, scene2: 3 },
+  scene2: { gate: 5, scene1: 4, scene3: 6 },
+  scene3: { scene2: 7 }
 };
 
 // One portal of the single scene pointed where the pair said, and nothing checked the door was a
@@ -72,9 +75,9 @@ const RETARGET = { 5: 'gate' };
 // about where the door leads, so that door is left with `window: none` (a legal combination) until
 // the author has an image (decision of 2026-10-15, §9).
 const PORTRAIT = {
-  cidade: 'retrato-cidade',
-  praia: 'retrato-praia',
-  ceu: 'retrato-ceu'
+  scene1: 'retrato-cidade',
+  scene2: 'retrato-praia',
+  scene3: 'retrato-ceu'
 };
 
 const worldOfDimension = (id) => {
@@ -236,8 +239,8 @@ function fixtureWorld(scene) {
       boxPosition: [0, 8, 0],
       trigger: 'plane',
       window: { kind: 'preview', asset: 'retrato-praia', radius: PORTRAIT_RADIUS },
-      action: { kind: 'navigate', target: 'praia' },
-      arrivalFrom: 'praia'
+      action: { kind: 'navigate', target: 'scene2' },
+      arrivalFrom: 'scene2'
     },
     // A second door with the **same** portrait, and the reason the fixture keeps it: two doors that
     // show the same picture share one derived dimension — 1 texture, 1 stencil value, 1 drawing
@@ -254,7 +257,7 @@ function fixtureWorld(scene) {
       boxPosition: [0, 8, 0],
       trigger: 'plane',
       window: { kind: 'preview', asset: 'retrato-praia', radius: PORTRAIT_RADIUS },
-      action: { kind: 'navigate', target: 'praia' }
+      action: { kind: 'navigate', target: 'scene2' }
     }
   ];
   const assets = assetsFor(scene, [1, 3], artworks, doors);

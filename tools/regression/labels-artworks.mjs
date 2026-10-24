@@ -61,15 +61,15 @@ async function main() {
 
   try {
     const esperado = {
-      cidade: ['#0 · galeriaFoto1 · Cidade 360º · modal', '#1 · galeriaFoto2 · Cidade 360º · modal',
+      scene1: ['#0 · galeriaFoto1 · Cidade 360º · modal', '#1 · galeriaFoto2 · Cidade 360º · modal',
         '#2 · video · Cidade 360º · modal', '#3 · praia · Cidade 360º · modal',
         '#4 · skycloud · Cidade 360º · modal'],
-      praia: ['#5 · skycloud · Praia · modal', '#6 · galeriaFoto2 · Praia · modal',
+      scene2: ['#5 · skycloud · Praia · modal', '#6 · galeriaFoto2 · Praia · modal',
         '#7 · galeriaFoto1 · Praia · modal'],
-      ceu: ['#8 · praia · Céu 360º · modal', '#9 · cidade-360 · Céu 360º · modal']
+      scene3: ['#8 · praia · Céu 360º · modal', '#9 · cidade-360 · Céu 360º · modal']
     };
 
-    for (const [slug, from] of [['cidade', 'gate'], ['praia', 'cidade'], ['ceu', 'praia']]) {
+    for (const [slug, from] of [['scene1', 'gate'], ['scene2', 'scene1'], ['scene3', 'scene2']]) {
       await open(site.base + '/?scene=' + slug + '&from=' + from + '&bust=' + bust + Math.random());
       const antes = await evaluate(NOMES);
       check(slug + ': sem a tecla D não há nome nenhum',
@@ -105,13 +105,13 @@ async function main() {
       JSON.stringify({ caixas: caixasNoPortao }));
 
     // O editor: os nomes sem tecla nenhuma.
-    await open(site.base + '/editor.html?world=praia&bust=' + bust);
+    await open(site.base + '/editor.html?world=scene2&bust=' + bust);
     const editor = await evaluate(NOMES);
     check('editor: as obras têm nome desde o arranque',
       editor.length === 3 && editor.every((entry) => entry.sprite && entry.visible === true),
       JSON.stringify(editor.map((entry) => entry.label)));
     check('editor: os nomes são os mesmos da exposição',
-      JSON.stringify(editor.map((entry) => entry.label)) === JSON.stringify(esperado.praia),
+      JSON.stringify(editor.map((entry) => entry.label)) === JSON.stringify(esperado.scene2),
       JSON.stringify(editor.map((entry) => entry.label)));
 
     // Criar e destruir obras com nome não deixa textura nem nó atrás.
@@ -121,7 +121,7 @@ async function main() {
       const schema = await import('/js/scene/schema.js');
       const scene = document.querySelector('a-scene');
       const renderer = scene.renderer;
-      const world = await (await fetch('data/worlds/praia.json')).json();
+      const world = await (await fetch('data/worlds/scene2.json')).json();
       const model = world.artworks[0];
       const before = { textures: renderer.info.memory.textures, nodes: scene.object3D.children.length };
       const made = [];

@@ -45,12 +45,12 @@ const TAMANHO = { largura: 3072, altura: 1536, face: 1536, qualidade: 0.7 };
 // As seis portas com retrato, como (mundo de destino, mundo de origem): é o par que diz de onde a
 // câmara parte para desenhar a chegada. `--todos` desenha as seis.
 const PORTAS = [
-  ['cidade', 'gate'],
-  ['praia', 'gate'],
-  ['praia', 'cidade'],
-  ['cidade', 'praia'],
-  ['ceu', 'praia'],
-  ['praia', 'ceu']
+  ['scene1', 'gate'],
+  ['scene2', 'gate'],
+  ['scene2', 'scene1'],
+  ['scene1', 'scene2'],
+  ['scene3', 'scene2'],
+  ['scene2', 'scene3']
 ];
 
 const todos = process.argv[2] === '--todos';
@@ -59,7 +59,7 @@ const origem = todos ? null : process.argv[3];
 if (!todos && (!mundo || !origem)) {
   console.error('uso: node tools/scene/portrait.mjs <mundo> <origem> [ficheiro]');
   console.error('     node tools/scene/portrait.mjs --todos');
-  console.error('exemplo: node tools/scene/portrait.mjs cidade praia');
+  console.error('exemplo: node tools/scene/portrait.mjs scene1 scene2');
   process.exit(1);
 }
 

@@ -20,18 +20,18 @@ const ESCALA = 0.5;
 
 // As portas com retrato, e de que mundo são.
 const PORTAS = [
-  { mundo: 'gate', porta: 0, destino: 'cidade' },
-  { mundo: 'gate', porta: 1, destino: 'praia' },
-  { mundo: 'cidade', porta: 3, destino: 'praia' },
-  { mundo: 'praia', porta: 4, destino: 'cidade' },
-  { mundo: 'praia', porta: 6, destino: 'ceu' },
-  { mundo: 'ceu', porta: 7, destino: 'praia' }
+  { mundo: 'gate', porta: 0, destino: 'scene1' },
+  { mundo: 'gate', porta: 1, destino: 'scene2' },
+  { mundo: 'scene1', porta: 3, destino: 'scene2' },
+  { mundo: 'scene2', porta: 4, destino: 'scene1' },
+  { mundo: 'scene2', porta: 6, destino: 'scene3' },
+  { mundo: 'scene3', porta: 7, destino: 'scene2' }
 ];
 
 // As que levam ao portão, onde a imagem é a câmara: medidas, mas não verificadas contra 0,5.
 const CAMARA = [
-  { mundo: 'cidade', porta: 2, destino: 'gate' },
-  { mundo: 'praia', porta: 5, destino: 'gate' }
+  { mundo: 'scene1', porta: 2, destino: 'gate' },
+  { mundo: 'scene2', porta: 5, destino: 'gate' }
 ];
 
 const SONDA = `

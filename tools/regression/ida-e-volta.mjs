@@ -117,7 +117,7 @@ async function main() {
   const site = await serveProject();
   const browser = await openBrowser({ width: 640, height: 320, camera: false });
   try {
-    await browser.goto(site.base + '/praia/?bust=' + Date.now(), 60000);
+    await browser.goto(site.base + '/scene2/?bust=' + Date.now(), 60000);
     await sleep(1500);
     const resultado = await browser.evaluate(TESTE(panorama, LARGURA, ALTURA, FACE), 120000);
     if (!resultado || !resultado.convertido) throw new Error('o teste não correu');

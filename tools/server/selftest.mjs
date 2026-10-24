@@ -53,13 +53,13 @@ const MUNDO_COM_ERRO = Object.assign({}, MUNDO, {
 
 function fixture() {
   const root = mkdtempSync(join(tmpdir(), 'zonas12-serve-'));
-  mkdirSync(join(root, 'cidade'), { recursive: true });
+  mkdirSync(join(root, 'scene1'), { recursive: true });
   mkdirSync(join(root, 'data', 'worlds'), { recursive: true });
   mkdirSync(join(root, '.harness'), { recursive: true });
   mkdirSync(join(root, '.git'), { recursive: true });
   mkdirSync(join(root, 'node_modules'), { recursive: true });
   writeFileSync(join(root, 'index.html'), '<!doctype html><title>raiz</title>\n');
-  writeFileSync(join(root, 'cidade', 'index.html'), '<!doctype html><title>sala</title>\n');
+  writeFileSync(join(root, 'scene1', 'index.html'), '<!doctype html><title>sala</title>\n');
   writeFileSync(join(root, 'data', 'worlds', 'teste.json'), text(MUNDO));
   writeFileSync(join(root, '.harness', 'segredo.txt'), SEGREDO);
   writeFileSync(join(root, '.git', 'config'), '[core]\n');
@@ -102,12 +102,12 @@ async function main() {
     const raiz = await ask(port, '/');
     result.check('/ serve a raiz da publicação', raiz.status === 200 && raiz.body.includes('raiz'),
       'HTTP ' + raiz.status);
-    const sala = await ask(port, '/cidade/');
-    result.check('/cidade/ resolve o index.html da sala',
+    const sala = await ask(port, '/scene1/');
+    result.check('/scene1/ resolve o index.html da sala',
       sala.status === 200 && sala.body.includes('sala'), 'HTTP ' + sala.status);
-    const semBarra = await ask(port, '/cidade');
-    result.check('/cidade sem a barra mudou de endereço para /cidade/',
-      semBarra.status === 301 && semBarra.headers.location === '/cidade/',
+    const semBarra = await ask(port, '/scene1');
+    result.check('/scene1 sem a barra mudou de endereço para /scene1/',
+      semBarra.status === 301 && semBarra.headers.location === '/scene1/',
       'HTTP ' + semBarra.status + ' → ' + semBarra.headers.location);
     const mundo = await ask(port, '/data/worlds/teste.json');
     result.check('o ficheiro de um mundo é servido como JSON',

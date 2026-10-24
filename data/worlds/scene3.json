@@ -1,7 +1,7 @@
 {
   "version": 3,
   "world": {
-    "slug": "ceu",
+    "slug": "scene3",
     "name": {
       "pt": "Céu 360º",
       "en": "Sky 360º"
@@ -150,9 +150,9 @@
       },
       "action": {
         "kind": "navigate",
-        "target": "praia"
+        "target": "scene2"
       },
-      "arrivalFrom": "praia"
+      "arrivalFrom": "scene2"
     }
   ]
 }
