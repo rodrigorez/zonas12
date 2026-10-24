@@ -25,7 +25,8 @@
 > **R16** (a sangria do T10/T12 era a aresta da moldura, uma textura a assentar **e** uma obra em
 > vídeo; a medida voltou a **0 px**) e a **R17** (a ponte espera pela descodificação da imagem, com
 > teto de 1,5 s). O plano, os blocos e o que cada um mediu estão em §9; o README ganhou o comando
-> único. **Marco:** a decidir pelo autor.
+> único. **No telemóvel, a 2026-10-24, na versão publicada: aceito e validado pelo autor.**
+> **Marco: a branch `v0.0.11`.**
 >
 > **Atualização (2026-10-24, Fase 6 — plano):** a fase foi planeada **antes** de mexer em código,
 > com a linha de base re-medida no mesmo dia: `validate` **0**, as leis **21 de 21**, a bateria dos
@@ -3172,6 +3173,10 @@ passou a documentar as **três** avarias; a §10 ficou com os cinco instrumentos
 
 O `validate.mjs` sai com **0** (5 mundos, 12 portas, grafo e L19 completos) e as leis dão **21 de
 21**, com o controlo limpo.
+
+**No telemóvel, a 2026-10-24, na versão publicada o autor deu a fase como aceite e validada.** Fica
+fechada dos dois lados: o que os instrumentos medem e o que quem usa vê. **Marco: a branch
+`v0.0.11`** (publicada no `origin` com o `main`).
 
 ---
 
