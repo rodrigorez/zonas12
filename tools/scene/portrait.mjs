@@ -1,24 +1,24 @@
-// O retrato de uma porta de mundo, desenhado pela própria exposição (D46).
+// O retrato de uma porta de mundo, desenhado pela prÃ³pria exposiÃ§Ã£o (D46).
 //
 // Porque existe: a janela de uma porta de mundo mostrava o **panorama** do destino, e a chegada a esse
 // destino mostra o panorama **mais as obras e as portas dele**. O que se via ao atravessar era, por
-// isso, uma imagem diferente da que estava no ecrã — medido: o salto no corte ia de **0,68 a 13,36**
+// isso, uma imagem diferente da que estava no ecrÃ£ â€” medido: o salto no corte ia de **0,68 a 13,36**
 // nas seis portas com retrato.
 //
-// O que faz: abre o mundo de destino com `?from=<origem>`, deixa o `arrivalPoint` pôr a câmara onde o
-// visitante vai aparecer (uma só casa para a geometria — L16), desenha seis faces de cubo a partir
-// dali e converte-as numa equirretangular 2:1 — com as obras e as portas lá dentro, porque são a
-// cena. O ficheiro é o retrato que a porta vai mostrar, e é por isso que atravessar deixa de mudar a
+// O que faz: abre o mundo de destino com `?from=<origem>`, deixa o `arrivalPoint` pÃ´r a cÃ¢mara onde o
+// visitante vai aparecer (uma sÃ³ casa para a geometria â€” L16), desenha seis faces de cubo a partir
+// dali e converte-as numa equirretangular 2:1 â€” com as obras e as portas lÃ¡ dentro, porque sÃ£o a
+// cena. O ficheiro Ã© o retrato que a porta vai mostrar, e Ã© por isso que atravessar deixa de mudar a
 // imagem.
 //
-// O retrato é um **asset derivado**: regere-o quando a sala mudar (mover uma obra muda o retrato das
-// portas que a mostram). E regere-o **duas vezes**: o retrato de um mundo contém as janelas das
-// portas desse mundo, que são retratos deles próprios — a primeira passagem cozinha o que lá estava,
-// a segunda o que lá ficou. Medido, o mesmo retrato saiu com 438, 215 e 378 kB em passagens seguidas;
-// a costura não se mexe com isso (0,37 antes e depois), mas o ficheiro sim.
+// O retrato Ã© um **asset derivado**: regere-o quando a sala mudar (mover uma obra muda o retrato das
+// portas que a mostram). E regere-o **duas vezes**: o retrato de um mundo contÃ©m as janelas das
+// portas desse mundo, que sÃ£o retratos deles prÃ³prios â€” a primeira passagem cozinha o que lÃ¡ estava,
+// a segunda o que lÃ¡ ficou. Medido, o mesmo retrato saiu com 438, 215 e 378 kB em passagens seguidas;
+// a costura nÃ£o se mexe com isso (0,37 antes e depois), mas o ficheiro sim.
 //
-// A esfera onde o retrato é mostrado fica centrada à **altura dos olhos** (D47), que é a altura de
-// onde este cubo é desenhado — é o que faz a imagem através da porta ser a imagem da chegada.
+// A esfera onde o retrato Ã© mostrado fica centrada Ã  **altura dos olhos** (D47), que Ã© a altura de
+// onde este cubo Ã© desenhado â€” Ã© o que faz a imagem atravÃ©s da porta ser a imagem da chegada.
 //
 // Uso, da raiz do projeto:
 //   node tools/scene/portrait.mjs --todos
@@ -27,23 +27,19 @@ import { join } from 'node:path';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { serveProject, openBrowser, ROOT, sleep } from '../regression/harness.mjs';
 
-// O tamanho da imagem. Medido na porta mais difícil (praia 4 → cidade), com o centro do retrato já à
-// altura dos olhos (D47): 2560x1280 deixa a costura em **0,58** (falha a meta de 0,50), 3072x1536 em
-// **0,41 a 0,47** e 4096x2048 em **0,40**. A faixa do 3072 é real: o ficheiro não é estável entre
-// passagens (ver acima), e o que a costura herda é o que lá estava.
+// O tamanho da imagem. Enquanto o fundo era um panorama, quem mandava era a resoluÃ§Ã£o: medido na
+// porta mais difÃ­cil (praia 4 â†’ cidade), 2560x1280 deixava a costura em **0,58** (falhava a meta de
+// 0,50) e 3072x1536 em **0,41 a 0,47**. Com o shader como fundo isso deixa de existir â€” o cÃ©u, o mar
+// e o chÃ£o sÃ£o calculados e chegam exatos â€”, e o retrato sÃ³ carrega as obras e as portas. Fica o
+// tamanho padrÃ£o das imagens do projeto (2048x1024, lei L14): 8 MiB de textura por retrato em vez de
+// 18, que Ã© o que um PowerVR GE8320 (o aparelho fraco do ensaio de 2026-10) agradece.
 //
-// Fica **3072x1536**, e não 4096: a resolução a mais comprava 0,01 a 0,07 de margem e custava 32 MiB
-// de textura por retrato em vez de 18 MiB — num PowerVR GE8320 (o aparelho fraco que o ensaio de
-// 2026-10 mediu) a praia ia a **52 MiB** de texturas. O orçamento de imagem do ensaio (1024x512 no
-// telemóvel, 4096 «não recomendado para móvel») aponta no mesmo sentido. Com o shader como fundo,
-// esta decisão deixa de existir: a costura do céu e do mar passa a ser exata e o retrato só carrega
-// as obras e as portas.
-//
-// A qualidade do JPEG quase não conta (0,85 dá 0,39 e 0,75 dá 0,40 a 4096); quem manda é a resolução.
-const TAMANHO = { largura: 3072, altura: 1536, face: 1536, qualidade: 0.7 };
+// A qualidade do JPEG quase nÃ£o conta (0,85 dava 0,39 e 0,75 dava 0,40 a 4096); quem mandava era a
+// resoluÃ§Ã£o.
+const TAMANHO = { largura: 2048, altura: 1024, face: 1536, qualidade: 0.85 };
 
-// As seis portas com retrato, como (mundo de destino, mundo de origem): é o par que diz de onde a
-// câmara parte para desenhar a chegada. `--todos` desenha as seis.
+// As seis portas com retrato, como (mundo de destino, mundo de origem): Ã© o par que diz de onde a
+// cÃ¢mara parte para desenhar a chegada. `--todos` desenha as seis.
 const PORTAS = [
   ['scene1', 'gate'],
   ['scene2', 'gate'],
@@ -63,23 +59,23 @@ if (!todos && (!mundo || !origem)) {
   process.exit(1);
 }
 
-// O desenho, dentro da página: cubo a partir da câmara de chegada, e o cubo desdobrado.
+// O desenho, dentro da pÃ¡gina: cubo a partir da cÃ¢mara de chegada, e o cubo desdobrado.
 const DESENHAR = (largura, altura, face, qualidade) => `(async () => {
   const cena = document.querySelector('a-scene');
   const renderer = cena.renderer;
   const camera = cena.camera;
   const cena3d = cena.object3D;
-  if (!renderer || !camera || !cena3d) return { erro: 'sem renderer ou câmara' };
+  if (!renderer || !camera || !cena3d) return { erro: 'sem renderer ou cÃ¢mara' };
 
-  // O cursor é interface, não paisagem: não entra no retrato.
+  // O cursor Ã© interface, nÃ£o paisagem: nÃ£o entra no retrato.
   const cursor = document.querySelector('a-cursor');
   if (cursor) cursor.setAttribute('visible', false);
 
   const posicao = new THREE.Vector3();
   camera.getWorldPosition(posicao);
 
-  // O fundo da cena é transparente (alpha 0); num retrato isso seria preto, e uma imagem opaca é o
-  // que o visitante vê.
+  // O fundo da cena Ã© transparente (alpha 0); num retrato isso seria preto, e uma imagem opaca Ã© o
+  // que o visitante vÃª.
   renderer.setClearColor(0x000000, 1);
 
   const alvoCubo = new THREE.WebGLCubeRenderTarget(${face}, {
@@ -88,6 +84,13 @@ const DESENHAR = (largura, altura, face, qualidade) => `(async () => {
   });
   const cubo = new THREE.CubeCamera(0.1, 4000, alvoCubo);
   cubo.position.copy(posicao);
+  // O retrato tem de casar com o primeiro quadro do destino: o shader comeÃ§a congelado no tempo
+  // estÃ¡tico da polÃ­tica (2), e Ã© esse o instante que o retrato guarda.
+  cena3d.traverse((object) => {
+    if (object.material && object.material.uniforms && object.material.uniforms.uTime) {
+      object.material.uniforms.uTime.value = 2;
+    }
+  });
   cubo.update(renderer, cena3d);
 
   const alvo = new THREE.WebGLRenderTarget(${largura}, ${altura}, {
@@ -98,9 +101,9 @@ const DESENHAR = (largura, altura, face, qualidade) => `(async () => {
   const material = new THREE.ShaderMaterial({
     uniforms: { mapa: { value: alvoCubo.texture } },
     vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
-    // A convenção da esfera do three (SphereGeometry com phi 0..2π e theta 0..π, uv = (u, 1-v)):
-    // o topo da imagem olha para cima, e a coluna 0 para -X. A cor sai como está: o render target do
-    // three já entrega sRGB, e codificar outra vez (medido) estraga a imagem toda — 47,8 de costura.
+    // A convenÃ§Ã£o da esfera do three (SphereGeometry com phi 0..2Ï€ e theta 0..Ï€, uv = (u, 1-v)):
+    // o topo da imagem olha para cima, e a coluna 0 para -X. A cor sai como estÃ¡: o render target do
+    // three jÃ¡ entrega sRGB, e codificar outra vez (medido) estraga a imagem toda â€” 47,8 de costura.
     fragmentShader: [
       'uniform samplerCube mapa;',
       'varying vec2 vUv;',
@@ -129,7 +132,7 @@ const DESENHAR = (largura, altura, face, qualidade) => `(async () => {
   tela.height = ${altura};
   const contexto = tela.getContext('2d');
   const dados = contexto.createImageData(${largura}, ${altura});
-  // O readback começa na linha de baixo; a imagem começa em cima.
+  // O readback comeÃ§a na linha de baixo; a imagem comeÃ§a em cima.
   for (let y = 0; y < ${altura}; y++) {
     const origem = (${altura} - 1 - y) * ${largura} * 4;
     dados.data.set(pixels.subarray(origem, origem + ${largura} * 4), y * ${largura} * 4);
@@ -146,14 +149,14 @@ async function gerar(mundo, origem, destino) {
   try {
     const url = site.base + '/' + mundo + '/?from=' + origem + '&bust=' + Date.now();
     const pronta = await browser.goto(url, 90000);
-    if (!pronta) throw new Error('a cena de ' + mundo + ' não ficou pronta');
-    // A cena só está construída quando as portas existem: o `world` é escrito antes do build.
+    if (!pronta) throw new Error('a cena de ' + mundo + ' nÃ£o ficou pronta');
+    // A cena sÃ³ estÃ¡ construÃ­da quando as portas existem: o `world` Ã© escrito antes do build.
     for (let i = 0; i < 240; i++) {
       if (await browser.evaluate('Boolean(window.portalDebug.state.portals.length)').catch(() => false)) break;
       await sleep(250);
     }
     await sleep(2500);
-    // O `?from=` tem de ter posto a câmara no sítio: se não pôs, o mundo não tem porta de chegada
+    // O `?from=` tem de ter posto a cÃ¢mara no sÃ­tio: se nÃ£o pÃ´s, o mundo nÃ£o tem porta de chegada
     // para esta origem e o retrato sairia do lugar errado.
     const chegada = await browser.evaluate(`(() => {
       const cena = document.querySelector('a-scene');
@@ -162,7 +165,7 @@ async function gerar(mundo, origem, destino) {
       camera.getWorldPosition(posicao);
       return { mundo: window.portalDebug.world, posicao: [posicao.x, posicao.y, posicao.z] };
     })()`);
-    console.log('mundo ' + mundo + ' a chegar de ' + origem + ': câmara em [' +
+    console.log('mundo ' + mundo + ' a chegar de ' + origem + ': cÃ¢mara em [' +
       chegada.posicao.map((valor) => Math.round(valor * 100) / 100).join(', ') + ']');
 
     const desenho = await browser.evaluate(

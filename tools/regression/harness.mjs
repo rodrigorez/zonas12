@@ -295,6 +295,10 @@ export async function openBrowser(options) {
   await page.send('Network.enable');
   // A battery that reads a cached page measures the last build, not this one.
   await page.send('Network.setCacheDisabled', { cacheDisabled: true });
+  // Sem barras de deslocamento a pintar por cima do ecrã: uma página que transborda 4 px mostra uma
+  // barra cinzenta na borda direita durante meio segundo, e uma assinatura de luminosidade apanha-a
+  // como se fosse imagem — o painel não tem barras de deslocamento, e a medição também não.
+  await page.send('Emulation.setScrollbarsHidden', { hidden: true });
   // What the page says it is doing wrong. A scene that is fine says nothing (T8), so anything here is
   // a finding — the batteries decide which lines are noise of the browser itself.
   const noise = [];

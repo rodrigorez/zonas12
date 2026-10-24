@@ -46,7 +46,7 @@
       }
     },
     "retrato-praia": {
-      "path": "assets/previews/praia-de-ceu.jpg",
+      "path": "assets/previews/scene2-de-scene3.jpg",
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Praia, visto da porta",
@@ -57,8 +57,9 @@
   "dimensions": [
     {
       "id": 0,
-      "kind": "image",
-      "asset": "skycloud",
+      "kind": "shader",
+      "shaderId": "nuvens",
+      "fallbackAsset": "skycloud",
       "name": {
         "pt": "Céu 360º",
         "en": "Sky 360º"

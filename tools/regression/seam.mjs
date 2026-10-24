@@ -4,8 +4,10 @@
 // (o que estava no ecrã) e a que chega é fotografada depois de assente. A diferença entre as duas
 // assinaturas 4x4 de luminosidade é o **salto no corte** — o que muda de uma imagem para a outra.
 //
-// A referência é o movimento: um passo a caminhar muda a imagem em ~0,9 (mediana) e nunca mais de 2,7.
-// Um salto no corte abaixo disso não se distingue de andar. A meta do B20 (D46) é **0,5**.
+// A referência é o movimento: um passo a caminhar muda a imagem em ~1 (mediana), e os passos mais
+// largos chegam a 3. Um salto no corte abaixo disso não se distingue de andar — a meta do B20 (D46) é
+// **0,5**. A coluna do maior passo inclui o próprio corte (é a maior diferença entre dois fotogramas
+// seguidos, travessia adentro) e fica ali como retrato do que é mexer.
 //
 // Só as portas com retrato entram na verificação: as duas que mostram a câmara (cidade 2 e praia 5)
 // levam ao portão, cuja imagem é a câmara ao vivo — uma fotografia nunca é igual a uma câmara a andar,
@@ -43,9 +45,13 @@ const SONDA = `
     if (chave === 'zonas12.ultimoQuadro' && valor) window.__quadroDaPonte = valor;
     return valor;
   };
+  // Só conta como saída depois de a ponte ter sido **vista**: um documento novo passa os primeiros
+  // instantes sem quadro nenhum, e isso não é a ponte a sair — é a página a chegar.
+  let ponteVista = false;
   const vigia = setInterval(() => {
     const imagem = document.querySelector('.ultimo-quadro');
-    if (!imagem && !window.__saiu) { window.__saiu = true; marca('ponte retirada'); }
+    if (imagem) ponteVista = true;
+    else if (ponteVista && !window.__saiu) { window.__saiu = true; marca('ponte retirada'); }
   }, 8);
 `;
 
@@ -110,12 +116,24 @@ async function medir(browser, site, alvo) {
 
   const amostras = [];
   let aCorrer = true;
+  let depoisDaPonte = null;
   const inicio = Date.now();
   const amostrar = (async () => {
     while (aCorrer && Date.now() - inicio < 9000) {
       try {
         const shot = await browser.screenshot(ESCALA);
-        amostras.push({ t: Date.now() - inicio, mean: shot.mean, blocks: shot.blocks });
+        // O quadro que interessa para a costura é o **primeiro depois de a ponte sair**: com fundos
+        // animados, esperar 8 s compara o retrato com um instante qualquer da animação, e isso não é
+        // o corte — é o tempo a passar.
+        const saiu = await browser.evaluate('Boolean(window.__saiu)').catch(() => false);
+        if (saiu && !depoisDaPonte) {
+          // Um fotograma pintado depois de a ponte sair, e não a superfície da página anterior que o
+          // compositor ainda mostra: dois `requestAnimationFrame` chegam para a cena se pintar.
+          await browser.evaluate('new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))')
+            .catch(() => { /* a página vai-se embora */ });
+          depoisDaPonte = await browser.screenshot(ESCALA);
+        }
+        amostras.push({ t: Date.now() - inicio, mean: shot.mean, blocks: shot.blocks, saiu: saiu });
       } catch (error) {
         amostras.push({ t: Date.now() - inicio, failed: error.message });
       }
@@ -132,7 +150,10 @@ async function medir(browser, site, alvo) {
   const escuros = amostras.filter((item) => !item.failed && item.mean < 6).length;
   const mundo = await browser.evaluate('window.portalDebug && window.portalDebug.world').catch(() => null);
   const ponte = await browser.evaluate(ASSINATURA).catch(() => null);
-  const chegada = await browser.screenshot(ESCALA);
+  const final = await browser.screenshot(ESCALA);
+  // A chegada para a costura é o primeiro quadro depois de a ponte sair; o final fica só para se
+  // poder olhar para a imagem.
+  const chegada = depoisDaPonte || final;
   const salto = ponte ? difference(ponte, chegada) : null;
   const blocos = ponte ? ponte.blocks.map((valor, i) => Math.abs(valor - chegada.blocks[i])) : null;
   // Para se poder olhar para as duas imagens: os pixels do quadro da ponte e o PNG da chegada.
@@ -147,7 +168,7 @@ async function medir(browser, site, alvo) {
   }
 
   return { mundo: mundo, escuros: escuros, salto: salto, blocos: blocos, maiorPasso: maiorPasso,
-    ponte: pixelsDaPonte, chegada: chegada,
+    ponte: pixelsDaPonte, chegada: final, depoisDaPonte: depoisDaPonte,
     amostras: amostras.filter((item) => !item.failed).length };
 }
 
@@ -176,10 +197,14 @@ async function main() {
         // As duas imagens que se comparam: a que a ponte pintou e a que o mundo mostrou depois.
         const { writeFileSync } = await import('node:fs');
         const { join } = await import('node:path');
-        writeFileSync(join(process.cwd(), 'costura-ponte.jpg'),
+        const prefixo = 'costura-' + alvo.mundo + '-' + alvo.porta;
+        writeFileSync(join(process.cwd(), prefixo + '-ponte.jpg'),
           Buffer.from(String(medida.ponte).split(',')[1], 'base64'));
-        writeFileSync(join(process.cwd(), 'costura-chegada.png'), medida.chegada.bytes);
-        console.log('    escritas costura-ponte.jpg e costura-chegada.png');
+        writeFileSync(join(process.cwd(), prefixo + '-chegada.png'), medida.chegada.bytes);
+        if (medida.depoisDaPonte) {
+          writeFileSync(join(process.cwd(), prefixo + '-depois.png'), medida.depoisDaPonte.bytes);
+        }
+        console.log('    escritas ' + prefixo + '-ponte.jpg, ' + prefixo + '-chegada.png e ' + prefixo + '-depois.png');
       }
       if (process.env.BLOCOS && medida.blocos) {
         // Onde é que a diferença está: uma grelha 4x4 do valor absoluto por bloco.

@@ -160,6 +160,8 @@ const cases = [
       dimension.kind = 'color';
       dimension.color = '#202020';
       delete dimension.asset;
+      delete dimension.shaderId;
+      delete dimension.fallbackAsset;
       delete dimension.radius;
     }
   },

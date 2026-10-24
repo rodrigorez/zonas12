@@ -22,7 +22,7 @@
   },
   "assets": {
     "retrato-cidade": {
-      "path": "assets/previews/cidade-de-gate.jpg",
+      "path": "assets/previews/scene1-de-gate.jpg",
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Cidade 360º, visto da porta",
@@ -30,7 +30,7 @@
       }
     },
     "retrato-praia": {
-      "path": "assets/previews/praia-de-gate.jpg",
+      "path": "assets/previews/scene2-de-gate.jpg",
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Praia, visto da porta",

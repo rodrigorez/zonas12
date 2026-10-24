@@ -12,18 +12,22 @@
 > chaves), o **catálogo de assets** no editor e os **portais animados** (§1) — mais o saneamento das
 > três afirmações que a documentação deixou para trás. O plano, os blocos **B1–B10**, as metas e a
 > aceitação estão em §9. **B1** e **B9** implementados (o B1 veio com o plano); os restantes blocos
-> não começaram. A produção continua a declarar `kind: "image"` até o
-> **B9** fechar o A/B nos três aparelhos.
+> não começaram.
 >
-> **Atualização (2026-10-24, Fase 7 — B9 e o rename):** o **B9** está implementado: o
-> `kind: "shader"` entrou no esquema (`shaderId` de lista interna, `fallbackAsset` validado), a
-> política **20 → 15 FPS → estático** corre em `js/modules/shader-policy.js` atrás de `?shader=1`,
-> o fixture é `?scene=shader` e o instrumento é `tools/regression/shader.mjs` (**26** verificações).
-> O **A/B nos três aparelhos não foi medido**, por isso o **R14/R15 continuam abertos** e a produção
-> continua `kind: "image"`. Na mesma data as salas passaram a chamar-se **`scene1`** (a cidade),
-> **`scene2`** (a praia) e **`scene3`** (o céu): o nome de conteúdo e as imagens não mudaram, o
-> endereço é que sim — as secções históricas (§9, §11, §13, §14) continuam a citar os nomes e
-> endereços antigos, que é onde foram medidos.
+> **Atualização (2026-10-24, Fase 7 — B9 em produção e o rename):** o **B9** está implementado e o
+> shader passou a ser o **fundo de produção** das três salas, por decisão do autor depois de o
+> ensaio passar no telemóvel fraco e no desktop: `scene1` → `grade-neon`, `scene2` → `por-do-sol`,
+> `scene3` → `nuvens`, cada uma com o panorama atual como `fallbackAsset` e `?shader=0` como escape.
+> A política **20 → 15 FPS → estático** (pixelRatio primeiro, piso **1**) corre em
+> `js/modules/shader-policy.js`; a cadência é mantida por um prazo que avança um intervalo, para um
+> ecrã rápido não a arredondar para baixo. Há agora um **validador/instalador** de shaders
+> (`tools/shader/`): recebe o corpo do fragment, compila, mede as atualizações entregues e **recusa**
+> abaixo de **19 de 20** por segundo; `--force` instala para ensaio com o número medido. O **A/B
+> controlado nos três aparelhos continua por registar** — a decisão de produção foi tomada com o que
+> o autor observou, e é isso que fica escrito; **R14/R15 ficam abertos** até esse registo. Na mesma
+> data as salas passaram a chamar-se **`scene1`** (a cidade), **`scene2`** (a praia) e **`scene3`**
+> (o céu): o nome de conteúdo e as imagens não mudaram, o endereço é que sim — as secções históricas
+> (§9, §11, §13, §14) continuam a citar os nomes e endereços antigos, que é onde foram medidos.
 >
 > **Atualização (2026-10-24, Fase 6 — FECHADA):** a **Fase 6 (testes e limpeza)** correu
 > **bloco a bloco** (B0–B7) e fechou com a verificação medida, não estimada. O **T1** e o
@@ -468,7 +472,8 @@ O único sítio que conhece a cena toda.
 
 - **Responsabilidade:** uma dimensão = ID + fundo + lista de conteúdo dela.
 - **Campos:** `id` (0…511), `background` (`asset`), `kind` (`image | video | color |
-  camera`), `radius`, `followCamera`, `color`.
+  camera | shader`), `radius`, `followCamera`, `color`, `shaderId` (id da lista interna, só com
+  `shader`) e `fallbackAsset` (um asset de imagem, só com `shader`).
 - **API:** `create / update / remove / list`.
 - **Regras:** ID único; `radius` > distância a qualquer portal (senão o fundo aparece dentro
   da janela — regra medida na v0.0.2); vídeo obriga a `VideoTexture`.
@@ -812,6 +817,11 @@ desde que as 6 regras acima estejam cumpridas.
 `interaction: "link"` (uma ligação externa, que não é um asset); com `interaction: "modal"` o
 endereço **deriva** do catálogo (D20), e o validador recusa os dois campos juntos. O `title` de
 uma obra é opcional: é texto de conteúdo, e quem o lê é o editor (Fase 4).
+
+**Nota (Fase 7):** uma dimensão pode ser `kind: "shader"`, com `shaderId` (id da **lista interna**,
+nunca GLSL) e `fallbackAsset` (uma imagem do catálogo) no lugar de `asset` — o exemplo acima
+continua válido para os fundos de imagem, que são a reserva. A cadência e o pixelRatio não estão no
+dado: são da política (`js/modules/shader-policy.js`).
 
 **Causa/consequência:** passar a dados obrigou a que o `index.html` deixasse de ter entidades (foi
 a Fase 3) e que o editor saiba escrever este formato (é a Fase 4). O ganho: criar uma dimensão
@@ -2782,6 +2792,11 @@ do destino lá dentro, e **um por porta**. A esfera onde ele é mostrado passa a
 | praia 6 | céu | 0,70 | **0,17** | `ceu-de-praia.jpg` |
 | céu 7 | praia | 1,41 | **0,39** | `praia-de-ceu.jpg` |
 
+*(Medição de 2026-10-20. Em 2026-10-24 os retratos das seis portas foram regerados com os fundos
+shader — os ficheiros passaram a `scene1-de-gate.jpg`, `scene2-de-gate.jpg`, `scene2-de-scene1.jpg`,
+`scene1-de-scene2.jpg`, `scene3-de-scene2.jpg` e `scene2-de-scene3.jpg`, e o shader é congelado no
+tempo estático para o retrato casar com a chegada.)*
+
 **12 de 12 verificações** (antes: 5 de 12, e uma porta com cinco fotogramas escuros). A meta de
 **0,50** fica cumprida com **0,09 de margem**; a referência de contexto é que um passo a caminhar
 muda a imagem em ~0,9.
@@ -2807,14 +2822,42 @@ mundo**, que são retratos deles próprios: o mesmo comando deu 438, 215 e 378 k
 seguidas. A costura não se mexe com isso (0,37 antes e depois de regenerar), mas o ficheiro sim —
 por isso a regra é gerar **duas vezes** quando uma sala muda, e está no cabeçalho da ferramenta.
 
-**A consequência que se aceita.** Como o retrato ficou a **3072×1536**, acima do padrão de
-**2048×1024** da **L14**, a lei passa a avisar: **6 avisos** em `tools/scene/validate.mjs` (um por
-retrato acima do padrão) e **1 a 2 por mundo** no relatório do editor. É a lei a fazer o seu trabalho
-— a memória de uma textura cresce com os pixels, e a 2048 a meta **não** se cumpria (0,54) —, e por
-isso o aviso fica **à vista**, em vez de a lei ser baixada para o silenciar. A bateria do editor passa
+**A consequência aceita (revista na Fase 7).** Como o retrato ficou a **3072×1536**, acima do padrão
+de **2048×1024** da **L14**, a lei passava a avisar: **6 avisos** em `tools/scene/validate.mjs` (um
+por retrato acima do padrão) e **1 a 2 por mundo** no relatório do editor. A bateria do editor passou
 de **35** para **34 de 35**: a que falha é a que exige «Avisos: 0». **Decisão do autor em
 2026-10-23: fica assim** — sem padrão próprio na lei; se um dia o shader substituir o fundo, os
 retratos voltam a poder ser pequenos e o aviso desaparece por si.
+
+**Emenda de 2026-10-24 (Fase 7, com o fundo shader em produção): foi isso que aconteceu.** Com o
+céu, o mar e o chão calculados — iguais dos dois lados do corte —, o retrato deixou de ter de
+carregar o panorama e voltou ao padrão: `2048 × 1024`, JPEG q0,85, os seis entre **90 e 172 kB**
+(**772 kB** no total, contra 2,0 MB). Medido com a bateria da costura, agora a comparar o **primeiro
+fotograma depois de a ponte sair**:
+
+| porta | destino | salto (retrato 3072, imagem de fundo) | salto (retrato 2048, fundo shader) |
+| --- | --- | --- | --- |
+| gate 0 | scene1 | 0,31 | **0,42** |
+| gate 1 | scene2 | 0,32 | **0,19** |
+| scene1 3 | scene2 | 0,30 | **0,18** |
+| scene2 4 | scene1 | 0,41 | **0,47** |
+| scene2 6 | scene3 | 0,17 | **0,13** |
+| scene3 7 | scene2 | 0,39 | **0,22** |
+
+**12 de 12**, e agora **reprodutível**: duas passagens seguidas dão exactamente os mesmos seis
+números. A porta 4 é a que fica mais perto da meta (0,47): o fundo `grade-neon` tem uma grelha fina
+que o retrato, a 2048, suaviza (a média de luminosidade sobe ~0,5 num bloco de 48 px) — mais
+resolução foi medida e não comprava nada a 2048 de saída. O `validate.mjs` voltou a `Erros: 0 ·
+Avisos: 0` nos seis mundos, e a bateria do editor volta a poder fechar em **35 de 35**.
+
+**Duas lições de instrumento, que custaram a achar.** (1) O `__saiu` da sonda só pode valer depois de
+a ponte ter sido **vista**: um documento novo passa os primeiros instantes sem quadro nenhum, e sem
+isso a «primeira fotografia depois da ponte» era a página anterior, ainda no ecrã (0,40 virava 2,4 e
+depois 67). (2) O Chrome sem cabeça pintava uma **barra de deslocamento** de 4 px na borda direita
+enquanto a página assentava (transborda 4 px): a assinatura de luminosidade lia-a como imagem e o
+salto subia a **0,55–0,90** conforme a máquina estivesse mais ou menos ocupada. O arnês passou a
+esconder as barras (`Emulation.setScrollbarsHidden`) — o painel não tem barras de deslocamento, e a
+medição também não.
 
 #### Metas de sucesso
 
@@ -3254,13 +3297,17 @@ fechada dos dois lados: o que os instrumentos medem e o que quem usa vê. **Marc
 | **B9** | Fundos shader: o A/B controlado fecha o **R14**; a política **20 → 15 FPS → estático** atrás de flag fecha o **R15**; `kind: "shader"` no esquema com `shaderId` de lista interna, `fallbackAsset` validado e piso de pixelRatio **1** | **R14** e **R15** |
 | **B10** | README, §14 e o fecho com o que cada bloco mediu | a verificação da fase |
 
-**Estado a 2026-10-24:** **B1** e **B9** estão feitos. O B9 entregou o ensaio **atrás de flag**
-(`?shader=1`), o `kind: "shader"` com `shaderId` de lista interna e `fallbackAsset` validado, a
-política `20 → 15 FPS → estático` (piso de pixelRatio **1**), o fixture `?scene=shader` e o
-instrumento `tools/regression/shader.mjs` — mas o **A/B nos três aparelhos não foi medido**, logo
-**R14/R15 continuam abertos** e a produção continua `kind: "image"`. Os restantes blocos não
-começaram. O `pt.json` tem agora **163** chaves (as três do painel da dimensão), o que o **B2** tem
-de traduzir: a meta M2 passa a ser «todas as chaves», não as 160 do inventário de 2026-10-24.
+**Estado a 2026-10-24:** **B1** e **B9** estão feitos, e o **B9 passou a produção** por decisão do
+autor: as três salas correm shader (`scene1` → `grade-neon`, `scene2` → `por-do-sol`, `scene3` →
+`nuvens`), com o panorama como `fallbackAsset` e `?shader=0` como escape. O B9 entregou ainda o
+`kind: "shader"` com `shaderId` de lista interna, a política `20 → 15 FPS → estático` (piso de
+pixelRatio **1**), o fixture `?scene=shader`, o instrumento `tools/regression/shader.mjs` (**36**
+verificações) e o **validador/instalador** `tools/shader/` (compila, mede e recusa abaixo de **19 de
+20** atualizações/s). O **A/B nos três aparelhos não foi registado**, logo **R14/R15 continuam
+abertos** — a decisão de produção está tomada com o teste do autor (telemóvel fraco e desktop), e
+não se declara fechado o que não foi medido. Os restantes blocos não começaram. O `pt.json` tem agora
+**163** chaves (as três do painel da dimensão), o que o **B2** tem de traduzir: a meta M2 passa a ser
+«todas as chaves», não as 160 do inventário de 2026-10-24.
 
 #### Metas de sucesso
 
@@ -3932,8 +3979,8 @@ alteram comportamento.
 | D43 | A travessia entre mundos não passa pelo preto | A página que sai guarda o **último quadro** que estava a mostrar (`sessionStorage`) e a que chega pinta-o antes de tudo o resto, desvanecendo-o quando há cena. O quadro é **composto**: o `<video>` da câmara por baixo e o canvas por cima, na ordem e no enquadramento do CSS — o canvas é `alpha: true` e, sem essa composição, a ponte seria um retângulo preto nas salas onde a câmara é o chão da cena. Vive em `js/arrival-frame.js`, e é o único script **clássico** do projeto: tem de correr antes da primeira pintura, e um módulo só corre depois de carregar a sua árvore de importações (que é exactamente a janela que se quer fechar). A chave é de **uso único** (recarregar não repete a imagem) e tem um prazo de **20 s**; uma cena que não chegue ao fim vê a ponte sair na mesma ao fim de **10 s**, para uma imagem parada não esconder um erro |
 | D44 | A travessia não dá a ver que houve uma | A ponte não se **desvanece**: sai num só fotograma, quando o mundo já está a ser desenhado — uma dissolução de 240 ms entre duas fotografias do mesmo sítio lê-se como efeito, e o que se quer é que a travessia não se anuncie. E enquanto a ponte cobre o ecrã **não se mostra a linha «Carregando…»**: o ecrã nunca está vazio, e um elemento a aparecer é o sinal mais visível de todos. Medido: o quadro da ponte difere do ecrã em **0,22** (é o ecrã), o mundo difere do quadro em **3,94** — um passo de caminhada (o maior salto a caminhar é **2,69**) —, o que sobra é a obra que está em frente da chegada, que nenhuma fotografia da página anterior pode prever |
 | D45 | Nenhum fotograma de câmara dentro da travessia | Tudo o que faça o canvas não ter desenho mostra o que está por baixo dele — o `<video>` da câmara, ou o preto dele. Eram duas janelas: a ponte saía **antes** de o vídeo ter imagem (medido: **58 ms** de preto por baixo, mais num telemóvel) e o `resize` da câmara limpava o buffer do canvas. A ponte passou a esperar **também** pelo primeiro fotograma **apresentado** pela câmara (`cameraFirstFrame()` com `requestVideoFrameCallback` — `loadeddata` não chega: decodificar não é apresentar, e num portão publicado isso deu segundos de preto com o evento já disparado), no máximo **3 s**; uma câmara recusada resolve de imediato, para a chegada não ficar à espera de um fotograma que não vem. O `resize` passou a ser seguido de uma renderização imediata (o canvas fica sem desenho **0,5–5,2 ms**, dentro do mesmo fotograma) |
-| D46 | O retrato de uma porta é a vista da chegada | A janela de uma porta de mundo mostrava o **panorama** do destino, e a chegada mostra o panorama **mais as obras e as portas** — o corte era, por isso, uma troca de imagem (medido: **0,68 a 13,36** de salto nas seis portas). O retrato passa a ser um equirretangular desenhado **pela própria exposição** a partir do ponto onde o visitante vai aparecer: `?from=<origem>` deixa o `arrivalPoint` pôr a câmara (uma só casa para a geometria, L16) e a ferramenta desenha seis faces de cubo, convertidas para 3072×1536 (4096×2048 em duas portas — D47). É um **asset derivado** — regera-se quando a sala mudar — e um por porta, não um por destino: a chegada depende de onde se vem (as três portas da praia mostram três vistas). **Fechada em 2026-10-22 com o B20:** com o centro à altura dos olhos e a resolução da D47, o salto ficou em **0,21 a 0,40** nas seis portas (12 de 12 verificações), contra a meta de 0,50 |
-| D47 | O retrato nasce à altura dos olhos, e com que tamanho | A esfera do retrato nascia no `portal.position` — no **chão** — e o retrato inteiro aparecia deslocado para baixo (~11 px num telemóvel); era isso a diferença de **3,6–3,9 na faixa de cima** do ecrã. O centro passa a ser `[x, altura do jogador, z]`, com a altura lida **uma só vez** de `cameras.player.position[1]` (L16): não é um campo novo nos dados, e a paralaxe da janela mantém-se porque a esfera continua a não seguir a câmara. Medido na porta 4 da praia: **1,56** com o centro no chão, **0,54** à altura dos olhos, 0,47 a +0,1 m; o raio quase não conta (500 dá 0,53 onde 120 dá 0,54) e a esfera a **seguir a câmara** foi medida e rejeitada (**25,30 / 7,30 / 1,17** conforme o raio). O tamanho do ficheiro (emenda de 2026-10-23, aprovada pelo autor ao fechar a fase): **3072×1536 q0,70 nos seis retratos** — 2560 falha com 0,58, 3072 fica em **0,17 a 0,41** e 4096 daria 0,40; a resolução a mais comprava 0,01 a 0,07 de margem e custava **32 MiB** de textura por retrato em vez de 18 MiB (a praia ia a **52 MiB**), contra o orçamento de imagem do ensaio **R14** (`1024×512` no telemóvel; 4096 «não recomendado para móvel»). A qualidade do JPEG quase não conta (a 4096, 0,85 dá 0,39 e 0,75 dá 0,40); quem manda é a resolução. A consequência aceita é a **L14** a avisar 6 vezes — ver o registo do B20 |
+| D46 | O retrato de uma porta é a vista da chegada | A janela de uma porta de mundo mostrava o **panorama** do destino, e a chegada mostra o panorama **mais as obras e as portas** — o corte era, por isso, uma troca de imagem (medido: **0,68 a 13,36** de salto nas seis portas). O retrato passa a ser um equirretangular desenhado **pela própria exposição** a partir do ponto onde o visitante vai aparecer: `?from=<origem>` deixa o `arrivalPoint` pôr a câmara (uma só casa para a geometria, L16) e a ferramenta desenha seis faces de cubo, convertidas para 3072×1536 (4096×2048 em duas portas — D47). É um **asset derivado** — regera-se quando a sala mudar — e um por porta, não um por destino: a chegada depende de onde se vem (as três portas da praia mostram três vistas). **Fechada em 2026-10-22 com o B20:** com o centro à altura dos olhos e a resolução da D47, o salto ficou em **0,21 a 0,40** nas seis portas (12 de 12 verificações), contra a meta de 0,50. **Emenda de 2026-10-24 (Fase 7):** com fundos animados a chegada passa a ser comparada no **primeiro fotograma depois de a ponte sair** — comparar 8 s depois media a fase da animação, não o corte —, e o salto fica em **0,13 a 0,47**, reprodutível |
+| D47 | O retrato nasce à altura dos olhos, e com que tamanho | A esfera do retrato nascia no `portal.position` — no **chão** — e o retrato inteiro aparecia deslocado para baixo (~11 px num telemóvel); era isso a diferença de **3,6–3,9 na faixa de cima** do ecrã. O centro passa a ser `[x, altura do jogador, z]`, com a altura lida **uma só vez** de `cameras.player.position[1]` (L16): não é um campo novo nos dados, e a paralaxe da janela mantém-se porque a esfera continua a não seguir a câmara. Medido na porta 4 da praia: **1,56** com o centro no chão, **0,54** à altura dos olhos, 0,47 a +0,1 m; o raio quase não conta (500 dá 0,53 onde 120 dá 0,54) e a esfera a **seguir a câmara** foi medida e rejeitada (**25,30 / 7,30 / 1,17** conforme o raio). O tamanho do ficheiro (emenda de 2026-10-23, aprovada pelo autor ao fechar a fase): **3072×1536 q0,70 nos seis retratos** — 2560 falha com 0,58, 3072 fica em **0,17 a 0,41** e 4096 daria 0,40; a resolução a mais comprava 0,01 a 0,07 de margem e custava **32 MiB** de textura por retrato em vez de 18 MiB (a praia ia a **52 MiB**), contra o orçamento de imagem do ensaio **R14** (`1024×512` no telemóvel; 4096 «não recomendado para móvel»). A qualidade do JPEG quase não conta (a 4096, 0,85 dá 0,39 e 0,75 dá 0,40); quem manda é a resolução. A consequência aceita é a **L14** a avisar 6 vezes — ver o registo do B20. **Emenda de 2026-10-24 (Fase 7):** com o fundo shader o retrato deixou de carregar o céu e o mar e voltou ao padrão `2048×1024` q0,85 (os seis entre 90 e 172 kB), e os 6 avisos da L14 desapareceram |
 | D48 | A gravação direta, e onde ela vive (**emenda da D2**) | **Um servidor local, `tools/server/serve.mjs`**, que serve a publicação **e** as rotas `/api/…`: Node sem dependências, a escutar **só** em `127.0.0.1:8123`, e a substituir o `python -m http.server` no dia-a-dia. **Não entra na publicação** (o GitHub Pages não corre Node) e **não serve** `.harness/`, `.git/` nem caminhos com `..` — o que não se publica não se serve. **Emenda da D2, não revogação:** o editor continua a **não** escrever sozinho; quem escreve é a ferramenta, e só quando o pedido vem de uma página servida por ela (o `Host` e o `Origin` são conferidos) |
 | D49 | Gravar é um verbo novo, não um substituto | O «Exportar» da **D2 fica**: é o caminho que funciona em qualquer host, e é o que o GitHub Pages permite. O «Gravar» é um **botão ao lado**, que só existe quando o servidor diz o que é: a ferramenta põe `X-Zonas12-Serve` em **todas** as respostas, o editor faz um `HEAD` na raiz da publicação e lê-o — uma página publicada não traz o cabeçalho e não mostra botão nenhum, e nada no editor muda por isso. *(A primeira versão perguntava `GET /api/ping`; medido no B3, isso deixava um **404 na consola** de qualquer página servida por um host estático — e a consola limpa é uma regra do projeto, T8 —, e por isso a pergunta passou a ser um cabeçalho.)* O que sai por um lado sai igual pelo outro: gravar escreve o **mesmo texto** do export (2 espaços e `\n` final, ordem do ficheiro), para o `git diff` continuar a ser a prova de cada alteração |
 | D50 | O servidor recusa o que o editor recusaria | Valida com o **mesmo** `js/scene/validation.js` (uma só implementação) e com o disco (`exists`, `imageSize`, `worldExists`), pela mesma regra do export: **erros travam, avisos não**. Respostas: JSON inválido → **400**; `world.slug` diferente do slug do URL → **400**; `version` diferente da do esquema → **400**; mundo que não existe em `data/worlds/` → **404** (gravar é **substituir**; criar um mundo continua a ser da ferramenta, **D31**); erros de validação → **422** com a lista; em nenhum destes casos se escreve um byte. A escrita é **atómica** (`*.tmp` + `rename`), para uma falha a meio não deixar um ficheiro truncado |
@@ -4205,18 +4252,28 @@ módulos **não** carregam numa página sem a UI da exposição.
 ### R14 — Fundos esféricos procedurais e governor de resolução (ensaio, 2026-10-23)
 
 **Plano:** entra na **Fase 7**, bloco **B9** (§9). O que a fecha é o A/B controlado nos três
-aparelhos; até lá a produção continua `kind: "image"`.
+aparelhos; a produção foi adotada antes desse registo, por decisão do autor, com a escada do R15 e o
+`fallbackAsset` como rede.
 
-**Estado a 2026-10-24 (B9):** o ensaio passou a correr **na exposição**, por `?shader=1`, e o A/B
-continua por medir — a pendência é essa, não o código. O `kind: "shader"` está no esquema
-(`shaderId` de lista interna, `fallbackAsset` validado), o fixture abre-se com `?scene=shader` e o
-instrumento `tools/regression/shader.mjs` mede a política e as páginas (entra em `all.mjs --full`).
-Sem a flag, o mesmo mundo mostra a imagem de reserva; nenhum mundo de `data/worlds/` mudou de fundo.
+**Estado a 2026-10-24 (B9):** o shader é o **fundo de produção** das três salas — `scene1` →
+`grade-neon`, `scene2` → `por-do-sol`, `scene3` → `nuvens` —, com o panorama como `fallbackAsset` e
+`?shader=0` como escape. O A/B **não foi registado**; a decisão foi tomada com o teste do autor no
+telemóvel fraco e no desktop. O `kind: "shader"` está no esquema (`shaderId` de lista interna,
+`fallbackAsset` validado), o fixture abre-se com `?scene=shader`, o instrumento
+`tools/regression/shader.mjs` mede a política e as páginas (entra em `all.mjs --full`) e
+`tools/shader/` valida/instala um shader novo (compila e exige **19 de 20** atualizações/s).
 
-O ensaio em `teste/` continua a comparar a arquitetura existente de panoramas com fundos gerados por
-shader GLSL. É **protótipo de medição**, não integração de produção: `data/worlds/*.json` continua a
-declarar fundos de imagem nos mundos que se visitam, e `js/modules/dimension.js` continua a usar
-`dimension-panorama` para eles.
+**Fechado o instrumento (2026-10-24):** `node tools/shader/validate.mjs --all` passa nos **5**
+shaders instalados (19,8–20,0 atualizações/s, p95 de 6,2 ms). `--force` perdoa **só** a cadência — um
+corpo que não compila ou que não desenha nada é recusado sempre, porque um fundo preto não é um
+ensaio (era o buraco que o ensaio do instalador apanhou). Um `.glsl` gravado no Windows chega com
+**BOM** e é lido sem ele: o BOM é transporte, não é shader, e sem isso a recusa vinha como um erro de
+compilação incompreensível. `all.mjs --full` deu **12 de 12 baterias** em **604 s**, com a costura em
+**12 de 12** (0,13 a 0,47) e os retratos de volta ao padrão de 2048.
+
+O ensaio em `teste/` continua a comparar a arquitetura de panoramas com fundos gerados por shader
+GLSL. É **protótipo de medição**, não a política de produção: `js/modules/dimension.js` usa
+`dimension-panorama` para as imagens de reserva e o componente do shader para o fundo.
 O resumo de implementação, tamanhos e medições também está no README, em «Fundos esféricos: imagem
 e shader».
 
@@ -4291,13 +4348,14 @@ resultados e os orçamentos de imagem/shader decidir se o modelo de produção a
 **Plano:** entra na **Fase 7**, bloco **B9** (§9), **depois** do **R14** — a escada 20 → 15 FPS →
 estático só vale com o A/B medido, e entra atrás de feature flag.
 
-**Estado a 2026-10-24 (B9):** a política **está implementada** em `js/modules/shader-policy.js`, atrás
-de `?shader=1`; o que falta é a validação nos aparelhos (R14), e por isso a pendência fica aberta. A
-produção continua a usar `kind: "image"` e nenhum mundo mudou de fundo. As decisões da escada — duas
-janelas más para descer, pixelRatio antes da cadência, piso 1, 15 FPS e depois estático, sem subir a
-cadência sozinha — estão medidas pelo `tools/regression/shader.mjs` (relógio em vez de GPU) e pela
-página com `?shader=1`. Detalhes e esquema ilustrativo estão no README, em «Política proposta para
-fundo shader em produção».
+**Estado a 2026-10-24 (B9):** a política **está em produção** em `js/modules/shader-policy.js`; o que
+falta é o registo do A/B nos aparelhos (R14), e por isso a pendência fica aberta. A escada — duas
+janelas más para descer, pixelRatio antes da cadência, piso **1**, 15 FPS e depois estático, sem
+subir a cadência sozinha — é medida pelo `tools/regression/shader.mjs` (com um relógio em vez de uma
+GPU) e pela página real. O **validador** (`tools/shader/validate.mjs`) fecha a porta de entrada: um
+shader novo só é instalado se compilar e entregar **19 de 20** atualizações/s. `?shader=0` força a
+imagem de reserva em qualquer sala. Detalhes e o formato real estão no README, em «Política do fundo
+shader em produção».
 
 **Comportamento pretendido**
 

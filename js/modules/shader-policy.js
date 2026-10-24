@@ -53,6 +53,12 @@ export function createPolicy(options) {
   let lastStepAt = animateFrom;
   let lastFrameAt = 0;
   let lastUpdateAt = animateFrom;
+  // The cadence is kept by a deadline that advances by one interval, not by "50 ms since the last
+  // frame": a display faster than the cadence would otherwise round every update up to the next
+  // frame (at 165 Hz, 20/s became 18.4/s). Late frames advance the deadline and skip the missed
+  // slots, so an update never comes in bursts.
+  let nextUpdateAt = animateFrom;
+  let cadenceChanged = false;
   let decision = false;
   let animationTime = defaults.staticTime;
 
@@ -119,6 +125,7 @@ export function createPolicy(options) {
     }
     if (cadence === defaults.targetFps) {
       cadence = defaults.fallbackFps;
+      cadenceChanged = true;
       note('15 fps', { p95: +stats.p95.toFixed(1) });
       return;
     }
@@ -152,6 +159,7 @@ export function createPolicy(options) {
       started = true;
       lastStepAt = now;
       lastUpdateAt = now;
+      nextUpdateAt = now + 1000 / Math.min(cadence, defaults.targetFps);
       resetStep();
     }
 
@@ -160,15 +168,22 @@ export function createPolicy(options) {
       if (stats) step(stats);
       resetStep();
       lastStepAt = now;
+      if (cadenceChanged) {
+        cadenceChanged = false;
+        nextUpdateAt = now + 1000 / Math.min(cadence, defaults.targetFps);
+      }
       if (!cadence) return false;
     }
 
     const interval = 1000 / Math.min(cadence, defaults.targetFps);
-    if (now - lastUpdateAt < interval - 1) {
+    if (now < nextUpdateAt) {
       decision = false;
       return false;
     }
-    const howLate = now - lastUpdateAt - interval;
+    const deadline = nextUpdateAt;
+    nextUpdateAt += interval;
+    if (now - nextUpdateAt >= interval) nextUpdateAt = now + interval;
+    const howLate = now - deadline;
     delivered += 1;
     totals.updates += 1;
     if (howLate > defaults.lateToleranceMs) {
@@ -203,6 +218,7 @@ export function createPolicy(options) {
       animateFrom = clock() + defaults.warmupMs;
       lastStepAt = animateFrom;
       lastUpdateAt = animateFrom;
+      nextUpdateAt = animateFrom;
       lastFrameAt = 0;
       resetStep();
       badSteps = 0;

@@ -28,7 +28,9 @@ zonas12/
 │   ├── i18n.js         o catálogo da interface: `t()`, `?lang=` e a aplicação ao markup (D12)
 │   ├── core/           núcleo: estado, registos, stencil, eventos, limites
 │   ├── modules/        dimensão, obra, portal e câmara (Fase 2), com as fábricas da Fase 3, e o
-│   │                   nome das coisas na vista de debug (`label.js`, Fase 4)
+│   │                   nome das coisas na vista de debug (`label.js`, Fase 4); a política do shader
+│   │                   (`shader-policy.js`) e a lista interna (`shaders.js`, Fase 7)
+│   ├── shaders/         um módulo por shader instalado (o corpo do fragment; Fase 7)
 │   ├── scene/          a cena em dados: schema, validação, construtor e as regras de desenho
 │   └── editor/         o editor (Fase 4): modelo, painéis, pré-visualização, problemas, os
 │                       controlos partilhados, as respostas que a página pode dar sobre os
@@ -38,7 +40,7 @@ zonas12/
 │                       `example` (o mundo sai do **endereço**: `/` é o portão, `/scene1/` é a
 │                       primeira sala; o `?scene=<mundo>` continua a forçar um deles, para os testes)
 ├── i18n/
-│   └── pt.json         textos da interface: 160 chaves (143 delas do editor), lidas por js/i18n.js
+│   └── pt.json         textos da interface: 163 chaves (146 delas do editor), lidas por js/i18n.js
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos, mundos e página de edição)
 ├── assets/
@@ -57,6 +59,8 @@ zonas12/
 │   ├── migration/           o conversor HTML→JSON da Fase 0 e a migração para o formato v3, ambos
 │   │                        com guarda: são o registo das migrações
 │   ├── assets/              normalização das imagens (2:1 e teto de 2048 px — lei L14)
+│   ├── shader/              o validador e o instalador de shaders (Fase 7): compila, mede a
+│   │                        cadência de 20 atualizações/s e recusa o que não cumpre
 │   └── regression/          a verificação inteira num comando (`all.mjs`), a varredura de poses
 │                            T2/T3, a bateria dos doze testes, as portas e a chegada (T1, T7/T11),
 │                            o ciclo build/remove de portais (estes correm na consola do browser,
@@ -205,13 +209,14 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 
 ## Estado atual do código (v0.0.11)
 
-> **Atualização (2026-10-24, Fase 7 — B9 e o rename):** depois da v0.0.11, o **B9** pôs o fundo
-> shader na exposição **atrás de `?shader=1`** (a produção continua `kind: "image"`, e o A/B nos
-> três aparelhos está por medir — R14/R15 abertos), e as salas passaram a chamar-se **`scene1`**
-> (a cidade), **`scene2`** (a praia) e **`scene3`** (o céu): o nome de conteúdo e as imagens não
-> mudaram, o endereço é que sim. Os números desta secção são os da **v0.0.11**; o que o B9 mediu
-> está na §9 do roadmap. As secções históricas deste README continuam a citar os nomes e endereços
-> antigos, que é onde foram medidos.
+> **Atualização (2026-10-24, Fase 7 — B9, o rename e a produção):** depois da v0.0.11, o **B9** pôs o
+> fundo shader na exposição e o autor **adotou-o como produção** (o ensaio passou no telemóvel fraco e
+> no desktop; o A/B nos três aparelhos está por medir — R14/R15 abertos), com `?shader=0` como
+> escape para a imagem de reserva. As salas passaram a chamar-se **`scene1`** (a cidade),
+> **`scene2`** (a praia) e **`scene3`** (o céu): o nome de conteúdo e as imagens não mudaram, o
+> endereço é que sim. Os números desta secção são os da **v0.0.11**; o que o B9 mediu está na §9 do
+> roadmap. As secções históricas deste README continuam a citar os nomes e endereços antigos, que é
+> onde foram medidos.
 
 Marcado pela branch `v0.0.11`. É o estado depois da **Fase 6** do roadmap — **testes e limpeza** —,
 medida em 2026-10-24 e **aceite no telemóvel** no mesmo dia: a automação dos **doze testes** num
@@ -328,12 +333,12 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 7. O raio do panorama de uma dimensão tem de ser maior do que a distância a qualquer
    portal (`radius: 500` em `data/worlds/<mundo>.json`); sem isso o fundo aparece dentro da janela.
 
-### Fundos esféricos: imagem e shader (ensaio em `teste/`)
+### Fundos esféricos: imagem e shader
 
-O fundo 360º de produção continua a ser uma imagem (`dimension-panorama`, `kind: "image"`). A
-alternativa por código foi testada separadamente em [`teste/shader.html`](teste/shader.html), com
-cinco fundos GLSL, câmera real, portais com stencil e ajuste automático do pixelRatio. O protótipo
-não altera ainda o formato das cenas de produção.
+O fundo 360º de produção é o **shader** (Fase 7, ver «Política do fundo shader em produção»); o
+panorama continua lá como **imagem de reserva**, e é o que `?shader=0` desenha. O ensaio que
+decidiu isto vive em [`teste/shader.html`](teste/shader.html), com cinco fundos GLSL, câmera real,
+portais com stencil e ajuste automático do pixelRatio.
 
 #### Formato e tamanho das imagens
 
@@ -353,14 +358,14 @@ não altera ainda o formato das cenas de produção.
 - Como orçamento inicial, procurar ficar até **500 KiB** em `1024 × 512` e até **1,5 MiB** em
   `2048 × 1024`; são metas de compressão, não limites do validador. Se a imagem apresentar blocos,
   banding ou perda de detalhe, priorizar qualidade visual e medir o carregamento real.
-- **Os retratos das portas são a exceção medida (D47).** Um retrato não é um panorama: é a **vista da
-  chegada** desenhada pela exposição (D46), e o que ele tem de mostrar é a obra nítida lá dentro. A
-  `2048 × 1024` a costura no corte ficava em **0,54** — acima da meta de **0,50** —, e a
-  `3072 × 1536` fica em **0,17 a 0,41**. São **6** ficheiros, **2,0 MB** no total, **18 MiB** de
-  textura cada: a praia carrega **38 MiB** (dois retratos e o panorama) e o portão **36 MiB**. É por
-  isso que o `validate.mjs` avisa **5** vezes da **L14** e o editor **1 a 2 vezes por mundo** — a lei
-  a fazer o seu trabalho, com a excepção registada e não silenciada. Quando o fundo passar a ser um
-  shader, o retrato deixa de ter de carregar o céu e o mar e pode descer de resolução.
+- **Os retratos das portas voltaram ao padrão `2048 × 1024`.** Um retrato não é um panorama: é a
+  **vista da chegada** desenhada pela exposição (D46). Enquanto o fundo das salas era um panorama, o
+  retrato tinha de o carregar também, e a `2048 × 1024` a costura ficava em **0,54** (acima da meta
+  de **0,50**): a exceção do **D47** subiu-o a `3072 × 1536`. Com o **fundo shader** (Fase 7) o céu, o
+  mar e o chão passam a ser calculados — iguais dos dois lados do corte — e o retrato só carrega as
+  **obras e as portas**: a `2048 × 1024` a costura fica em **0,13 a 0,47** nas seis portas. São **6**
+  ficheiros, **772 kB** no total, **8 MiB** de textura cada, e a **L14** deixa de ter o que avisar
+  (`validate.mjs`: `Erros: 0 · Avisos: 0` nos seis mundos).
 - A produção configura `THREE.LinearFilter` e desativa mipmaps em
   `js/modules/dimension.js`; manter isso consistente ao trocar ou otimizar a textura e validar a
   qualidade visual antes de alterar o filtro.
@@ -414,28 +419,49 @@ GPU durante a renderização. O instrumento [`teste/bench.js`](teste/bench.js) c
 com p5.js, mas não inclui um cenário shader equivalente; por isso, os números acima são evidência
 prática em aparelhos reais, não um A/B controlado imagem × shader na mesma sessão.
 
-**Decisão atual:** manter imagens como opção de produção e shaders como alternativa para fundos
-procedurais/animados. A medição indica que shaders GLSL são muito mais adequados que p5.js para
-animação neste caso, mas não prova que todo shader será mais rápido que toda imagem: a complexidade
-do shader e a resolução continuam a importar. Antes de integrar em produção, adicionar uma
-comparação controlada imagem × shader no mesmo aparelho, cena, câmera, pixelRatio e duração, e
-validar a qualidade visual nas resoluções recomendadas.
+**Decisão atual (2026-10-24):** o shader é a produção; a imagem é a reserva. A medição indica que
+shaders GLSL são muito mais adequados que p5.js para animação neste caso, mas não prova que todo
+shader será mais rápido que toda imagem: a complexidade do shader e a resolução continuam a
+importar — é por isso que o **validador** mede cada shader antes de ele poder ser nomeado, e que a
+**escada** do R15 (pixelRatio → 15 fps → quadro parado) fica como rede. Falta a comparação
+controlada imagem × shader no mesmo aparelho, cena, câmera, pixelRatio e duração (**R14**).
 
-#### Política proposta para fundo shader em produção (a validar)
+#### Política do fundo shader em produção
 
-A política **está implementada** desde a Fase 7 (bloco **B9**), mas atrás de uma flag e sem trocar
-nenhum mundo de produção: `?shader=1` liga o ensaio e, sem ela, um fundo `kind: "shader"` mostra a
-sua **imagem de reserva**, exatamente como um fundo de imagem. O mundo de ensaio é
-`?scene=shader` (`data/worlds/shader.json`, um fixture fora do grafo) e o instrumento é
-`node tools/regression/shader.mjs` (entra em `all.mjs --full`): mede a política sem GPU, a taxa
-entregue (≤ 20 atualizações/s), o `?shader=1`, o `prefers-reduced-motion` e o painel do editor. O
-que **falta** — e é o que mantém o R14/R15 abertos — é o A/B controlado nos três aparelhos.
+Desde **2026-10-24** o shader é o que a exposição **desenha por omissão** (decisão do autor, depois
+de o ensaio passar no telemóvel fraco e no desktop). Cada sala nomeia um `shaderId` da **lista
+interna** e mantém o panorama como `fallbackAsset`; `?shader=0` é o escape — constrói a imagem de
+reserva, e é o que serve o A/B e o rollback. O mundo de ensaio é `?scene=shader`
+(`data/worlds/shader.json`, um fixture fora do grafo).
+
+| Sala | Shader | Reserva |
+| --- | --- | --- |
+| `scene1` (cidade) | `grade-neon` | `cidade-360` |
+| `scene2` (praia) | `por-do-sol` | `praia` |
+| `scene3` (céu) | `nuvens` | `skycloud` |
+
+**Enviar um shader** é `node tools/shader/validate.mjs <ficheiro.glsl>` para medir e
+`node tools/shader/install.mjs <ficheiro.glsl> --id <id> --name "<nome>"` para instalar. O ficheiro
+é o **corpo** do fragment (o prelúdio, com `uTime`, `vDir`, `az`, `el` e `vec3 col`, é da exposição).
+O validador compila-o num Chrome sem cabeça, mede as atualizações entregues e **recusa** o que não
+sustenta **19 de 20** por segundo (95% do teto), o que não compila ou o que não desenha;
+`--force` instala na mesma **quando é só a cadência a falhar** (com o número medido escrito no
+módulo) — um corpo que não compila, ou que não pinta nada, é recusado sempre, porque não há ensaio
+possível com um fundo preto. Um shader que passe
+é `js/shaders/<id>.js` e entra na lista marcada de `js/modules/shaders.js` — o mundo continua a
+nomear só o `id`, nunca GLSL.
+
+O instrumento da política é `node tools/regression/shader.mjs` (entra em `all.mjs --full`): mede a
+escada sem GPU, a taxa entregue (≤ 20 atualizações/s), o `?shader=0`, o `prefers-reduced-motion`, as
+três salas de produção e o painel do editor. O **A/B controlado nos três aparelhos** continua por
+registar — é a medição que falta para o R14/R15, e a decisão de produção está tomada com o que foi
+observado (funciona no telemóvel fraco e no desktop), não com o A/B.
 
 A integração deve ser gradual e manter o panorama de imagem como fallback explícito de cada fundo.
 O shader começa num quadro estático (`uTime` fixo), mede a cena e só então tenta animar; “estático”
 significa congelar a saída do shader, não renderizar uma cena sem fundo.
 
-| Estado | Política proposta |
+| Estado | Política em produção |
 | --- | --- |
 | Inicialização | Carregar/compilar o shader e preparar a imagem fallback. Renderizar um quadro estático e recolher uma linha de base antes de animar. |
 | Animação normal | Tentar no máximo **20 atualizações/renderizações por segundo** (intervalo-alvo de 50 ms). Não executar a animação em cadência maior. |
@@ -459,26 +485,18 @@ transições, sobreposição de portais, câmera ligada/desligada e aparelhos fr
 com o modo estático sob as mesmas condições. Se o runtime não permitir medir de forma fiável a
 entrega do quadro, registar essa limitação em vez de apresentar a cadência solicitada como FPS real.
 
-**Configuração segura a considerar** (proposta de esquema; não é o formato de cena atual):
+**Configuração que a cena aceita** (o formato real; a cadência e o pixelRatio são da política, não do mundo):
 
 ```json
 {
   "kind": "shader",
   "shaderId": "por-do-sol",
-  "fallbackAsset": "por-do-sol-1024x512.jpg",
-  "animation": {
-    "enabled": true,
-    "targetFps": 20,
-    "fallbackFps": 15
-  },
-  "quality": {
-    "minPixelRatio": 1,
-    "maxPixelRatio": "device"
-  }
+  "fallbackAsset": "praia",
+  "radius": 500
 }
 ```
 
-O projeto deve resolver `shaderId` por uma lista interna conhecida; não aceitar GLSL, URLs,
+O projeto resolve `shaderId` por uma lista interna conhecida; não aceita GLSL, URLs,
 expressões ou código fornecidos por cenas/conteúdo. Validar enumerações, tipos e faixas numéricas
 na fronteira de carregamento, rejeitar configuração inválida com erro visível e preservar o fundo
 de imagem válido como fallback. O asset fallback deve ser validado/carregado antes de substituir
@@ -492,12 +510,11 @@ aparelho, evitar alocações por quadro e validar a qualidade visual em cada deg
 Qualquer memória adaptativa local deve ser validada, expirar, ser apenas uma sugestão inicial e nunca
 impedir o fallback ou a inicialização.
 
-**Critério antes de produção:** o ensaio corre atrás de uma opção/feature flag (`?shader=1`) e numa
-página de teste; falta validar em aparelhos reais que a animação não ultrapassa 20 FPS, que a queda
-para 15 FPS e o congelamento ocorrem só após degradação persistente, que o retorno estático/fallback
-funciona e que imagem, shader e p5.js foram comparados com a mesma câmera, pixelRatio, cena e ordem
-alternada. Até esses testes passarem, manter `kind: "image"` como padrão de produção e não alterar os
-dados atuais das dimensões.
+**Critério antes de produção:** o shader está em produção desde 2026-10-24 (decisão do autor), com
+a escada do R15 como rede: `?shader=0` mostra a imagem de reserva, e o aparelho desce o pixelRatio,
+depois para 15 FPS e depois congela o quadro. O que continua por medir é o **A/B controlado nos três
+aparelhos** (imagem × shader com a mesma câmera, pixelRatio, cena e ordem alternada); sem esse
+registo, o R14/R15 ficam abertos na documentação.
 
 #### Comparativo controlado: imagem, shader e p5.js
 
@@ -565,9 +582,11 @@ transição, a travessia e o retrato das portas (D37 a D47) — têm baterias pr
 ser acreditado, não medido.
 
 **A travessia — o salto no corte, nas 6 portas com retrato** (`tools/regression/seam.mjs`, meta
-**0,50**, e a referência é que um passo a caminhar muda a imagem em ~0,9): gate 0 **0,31**, gate 1
-**0,32**, cidade 3 **0,30**, praia 4 **0,41**, praia 6 **0,17**, céu 7 **0,39** — **12 de 12**
-verificações, contra **5 de 12** com a geometria anterior (0,70 a 1,49). Os três instrumentos que
+**0,50**, e a referência é que um passo a caminhar muda a imagem em ~1): gate 0 **0,42**, gate 1
+**0,19**, scene1 3 **0,18**, scene2 4 **0,47**, scene2 6 **0,13**, scene3 7 **0,22** — **12 de 12**
+verificações, contra **5 de 12** com a geometria anterior (0,70 a 1,49). Desde a Fase 7 a chegada é
+comparada no **primeiro fotograma depois de a ponte sair**, e não 8 s depois: com fundos animados, o
+que se via mais tarde era um instante qualquer da animação e não o corte. Os três instrumentos que
 dizem **porque** está certo também ficaram no repositório: o conversor do retrato volta do cubo com
 **0,39** de diferença e deslocamento **0** (`ida-e-volta.mjs`), a ponte a mostrar o mesmo conteúdo
 custa **0,00** (`piso-ponte.mjs`) e a ponte e a chegada estão sobrepostas a **dx=0, dy=0**
@@ -604,15 +623,15 @@ o runner é o que a vai lá buscar.
   chegada e **dentro do primeiro plano**, cidade **1** de 5 obras, praia **1** de 3 — e o céu, que
   não tinha **nenhuma**, passou a ter **2** de 2
 
-**O editor — 34 de 35** (as três leis que a página sabe responder, o desfazer, a guarda de saída) —
-a que não passa é a que exige «Avisos: 0» num mundo, e o aviso que lá está é o da **L14** sobre o
-retrato maior do **D47** (explicado no ponto seguinte), não um erro
+**O editor — 35 de 35** (as três leis que a página sabe responder, o desfazer, a guarda de saída).
+Passou a **34 de 35** no B20 (a verificação que exige «Avisos: 0» falhava pelo aviso da **L14** sobre
+os retratos grandes do **D47**) e voltou a **35 de 35** na Fase 7, quando os retratos voltaram ao
+padrão `2048 × 1024`.
 
-- Os **5** mundos validam com `Erros: 0 · Avisos: 6 · Por verificar: 0` — a **L9** e a **L14**
-  deixaram de ser «não verificadas» no browser (o asset existe; a imagem mede 2:1). Os **6 avisos**
-  são a **L14** a fazer o seu trabalho: desde o B20 os retratos das portas são maiores do que o
-  padrão de 2048×1024 (**3072×1536**, um por porta) porque a 2048 o salto no corte ficava em
-  **0,54**, acima da meta — é uma excepção **medida** e registada no **D47**, não um defeito
+- Os **6** mundos validam com `Erros: 0 · Avisos: 0 · Por verificar: 0` — a **L9** e a **L14**
+  deixaram de ser «não verificadas» no browser (o asset existe; a imagem mede 2:1), e a **L14**
+  deixou de avisar: com o fundo shader os retratos não carregam o céu nem o mar e cabem no padrão
+  (ver «Formato e tamanho das imagens»)
 - **Importar→exportar** os 5 mundos sem tocar em nada: **0 diferenças**, byte a byte
 - Uma avaria injectada de cada vez: um asset que não existe acusa a **L9** e um retrato no lugar do
   panorama acusa a **L14** (`1226×855`, que não é o 2:1)
@@ -1294,8 +1313,8 @@ Quem quiser experimentar sem mexer na exposição pode forçar um mundo com `?sc
 (`http://127.0.0.1:8123/?scene=example`): carrega o `data/worlds/example.json`, o mundo de ensaio
 com duas dimensões e **duas portas de cada tipo** (o par de dimensões ao vivo, atravessável, e o retrato que navega) — `?scene=scene1`, `?scene=scene2` e `?scene=scene3` também
 funcionam. E `&from=<mundo>` diz de que mundo se vem, o que faz o visitante aparecer atrás da porta
-de chegada: `/scene2/?from=scene1`. O ensaio do fundo shader (Fase 7, **R14**/**R15**) é
-`?scene=shader&shader=1`; sem `shader=1` o mesmo mundo mostra a imagem de reserva.
+de chegada: `/scene2/?from=scene1`. O mundo de ensaio do fundo shader (Fase 7, **R14**/**R15**) é
+`?scene=shader`, e `&shader=0` mostra a imagem de reserva em vez do shader — em qualquer mundo.
 
 ### 2. Personalizar Conteúdo
 
@@ -1336,6 +1355,10 @@ isso não são o `default`.
 
 Cada bateria continua a poder correr sozinha, com os argumentos que ela própria documenta — é o que
 se usa quando se está a investigar um número.
+
+O **validador de shaders** (`node tools/shader/validate.mjs --all`) não entra no `all.mjs`: abre um
+Chrome e mede cada shader instalado (cadência, compilação, desenho). É o que se corre quando se
+instala um shader novo — § «Enviar um shader».
 
 ### 4. Correr a varredura de regressão (T2 e T3)
 
@@ -1408,15 +1431,31 @@ Com a pasta servida por HTTP (o mesmo servidor do passo 1), abra por exemplo
 A pré-visualização **não navega** (D32): atravessar uma porta de mundo dentro do editor diz na
 consola e fica onde está — o editor serve para arrumar a sala, não para a visitar.
 
+### 7. Enviar um shader
+
+O ficheiro é o **corpo** do fragment: `uTime`, `vDir`, `az`, `el` e `vec3 col` vêm do prelúdio, e o
+corpo só pinta `col` (sem texturas, sem `#`, sem `discard`). Da raiz do projeto:
+
+1. `node tools/shader/validate.mjs meu.glsl` — compila num Chrome sem cabeça e mede a cadência; diz
+   **PASSA** ou **RECUSA** (e porquê).
+2. `node tools/shader/install.mjs meu.glsl --id meu-shader --name "Meu shader"` — só instala se
+   passar: escreve `js/shaders/<id>.js` e acrescenta o id à lista interna.
+3. `node tools/scene/validate.mjs` e, no editor, escolha do `shaderId` e da imagem de reserva no
+   painel da dimensão.
+
+O mínimo é **19 de 20 atualizações por segundo** (95% do teto); um shader mais pesado é recusado.
+`--force` instala-o na mesma para ensaio, com o número medido escrito no módulo. Em qualquer sala,
+`?shader=0` força a imagem de reserva.
+
 ## Melhorias Planejadas
 
 Desde 2026-10-24 estas melhorias têm fase e blocos no roadmap: a **Fase 7** (§9 de
-[docs/ROADMAP.md](docs/ROADMAP.md)) — está implementado o **B1** (só documentação) e o **B9** (o
-ensaio do shader, atrás de flag); os restantes blocos não.
+[docs/ROADMAP.md](docs/ROADMAP.md)) — estão implementados o **B1** (só documentação) e o **B9**
+(shader em produção, com validador); os restantes blocos não.
 
-- **Fundos shader** (**R14**/**R15**, bloco **B9**): o ensaio corre agora **na exposição**, atrás de
-  `?shader=1` — política 20 → 15 FPS → estático, imagem de reserva, fixture `?scene=shader`; a
-  produção continua `kind: "image"` e o **A/B nos três aparelhos** é a medição que ainda falta
+- **Fundos shader** (**R14**/**R15**, bloco **B9**): em produção desde 2026-10-24 — shader por
+  omissão, `?shader=0` para a imagem de reserva, validador em `tools/shader/` e a política
+  20 → 15 FPS → estático; falta o **A/B controlado nos três aparelhos**
 - **O que o esquema promete e a cena não constrói** (**R9**/**D30**, blocos **B5**–**B7**): obra
   `kind: "model"` e `"text"`, dimensão `kind: "color"` e `interaction: "link"` a navegar
 - **O catálogo de assets no editor** (bloco **B4**): hoje é dado do ficheiro — o editor escolhe

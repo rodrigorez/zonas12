@@ -54,7 +54,7 @@
       }
     },
     "retrato-cidade": {
-      "path": "assets/previews/cidade-de-praia.jpg",
+      "path": "assets/previews/scene1-de-scene2.jpg",
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Cidade 360º, visto da porta",
@@ -62,7 +62,7 @@
       }
     },
     "retrato-ceu": {
-      "path": "assets/previews/ceu-de-praia.jpg",
+      "path": "assets/previews/scene3-de-scene2.jpg",
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Céu 360º, visto da porta",
@@ -73,8 +73,9 @@
   "dimensions": [
     {
       "id": 0,
-      "kind": "image",
-      "asset": "praia",
+      "kind": "shader",
+      "shaderId": "por-do-sol",
+      "fallbackAsset": "praia",
       "name": {
         "pt": "Praia",
         "en": "Beach"

@@ -3,9 +3,9 @@
 //   1. a política, sem GPU: nunca passa de 20 atualizações por segundo; só desce depois de **duas**
 //      janelas más; desce primeiro o pixelRatio, depois a cadência para 15, e só então congela; e o
 //      pixelRatio nunca fica abaixo de 1;
-//   2. com a flag fechada, um mundo `kind: "shader"` mostra a **imagem de reserva** — a produção
-//      continua a ser o que era;
-//   3. com `?shader=1`, é o shader que está desenhado e entrega no máximo 20 atualizações por segundo;
+//   2. com `?shader=0`, um mundo `kind: "shader"` mostra a **imagem de reserva** — o escape e o
+//      rollback;
+//   3. por omissão, é o shader que está desenhado e entrega no máximo 20 atualizações por segundo;
 //   4. com `prefers-reduced-motion`, o fundo começa e fica estático.
 //
 // O A/B controlado nos três aparelhos (o que fecha o R14) não se faz aqui: é a medição que falta, e
@@ -138,6 +138,22 @@ function dataChecks() {
   check.check('um shaderId fora da lista é recusado',
     !missing.ok && missing.errors.some((error) => error.includes('is not one of')), JSON.stringify(missing.errors));
 
+  // A produção: as três salas, cada uma com o seu shader e a imagem que a substitui.
+  const production = [
+    ['scene1', 'grade-neon', 'cidade-360'],
+    ['scene2', 'por-do-sol', 'praia'],
+    ['scene3', 'nuvens', 'skycloud']
+  ];
+  for (const [slug, shaderId, asset] of production) {
+    const world = JSON.parse(readFileSync(join(ROOT, 'data', 'worlds', slug + '.json'), 'utf8'));
+    const dimension = (world.dimensions || []).find((entry) => entry.id === 0) || {};
+    check.check(slug + ': kind shader, ' + shaderId + ', reserva ' + asset,
+      dimension.kind === 'shader' && dimension.shaderId === shaderId && dimension.fallbackAsset === asset,
+      JSON.stringify(dimension));
+    const type = world.assets && world.assets[asset] ? world.assets[asset].type : null;
+    check.check(slug + ': a reserva é uma imagem do catálogo', type === 'image', String(type));
+  }
+
   return check.report('o dado do shader');
 }
 
@@ -151,27 +167,27 @@ async function pageChecks() {
     const status = () => browser.evaluate('window.portalDebug.shader()');
     const stamp = () => 'bust=' + Date.now() + '-' + Math.random();
 
-    // A flag fechada: o mesmo mundo, o fundo de imagem.
-    await browser.goto(site.base + '/?scene=shader&' + stamp());
+    // `?shader=0` é o escape (produção por omissão): o mesmo mundo, o fundo de imagem.
+    await browser.goto(site.base + '/?scene=shader&shader=0&' + stamp());
     await sleep(1500);
     let reported = await status();
-    check.check('sem a flag, o fundo é a imagem de reserva',
+    check.check('?shader=0 mostra a imagem de reserva',
       reported.backgrounds.length === 1 && reported.backgrounds[0].mode === 'image',
       JSON.stringify(reported.backgrounds));
     const offShot = await browser.screenshot();
     check.check('a imagem de reserva é desenhada (não é um ecrã preto)',
       offShot.litFraction > 0.2, 'litFraction=' + offShot.litFraction.toFixed(2));
 
-    // A flag aberta: o shader, e a taxa que ele entrega.
+    // Sem parâmetro: o shader é o que a produção desenha.
     const noiseBefore = browser.console.length;
-    await browser.goto(site.base + '/?scene=shader&shader=1&' + stamp());
+    await browser.goto(site.base + '/?scene=shader&' + stamp());
     await sleep(4500);
     const first = await status();
     await sleep(3000);
     const second = await status();
     const delta = second.policy ? second.policy.updates - (first.policy ? first.policy.updates : 0) : 0;
     const rate = delta / 3;
-    check.check('com a flag, o fundo é o shader',
+    check.check('por omissão, o fundo é o shader',
       second.enabled === true && second.backgrounds[0] && second.backgrounds[0].mode === 'shader',
       JSON.stringify(second.backgrounds));
     check.check('o shader entrega no máximo 20 atualizações por segundo',
@@ -194,7 +210,7 @@ async function pageChecks() {
     await browser.page.send('Emulation.setEmulatedMedia', {
       features: [{ name: 'prefers-reduced-motion', value: 'reduce' }]
     });
-    await browser.goto(site.base + '/?scene=shader&shader=1&' + stamp());
+    await browser.goto(site.base + '/?scene=shader&' + stamp());
     await sleep(5000);
     const reduced = await status();
     check.check('prefers-reduced-motion mantém o shader estático',
@@ -204,6 +220,23 @@ async function pageChecks() {
     check.check('o quadro estático continua visível',
       reducedShot.litFraction > 0.2, 'litFraction=' + reducedShot.litFraction.toFixed(2));
     await browser.page.send('Emulation.setEmulatedMedia', { features: [] });
+
+    // As três salas de produção, cada uma com o seu shader, por omissão.
+    const salas = [['scene1', 'grade-neon'], ['scene2', 'por-do-sol'], ['scene3', 'nuvens']];
+    for (const [slug, shaderId] of salas) {
+      await browser.goto(site.base + '/?scene=' + slug + '&' + stamp());
+      await sleep(1200);
+      const state = await status();
+      const entry = (state.backgrounds || []).find((item) => item.dimension === 0) || {};
+      check.check(slug + ': a produção desenha ' + shaderId,
+        entry.mode === 'shader' && entry.shaderId === shaderId, JSON.stringify(entry));
+    }
+    await browser.goto(site.base + '/?scene=scene1&shader=0&' + stamp());
+    await sleep(1200);
+    const escape = await status();
+    const offEntry = (escape.backgrounds || []).find((item) => item.dimension === 0) || {};
+    check.check('scene1 com ?shader=0 mostra a imagem de reserva',
+      offEntry.mode === 'image', JSON.stringify(offEntry));
 
     // O editor: o painel da dimensão oferece o que a cena constrói, e abre o fixture sem erros.
     const editorNoise = browser.console.length;

@@ -6,10 +6,11 @@
 // registration with the core (so a dimension that leaves takes its GPU memory with it, A4):
 //
 //   · an image or a video, as a texture (Fase 3);
-//   · a shader from the internal list, animated by the cadence policy of R15 — the trial that stays
-//     behind `?shader=1` until the A/B on three devices closes R14;
-//   · the image fallback of a shader dimension, which is what a `kind: "shader"` world shows when the
-//     flag is off, and what a shader swaps to when the context is lost.
+//   · a shader from the internal list, animated by the cadence policy of R15 — the production
+//     background since 2026-10-24, with `?shader=0` as the escape and the A/B on three devices still
+//     open (R14);
+//   · the image fallback of a shader dimension, which is what a `kind: "shader"` world shows with
+//     `?shader=0`, and what a shader swaps to when the context is lost.
 //
 // It asks the camera where the player is instead of looking for the element itself
 // (docs/ROADMAP.md, A5), and it registers and unregisters its sphere with the core, so removing
@@ -89,8 +90,8 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     src: { type: 'selector' },
     radius: { default: 100 },
     followCamera: { type: 'boolean', default: true },
-    // The id of a shader of the internal list, or empty for a texture background. The builder sets
-    // it only when the trial's flag is open (js/modules/shaders.js).
+    // The id of a shader of the internal list, or empty for a texture background. The builder leaves
+    // it empty when the page asks for the fallback (`?shader=0`, js/modules/shaders.js).
     shader: { type: 'string', default: '' },
     // The image a shader dimension falls back to: loaded with every other asset before the build, so
     // swapping to it does not wait for the network.
@@ -109,13 +110,26 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     this.el.classList.add('dimension-' + this.data.dimension);
 
     if (definition) {
-      this.material = shaderMaterial(definition);
-      this.shaderActive = true;
-      pagePolicy = shaderPolicy(pixelRatioAdapter(this.el.sceneEl));
-      this.policy = pagePolicy;
-      this.listenForContextLoss();
-    } else {
-      this.material = imageMaterial(textureFrom(source));
+      // The material can throw (no WebGL context, a driver that refuses the program); the image
+      // fallback is the answer, and it is already decoded.
+      try {
+        this.material = shaderMaterial(definition);
+        this.shaderActive = true;
+        pagePolicy = shaderPolicy(pixelRatioAdapter(this.el.sceneEl));
+        this.policy = pagePolicy;
+        this.listenForContextLoss();
+        this.listenForShaderErrors();
+      } catch (error) {
+        console.warn('[shader] ' + definition.id + ' could not be built: ' + error.message +
+          '; the background falls back to the image');
+        this.material = null;
+        this.shaderActive = false;
+      }
+    }
+    if (!this.material) {
+      const fallback = this.data.fallback || source;
+      if (!fallback) return;
+      this.material = imageMaterial(textureFrom(fallback));
       this.shaderActive = false;
     }
 
@@ -157,6 +171,19 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     if (!canvas || this.onContextLost) return;
     this.onContextLost = () => this.useFallback('the WebGL context was lost');
     canvas.addEventListener('webglcontextlost', this.onContextLost, false);
+  },
+  // A fragment that compiles is not a promise: three reports a program that fails to compile or
+  // link through `renderer.debug.onShaderError`, and the visitor must see the image fallback
+  // instead of a black background. The hook is the page's (there is one shader background per room
+  // in production), and it is replaced by the next one that is built.
+  listenForShaderErrors: function () {
+    const renderer = this.el.sceneEl && this.el.sceneEl.renderer;
+    if (!renderer || !renderer.debug) return;
+    const component = this;
+    renderer.debug.onShaderError = function (gl, program) {
+      const log = gl.getProgramInfoLog(program) || '';
+      component.useFallback('the shader did not compile' + (log ? ': ' + log.trim() : ''));
+    };
   },
   tick: function () {
     const sphere = this.sphere;
