@@ -1460,9 +1460,11 @@ http://127.0.0.1:8123/scene1/?sonda=1        (ou o endereço de Pages)
 ```
 
 A linha **quadros** é a do A/B: é o que a página desenhou, independente do teto de 20 do shader, e é
-ela que se compara entre a mesma sala com shader e com `?shader=0` no mesmo aparelho. Sem o parâmetro
-não existe painel nenhum: a exposição não sabe que a sonda existe. O painel não é interface (não sai
-do catálogo `i18n`): é um instrumento, como as baterias de `tools/`.
+ela que se compara entre a mesma sala com shader e com `?shader=0` no mesmo aparelho. Em cima do painel
+está um **resumo de uma linha** (`R scene1 20 1.945 57.3 291 411x748/2.63`), curto o suficiente para
+se escrever à mão quando copiar do telemóvel é difícil. Sem o parâmetro não existe painel nenhum: a
+exposição não sabe que a sonda existe. O painel não é interface (não sai do catálogo `i18n`): é um
+instrumento, como as baterias de `tools/`.
 
 ## Melhorias Planejadas
 

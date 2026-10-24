@@ -260,6 +260,13 @@ async function pageChecks() {
     const quadrosNaSonda = sonda === null ? null : Number((/quadros\s+([0-9.]+)\/s/.exec(sonda) || [])[1]);
     check.check('a sonda conta os quadros da página (é o número do A/B)',
       quadrosNaSonda !== null && quadrosNaSonda >= 10, 'quadros=' + quadrosNaSonda);
+    const resumo = await browser.evaluate(`(() => {
+      const elemento = document.getElementById('sonda-resumo');
+      return elemento ? elemento.textContent : null;
+    })()`);
+    check.check('o resumo de uma linha cabe num SMS e traz os seis números',
+      typeof resumo === 'string' && /^R scene2 20 [0-9.]+ [0-9.]+ 0 \d+x\d+\/[0-9.]+ \([0-9.]+\/s\)$/.test(resumo),
+      resumo === null ? 'sem resumo' : resumo);
     const sondaErrors = browser.console.slice(sondaNoise).filter((line) => /error|exception/i.test(line));
     check.check('a sonda não escreve erros na consola', sondaErrors.length === 0, sondaErrors.join(' | '));
 

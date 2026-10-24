@@ -4281,10 +4281,12 @@ e shader».
 telemóvel o que `portalDebug.shader()` responde — fundo, modo, cadência, pixelRatio, atualizações por
 segundo, quadros por segundo, atrasos e os eventos da escada — e tem um botão **Copiar** que devolve o
 relatório como texto. É o que permite ler os números num aparelho sem consola e juntá-los aos dos
-outros dois. A linha **quadros** é a medida do A/B: conta o que a página desenhou, sem o teto de 20 do
-shader, e compara-se entre a mesma sala com shader e com `?shader=0`. A bateria verifica que o painel
-só existe com o parâmetro, que mostra o fundo e a cadência certos, que mede a taxa (19 a 21 por
-segundo) e que conta os quadros.
+outros dois. Em cima do painel está um **resumo de uma linha** — `R <mundo> <cadência> <pixelRatio>
+<quadros> <atrasos> <ecrã>/<dpr>` —, que é o que se escreve à mão quando copiar é difícil. A linha
+**quadros** é a medida do A/B: conta o que a página desenhou, sem o teto de 20 do shader, e compara-se
+entre a mesma sala com shader e com `?shader=0`. A bateria verifica que o painel só existe com o
+parâmetro, que mostra o fundo e a cadência certos, que mede a taxa (19 a 21 por segundo), que conta os
+quadros e que o resumo cabe num SMS.
 
 **Formato e orçamento de imagem**
 

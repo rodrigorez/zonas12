@@ -64,6 +64,20 @@ function relatorio(estado, taxa, fps) {
   return linhas.join('\n');
 }
 
+// O resumo de uma linha é o que se escreve à mão quando copiar é difícil: mundo, cadência, pixelRatio,
+// quadros, atrasos e ecrã/dpr — os seis números que decidem o A/B e a escada. Cabe num SMS.
+function resumo(estado, taxa, fps) {
+  const policy = estado.policy;
+  const numero = (valor, casas) => (valor === null || valor === undefined ? '—' : valor.toFixed(casas));
+  return 'R ' + window.portalDebug.world +
+    ' ' + (policy ? policy.cadence : '—') +
+    ' ' + (policy ? policy.pixelRatio : '—') +
+    ' ' + numero(fps, 1) +
+    ' ' + (policy ? policy.late : '—') +
+    ' ' + innerWidth + 'x' + innerHeight + '/' + (Math.round(devicePixelRatio * 100) / 100) +
+    (taxa === null ? '' : ' (' + numero(taxa, 1) + '/s)');
+}
+
 function copiar(texto, botao) {
   const dizer = (mensagem) => {
     botao.textContent = mensagem;
@@ -83,6 +97,9 @@ export function startSonda() {
   const painel = document.createElement('div');
   painel.id = 'sonda';
   painel.setAttribute('role', 'log');
+  // O resumo primeiro e em letra maior: é o que se lê e se escreve à mão quando copiar é difícil.
+  const curto = document.createElement('div');
+  curto.id = 'sonda-resumo';
   const texto = document.createElement('pre');
   texto.id = 'sonda-texto';
   const botao = document.createElement('button');
@@ -94,7 +111,7 @@ export function startSonda() {
   fechar.type = 'button';
   fechar.textContent = '×';
   fechar.setAttribute('aria-label', 'fechar a sonda');
-  painel.append(texto, botao, fechar);
+  painel.append(curto, texto, botao, fechar);
   document.body.appendChild(painel);
 
   let amostras = [];
@@ -131,11 +148,12 @@ export function startSonda() {
       if (segundos >= 0.8) fps = (quadros - amostrasQuadros[0].quadros) / segundos;
     }
     texto.textContent = relatorio(estado, taxa, fps);
+    curto.textContent = resumo(estado, taxa, fps);
   };
 
   medir();
   const relogio = setInterval(medir, INTERVALO_MS);
-  botao.addEventListener('click', () => copiar(texto.textContent, botao));
+  botao.addEventListener('click', () => copiar(curto.textContent + '\n' + texto.textContent, botao));
   fechar.addEventListener('click', () => {
     activa = false;
     clearInterval(relogio);
