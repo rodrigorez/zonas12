@@ -57,9 +57,10 @@ zonas12/
 │   ├── migration/           o conversor HTML→JSON da Fase 0 e a migração para o formato v3, ambos
 │   │                        com guarda: são o registo das migrações
 │   ├── assets/              normalização das imagens (2:1 e teto de 2048 px — lei L14)
-│   └── regression/          a varredura de poses T2/T3, a bateria dos doze testes e o ciclo
-│                            build/remove de portais (correm na consola do browser, com uma página
-│                            da exposição aberta) e as baterias de linha de comando da Fase 4
+│   └── regression/          a verificação inteira num comando (`all.mjs`), a varredura de poses
+│                            T2/T3, a bateria dos doze testes, as portas e a chegada (T1, T7/T11),
+│                            o ciclo build/remove de portais (estes correm na consola do browser,
+│                            com uma página da exposição aberta) e as baterias de linha de comando
 ├── .harness/           fora do repositório (está no .gitignore)
 │   ├── dev/            ferramentas retiradas da raiz (não são precisas para o app)
 │   │   ├── package.json, package-lock.json   dependências npm (A-Frame vem do CDN)
@@ -202,7 +203,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.10)
+## Estado atual do código (v0.0.10 + Fase 6)
 
 Marcado pela branch `v0.0.10`. É o estado depois da **Fase 5** do roadmap — a **gravação direta**: o
 servidor da ferramenta (`tools/server/serve.mjs`) e o botão «Gravar» no editor. As decisões são a
@@ -213,17 +214,23 @@ portão, travessia entre as três salas sem preto, retratos a casar com a chegad
 obra, regresso e desempenho. A versão anterior é a `v0.0.9` (o fecho da Fase 4), marcada pela branch
 com o mesmo nome.
 
+**Depois da `v0.0.10`**, a **Fase 6** (testes e limpeza, medida a 2026-10-24) fechou a automação dos
+doze testes e as duas pendências dos instrumentos (**R16** e **R17**): o que mudou está na §9/§10 do
+roadmap e no passo 3 de «Como Usar». Nenhum comportamento da exposição mudou — o único ficheiro de
+produção tocado foi `js/arrival-frame.js` (a ponte espera pela descodificação da imagem). O marco
+desta fase é decisão do autor.
+
 Resumo do que existe hoje: `index.html` (**93 linhas**) e as **3** salas com o **mesmo** ficheiro
 (`cidade/`, `praia/`, `ceu/`, iguais fora da linha do `<base>` — D28), `editor.html` (**95**),
-`js/app.js` (**185**), `js/arrival-frame.js` (**125**, a ponte de imagem entre mundos — D43),
+`js/app.js` (**185**), `js/arrival-frame.js` (**144**, a ponte de imagem entre mundos — D43),
 `js/editor.js` (**14**, a entrada do editor — D36), `js/editor/`
 (**14** ficheiros, **2789** linhas com os painéis e a ponte com o servidor), `js/i18n.js` (**92**),
 `js/core/` (7 ficheiros, **219**), `js/modules/` (6 ficheiros, **1425**), `js/scene/` (5 ficheiros,
 **1132**), `css/style.css` (105) e `css/editor.css` (**313**), **5** mundos em `data/worlds/` (o
 portão, as três salas e o fixture, **1279 linhas** no total e **12** portas), `i18n/pt.json` (**160**
 chaves), os **15** assets em `assets/{panoramas,artworks,video,previews}` (**6** deles retratos das
-portas, um por porta — D46) e **27** ficheiros em `tools/`
-(**5958** linhas — as ferramentas de dados, o servidor da ferramenta e os instrumentos das fases).
+portas, um por porta — D46) e **29** ficheiros em `tools/`
+(**6384** linhas — as ferramentas de dados, o servidor da ferramenta e os instrumentos das fases).
 
 O `js/core/` é o **núcleo** (Fase 1 do roadmap): o estado da cena, os registos e as
 regras de stencil — a única parte global, porque o stencil é um recurso de toda a cena.
@@ -604,14 +611,31 @@ retrato maior do **D47** (explicado no ponto seguinte), não um erro
 
 **As leis, na linha de comando:** `node tools/scene/validate.mjs` sai com **0** (5 mundos, **12**
 portas, grafo todo alcançável a partir do portão, **L19** sem falhas, **4** arranques iguais fora do
-`<base>`), e `node tools/scene/laws-selftest.mjs` dá **20 de 20** avarias detectadas, com o controlo
+`<base>`), e `node tools/scene/laws-selftest.mjs` dá **21 de 21** avarias detectadas, com o controlo
 (nada injectado) **limpo**.
 
-**O que não foi re-medido nesta versão:** o **T1** (as travessias porta a porta, que precisam de uma
-sessão que conte navegações de página — o B3 mediu `walkDoor(0)` a navegar para `/cidade/?from=gate`),
-a captura no **telemóvel** (390×844) e o D-pad (**4,2 m** em 250 ms) — os três são da v0.0.6 e a
-Fase 4 não lhes tocou: a única mudança no construtor de cena foi a pré-visualização sem navegação
-(D32), que só o editor usa.
+**O que não foi re-medido nesta versão:** a captura no **telemóvel** (390×844) e o D-pad (**4,2 m**
+em 250 ms) — os dois são da v0.0.6 e nem a Fase 4 nem a Fase 6 lhes tocaram. O **T1**, que aqui
+faltava, passou a ser medido pela verificação da Fase 6 (ver o ponto seguinte).
+
+**A Fase 6 — os testes por um comando (medido a 2026-10-24).** `node tools/regression/all.mjs` corre
+o validador, as leis, os doze e as portas/chegada e devolve um código de saída: **4 de 4** baterias
+em **119,3 s**; com `--full`, as sete baterias arquivadas juntam-se e dão **11 de 11** em **551,4 s**.
+
+- **O T1, agora automatizado** (`tools/regression/traversal-tests.mjs`): as **12** portas dos 5
+  mundos — **10** navegam uma vez e chegam ao destino com `?from=<origem>`, **2** mudam a dimensão
+  uma vez e não navegam (a porta 2 do fixture vive na dimensão 1, e o runner põe a cena nessa
+  dimensão antes de a atravessar)
+- **O T7/T11, idem:** as **8** chegadas (as 4 páginas com `?from=`) ficam no ponto que o
+  `arrivalPoint` calcula, com **0** travessias a andar para dentro e **1** a meia volta
+- **O T10/T12 voltou a zero estrito:** **0** px fora da moldura nas 5 páginas. A sangria que a R16
+  registou tinha três causas — a aresta antialiased das barras (a régua ganhou 2 px de margem), uma
+  textura ainda a assentar (as capturas esperam pela descodificação) e uma **obra em vídeo** a
+  mudar entre as duas capturas (a medição pára os vídeos)
+- **A varredura de poses recusa** o resultado quando a câmara se mexe (`fault: 'camera'` prova-o):
+  `refused`, e não `fail`
+- **A travessia:** as **6** portas numa sessão fria a **0** fotogramas escuros, com a costura a
+  **0,17–0,41** (meta **0,50**); a ponte passou a esperar pela descodificação da imagem (R17)
 
 **A versão publicada** (<https://rodrigorez.github.io/zonas12/>, o `main` servido pelo GitHub Pages),
 medida no browser depois do *push*, com a cache desligada — **7 de 7**:
@@ -682,8 +706,10 @@ dois sítios.
   começa com o catálogo que se lhe escrever — o editor escolhe entre os assets que o mundo já tem.
 - **A pré-visualização não navega**: atravessar uma porta de mundo dentro do editor não muda de
   página (aviso na consola); o editor serve para arrumar a sala, não para a visitar (**D32**).
-- **O editor não grava**: exporta. Pôr o ficheiro em `data/worlds/` e commitá-lo é do autor (D2) —
-  e é por isso que a marca «alterado» e o aviso de saída existem.
+- **O editor grava pelo servidor da ferramenta, e só quando ele responde** (**D48–D51**): sem
+  servidor, o botão «Gravar» não existe e o caminho é o «Exportar» da **D2** — pôr o ficheiro em
+  `data/worlds/` e commitá-lo continua a ser do autor, e é por isso que a marca «alterado» e o
+  aviso de saída existem.
 - **As salas pedem a câmara** (desde a **D38**): é o preço de a porta do portão a mostrar ao vivo.
   Quem recusar vê a mensagem da câmara e a janela dessa porta sem imagem; o resto da sala não depende
   dela.
@@ -1261,7 +1287,7 @@ de chegada: `/praia/?from=cidade`.
 - Atualize os caminhos no **catálogo `assets`** do mundo (`data/worlds/<mundo>.json`) — cada
   caminho aparece lá **uma vez**, e as dimensões e as obras apontam para ele pelo nome (D20). O
   catálogo é a única parte que o editor não edita: as dimensões, as obras e as portas editam-se
-  nos painéis (passo 5)
+  nos painéis (passo 6)
 - Para acrescentar um **mundo**: `node tools/scene/new-world.mjs <slug>` cria a pasta e o arranque
   (D31), o editor grava (ou exporta) o `data/worlds/<slug>.json`, e a porta que o liga ao portão
   cria-se no painel «Mundo» — com o retrato do destino em `assets/previews/` e o `radius` do retrato
@@ -1269,7 +1295,32 @@ de chegada: `/praia/?from=cidade`.
   `tools/assets/normalize.mjs` corta e reduz sem ampliar
 - Valide antes de publicar: `node tools/scene/validate.mjs` (confere todos os mundos e o grafo)
 
-### 3. Correr a varredura de regressão (T2 e T3)
+### 3. Correr a verificação (um comando)
+
+Na raiz do projeto, com o Node instalado:
+
+```powershell
+node tools/regression/all.mjs
+```
+
+Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** código de saída
+(**0** quando tudo passa, **1** quando alguma coisa falha):
+
+| Bateria | O que responde |
+| --- | --- |
+| `tools/scene/validate.mjs` | os 5 mundos, as leis, o grafo das portas e os arranques |
+| `tools/scene/laws-selftest.mjs` | 21 avarias injectadas, todas detectadas, com o controlo limpo |
+| `tools/regression/twelve-tests.mjs` | **T2–T12** nas 5 páginas (**35** verificações) |
+| `tools/regression/traversal-tests.mjs` | **T1** (as 12 portas) e **T7/T11** (as 8 chegadas) |
+
+`--full` acrescenta as baterias arquivadas das Fases 4 e 5 (a costura das travessias, a ponte de
+imagem, a chegada por uma porta, os rótulos, o botão, a transição) — cada uma abre um Chrome e
+juntas somam minutos, por isso não são o `default`.
+
+Cada bateria continua a poder correr sozinha, com os argumentos que ela própria documenta — é o que
+se usa quando se está a investigar um número.
+
+### 4. Correr a varredura de regressão (T2 e T3)
 
 Com a cena aberta e carregada, cole na consola do browser:
 
@@ -1284,11 +1335,14 @@ pontos dentro da abertura servem de **controlo**: se o controlo acusar diferenç
 inválido (avisou que os dois renders diferem por outra razão). Leva cerca de 1 segundo e devolve
 `verdict.T2`, `verdict.T3` e `verdict.method`.
 
-Para confirmar que o instrumento consegue mesmo falhar, há duas avarias injetadas de propósito:
-`runPoseSweep({ fault: 'bar' })` (uma barra da moldura nunca é desenhada) e
-`runPoseSweep({ fault: 'stencil' })` (o defeito da lei L3, a moldura levando teste de stencil).
+A varredura exige a página sem interação: se a câmara sair do sítio durante a medição (um D-pad
+preso move-a 0,1 m por fotograma), o veredicto é **`refused`** — a medição não vale, em vez de a
+cena parecer partida. Para confirmar as três avarias injectadas de propósito:
+`runPoseSweep({ fault: 'bar' })` (uma barra da moldura nunca é desenhada),
+`runPoseSweep({ fault: 'stencil' })` (o defeito da lei L3, a moldura levando teste de stencil) e
+`runPoseSweep({ fault: 'camera' })` (o D-pad preso, que tem de dar `refused`).
 
-### 4. Correr a bateria da fase (T4–T12)
+### 5. Correr a bateria da fase (T4–T12)
 
 Na mesma consola, com uma página (portão ou sala) aberta:
 
@@ -1298,8 +1352,9 @@ Na mesma consola, com uma página (portão ou sala) aberta:
 
 Mede, de uma vez, a **janela** (T4), o **rig das duas portas** (T5: ganha a da frente e a moldura
 de trás não invade a janela), o **clique na obra** (T6), o **ciclo de 20 portais** (T9), o
-**retrato** (T10 e T12, a duas distâncias) e chama a varredura (T2/T3). Os três que precisam de uma
-porta ou de uma chegada concreta correm em separado, e é a sessão que os junta:
+**retrato** (T10 e T12, a duas distâncias) e chama a varredura (T2/T3). Os que precisam de uma porta
+ou de uma chegada concreta têm o seu próprio runner desde a Fase 6
+(`node tools/regression/traversal-tests.mjs`), e as duas sondas continuam a poder correr-se à mão:
 
 - `walkDoor(<id da porta>)` — o **T1**: atravessa a porta a passo de 0,1 m e diz quantas
   travessias ela fez (as que navegam deixam o registo em `sessionStorage`, porque a página vai
@@ -1312,7 +1367,7 @@ O T8 (a consola) mede-se **de fora**, instrumentando `console.error`/`warn` ante
 bateria lê essa sonda quando ela existe. Os números medidos estão no roadmap §9; os três erros que o
 próprio instrumento cometeu primeiro (e as lições) estão na §10.
 
-### 5. Editar um mundo no editor
+### 6. Editar um mundo no editor
 
 Com a pasta servida por HTTP (o mesmo servidor do passo 1), abra por exemplo
 `http://127.0.0.1:8123/editor.html?world=cidade`:
@@ -1338,21 +1393,36 @@ consola e fica onde está — o editor serve para arrumar a sala, não para a vi
 
 ## Melhorias Planejadas
 
-- **A tradução do catálogo** (`i18n/en.json`): o conjunto de chaves estabilizou com a Fase 4
-  (**154**) e a Fase 5 acrescentou **6** (**160**), e é agora que traduzir não é traduzir duas vezes;
-  até lá o `?lang=en` cai no português com **1** aviso
-- **O catálogo de assets no editor**: hoje é dado do ficheiro (o editor escolhe entre os assets que
-  o mundo já tem), e um mundo novo começa com o catálogo que se lhe escrever
-- **Portais com movimento e rotação animados**, definidos na cena
-- Mais conteúdo por dimensão (vídeo 360º como fundo, por exemplo)
-- **Automatizar as medições que ainda são à mão**: as travessias (T1) precisam de uma sessão que
-  conte navegações de página, e a consola (T8) precisa de uma sonda instalada antes da carga — as
-  duas coisas vivem hoje no arnês de quem mede, não no repositório. A moldura (T2/T3), a bateria
-  (T4–T12) e o ciclo de portais (T9) já são automáticos em `tools/regression/`
+Desde 2026-10-24 estas melhorias têm fase e blocos no roadmap: a **Fase 7** (§9 de
+[docs/ROADMAP.md](docs/ROADMAP.md)) — nenhum bloco está implementado, excepto o **B1** (só
+documentação).
+
+- **Fundos shader** (**R14**/**R15**, bloco **B9**): o ensaio está em `teste/` e a política
+  20 → 15 FPS → estático ainda não corre na exposição; a produção continua `kind: "image"`
+- **O que o esquema promete e a cena não constrói** (**R9**/**D30**, blocos **B5**–**B7**): obra
+  `kind: "model"` e `"text"`, dimensão `kind: "color"` e `interaction: "link"` a navegar
+- **O catálogo de assets no editor** (bloco **B4**): hoje é dado do ficheiro — o editor escolhe
+  entre os assets que o mundo já tem e não cria nenhum
+- **A exclusão em lote por dimensão** (bloco **B3**): os painéis só excluem individualmente
+- **A tradução do catálogo** (bloco **B2**): `i18n/en.json` não existe; `?lang=en` cai no português
+  com **1** aviso, e o `pt.json` tem **160** chaves
+- **Portais com movimento e rotação animados**, definidos na cena (bloco **B8**)
+- **Um fundo 360º em vídeo**: a capacidade **já existe** (`kind: "video"` anima com
+  `THREE.VideoTexture`), mas nenhum mundo a usa — falta o asset, não o código
+
+Fora da Fase 7, e sem data:
+
+- **As baterias arquivadas por omissão**: hoje `node tools/regression/all.mjs` corre as quatro que
+  decidem uma alteração e deixa as sete da Fase 4/5 atrás de `--full`, porque cada uma abre um
+  Chrome; juntá-las num só browser (uma sessão, sete medições) poria as **11** em minutos
 
 **Fechado na Fase 4:** a **página de edição** (§ acima), o **retrato do portão** (decidido: não se
 faz — a ausência é honesta, **R10**) e a **orientação da chegada** no céu (resolvida por dado: as
 duas obras passaram para a frente do visitante, **R11**).
+
+**Fechado na Fase 6:** a **automação dos doze testes** — o T1 e o T7/T11 passaram a correr em
+`tools/regression/traversal-tests.mjs`, e a verificação inteira é um comando (§ «Como Usar», passo 3)
+—, a **recusa** da varredura de poses com a câmara a mexer, e as pendências **R16** e **R17**.
 
 ## Requisitos do Sistema
 

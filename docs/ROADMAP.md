@@ -4,6 +4,33 @@
 > secção [11](#11-decisões) com data. Nada de código foi implementado: este documento é o
 > guia de desenvolvimento, e o `README.md` descreve o que **já** existe.
 >
+> **Atualização (2026-10-24, Fase 7 — plano):** com a **Fase 6 fechada**, o autor pediu a fase que
+> implementa o que ficou documentado e **sem fase**. A **Fase 7** junta, **bloco a bloco**, os sete
+> itens do inventário de 2026-10-24: os fundos **shader** (**R14**/**R15** — último bloco e atrás de
+> flag), os quatro valores que o esquema valida e a cena ignora (**R9**/**D30**: `model`, `text`,
+> `color` e `link` a navegar), a **exclusão em lote** por dimensão, o **`i18n/en.json`** (**160**
+> chaves), o **catálogo de assets** no editor e os **portais animados** (§1) — mais o saneamento das
+> três afirmações que a documentação deixou para trás. O plano, os blocos **B1–B10**, as metas e a
+> aceitação estão em §9. **Nada implementado** — o **B1**, que é só documentação, veio com o plano.
+> A produção continua a declarar `kind: "image"` até o
+> **B9** fechar o A/B nos três aparelhos.
+>
+> **Atualização (2026-10-24, Fase 6 — FECHADA):** a **Fase 6 (testes e limpeza)** correu
+> **bloco a bloco** (B0–B7) e fechou com a verificação medida, não estimada. O **T1** e o
+> **T7/T11** deixaram de precisar de uma sessão de trabalho: `tools/regression/traversal-tests.mjs`
+> mede as **12** portas e as **8** chegadas (**20 de 20**). O comando único da §9 passou a existir —
+> `node tools/regression/all.mjs`, **4 de 4** baterias em **119,3 s**, e **11 de 11** em **551,4 s**
+> com `--full`. A varredura de poses passou a **recusar** o resultado quando a câmara se mexe
+> (`refused`, e não `fail`), e as duas pendências que viviam dentro dos instrumentos fecharam-se: a
+> **R16** (a sangria do T10/T12 era a aresta da moldura, uma textura a assentar **e** uma obra em
+> vídeo; a medida voltou a **0 px**) e a **R17** (a ponte espera pela descodificação da imagem, com
+> teto de 1,5 s). O plano, os blocos e o que cada um mediu estão em §9; o README ganhou o comando
+> único. **Marco:** a decidir pelo autor.
+>
+> **Atualização (2026-10-24, Fase 6 — plano):** a fase foi planeada **antes** de mexer em código,
+> com a linha de base re-medida no mesmo dia: `validate` **0**, as leis **21 de 21**, a bateria dos
+> doze **35 de 35** nas 5 páginas.
+>
 > **Atualização (2026-10-23, Fase 5 — fechada):** a **gravação direta** correu **bloco a bloco** e
 > cada bloco foi dado por **medido**, como nas fases anteriores. O que a fase entregou: o **servidor
 > da ferramenta** (`tools/server/serve.mjs`) que serve a publicação **e** grava
@@ -109,8 +136,9 @@ página** de criação/manutenção com inserir, alterar e excluir para cada mó
 dados; construir `editor.html` com CRUD; validar com as medições que já usamos; e, depois
 disso, **mundos com endereço próprio e portas de mundo** (D14, §11).
 
-**Fora do escopo (por agora):** multiusuário, base de dados remota, autenticação, portais em
-movimento animado (fica para depois), substituir o A-Frame, modelo de iluminação/PBR.
+**Fora do escopo (por agora):** multiusuário, base de dados remota, autenticação, substituir o
+A-Frame, modelo de iluminação/PBR. Os **portais em movimento animado** estavam nesta lista até
+2026-10-24, quando a **Fase 7** (§9) os trouxe para dentro do escopo (bloco **B8**).
 
 ---
 
@@ -1222,9 +1250,9 @@ provoca (D10) e cada bloco mede no browser o que fez.
    **19 323** amostras falhadas — números sem valor nenhum, porque a câmara se move entre os dois
    renders de cada pose. Os **controlos ficaram limpos** (0 falhas), que é justamente o que se
    espera quando os dois renders são o mesmo. A varredura de poses exige **página sem interação e
-   câmara parada**; numa recarga limpa, os mesmos 84 poses dão **0** cortadas. *(Melhoria para a
-   Fase 6: a varredura podia detetar que a câmara se mexeu e recusar o resultado, em vez de o
-   reportar como falha.)*
+   câmara parada**; numa recarga limpa, os mesmos 84 poses dão **0** cortadas. *(Fechado na
+   **Fase 6**, a 2026-10-24: a varredura deteta que a câmara se mexeu e recusa o resultado —
+   veredicto `refused`, §10.)*
 
 #### Metas de sucesso
 
@@ -1729,8 +1757,8 @@ dimensão → dimensão do mundo, obra → obra) mais os testes: T10 (o retrato)
 
 **O que a fase não faz** (e é de propósito): o `update`/`list` das fábricas e o editor (**Fase 4**,
 que traz as pendências **R8** e **R9**) · a interface a ler o catálogo `i18n` (**R3**, Fase 4) · a
-gravação direta (Fase 5) · automatizar T1 e T4–T7 (Fase 6 — na 3B ficam medidos no browser, mais o
-T10/T12 pela varredura).
+gravação direta (Fase 5) · automatizar T1 e T4–T7 (**Fase 6** — na 3B ficam medidos no browser, mais
+o T10/T12 pela varredura; **fechado em 2026-10-24**, §9).
 
 ### Fase 4 — Página de edição
 
@@ -2996,7 +3024,259 @@ o regresso pela porta e o desempenho. **Marco: a branch `v0.0.10`.**
   Índice verificado nas **três passes** (ver `🔧 Manutenção`, no próprio índice).
   O que restava decidir sobre `.agent/garbage/` foi **fechado em 2026-10-14 pela D18** (§11):
   **mantém-se como referência** — não se adapta nem se apaga.
-- **Verificação:** `npm test`-like (ou `node testes/regressao.mjs`) verde na `main`.
+- **Verificação:** um comando único verde na `main` — desde 2026-10-24,
+  `node tools/regression/all.mjs`.
+
+#### O que existe hoje (medido em 2026-10-24, antes de mexer)
+
+O ponto de partida não é uma estimativa: é o que cada instrumento deu na `main` da `v0.0.10`,
+com a árvore limpa e o Chrome a arrancar do zero.
+
+| Teste | Instrumento | Como corre | Estado a 2026-10-24 |
+| --- | --- | --- | --- |
+| T1 (travessias) | `walkDoor()` em `acceptance.mjs` | na página, chamado pela sessão | **sonda pronta, runner não**: as 12 portas medem-se só à mão |
+| T7/T11 (chegada) | `checkArrival()` em `acceptance.mjs` | na página, com `?from=` | **sonda pronta, runner não** |
+| T2/T3 (moldura) | `pose-sweep.mjs`, chamado pela bateria | na página | **84 poses, 0 cortadas, 0 falhas em 23 098 amostras** por página |
+| T4, T5, T6, T9, T10/T12, T8 | `twelve-tests.mjs` + `acceptance.mjs` | linha de comando, 5 páginas | **35 de 35** |
+| As leis | `validate.mjs`, `laws-selftest.mjs` | linha de comando | **0** nos 5 mundos; **21 de 21** avarias |
+
+Os números de hoje, para a fase se comparar com eles: `validate` sai com **0** (5 mundos, 12 portas,
+grafo e L19 completos; **6** avisos L14 do D47); `laws-selftest` **21 de 21** com o controlo limpo;
+`twelve-tests` **35 de 35** (T5 com **1 909** px de controlo e **0** dentro; T9 de **2→2** a **4→4**
+portas; T10/T12 com **0** px fora da moldura, mais **16** px de fio de bordo tolerados no fixture a
+12 m; T2/T3 com **84** poses e **0** falhas em **23 098** amostras).
+
+Duas pendências da §14 vivem dentro destes instrumentos e são desta fase: a **R16** (a medida do
+T10/T12 já sangrou 3 759 px e 16 px, e ainda se tolera 0,1% da moldura) e a **R17** (a primeira
+porta de uma sessão fria conta **5–6** fotogramas escuros no `seam.mjs`). Uma terceira nota está
+escrita em §7 e §9: a varredura de poses **reporta como falha** o que é uma câmara a mexer-se — devia
+recusar o resultado.
+
+#### As decisões do autor (2026-10-24)
+
+1. **O comando único é `node tools/regression/all.mjs`** — vive ao lado das outras baterias e não
+   numa pasta nova (`testes/`), que seria o único sítio do projeto fora de `tools/`.
+2. **Por omissão corre o que decide a fase:** o validador, as leis e os arranques (node, segundos),
+   a bateria dos doze e as travessias/chegada. As baterias arquivadas da Fase 4/5 abrem um Chrome
+   cada uma e ficam atrás de `--full`.
+3. **Três pendências entram nesta fase**, porque são todas do instrumento: **R16** (o retrato
+   determinístico), **R17** (a ponte espera pela descodificação da imagem) e a **recusa** da
+   varredura de poses quando a câmara se mexe. A **R14/R15** (fundos shader) continuam ensaio e não
+   são desta fase.
+
+#### Blocos de execução
+
+| Bloco | O que entrega | O que fecha |
+| --- | --- | --- |
+| **B0** | Este plano, com a linha de base medida antes de mexer | — |
+| **B1** | `tools/regression/traversal-tests.mjs`: as **12** portas dos 5 mundos atravessadas a passo de 0,1 m; as que navegam contam **uma** navegação e chegam ao mundo do `action.target`, as de janela contam **uma** mudança de dimensão e **zero** navegações | O **T1** deixa de precisar de sessão |
+| **B2** | No mesmo runner, o **T7/T11** de cada página com `?from=`: a câmara no ponto que o `arrivalPoint` calcula, **0** travessias a andar para dentro e **1** a meia volta | O **T7/T11** deixa de precisar de sessão |
+| **B3** | `js/arrival-frame.js`: a ponte só se dá por posta depois de `img.decode()`, com teto de tempo; o `hide()` espera por ela em vez de a tirar antes de pintada | **R17** |
+| **B4** | `acceptance.mjs`: o T10/T12 espera que as texturas da cena estejam descodificadas (e um fotograma desenhado com elas) antes das duas capturas | **R16** |
+| **B5** | `pose-sweep.mjs`: se a câmara sair do sítio durante a varredura, o veredicto é **`refused`** e não `fail` — o resultado é recusado, não atribuído à cena | A nota de §7/§9 |
+| **B6** | `tools/regression/all.mjs`: um comando, um veredicto; `--full` acrescenta as baterias arquivadas | A verificação da fase |
+| **B7** | README (como correr) e o fecho da fase com os números medidos | — |
+
+#### Metas de sucesso
+
+| # | Meta | Como se mede | Alvo |
+| --- | --- | --- | --- |
+| M1 | O T1 corre sem sessão de trabalho | `node tools/regression/all.mjs` | **12 de 12** portas, uma travessia cada, destino certo |
+| M2 | O T7/T11 corre sem sessão de trabalho | idem | **4** páginas com `?from=`: no sítio calculado, **0** a andar para dentro, **1** a meia volta |
+| M3 | A ponte espera pela imagem | `seam.mjs` numa sessão fria, as 6 portas | a **primeira** porta também a **0** escuros |
+| M4 | O retrato não sangra | `twelve-tests.mjs`, 4 corridas seguidas | **0** px fora da moldura em todas (sem tolerância) |
+| M5 | A varredura recusa a câmara a mexer | avaria injectada que move a câmara | veredicto **`refused`**, com o motivo, e não `fail` |
+| M6 | Um comando, um veredicto | `node tools/regression/all.mjs` | sai com **0** quando tudo passa e com **1** quando uma bateria falha |
+
+**Emenda (2026-10-24):** a **M2** fala de **4 páginas**; as chegadas que existem são **8** — cada
+porta que navega para um mundo onde há porta de chegada da origem (L19), o que dá *cidade* duas
+vezes, *praia* três, *portão* duas e *céu* uma. O runner enumera-as a partir do dado.
+
+#### Aceitação da fase
+
+1. **Do zero:** `node tools/regression/all.mjs` verde na `main`, com o Chrome fechado e a cache
+   desligada — é o comando que a §9 prometia.
+2. **Os doze testes continuam com os números da `v0.0.10`:** os **35 de 35** das cinco páginas mais
+   o **T1** e o **T7/T11**, agora medidos pela mesma bateria.
+3. **A ponte:** as **6** portas numa só sessão, com a primeira a **0** escuros — o número que a R17
+   deixou em aberto.
+4. **O retrato:** `0` px fora da moldura em todas as medições, sem o fio de bordo tolerado.
+5. **A varredura:** com a câmara a mexer-se, `refused`; parada, os mesmos **84** poses e **0** falhas.
+
+#### Riscos da fase
+
+| Risco | Gravidade | Mitigação |
+| --- | --- | --- |
+| A ponte a esperar pela imagem atrasar a travessia | Média | teto de tempo no `decode()`; a costura e os fotogramas escuros medem-se antes e depois |
+| Esperar pelas texturas tornar a bateria mais lenta | Baixa | `decode()` de uma imagem já descodificada resolve no mesmo tick; a duração é medida |
+| O T1 a navegar deixar o browser num estado estranho | Média | cada porta medida numa página nova; o registo da travessia fica no `sessionStorage`, que a navegação preserva |
+| Duas cópias do mesmo instrumento | Baixa | o T1/T7 reutiliza as sondas `walkDoor`/`checkArrival` de `acceptance.mjs`: **0** cópias |
+
+#### O que cada bloco entregou e mediu (2026-10-24)
+
+**B1 e B2 — o T1 e o T7/T11 numa bateria.** O `tools/regression/traversal-tests.mjs` abre cada
+mundo, **põe a cena na dimensão da porta** (`ownedBy`), atravessa-a a passo de 0,1 m e lê o registo
+que a página que sai deixou no `sessionStorage`. A ordem não é decorativa: a porta 2 do fixture vive
+na dimensão 1, e sem a troca o runner diria «0 travessias» de uma porta que não estava na cena
+(medido — foi o único vermelho da primeira corrida, 19 de 20). Resultado: **12 de 12** portas —
+**10** navegam **uma** vez e chegam ao `action.target` com `?from=<origem>`, **2** mudam a dimensão
+**uma** vez e navegam **zero** — e **8 de 8** chegadas exactamente no ponto que o `arrivalPoint`
+calcula, com **0** travessias a andar para dentro e **1** a meia volta. **20 de 20** verificações em
+**87 s**.
+
+**B3 — R17.** A ponte passou a pedir a descodificação da imagem (`img.decode()`, teto de **1,5 s**) e
+o `hide()` espera por ela — o quadro nunca sai antes de poder ter sido visto, e continua a sair num
+corte (D44). **Não se reproduziu nesta máquina:** as **6** portas numa só sessão fria deram **0**
+fotogramas escuros **antes** e **depois** da mudança, com a mesma costura (0,31 / 0,32 / 0,30 / 0,41
+/ 0,17 / 0,39) e **12 de 12** verificações. O número continua a ser medido pelo `seam.mjs`.
+
+**B4 — R16.** A causa não era só a que a pendência supunha, e o instrumento passou a dizer **onde**
+mudou (`caixaForaDaMoldura`). Três correções, cada uma com a sua prova:
+
+1. as duas capturas esperam pelas **imagens descodificadas** (`img.decode()`, teto de 3 s) — uma
+   textura a assentar muda o ecrã inteiro;
+2. o rectângulo da moldura ganhou **2 px para fora** — a aresta antialiased das barras dava **1 a
+   22 px**, sempre na linha do bordo (a regra do T5);
+3. a medição **pára os vídeos** enquanto compara — o que restava era a **obra em vídeo** do fixture
+   e da cidade: a caixa dos pixels mudados (`[179,326,190,352]`) tem a **mesma cor** com a dimensão
+   derivada escondida, ou seja, não era o retrato.
+
+Medido depois, em corridas repetidas: **0 px** fora da moldura nas 5 páginas, e o `twelve-tests`
+voltou a exigir **exactamente zero** (o limite de 0,1% saiu do runner).
+
+**B5 — a varredura recusa a câmara a mexer.** Se a câmara sai do sítio (mais de **1 mm**), o
+veredicto é **`refused`** — `T2` e `T3` ficam `refused`, não `fail` —, com o motivo e a pose. A
+terceira avaria injectada, `fault: 'camera'` (o D-pad preso, 0,1 m por pose), dá **`refused` na
+primeira pose** e deixa câmara e rig repostos; a mesma página, com a câmara parada, dá os mesmos
+**84** poses, **0** cortadas, **0** falhas em **23 098** amostras e **420** controlos a **0**.
+
+**B6 — o comando único.** `node tools/regression/all.mjs` corre o validador, as leis, os doze e as
+portas/chegada e devolve **0** ou **1**: **4 de 4** em **119,3 s**. Com `--full`, as sete baterias
+arquivadas juntam-se e dão **11 de 11** em **551,4 s** (a costura 97,7 s, a chegada 45,5, a ponte
+59,6, os rótulos 48,6 e 49,3, o botão 46,2, a transição 86,3). Cada bateria tem um teto de **25
+minutos**: um Chrome que não fecha falha a bateria em vez de travar a verificação.
+
+**B7 — a documentação.** O README ganhou o comando único (§ «Como Usar», passo 3) e a varredura
+passou a documentar as **três** avarias; a §10 ficou com os cinco instrumentos; a §14 fechou a
+**R16** e a **R17**.
+
+#### Fecho da fase (2026-10-24)
+
+1. **Do zero** — `node tools/regression/all.mjs` verde: **4 de 4** baterias, **119,3 s**; com
+   `--full`, **11 de 11** e **551,4 s**.
+2. **Os doze testes** — os **35 de 35** das cinco páginas continuam, e o **T1** (**12 de 12**) e o
+   **T7/T11** (**8 de 8**) passaram a ser medidos pela mesma verificação, **20 de 20**.
+3. **A ponte** — as **6** portas numa só sessão a **0** escuros, antes e depois da mudança do R17.
+4. **O retrato** — **0** px fora da moldura nas 5 páginas, com o `twelve-tests` a exigir zero.
+5. **A varredura** — `refused` com a câmara a mexer; **84** poses e **0** falhas com ela parada.
+
+O `validate.mjs` sai com **0** (5 mundos, 12 portas, grafo e L19 completos) e as leis dão **21 de
+21**, com o controlo limpo.
+
+---
+
+### Fase 7 — O que os documentos prometem e o código não faz (plano, 2026-10-24)
+
+- **Entregável:** fechar o **inventário de 2026-10-24** — as sete coisas que o README e este
+  roadmap documentam (ou pedem em §1 e §7) e que o código não constrói, mais as três afirmações que
+  a documentação deixou para trás. A fase existe porque o autor pediu para **implementar o ensaio
+  dos fundos shader**, e com ele tudo o que ficou sem fase: os quatro valores que o esquema valida e
+  a cena ignora (**R9**/**D30**), a exclusão em lote do editor (§7), o `i18n/en.json`, o catálogo de
+  assets no editor e os portais animados (§1).
+- **O que não muda:** a produção continua a declarar `kind: "image"`. O **R14**/**R15** continua a
+  ser ensaio até o **B9** fechar com o A/B nos três aparelhos; nenhum mundo em `data/worlds/` troca
+  de fundo nesta fase sem esse número.
+- **Verificação:** `node tools/regression/all.mjs` continua verde com os números da Fase 6
+  (**4 de 4**, **119,3 s**; os doze **35 de 35**, as portas **12 de 12**, as chegadas **8 de 8**,
+  as leis **21 de 21**, `validate` **0**), e cada bloco mede o seu próprio número, como nas fases
+  anteriores.
+
+#### O que existe hoje (medido em 2026-10-24, antes de mexer)
+
+| Item | Medido onde | Estado a 2026-10-24 |
+| --- | --- | --- |
+| Fundos shader (**R14**/**R15**) | §14; `data/worlds/*.json`; `teste/engine.js` | **0** dimensões `kind: "shader"` nos **5** mundos; o ensaio corre em `teste/` com `fps = 30` e **não** tem a escada de cadência |
+| Obra `kind: "model"` / `"text"`, dimensão `kind: "color"`, `interaction: "link"` | `js/scene/schema.js` (39–41); `js/scene/validation.js` | **0** de **17** obras e **0** de **8** dimensões usam esses valores; o validador dá **3** avisos para os **4** valores e o editor não os oferece (**D30**) |
+| Exclusão em lote por dimensão | §7 contra `js/editor/` | **0** operações em lote: os **5** painéis (mundo, dimensão, obra, portal, câmara) só excluem **individualmente** |
+| `i18n/en.json` | `i18n/` | só `pt.json`, com **160** chaves em `strings`; `?lang=en` cai no português com **1** aviso |
+| Catálogo de assets no editor | §7; `js/editor/assets.js` | nenhum painel de assets; o `assets.js` (**3 846 B**) só **confere** se o ficheiro existe e mede a imagem |
+| Portais animados | §1 | o dado do portal não tem campo de animação (`box`, `boxPosition`, `boxRotation`, `trigger`, `frame`, `ownedBy`, `window`, `action`, `arrivalFrom`) |
+| Documentação desactualizada | README | **3** afirmações falsas na auditoria: «o editor não grava», «o T8 precisa de sonda fora do repositório» e «vídeo 360º como fundo é melhoria». A do **T8** já foi corrigida no **B7** da Fase 6; as outras **duas** no **B1** desta fase, que veio com o plano |
+
+#### As decisões do autor (2026-10-24)
+
+1. **Uma fase só, com os sete itens**, desde que cada um seja um **bloco com o seu número** — a fase
+   não junta assuntos no mesmo bloco: o critério continua a ser «um bloco, uma medida».
+2. **A D30 é emendada:** os quatro valores que hoje só **avisam** (`model` e `text` de obra, `color`
+   de dimensão, `link` a navegar) passam a ser **construídos**. É o que a própria D30 escreveu —
+   «implementar geometria de modelo, texto 3D e `link` a navegar é uma fase própria» — e a fase é
+   esta.
+3. **A §1 é emendada:** «portais em movimento animado (fica para depois)» sai do «fora do escopo» e
+   passa a dado da cena.
+4. **O editor cresce as duas coisas que §7 pediu e não teve:** a exclusão **em lote por dimensão**
+   (a nota do B6 da Fase 4) e o **catálogo de assets** editável (a limitação registada no README).
+5. **O `en.json` é tradução integral** das **160** chaves de `pt.json` — sem chaves novas e sem
+   tocar no `pt.json`; um teste compara as chaves dos dois ficheiros.
+6. **Os fundos shader são o último bloco (B9) e entram atrás de feature flag.** A produção só troca
+   `kind: "image"` por `kind: "shader"` se o A/B dos três aparelhos fechar o **R14**; sem esse
+   número, o B9 entrega o ensaio e a política **atrás da flag** e o **R14**/**R15** ficam abertos,
+   em vez de dados por fechados.
+7. Quando a fase fechar, estas decisões entram na §11/§13 numeradas a partir de **D52** — a última
+   registada é a **D51**.
+
+#### Blocos de execução
+
+| Bloco | O que entrega | O que fecha |
+| --- | --- | --- |
+| **B1** | As **duas** afirmações falsas que restavam no README — «o editor não grava» e «vídeo 360º como fundo é melhoria» — corrigidas, e «Melhorias Planejadas» a apontar para esta fase em vez de prometer o que já existe. **Feito com o plano (2026-10-24)** | a documentação desactualizada |
+| **B2** | `i18n/en.json` com as **160** chaves de `pt.json`; `?lang=en` deixa de cair no português | a lacuna do catálogo |
+| **B3** | Editor: **exclusão em lote por dimensão**, com confirmação e **um** instantâneo de desfazer | a nota «não entrou» do B6 da Fase 4 |
+| **B4** | Editor: **catálogo de assets** editável (`id`, `path`, `type`, `alt` por língua), com a **L9** e a **L14** a medir cada alteração | «o editor não cria assets» |
+| **B5** | Dimensão `kind: "color"`: fundo plano no renderer, oferecido pelo painel da dimensão | o aviso «no flat background» |
+| **B6** | `interaction: "link"` a **navegar** para o endereço, em vez de o mostrar no modal | a terceira coisa do **R9** |
+| **B7** | Obra `kind: "model"` (GLTF) e `kind: "text"` (texto 3D), com posição/rotação/tamanho como as outras | as duas primeiras coisas do **R9** |
+| **B8** | Portais com **movimento e rotação animados**, declarados no dado | o «fica para depois» da §1 |
+| **B9** | Fundos shader: o A/B controlado fecha o **R14**; a política **20 → 15 FPS → estático** atrás de flag fecha o **R15**; `kind: "shader"` no esquema com `shaderId` de lista interna, `fallbackAsset` validado e piso de pixelRatio **1** | **R14** e **R15** |
+| **B10** | README, §14 e o fecho com o que cada bloco mediu | a verificação da fase |
+
+#### Metas de sucesso
+
+| # | Meta | Como se mede | Alvo |
+| --- | --- | --- | --- |
+| M1 | Nenhuma afirmação falsa no README | `grep` das três frases substituídas | **0** ocorrências |
+| M2 | As duas línguas dizem o mesmo | chaves de `pt.json` contra `en.json`, e `?lang=en` | **160 de 160** chaves, **0** avisos |
+| M3 | O lote é uma operação | editor: excluir as **4** obras de uma dimensão | **1** comando, **1** instantâneo, `validate` **0** |
+| M4 | O catálogo é editável | editor: criar, alterar e remover um asset | os seletores acompanham; **0** erros de consola; **L9**/**L14** a avisar quando o ficheiro falta |
+| M5 | Os quatro valores do R9 são construídos | `laws-selftest` e um fixture com os quatro | avisos do R9 a **0**; o fixture constrói o que o nome promete |
+| M6 | Os portais animam por dado | T9 (**20** ciclos) e T4 nas 5 páginas | os números da Fase 6 mantêm-se: T4 **255/0**, T9 **20** ciclos |
+| M7 | O shader não passa de 20 FPS | os **3** aparelhos do **R14** | **≤ 20** atualizações/s; **15** FPS só sob degradação persistente; estático ao fim |
+| M8 | A verificação não regride | `node tools/regression/all.mjs` | **4 de 4**, **35 de 35**, **12 de 12**, **8 de 8**, **21 de 21**, `validate` **0** |
+
+#### Aceitação da fase
+
+1. **A linha de base intacta:** `node tools/regression/all.mjs` verde, com os números da Fase 6
+   (**4 de 4**; **35** verificações nos doze, **20** nas portas/chegadas, **21** nas leis).
+2. **As duas línguas:** **160 de 160** chaves e nenhum aviso em `?lang=en`.
+3. **O que o esquema promete é construído:** um fixture com uma obra `model`, uma obra `text`, uma
+   dimensão `color` e um `link` a navegar — medido no browser, não no validador.
+4. **O editor:** o lote por dimensão e o catálogo de assets medidos no painel, com **0** erros de
+   consola e a L9/L14 a reagirem ao ficheiro que falta.
+5. **Os portais animados:** T4, T9 e T2/T3 com os números da Fase 6.
+6. **O shader:** o A/B nos **3** aparelhos guardado (JSONs), a cadência **≤ 20 FPS**, e a queda para
+   **15 FPS** e para estático só sob degradação persistente. Se o A/B não passar, a fase fecha
+   **sem** produção de shader e o **R14**/**R15** ficam abertos com o número que faltou — não se
+   declara aceite o que não foi medido.
+
+#### Riscos da fase
+
+| Risco | Gravidade | Mitigação |
+| --- | --- | --- |
+| Sete assuntos numa fase perderem o critério único | Média | um bloco, uma medida; a aceitação é a de cada bloco mais o `all.mjs` |
+| O `model`/`text` não terem arte nem caso de uso (foi o motivo da D30) | Alta | um fixture mínimo por valor, fora de `data/worlds/`; o editor só oferece o que a cena constrói |
+| O shader depender de três aparelhos que não estão na mesa | Alta | o B9 entrega o ensaio e a flag; a produção fica bloqueada e registada no **R14** |
+| A animação de portais mexer na ordem de desenho (**L6**) | Média | o `renderOrder` não muda: T2/T3 e T9 em cada bloco |
+| O `en.json` divergir do `pt.json` | Baixa | um teste compara as chaves; a tradução não acrescenta nem remove nenhuma |
+| O catálogo de assets abrir a porta a caminhos fora do sítio | Média | validar `path` contra a raiz do projeto e os tipos de `ASSET_KINDS`; a L9 continua a recusar o que falta |
 
 ---
 
@@ -3021,13 +3301,16 @@ Estes já foram medidos manualmente; passam a ser o critério de aceitação de 
 
 ### Os instrumentos destes testes
 
-Dois, e ambos correm **na página** (o que se mede é o que está desenhado, e o projeto não tem build
-nem dependências — D1). Carregam-se da consola, com a exposição aberta por HTTP:
+Dois correm **na página** (o que se mede é o que está desenhado, e o projeto não tem build nem
+dependências — D1) e três correm **de fora**, com um Chrome sem cabeça e o `tools/regression/harness.mjs`:
 
 | Instrumento | O que mede | Como corre |
 | --- | --- | --- |
-| `tools/regression/pose-sweep.mjs` | **T2** e **T3**: 84 poses em frente de um portal isolado, por diferença entre dois desenhos, com controlos dentro da abertura e duas avarias injectadas que provam que ele falha quando deve | `(await import('/tools/regression/pose-sweep.mjs')).runPoseSweep()` |
+| `tools/regression/pose-sweep.mjs` | **T2** e **T3**: 84 poses em frente de um portal isolado, por diferença entre dois desenhos, com controlos dentro da abertura e três avarias injectadas que provam que ele falha (ou recusa) quando deve | `(await import('/tools/regression/pose-sweep.mjs')).runPoseSweep()` |
 | `tools/regression/acceptance.mjs` | A bateria da fase: **T4, T5, T6, T9, T10, T12** de uma vez, mais **T2/T3** (chama a varredura) e **T8** (lê a sonda da sessão). O **T1** e o **T7/T11** medem-se porta a porta e chegada a chegada (`walkDoor`, `checkArrival`) | `(await import('/tools/regression/acceptance.mjs')).runAcceptance()` |
+| `tools/regression/twelve-tests.mjs` | **T2–T12** nas **5** páginas, de fora: abre o Chrome, entra em cada página e lê o relatório da sonda | `node tools/regression/twelve-tests.mjs [slug[:from] …]` |
+| `tools/regression/traversal-tests.mjs` | **T1** (as 12 portas) e **T7/T11** (as 8 chegadas), com as navegações de página contadas pelo `sessionStorage` | `node tools/regression/traversal-tests.mjs [slug …]` |
+| `tools/regression/all.mjs` | A verificação inteira, com um código de saída: validador, leis, doze e portas/chegada (**4** baterias); `--full` acrescenta as sete arquivadas | `node tools/regression/all.mjs [--full]` |
 
 O `acceptance.mjs` nasceu da medição da fase e traz três lições de método escritas no próprio
 ficheiro, todas de erros que ele próprio cometeu primeiro:
@@ -3116,6 +3399,14 @@ diferença, os dois renders diferem por outra razão e o resultado é **inválid
 
 Nas duas avarias os **controlos continuaram a 0** — o que falhou foi mesmo a moldura.
 
+**A terceira avaria, e a recusa (Fase 6, 2026-10-24).** Uma câmara a mexer-se durante a varredura não
+é um defeito da cena: é uma medição que não vale, e a varredura passou a dizê-lo. Se a câmara sai do
+sítio onde foi posta (mais de **1 mm**), o veredicto é **`refused`** — `T2` e `T3` ficam `refused`, e
+não `fail` —, com o motivo e a pose onde aconteceu. Provado com `fault: 'camera'`, que move a câmara
+0,1 m por pose (o passo do D-pad): **`refused` na primeira pose**, câmara e rig repostos; a mesma
+página, com a câmara parada, dá os mesmos **84** poses, **0** cortadas e **0** falhas em **23 098**
+amostras.
+
 **Limites do instrumento** (escritos para não serem esquecidos): mede a moldura de um portal
 **isolado**, não as oito da cena — assim não há oclusão legítima a confundir-se com defeito (a
 moldura de trás tapada pela janela da frente é o T5, não uma falha); não mede o **conteúdo** das
@@ -3136,8 +3427,8 @@ qualquer instrumento deste projeto:
   premido, a varredura deu **84 de 84** poses com o bordo cortado com os **controlos limpos** — que
   é exactamente o que se espera quando os dois renders comparados são o **mesmo** (a câmara mexe-se
   entre eles: a diferença vem do movimento, não da moldura). Numa recarga limpa, os mesmos 84 dão
-  **0**. A varredura exige página sem interação e câmara parada; e a Fase 6 deve detetá-lo e
-  **recusar** o resultado, em vez de o reportar como falha da cena.
+  **0**. A varredura exige página sem interação e câmara parada; desde a **Fase 6** ela deteta-o e
+  **recusa** o resultado (`refused`), em vez de o reportar como falha da cena.
 - **Uma medição por diferença precisa de um controlo positivo.** O T5 deu **0 px** à primeira
   tentativa com a porta de trás do **mesmo tamanho** da da frente: ela fica toda tapada pela
   máscara da frente, e um zero desses não prova nada. Com a porta de trás maior, há **6 768 px**
@@ -3226,7 +3517,7 @@ que se vê por baixo é o `#container-video`. Fica registado para um bloco futur
 | D27 | Divisão dos assets (D7) e nome dos retratos | **FECHADA** (2026-10-15) — **emendada ao fechar o B5** | `assets/{panoramas,artworks,video,previews}` (a divisão por tipo da D7, feita com `git mv`) e `<mundo>-d<N>-<nome>` no nome dos ficheiros. **Emenda:** os retratos são **um por mundo de destino** (`assets/previews/<destino>.jpg`) e não um por par origem→destino, porque a partilha da **D26** («duas portas para o mesmo mundo partilham 1 textura, 1 valor, 1 desenho») só acontece se as portas nomearem **o mesmo asset** — com o nome por par seriam **7** ficheiros e **7** texturas para **4** imagens. O formato continua a deixar uma porta nomear o seu próprio retrato, quando for uma escolha do autor. **Emenda de 2026-10-22 (D46):** os retratos passam a ser **um por porta** (`assets/previews/<destino>-de-<origem>.jpg`), porque a vista através da janela passou a ser a **vista da chegada** e a chegada depende de onde se vem — a partilha da D26 deixou de ser possível sem mentir. Ficam **6** ficheiros para as 6 portas com retrato; os três antigos (`cidade.jpg`, `praia.jpg`, `ceu.jpg`) mantêm-se, e `praia.jpg` continua a ser o do mundo de exemplo |
 | D28 | Como cada mundo se identifica | **FECHADA** (2026-10-15) — **emendada ao fechar o B7** | O **slug sai do caminho**: o que sobra de `location.pathname` depois de `document.baseURI` (raiz = `gate`). Assim os **4 arranques são o mesmo ficheiro copiado 4 vezes** — 1 fonte, não 4 — e a verificação das ferramentas exige que o nome da pasta e o `world.slug` do JSON coincidam. **Emenda:** idênticos **fora da linha do `<base>`** (a raiz leva `href="./"`, as salas `href="../"`), porque sem ela os caminhos relativos de uma sala resolvem para a raiz. **Custo aceite:** o nome da pasta *é* o slug, logo é implícito — e é exactamente por isso que passa a ser verificado |
 | D29 | A porta que faltava na praia | **FECHADA** (2026-10-16) | A porta **5 da praia** passa a ser o **regresso ao portão**: `window: none` + `action: navigate` com `target: gate` e `arrivalFrom: gate`, espelhando a porta 2 da cidade. **Motivo escrito:** na cena de onde a 3B nasceu os portais **4 e 5 eram a mesma porta duas vezes** (`ownedBy: 2`, par `2/1`); enquanto eram duas dimensões do mesmo ficheiro era redundância, mas com **um mundo por dimensão** passou a ser **falta de saída** — a praia não tinha porta para o portão e, ao chegar de lá, nenhuma porta podia dizer que era a chegada, logo o visitante aparecia onde a câmara dizia e o aviso do T8 disparava. **Medido:** o aviso apareceu na primeira ronda de portas do B7 (`praia?from=gate`), e a correção prova-se pelo **migrador emendado** — reposta a cena única e corrido outra vez, os 5 ficheiros saem iguais aos que estão em disco excepto a porta 5 (`1 file changed, 4 insertions(+), 5 deletions(-)`). **Custo aceite:** a praia perde a simetria esquerda/direita das duas portas para a cidade (fica uma); ganha o regresso directo ao portão, que era o que faltava |
-| D30 | **R9** — o esquema valida o que a cena não constrói (`model`/`text` de obra, `color` de dimensão, `interaction: link`) | **FECHADA** (2026-10-16) | **O validador passa a avisar e o editor não oferece o que não é construído.** Motivo escrito: implementar geometria de modelo, texto 3D e `link` a navegar é uma fase própria — nenhum deles tem arte nem caso de uso hoje —, enquanto a alternativa (o editor oferecer campos que a cena ignora) é exactamente o defeito que o **R9** mediu: quem escreve um desses campos vê o validador aceitar e a cena não mudar. O aviso entra na categoria que já existe (a mesma que avisa da dimensão de cor sem cor) e no `tools/scene/laws-selftest.mjs`, com uma avaria por valor. **Custo aceite:** o esquema continua a declarar mais do que constrói — passa a declará-lo **em voz alta** |
+| D30 | **R9** — o esquema valida o que a cena não constrói (`model`/`text` de obra, `color` de dimensão, `interaction: link`) | **FECHADA** (2026-10-16) | **O validador passa a avisar e o editor não oferece o que não é construído.** Motivo escrito: implementar geometria de modelo, texto 3D e `link` a navegar é uma fase própria — nenhum deles tem arte nem caso de uso hoje —, enquanto a alternativa (o editor oferecer campos que a cena ignora) é exactamente o defeito que o **R9** mediu: quem escreve um desses campos vê o validador aceitar e a cena não mudar. O aviso entra na categoria que já existe (a mesma que avisa da dimensão de cor sem cor) e no `tools/scene/laws-selftest.mjs`, com uma avaria por valor. **Custo aceite:** o esquema continua a declarar mais do que constrói — passa a declará-lo **em voz alta**. **Emendada pela Fase 7 (2026-10-24, §9):** os quatro valores passam a ser **construídos** — blocos **B5** (dimensão `color`), **B6** (`link` a navegar) e **B7** (`model` e `text` de obra) —, porque «a fase própria» que esta decisão previa é a Fase 7 |
 | D31 | O que o editor faz quando se cria um **mundo** (§7 pedia «slug, nome por língua, **pasta e arranque**») | **FECHADA** (2026-10-16) | **O editor exporta o ficheiro (`data/worlds/<slug>.json`) e mostra o comando; a pasta e o arranque são de uma ferramenta** — `tools/scene/new-world.mjs`, que cria `<slug>/index.html` a partir do arranque da raiz e o confere com o `checkArranques` que já existe. Motivo escrito: a **D2** diz que o editor **nunca escreve em disco** (é um site estático: gravar é substituir o ficheiro à mão) e a **D14** recusou o manifesto (M5) — sem ele, uma pasta nova não é sequer *vista* pelo editor. A ferramenta tem precedente: `tools/assets/normalize.mjs` já escreve ficheiros. **Custo aceite:** criar uma sala passa a ter dois passos (o comando e o ficheiro exportado), e o editor não os faz por si |
 | D32 | A pré-visualização e a travessia de uma porta de mundo | **FECHADA** (2026-10-16) | **A acção `navigate` fica inerte na pré-visualização** (o construtor ganha a opção e a porta avisa na consola quem a atravessa) **e há guarda de saída** quando o modelo tem alterações por gravar. Motivo escrito: a pré-visualização é uma caminhada **dentro** da ferramenta, e uma travessia a navegar **sai da página** e leva o trabalho consigo — sem isto, bastava andar em frente para perder meia hora de edição. O `dimension-pair` + `enter-window` continua a funcionar (é o que se está a afinar) e a **L13** continua respeitada: nenhum outro mundo é carregado nem construído. **Custo aceite:** a pré-visualização não prova o caminho entre mundos — isso mede-se na exposição, com `walkDoor` |
 | D33 | Como o editor reaplica o que se edita | **FECHADA** (2026-10-16) | **Ao alterar um campo, re-cria-se a entidade editada** (`remove` + a fábrica, com o dado novo); **inserir, excluir, mudar o catálogo de assets ou trocar de mundo reconstroem a cena** (`remove()` + `buildScene`). Motivo escrito, com o que o B0 mediu: (1) um `build` completo reconstrói **todos** os assets, e recarregar imagens a cada tecla é o que a D3 não quer; (2) o `update` por campo **não existe** nos módulos (a §5.2–5.4 prometiam-no para esta fase) e acrescentá-lo seria uma **segunda via** para a mesma geometria — o que a §5.0 quis evitar; (3) a re-criação usa a fábrica e o `remove()` que já existem (**uma** via) e **não mexe na câmara**, logo o autor não perde o sítio onde estava a olhar. **Custo aceite:** o `remove`+`create` passa a ser caminho quente — o que faz do editor o primeiro consumidor do `remove()` e fecha o **R8** |
@@ -3602,7 +3893,7 @@ alteram comportamento.
 | D27 | Divisão dos assets (D7) e nome dos retratos | `assets/{panoramas,artworks,video,previews}` com `git mv`, os retratos em `assets/previews/<destino>.jpg` (**um por mundo de destino** — emenda do B5) e `<mundo>-d<N>-<nome>` nos restantes |
 | D28 | Como cada mundo se identifica | O **slug sai do caminho** (`location.pathname` depois de `document.baseURI`; raiz = `gate`), com os **4 arranques idênticos fora da linha do `<base>`** e o nome da pasta e o `world.slug` a serem conferidos |
 | D29 | A porta que faltava na praia | A porta 5 da praia passa a **regresso ao portão** (`window: none` + `navigate/gate` + `arrivalFrom: gate`), acabando com a porta duplicada que a cena anterior trazia |
-| D30 | O que o esquema valida e a cena não constrói (R9) | O validador **avisa** e o editor **não oferece** o que não é construído: geometria de modelo, texto 3D, cor de fundo e `interaction: link` |
+| D30 | O que o esquema valida e a cena não constrói (R9) | O validador **avisa** e o editor **não oferece** o que não é construído: geometria de modelo, texto 3D, cor de fundo e `interaction: link` — **emendada na Fase 7** (2026-10-24, §9): os quatro passam a ser construídos |
 | D31 | Criar um mundo no editor | O editor exporta `data/worlds/<slug>.json` e mostra o comando; a **pasta e o arranque** são de `tools/scene/new-world.mjs` (a D2 não deixa o editor escrever em disco) |
 | D32 | Pré-visualização e navegação | A travessia `navigate` fica **inerte** na pré-visualização (aviso na consola), mais guarda de saída com alterações por gravar |
 | D33 | Como o editor reaplica o que se edita | **Re-criar a entidade** (`remove` + fábrica); reconstruir a cena só quando a estrutura muda — sem `update`/`list` nos módulos (uma via só) |
@@ -3890,6 +4181,9 @@ módulos **não** carregam numa página sem a UI da exposição.
 
 ### R14 — Fundos esféricos procedurais e governor de resolução (ensaio, 2026-10-23)
 
+**Plano:** entra na **Fase 7**, bloco **B9** (§9). O que a fecha é o A/B controlado nos três
+aparelhos; até lá a produção continua `kind: "image"`.
+
 O ensaio em `teste/` compara a arquitetura existente de panoramas com fundos gerados por shader
 GLSL. É **protótipo de medição**, não integração de produção: `data/worlds/*.json` continua a
 declarar fundos de imagem, e `js/modules/dimension.js` continua a usar `dimension-panorama`.
@@ -3964,6 +4258,9 @@ resultados e os orçamentos de imagem/shader decidir se o modelo de produção a
 
 ### R15 — Política adaptativa segura para fundos shader (proposta, 2026-10-23)
 
+**Plano:** entra na **Fase 7**, bloco **B9** (§9), **depois** do **R14** — a escada 20 → 15 FPS →
+estático só vale com o A/B medido, e entra atrás de feature flag.
+
 **Estado:** especificação para ensaio; não implementada. A produção continua a usar `kind: "image"`.
 Detalhes e esquema ilustrativo estão no README, em «Política proposta para fundo shader em
 produção».
@@ -4008,33 +4305,50 @@ silencioso para configurações inválidas.
 - Verificar qualidade visual nos degraus de pixelRatio, bateria/temperatura e retomada após ocultar
   a página; documentar medições e limites observados antes de propor formato final no schema/editor.
 
-### R16 — A medida do T10/T12 pode sangrar fora da moldura (aberta, 2026-10-23)
+### R16 — A medida do T10/T12 pode sangrar fora da moldura (**FECHADA em 2026-10-24**)
 
 O **T10/T12** tinge a dimensão derivada de um retrato e conta os pixels que mudaram: os que mudam
 **dentro** da janela são a prova de que a janela mostra o destino, e os que mudam **fora** da moldura
 são um defeito. Na **porta 1 do fixture a 30 m** (`example`), duas corridas de **2026-10-22**
 contaram **3 759 px** fora da moldura — iguais com e sem o B20, com a janela e a moldura nas mesmas
 coordenadas (`[613,280,771,469]`). Em **2026-10-23** a mesma medida deu **0** em **cinco** corridas,
-tanto na árvore do B20 como na anterior: não é um defeito estável e **não é regressão de nenhum
+tanto na árvore do B20 como na anterior: não era um defeito estável e **não era regressão de nenhum
 bloco**.
 
-**Hipótese:** a captura apanha uma textura ainda a assentar entre as duas fotografias que o teste
-compara — o que muda o ecrã inteiro, não só a janela. **O que a fecha:** esperar que todas as texturas
-da cena estejam descodificadas (e um fotograma desenhado com elas) antes de tirar as duas capturas, e
-repetir a bateria com as 3 salas e os 2 mundos de fixture várias vezes para provar que o zero é
-estável. Até lá, `tools/regression/twelve-tests.mjs` verifica **estritamente** («0 px fora da
-moldura»): se o número voltar, é para investigar, não para tolerar.
+**A hipótese da pendência — «uma textura a assentar» — era só uma parte.** Ao re-medir em
+2026-10-24, com o instrumento a dizer **onde** mudou, apareceram três causas, cada uma com a sua
+correção:
 
-### R17 — A primeira porta de uma sessão fria conta fotogramas escuros (aberta, 2026-10-23)
+| Causa | Prova | Correção |
+| --- | --- | --- |
+| Uma textura ainda a assentar entre as duas capturas | uma imagem por descodificar muda o ecrã inteiro, não uma janela | as duas capturas esperam que as imagens da cena estejam descodificadas (`img.decode()`, teto de **3 s**) |
+| A **aresta antialiased** das barras | **1 a 22 px**, sempre na linha do bordo, também nas salas | o rectângulo da moldura ganhou **2 px de margem para fora** (a regra do T5, §10) |
+| Uma **obra em vídeo** a meio do ecrã | a caixa dos pixels mudados (`[179,326,190,352]`) tem a **mesma cor** com a dimensão derivada escondida — não é o retrato; o fixture e a cidade têm uma obra em vídeo em `z = -55` | a medição **pára os vídeos** enquanto compara as duas capturas e volta a pô-los a andar no fim |
+
+**Medido depois, em corridas repetidas (2026-10-24):** **0 px** fora da moldura nas 5 páginas, e o
+`twelve-tests` voltou a exigir **exactamente zero** — o limite de 0,1% da moldura, que era a emenda
+provisória, saiu do runner. O instrumento passou a devolver a caixa dos pixels mudados
+(`caixaForaDaMoldura`), para uma próxima vez não ser preciso adivinhar.
+
+### R17 — A primeira porta de uma sessão fria conta fotogramas escuros (**FECHADA em 2026-10-24**)
 
 No `tools/regression/seam.mjs`, a **primeira** porta medida em cada sessão, com o Chrome acabado de
-arrancar e a cache fria, conta **5 ou 6** fotogramas escuros na travessia; a mesma porta, medida
-isolada e a seguir, conta **0** (medido em 2026-10-22: 0 escuros em 43 e em 42 amostras, duas vezes
-seguidas). Não é do retrato nem do B20 — já acontecia antes dele — e a hipótese é a mesma forma da
-D45: a ponte está no `sessionStorage` antes de o `<img>` que a mostra estar descodificado, e o que se
-vê por baixo é o `#container-video`. **O que a fecha:** a ponte esperar pela descodificação da imagem
-(`img.decode()`) antes de se dar por posta, com um teto de tempo — e a bateria passa a poder medir as
-seis portas numa só sessão sem a primeira mentir.
+arrancar e a cache fria, contava **5 ou 6** fotogramas escuros na travessia; a mesma porta, medida
+isolada e a seguir, contava **0** (medido em 2026-10-22: 0 escuros em 43 e em 42 amostras, duas
+vezes seguidas). Não era do retrato nem do B20 — já acontecia antes dele — e a hipótese era a mesma
+forma da D45: a ponte está no `sessionStorage` antes de o `<img>` que a mostra estar descodificado, e
+o que se vê por baixo é o `#container-video`.
+
+**A correção:** `js/arrival-frame.js` passou a pedir a descodificação da imagem (`img.decode()`) e o
+`hide()` **espera por ela** antes de tirar o quadro — o `decode()` explícito também pede a
+descodificação cedo, em vez de a deixar para a primeira pintura. O teto é **1,5 s**, para uma imagem
+que nunca descodifica não deixar a ponte no ecrã. A saída continua a ser um **corte** e não um
+desvanecimento (D44): o que a espera muda é o instante, não a forma.
+
+**Não se reproduziu nesta máquina.** Em 2026-10-24, as **6** portas numa só sessão fria deram **0**
+fotogramas escuros **antes** e **depois** da mudança, com a mesma costura (0,31 / 0,32 / 0,30 / 0,41
+/ 0,17 / 0,39) e as **12 de 12** verificações a passar. A correção fica em vigor — é a que a
+pendência pedia —, e o número continua a ser medido pelo `seam.mjs` em cada travessia.
 
 **R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
 apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o
