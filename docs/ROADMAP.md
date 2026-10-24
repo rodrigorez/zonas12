@@ -4386,6 +4386,16 @@ o último antes dos 60 s, e o valor final entre 1,8 e 1,9). Quando o valor em qu
 confiança desce 20% e a busca recomeça — é o que garante que um aparelho péssimo continua a chegar ao
 piso 1 e à cadência de 15 (a escada inteira, sem mudar).
 
+**O que a política *não* promete: quadros por segundo (medido no mesmo telemóvel, 2026-10-24).**
+Depois de ~20 minutos de uso o aparelho aqueceu e a cena passou de **59,5** para **40,0 quadros/s** a
+1,901 de pixelRatio — com a cadência do shader **intacta** (20,0/s, 356 atrasos em 3 593 = 10%, p95 na
+ordem dos 25 ms). A política não reagiu, e é de propósito: ela promete a cadência do shader, e perseguir
+os 60 quadros num aparelho quente obrigaria a descer a resolução até ao piso **1**, onde a imagem fica
+visivelmente pior para ganhar fluidez que o aparelho já não tem. A decisão do autor (2026-10-24) é
+**manter**: a cadência é a promessa, a fluidez é o que o aparelho der. Se um dia se quiser a fluidez
+como critério, o sinal já está medido (`p95`), e o custo é o pixelRatio — não há aqui campo por onde
+escapar.
+
 **Comportamento pretendido**
 
 1. Manter um asset de imagem válido como fallback de cada fundo shader e prepará-lo antes de trocar

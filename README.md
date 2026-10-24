@@ -478,6 +478,12 @@ arrasto até a escada reagir; começar em 2 não custa nada — quem aguenta sob
 chega lá. Nesse aparelho a busca do teto **termina aos 27 s**: 2 → 1,6 → 1,8 → 1,9 (falhou) → **1,85**,
 onde fica (59,5 quadros/s, cadência de 20/s, 10% de atrasos).
 
+**A política não promete quadros por segundo.** Promete a cadência do shader. No mesmo telemóvel, ao
+fim de ~20 minutos aquecido, a cena caiu de 59,5 para **40 quadros/s** com a cadência nos 20,0/s e 10%
+de atrasos — e a política **não** desce a resolução por causa disso: perseguir a fluidez num aparelho
+quente só a levaria ao piso `1`, com a imagem pior. A fluidez é o que o aparelho der; a cadência é a
+promessa.
+
 Os 20/15 FPS e o piso 1 são **valores iniciais de ensaio**, não garantias de fluidez nem limites já
 aprovados para todos os aparelhos. No protótipo anterior, reduzir o pixelRatio no PowerVR GE8320
 coincidiu com melhora de p95; isso justifica testar a redução antes de baixar a cadência, mas não
