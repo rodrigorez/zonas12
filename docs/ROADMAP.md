@@ -4271,6 +4271,26 @@ ensaio (era o buraco que o ensaio do instalador apanhou). Um `.glsl` gravado no 
 compilação incompreensível. `all.mjs --full` deu **12 de 12 baterias** em **604 s**, com a costura em
 **12 de 12** (0,13 a 0,47) e os retratos de volta ao padrão de 2048.
 
+**O A/B no build publicado, lido com a sonda de campo (2026-10-24).** Duas leituras no mesmo
+aparelho e no mesmo estado térmico, separadas por ~2 minutos, com `?sonda=1`:
+
+| aparelho (DPR) | fundo | pixelRatio | pixels | quadros/s | cadência |
+| --- | --- | --- | --- | --- | --- |
+| Android 10, PowerVR (411×748, 2,63) | `grade-neon` | 2,25 | ≈1,56 Mpx | **45,5** | 20,0/s (22% de atrasos) |
+| Android 10, PowerVR (411×748, 2,63) | imagem (`?shader=0`) | 2,63 (nativo) | ≈2,10 Mpx | **50,4** | — |
+| Windows, desktop (1580×791, 1,17) | `grade-neon` | 1,17 (nativo) | ≈2,16 Mpx | **165** | 20,0/s, 0 atrasos |
+
+O que isto responde: **numa GPU fraca o shader custa fluidez que a política não recupera.** O
+panorama desenha **35% mais** pixels e ainda vai **11% mais depressa** — o custo do `grade-neon` não é
+resolução, é o fragment por pixel. A política responde com o único recurso que tem (tirar 27% dos
+pixels, 2,63 → 2,25) e fica ~10% abaixo da imagem parada, com a cadência de 20/s cumprida. No
+desktop não há diferença que se meça: DPR nativo, **0** atrasos, **nenhum** evento da escada.
+`prefers-reduced-motion` verificado no build publicado (estático, 0 atualizações) e na bateria.
+
+**O que continua em falta para fechar o R14:** o **terceiro aparelho** (o médio, Adreno 630 do ensaio
+de 2026-10-23). Com dois aparelhos medidos e o par shader × imagem pareado num deles, a pendência
+passa de «não foi registado» a «falta um dos três».
+
 O ensaio em `teste/` continua a comparar a arquitetura de panoramas com fundos gerados por shader
 GLSL. É **protótipo de medição**, não a política de produção: `js/modules/dimension.js` usa
 `dimension-panorama` para as imagens de reserva e o componente do shader para o fundo.

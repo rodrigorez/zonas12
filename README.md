@@ -527,9 +527,11 @@ impedir o fallback ou a inicialização.
 
 **Critério antes de produção:** o shader está em produção desde 2026-10-24 (decisão do autor), com
 a escada do R15 como rede: `?shader=0` mostra a imagem de reserva, e o aparelho desce o pixelRatio,
-depois para 15 FPS e depois congela o quadro. O que continua por medir é o **A/B controlado nos três
-aparelhos** (imagem × shader com a mesma câmera, pixelRatio, cena e ordem alternada); sem esse
-registo, o R14/R15 ficam abertos na documentação.
+depois para 15 FPS e depois congela o quadro. O **A/B controlado** foi medido em **dois** dos três
+aparelhos, no build publicado e com a sonda — no telemóvel fraco o panorama desenha 35% mais pixels e
+ainda vai 11% mais depressa que o `grade-neon` (50,4 contra 45,5 quadros/s), e no desktop não há
+diferença que se meça. Falta o **terceiro aparelho** para o registo ficar completo; sem ele, o R14/R15
+continuam abertos na documentação, com os números que já existem.
 
 #### Comparativo controlado: imagem, shader e p5.js
 
