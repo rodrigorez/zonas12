@@ -27,8 +27,10 @@
 //   distances, angles, heights   pose grid (metres, degrees, metres)
 //   stepPx, tolerancePx, marginPx   sampling and tolerance (pixels)
 //   minSamplesPerPose            below this, the pose is reported as not assessable
-//   fault                        null | 'stencil' | 'bar' - injects a defect on purpose, so the
-//                                sweep can be shown to fail when the frame is cut
+//   fault                        null | 'stencil' | 'bar' | 'camera' - injects a defect on purpose,
+//                                so the sweep can be shown to fail when the frame is cut. 'camera'
+//                                is not a frame fault: it is the D-pad left pressed, and the sweep
+//                                has to **refuse** the result instead of blaming the scene.
 
 const RIG = {
   portalId: 63,
@@ -38,6 +40,10 @@ const RIG = {
   // window that can act on the frame is the rig's own.
   site: { x: 200, y: 1.6, z: 0 }
 };
+
+// Metres. The camera is parked on the rig and nothing in the sweep moves it: a D-pad left pressed
+// moves it 0.1 m per frame, which is a hundred times this. Below it there is only float noise.
+const CAMERA_DRIFT = 0.001;
 
 const DEFAULTS = {
   distances: [14, 20, 28, 38],
@@ -90,6 +96,9 @@ export async function runPoseSweep(options = {}) {
 
   const savedCameraPosition = cameraEl.object3D.position.clone();
   const savedDimension = state.activeDimension;
+  // Onde a câmara tem de estar durante toda a varredura. Se sair daqui, quem mede não é a moldura.
+  const cameraSite = new THREE.Vector3(RIG.site.x, RIG.site.y, RIG.site.z);
+  const cameraMoved = () => cameraEl.object3D.position.distanceTo(cameraSite) > CAMERA_DRIFT;
 
   const rig = document.createElement('a-entity');
   rig.setAttribute('data-regression-rig', '');
@@ -245,7 +254,10 @@ export async function runPoseSweep(options = {}) {
     // Per bar, so a failure shows which side of the frame it came from.
     bars: bars.map((bar) => ({ name: bar.name, samples: 0, failed: 0 })),
     failures: [],
-    dimensionChanged: false
+    dimensionChanged: false,
+    // Quando a medição não vale nada por uma razão que não é a cena (a câmara a mexer-se), fica aqui
+    // o motivo e o resultado é recusado em vez de reprovado.
+    refusal: null
   };
 
   let started = 0;
@@ -257,6 +269,7 @@ export async function runPoseSweep(options = {}) {
     window.portalDebug.setActiveDimension(0);
     await nextFrame();
 
+    poses:
     for (const distance of cfg.distances) {
       for (const angle of cfg.angles) {
         for (const heightOffset of cfg.heights) {
@@ -265,6 +278,23 @@ export async function runPoseSweep(options = {}) {
           rig.setAttribute('position', { x: RIG.site.x, y: heightOffset, z: -distance });
           rig.setAttribute('rotation', { x: 0, y: angle, z: 0 });
           await nextFrame();
+
+          // A avaria da câmara: é o D-pad preso, a mover o visitante 0,1 m por fotograma enquanto a
+          // varredura corre. Antes de mais nada, a varredura pergunta se a câmara ainda está onde a
+          // pôs — e recusa o resultado em vez de o atribuir à moldura (uma medição assim deu 84 de
+          // 84 poses com o bordo cortado e os controlos limpos, que é o que se espera quando os dois
+          // desenhos comparados são o mesmo).
+          if (cfg.fault === 'camera') cameraEl.object3D.position.x += 0.1;
+          if (cameraMoved()) {
+            result.refusal = {
+              reason: 'the camera moved away from the rig during the sweep - the page has to be ' +
+                'left alone (a D-pad left pressed moves it 0.1 m per frame)',
+              at: { distance, angle, heightOffset },
+              camera: cameraEl.object3D.position.toArray().map((value) => Number(value.toFixed(3)))
+            };
+            break poses;
+          }
+
           portal.portalGroup.updateWorldMatrix(true, true);
 
           const samples = bars
@@ -361,7 +391,14 @@ export async function runPoseSweep(options = {}) {
   }
 
   const methodValid = result.controls.failed === 0 && result.controls.assessed > 0;
-  result.verdict = {
+  // Uma medição com a câmara a mexer-se não diz nada sobre a moldura: não é `fail`, é **recusada** —
+  // a diferença é a que separa «a cena está mal» de «a medição não vale».
+  result.verdict = result.refusal ? {
+    method: 'refused',
+    T2: 'refused',
+    T3: 'refused',
+    reason: result.refusal.reason
+  } : {
     method: methodValid ? 'valid' : 'invalid',
     T2: methodValid && result.poses.withCutBorder === 0 ? 'pass' : 'fail',
     T3: methodValid && result.samples.failed === 0 ? 'pass' : 'fail'
@@ -378,6 +415,7 @@ export async function runPoseSweep(options = {}) {
     'T2': result.verdict.T2,
     'T3': result.verdict.T3
   }]);
+  if (result.refusal) console.warn('[pose-sweep] refused: ' + result.refusal.reason);
   if (result.failures.length) console.log('[pose-sweep] failures', result.failures);
   console.table(result.bars.map((bar) => ({ bar: bar.name, samples: bar.samples, failed: bar.failed })));
   if (result.dimensionChanged) console.warn('[pose-sweep] the active dimension changed during the sweep');

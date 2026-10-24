@@ -28,9 +28,23 @@
   // Se a cena não chegar (uma cena inválida, um asset que falha), o quadro sai na mesma: uma imagem
   // parada para sempre esconderia o problema em vez de o mostrar.
   const GUARD = 10000;
+  // O teto da descodificação: uma imagem que nunca descodifica não pode deixar a ponte no ecrã para
+  // sempre. Um segundo e meio é folgado para um quadro de 1280 px e curto para um ecrã errado.
+  const DECODE_CEILING = 1500;
 
   let shown = null;
   let guard = null;
+  // A descodificação da imagem que a ponte mostra. `hide()` espera por ela: tirar o quadro antes de
+  // ele estar descodificado é mostrar o preto do `#container-video` que a ponte existe para evitar
+  // (R17). O `decode()` explícito também pede a descodificação **cedo** — um `<img>` que ainda não
+  // teve layout pode ser descodificado só na primeira pintura, que é tarde por definição.
+  let decoded = null;
+
+  function decodeEarly(image) {
+    if (typeof image.decode !== 'function') return Promise.resolve();
+    const ceiling = new Promise((done) => setTimeout(done, DECODE_CEILING));
+    return Promise.race([image.decode().catch(() => {}), ceiling]);
+  }
 
   // O mesmo enquadramento do ecrã: o <video> é `object-fit: cover`, e o quadro tem de o imitar.
   function drawCover(context, source, sourceWidth, sourceHeight, width, height) {
@@ -93,6 +107,7 @@
     image.setAttribute('aria-hidden', 'true');
     image.src = data;
     document.body.appendChild(image);
+    decoded = decodeEarly(image);
     return image;
   }
 
@@ -104,10 +119,14 @@
     if (!shown) return;
     const image = shown;
     shown = null;
-    // Um corte, não um desvanecimento (D44): as duas imagens são a mesma cena a um passo de
-    // distância, e dissolvê-las durante 240 ms vê-se como um efeito — exactamente a «impressão de
-    // transição» que a ponte existe para não haver. Sai no mesmo fotograma em que o mundo aparece.
-    if (image.parentNode) image.parentNode.removeChild(image);
+    const remove = function () {
+      if (image.parentNode) image.parentNode.removeChild(image);
+    };
+    // O quadro sai depois de poder ter sido visto, e não antes (R17). Continua a ser um **corte** e
+    // não um desvanecimento (D44): as duas imagens são a mesma cena a um passo de distância, e
+    // dissolvê-las durante 240 ms vê-se como um efeito — exactamente a «impressão de transição» que
+    // a ponte existe para não haver. O que a espera muda é o instante, não a forma de sair.
+    if (decoded) decoded.then(remove); else remove();
   }
 
   shown = restore();

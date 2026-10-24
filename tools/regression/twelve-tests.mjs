@@ -13,16 +13,16 @@
 // que a página disse enquanto carregava.
 //
 // O fixture (`example`) já deu uma fuga de 3 759 px fora da moldura no `T10/T12` (porta 1 a 30 m, em
-// duas corridas de 2026-10-22) e voltou a dar **16 px** noutra (porta 1 a 12 m, 2026-10-23) — não é
-// um defeito estável, é uma medida que sangra quando uma textura ainda está a assentar entre as duas
-// capturas; fica registado como **R16** na §14 do roadmap.
+// duas corridas de 2026-10-22) e voltou a dar **16 px** noutra (porta 1 a 12 m, 2026-10-23) — era a
+// **R16** da §14 do roadmap, e fechou-se em 2026-10-24 com três mudanças no instrumento: as duas
+// capturas esperam que as imagens da cena estejam descodificadas (uma textura a assentar muda o ecrã
+// inteiro); o rectângulo da moldura ganhou 2 px de margem para fora (a aresta de uma barra é
+// antialiased e a linha do bordo mudava com o que está atrás dela — 1 a 22 px, sempre na aresta); e
+// os vídeos param enquanto as duas capturas são comparadas (uma obra em vídeo muda de fotograma
+// entre elas).
 //
-// Por isso a verificação não é «exactamente zero»: um fio de antialiasing no bordo da moldura dá
-// dezenas de píxeis, e exigi-lo tornava a bateria intermitente — que é o pior que uma bateria pode
-// ser. O limite é uma **fracção da área da moldura**: até **0,1%** passa e é impresso com o número,
-// acima disso falha. Medido: o fio de bordo dá **16 a 23 px** (0,02% da moldura, e aparece também nas
-// salas), e o caso dos 3 759 px era **12,6%** — a régua separa os dois com folga de 5× para baixo e
-// 126× para cima.
+// Por isso a verificação voltou a ser «exactamente zero»: 0 px fora da moldura, em todas as medições.
+// Se o número voltar, é para investigar — o instrumento diz onde mudou (`caixaForaDaMoldura`).
 //
 // Uso, da raiz do projeto: node tools/regression/twelve-tests.mjs [slug[:from] ...]
 // Sem argumentos mede as cinco páginas: o portão, as três salas e o fixture.
@@ -35,9 +35,6 @@ const PAGINAS = [
   { slug: 'ceu', from: 'praia' },
   { slug: 'example', from: null }
 ];
-
-// Quanto da moldura pode mudar sem ser uma fuga (ver o cabeçalho: 0,02% é ruído de bordo, 12,6% é fuga).
-const FIO_DE_BORDO = 0.001;
 
 const url = (site, pagina) =>
   site.base + '/?' + ['scene=' + pagina.slug, pagina.from ? 'from=' + pagina.from : null,
@@ -97,25 +94,15 @@ function verificar(result, pagina, report, ruido) {
 
   const t10 = testes.T10_T12 || {};
   const entradas = Object.values(t10);
-  const areaDaMoldura = (entrada) => {
-    const m = entrada.moldura || [0, 0, 0, 0];
-    return Math.abs((m[2] - m[0]) * (m[3] - m[1])) || 1;
-  };
-  const foraDaMoldura = entradas.filter((entrada) =>
-    entrada.mudadosForaDaMoldura / areaDaMoldura(entrada) > FIO_DE_BORDO);
-  const fio = entradas.filter((entrada) =>
-    entrada.mudadosForaDaMoldura > 0 && entrada.mudadosForaDaMoldura / areaDaMoldura(entrada) <= FIO_DE_BORDO);
+  const foraDaMoldura = entradas.filter((entrada) => entrada.mudadosForaDaMoldura > 0);
   const dentro = entradas.every((entrada) => entrada.mudadosDentroDaJanela > 0);
   result.check(nome + ' · T10/T12: a dimensão derivada muda pixels dentro da janela e nenhum fora',
     entradas.length > 0 && dentro && foraDaMoldura.length === 0,
     entradas.length + ' medição(ões), ' + (foraDaMoldura.length
       ? 'fora da moldura: ' + foraDaMoldura.map((entrada) =>
         'porta ' + entrada.porta + ' a ' + entrada.distancia + ' m → ' +
-        entrada.mudadosForaDaMoldura + ' px (' +
-        (100 * entrada.mudadosForaDaMoldura / areaDaMoldura(entrada)).toFixed(2) + '%)').join('; ')
-      : '0 px fora da moldura') +
-    (fio.length ? ' — fio de bordo tolerado: ' + fio.map((entrada) =>
-      entrada.mudadosForaDaMoldura + ' px a ' + entrada.distancia + ' m').join(', ') : ''));
+        entrada.mudadosForaDaMoldura + ' px em ' + JSON.stringify(entrada.caixaForaDaMoldura)).join('; ')
+      : '0 px fora da moldura'));
 
   const t2 = testes.T2_T3 || {};
   const veredicto = t2.veredicto || {};
@@ -123,7 +110,8 @@ function verificar(result, pagina, report, ruido) {
     t2.passou === true && veredicto.T2 === 'pass' && veredicto.T3 === 'pass' &&
     (t2.poses || {}).withCutBorder === 0 && (t2.controlos || {}).failed === 0,
     t2.poses ? t2.poses.assessed + ' poses, ' + t2.poses.withCutBorder + ' cortadas, ' +
-      (t2.amostras || {}).failed + ' falhas em ' + (t2.amostras || {}).assessed + ' amostras' : 'sem resultado');
+      (t2.amostras || {}).failed + ' falhas em ' + (t2.amostras || {}).assessed + ' amostras' +
+      (t2.motivo ? ' — recusado: ' + t2.motivo : '') : 'sem resultado');
 }
 
 async function main() {
@@ -146,7 +134,9 @@ async function main() {
   }
   const falhadas = result.list.filter((item) => !item.ok);
   result.report('T1–T12 (a aceitação)');
-  if (falhadas.length) process.exit(1);
+  // Sai explicitamente: a bateria é chamada por `all.mjs`, e um processo que fica pendurado por uma
+  // ligação do Chrome que não fechou trava a verificação toda, não só esta página.
+  process.exit(falhadas.length ? 1 : 0);
 }
 
 main().catch((error) => { console.error('harness failed:', error.message); process.exit(1); });

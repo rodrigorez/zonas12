@@ -150,9 +150,12 @@ function rectDaJanela(porta, camera, gl, margem = 1) {
 }
 
 // O rectângulo de fora da moldura: a união das quatro barras. É por fora disto que nada do retrato
-// pode aparecer (é o que o T12 promete).
+// pode aparecer (é o que o T12 promete). A margem de 2 px é **para fora**, e é a mesma lição do T5
+// (§10): a aresta de uma barra é antialiased e mistura a moldura com o que está atrás dela, por isso
+// a linha do bordo muda quando o que está atrás muda — sem a margem, essa linha contava como fuga
+// (1 a 22 px, medidos várias vezes, sempre na aresta e nunca longe dela).
 function rectDaMoldura(porta, camera, gl) {
-  return rectDeMalhas(barrasDe(porta), camera, gl, 0);
+  return rectDeMalhas(barrasDe(porta), camera, gl, -2);
 }
 
 const dentro = (rect, x, y) => x > rect.x0 && x < rect.x1 && y > rect.y0 && y < rect.y1;
@@ -173,17 +176,25 @@ function contarMudancas(a, b, rect) {
   return { dentroMuda, dentroTotal, foraMuda, foraTotal };
 }
 
-// Conta só o que muda **fora** de um rectângulo (é a pergunta do T12: nada do retrato fora da moldura).
+// Conta só o que muda **fora** de um rectângulo (é a pergunta do T12: nada do retrato fora da
+// moldura) e diz onde mudou: um número sozinho não distingue uma fuga de uma aresta.
 function contarFora(a, b, rect) {
   let foraMuda = 0;
+  const caixa = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
   for (let y = 0; y < a.h; y++) {
     for (let x = 0; x < a.w; x++) {
       if (dentro(rect, x, y)) continue;
       const i = (y * a.w + x) * 4;
-      if (Math.abs(a.buffer[i] - b.buffer[i]) + Math.abs(a.buffer[i + 1] - b.buffer[i + 1]) + Math.abs(a.buffer[i + 2] - b.buffer[i + 2]) > RUÍDO) foraMuda++;
+      if (Math.abs(a.buffer[i] - b.buffer[i]) + Math.abs(a.buffer[i + 1] - b.buffer[i + 1]) + Math.abs(a.buffer[i + 2] - b.buffer[i + 2]) > RUÍDO) {
+        foraMuda++;
+        if (x < caixa.x0) caixa.x0 = x;
+        if (y < caixa.y0) caixa.y0 = y;
+        if (x > caixa.x1) caixa.x1 = x;
+        if (y > caixa.y1) caixa.y1 = y;
+      }
     }
   }
-  return foraMuda;
+  return { contagem: foraMuda, caixa: foraMuda ? [caixa.x0, caixa.y0, caixa.x1, caixa.y1] : null };
 }
 
 // As barras da moldura de uma porta.
@@ -565,6 +576,30 @@ export async function checkPortalCycle(options = {}) {
 // T10 e T12: o retrato. Tingir a dimensão derivada muda os pixels **dentro** da janela e nenhum
 // fora dela — o que responde às duas perguntas de uma vez: o retrato está onde tem de estar (T10) e
 // não sai da moldura (T12). A duas distâncias, e com um controlo que prova que a medição não é vazia.
+//
+// R16: uma textura que ainda está a assentar muda o ecrã **inteiro** entre as duas capturas, e o
+// teste lê isso como retrato fora da moldura (foi o que deu 3 759 px numa tarde e 0 na seguinte, com
+// a janela e a moldura nas mesmas coordenadas). Por isso as duas capturas só são tiradas depois de
+// todas as imagens da cena estarem descodificadas — e com um teto, para uma imagem partida não
+// prender a bateria.
+async function esperarTexturas(sceneEl, limiteMs = 3000) {
+  const imagens = new Set();
+  sceneEl.object3D.traverse((no) => {
+    const materiais = no.material ? (Array.isArray(no.material) ? no.material : [no.material]) : [];
+    for (const material of materiais) {
+      for (const chave of ['map', 'emissiveMap', 'alphaMap']) {
+        const imagem = material[chave] && material[chave].image;
+        if (imagem && typeof imagem.decode === 'function') imagens.add(imagem);
+      }
+    }
+  });
+  const limite = new Promise((done) => setTimeout(done, limiteMs));
+  await Promise.race([
+    Promise.all(Array.from(imagens, (imagem) => imagem.decode().catch(() => {}))),
+    limite
+  ]);
+}
+
 export async function checkPortrait(options = {}) {
   const sceneEl = document.querySelector('a-scene');
   const cameraEl = sceneEl.querySelector('a-camera');
@@ -576,44 +611,62 @@ export async function checkPortrait(options = {}) {
   const portas = state.portals.filter((p) => p.data.previewDimension > 0);
   const resultados = [];
 
-  for (const porta of portas) {
-    const entradas = state.dimensions[porta.data.previewDimension] || [];
-    const entrada = entradas.find((e) => e.material && e.material.map) || entradas[0];
-    if (!entrada || !entrada.material) continue;
-    const corOriginal = entrada.material.color.getHex();
-    const mundo = new THREE.Vector3();
-    porta.el.object3D.getWorldPosition(mundo);
-    for (const distancia of distancias) {
-      cameraEl.object3D.position.set(mundo.x, mundo.y + porta.data.height / 2, mundo.z + distancia);
-      await proximoFrame();
-      const janela = rectDaJanela(porta, camera, gl);
-      const moldura = rectDaMoldura(porta, camera, gl);
-      desenhar(sceneEl, camera);
-      const antes = lerTudo(gl);
-      entrada.material.color.setHex(0xff00ff);
-      await proximoFrame();
-      desenhar(sceneEl, camera);
-      const tingido = lerTudo(gl);
-      entrada.material.color.setHex(corOriginal);
-      await proximoFrame();
-      const dentroDaJanela = contarMudancas(antes, tingido, janela).dentroMuda;
-      const foraDaMoldura = contarFora(antes, tingido, moldura || janela);
-      resultados.push({
-        porta: porta.data.id,
-        derivada: porta.data.previewDimension,
-        distancia: distancia,
-        // T10: o retrato tingido muda os pixéis dentro da janela (o retrato está lá).
-        mudadosDentroDaJanela: dentroDaJanela,
-        // T12: e não muda nenhum fora da moldura (o retrato não sai de lá).
-        mudadosForaDaMoldura: foraDaMoldura,
-        janela: janela.bruto,
-        moldura: moldura ? moldura.bruto : null,
-        passou: dentroDaJanela > 0 && foraDaMoldura === 0
-      });
-    }
-  }
-  cameraEl.object3D.position.copy(guardado);
+  await esperarTexturas(sceneEl);
+
+  // R16, a segunda face: um vídeo a correr muda os pixéis entre as duas capturas, e o teste lê isso
+  // como retrato fora da moldura — o fixture tem uma obra em vídeo (e as salas também), e na diagonal
+  // dela apareciam 1 a 22 px «fora da moldura» que não eram do retrato (medido: parar o vídeo
+  // apaga-os). A medição pára os vídeos e volta a pô-los a andar no fim; o visitante não vê nada,
+  // porque são duas capturas separadas por um fotograma.
+  const videos = Array.from(document.querySelectorAll('video')).filter((video) => !video.paused);
+  videos.forEach((video) => video.pause());
   await proximoFrame();
+
+  try {
+    for (const porta of portas) {
+      const entradas = state.dimensions[porta.data.previewDimension] || [];
+      const entrada = entradas.find((e) => e.material && e.material.map) || entradas[0];
+      if (!entrada || !entrada.material) continue;
+      const corOriginal = entrada.material.color.getHex();
+      const mundo = new THREE.Vector3();
+      porta.el.object3D.getWorldPosition(mundo);
+      for (const distancia of distancias) {
+        cameraEl.object3D.position.set(mundo.x, mundo.y + porta.data.height / 2, mundo.z + distancia);
+        await proximoFrame();
+        await esperarTexturas(sceneEl);
+        const janela = rectDaJanela(porta, camera, gl);
+        const moldura = rectDaMoldura(porta, camera, gl);
+        desenhar(sceneEl, camera);
+        const antes = lerTudo(gl);
+        entrada.material.color.setHex(0xff00ff);
+        await proximoFrame();
+        desenhar(sceneEl, camera);
+        const tingido = lerTudo(gl);
+        entrada.material.color.setHex(corOriginal);
+        await proximoFrame();
+        const dentroDaJanela = contarMudancas(antes, tingido, janela).dentroMuda;
+        const fora = contarFora(antes, tingido, moldura || janela);
+        resultados.push({
+          porta: porta.data.id,
+          derivada: porta.data.previewDimension,
+          distancia: distancia,
+          // T10: o retrato tingido muda os pixéis dentro da janela (o retrato está lá).
+          mudadosDentroDaJanela: dentroDaJanela,
+          // T12: e não muda nenhum fora da moldura (o retrato não sai de lá).
+          mudadosForaDaMoldura: fora.contagem,
+          // Onde mudou, quando mudou: uma fuga espalha-se, uma aresta fica na linha do bordo (R16).
+          caixaForaDaMoldura: fora.caixa,
+          janela: janela.bruto,
+          moldura: moldura ? moldura.bruto : null,
+          passou: dentroDaJanela > 0 && fora.contagem === 0
+        });
+      }
+    }
+  } finally {
+    videos.forEach((video) => { const promessa = video.play(); if (promessa) promessa.catch(() => {}); });
+    cameraEl.object3D.position.copy(guardado);
+    await proximoFrame();
+  }
   return resultados;
 }
 
@@ -627,6 +680,7 @@ export async function checkFrameSweep(options = {}) {
     amostras: r.samples,
     controlos: r.controls,
     veredicto: r.verdict,
+    motivo: r.verdict.reason || null,
     ms: Math.round(r.durationMs),
     passou: r.verdict.T2 === 'pass' && r.verdict.T3 === 'pass'
   };
