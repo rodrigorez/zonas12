@@ -15,7 +15,10 @@ import {
 import { startSession, cameraAlreadyAllowed, cameraFirstFrame, showStartButton, showLoading } from './modules/camera.js';
 import { closeArtwork, toggleArtworkLabels } from './modules/artwork.js';
 import { startFrameDriver } from './modules/portal.js';
-import { shaderStatus } from './modules/dimension.js';
+import { shaderStatus, freezeShaders } from './modules/dimension.js';
+// A sonda de campo (R14): só desenha alguma coisa com `?sonda=1`, e é o que permite ler os números
+// num telemóvel, onde não há consola.
+import { startSonda } from './modules/sonda.js';
 import { validateScene } from './scene/validation.js';
 import { buildScene } from './scene/scene-builder.js';
 import { initI18n, languageFromUrl } from './i18n.js';
@@ -39,7 +42,11 @@ window.portalDebug = {
   on: on,
   // Which backgrounds were built and how the shader cadence is going (R14/R15) — what the shader
   // battery reads instead of guessing from pixels.
-  shader: () => shaderStatus()
+  shader: () => shaderStatus(),
+  // The tests compare captures of the same scene (R16): a background that animates changes every
+  // pixel between them. This is the lever that stops it, and it is the visitor's own
+  // `prefers-reduced-motion` mechanism.
+  freezeShaders: freezeShaders
 };
 
 // Development keyboard shortcuts: one listener for the whole scene, walking the portal
@@ -152,6 +159,9 @@ async function start() {
   const built = await sceneReady;
   if (built) startFrameDriver();
   if (!built) return;
+  // The field probe shows what the page is doing, for whoever is testing on a phone (R14). It is
+  // created after the build, so it never measures a scene that does not exist yet.
+  startSonda();
   if (auto) startSession({ arrival: true });
   // The image bridge has done its work once there is a scene to look at (D43): what the visitor sees
   // from here on is the world, and the frame that was covering the wait goes in the same frame — no

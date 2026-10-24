@@ -284,3 +284,14 @@ export function shaderStatus() {
     policy: pagePolicy ? pagePolicy.status() : null
   };
 }
+
+// The instrument's lever (R16): a shader background changes **every** pixel between two captures, and
+// a check that compares two captures reads that as a leak — the same lesson as the undecoded texture
+// and the playing video, with one more source of change. Freezing is what
+// `prefers-reduced-motion` already does to the visitor's page, so nothing is invented for the test:
+// the background stays drawn, and it stops moving for as long as the page lives.
+export function freezeShaders() {
+  if (!pagePolicy) return false;
+  pagePolicy.setReducedMotion(true);
+  return true;
+}

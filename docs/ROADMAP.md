@@ -4277,6 +4277,15 @@ GLSL. É **protótipo de medição**, não a política de produção: `js/module
 O resumo de implementação, tamanhos e medições também está no README, em «Fundos esféricos: imagem
 e shader».
 
+**Como o A/B se recolhe (2026-10-24):** `?sonda=1` (`js/modules/sonda.js`) desenha no ecrã do
+telemóvel o que `portalDebug.shader()` responde — fundo, modo, cadência, pixelRatio, atualizações por
+segundo, quadros por segundo, atrasos e os eventos da escada — e tem um botão **Copiar** que devolve o
+relatório como texto. É o que permite ler os números num aparelho sem consola e juntá-los aos dos
+outros dois. A linha **quadros** é a medida do A/B: conta o que a página desenhou, sem o teto de 20 do
+shader, e compara-se entre a mesma sala com shader e com `?shader=0`. A bateria verifica que o painel
+só existe com o parâmetro, que mostra o fundo e a cadência certos, que mede a taxa (19 a 21 por
+segundo) e que conta os quadros.
+
 **Formato e orçamento de imagem**
 
 - O panorama equiretangular deve manter a proporção **2:1** (lei L14). Os arquivos atuais medidos

@@ -238,6 +238,31 @@ async function pageChecks() {
     check.check('scene1 com ?shader=0 mostra a imagem de reserva',
       offEntry.mode === 'image', JSON.stringify(offEntry));
 
+    // A sonda de campo (R14): com `?sonda=1` o painel diz o que a página está a fazer, e é o que se lê
+    // num telemóvel; sem o parâmetro não existe painel nenhum.
+    check.check('sem ?sonda=1 não há painel na página', await browser.evaluate('!document.getElementById("sonda")'),
+      'painel ausente');
+    const sondaNoise = browser.console.length;
+    await browser.goto(site.base + '/?scene=scene2&sonda=1&' + stamp());
+    // 3 s de aquecimento (quadro parado) mais 2 s de janela da taxa: é o que a sonda precisa para ter
+    // um número, e é o tempo que o visitante leva a olhar para o ecrã.
+    await sleep(6000);
+    const sonda = await browser.evaluate(`(() => {
+      const painel = document.getElementById('sonda');
+      return painel ? painel.querySelector('#sonda-texto').textContent : null;
+    })()`);
+    check.check('com ?sonda=1 o painel mostra o fundo e a cadência',
+      typeof sonda === 'string' && /por-do-sol/.test(sonda) && /cadência 20\/s/.test(sonda),
+      sonda === null ? 'sem painel' : sonda.split('\n').slice(2, 5).join(' | '));
+    const taxaNaSonda = sonda === null ? null : Number((/atualizações\s+([0-9.]+)\/s/.exec(sonda) || [])[1]);
+    check.check('a sonda mede a taxa entregue (19 a 21 por segundo)',
+      taxaNaSonda !== null && taxaNaSonda >= 19 && taxaNaSonda <= 21, 'taxa=' + taxaNaSonda);
+    const quadrosNaSonda = sonda === null ? null : Number((/quadros\s+([0-9.]+)\/s/.exec(sonda) || [])[1]);
+    check.check('a sonda conta os quadros da página (é o número do A/B)',
+      quadrosNaSonda !== null && quadrosNaSonda >= 10, 'quadros=' + quadrosNaSonda);
+    const sondaErrors = browser.console.slice(sondaNoise).filter((line) => /error|exception/i.test(line));
+    check.check('a sonda não escreve erros na consola', sondaErrors.length === 0, sondaErrors.join(' | '));
+
     // O editor: o painel da dimensão oferece o que a cena constrói, e abre o fixture sem erros.
     const editorNoise = browser.console.length;
     // `goto` waits for `portalDebug`, which only the exhibition has: the editor is opened by hand,

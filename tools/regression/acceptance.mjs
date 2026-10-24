@@ -711,6 +711,16 @@ export async function runAcceptance(options = {}) {
   const quais = options.quais || ['T4', 'T5', 'T6', 'T9', 'T10', 'T12', 'T2', 'T3', 'T8'];
   const relatorio = { mundo: window.portalDebug.world, url: location.pathname + location.search, testes: {} };
 
+  // R16, a terceira face: um fundo shader animado muda **todos** os pixéis entre duas capturas, e os
+  // testes que comparam capturas (o T5 e o T10/T12) leem isso como fuga do retrato — medido: 5 796 px
+  // «fora da moldura» que eram só a animação a andar. A bateria congela o fundo pelo mecanismo que o
+  // `prefers-reduced-motion` do visitante já usa: o fundo continua desenhado e deixa de se mexer. O que
+  // a animação promete mede-se na bateria do shader e na da costura, não aqui.
+  relatorio.fundoCongelado = typeof window.portalDebug.freezeShaders === 'function'
+    ? window.portalDebug.freezeShaders()
+    : false;
+  if (relatorio.fundoCongelado) await proximoFrame();
+
   const proteger = async (nome, fn) => {
     try { relatorio.testes[nome] = await fn(); } catch (error) { relatorio.testes[nome] = { erro: String(error && error.message || error) }; }
   };

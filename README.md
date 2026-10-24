@@ -1444,8 +1444,25 @@ corpo só pinta `col` (sem texturas, sem `#`, sem `discard`). Da raiz do projeto
    painel da dimensão.
 
 O mínimo é **19 de 20 atualizações por segundo** (95% do teto); um shader mais pesado é recusado.
-`--force` instala-o na mesma para ensaio, com o número medido escrito no módulo. Em qualquer sala,
-`?shader=0` força a imagem de reserva.
+`--force` instala-o na mesma para ensaio, com o número medido escrito no módulo — mas um corpo que não
+compila, ou que não pinta nada, é recusado sempre. Em qualquer sala, `?shader=0` força a imagem de
+reserva.
+
+### 8. Medir num telemóvel (a sonda de campo)
+
+Um telemóvel não tem consola de developer tools, e a decisão do **R14** precisa de números de três
+aparelhos. `?sonda=1` acrescenta um painel com o que a página está a fazer — mundo, fundo, modo,
+cadência, pixelRatio, atualizações por segundo, **quadros por segundo**, atrasos e os eventos da
+escada — e um botão que copia tudo como texto:
+
+```
+http://127.0.0.1:8123/scene1/?sonda=1        (ou o endereço de Pages)
+```
+
+A linha **quadros** é a do A/B: é o que a página desenhou, independente do teto de 20 do shader, e é
+ela que se compara entre a mesma sala com shader e com `?shader=0` no mesmo aparelho. Sem o parâmetro
+não existe painel nenhum: a exposição não sabe que a sonda existe. O painel não é interface (não sai
+do catálogo `i18n`): é um instrumento, como as baterias de `tools/`.
 
 ## Melhorias Planejadas
 

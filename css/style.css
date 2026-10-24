@@ -103,3 +103,23 @@ a-scene { width: 100% !important; height: 100% !important; background: transpare
   align-items: center; justify-content: center;
   pointer-events: none;
 }
+
+/* A sonda de campo (R14). Só existe com `?sonda=1` — o módulo não a cria sem o parâmetro. Por cima de
+   tudo porque é uma ferramenta de medição: quem está a testar precisa de a ler, não de a ver bonita. */
+#sonda {
+  position: fixed; top: 8px; left: 8px; z-index: 10001;
+  max-width: min(92vw, 460px);
+  padding: 8px 10px 6px;
+  border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.25);
+  background-color: rgba(0, 0, 0, 0.74); color: #f2f2f2;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 11px; line-height: 1.35;
+  text-align: left;
+}
+#sonda-texto { margin: 0; white-space: pre-wrap; word-break: break-word; }
+#sonda-copiar, #sonda-fechar {
+  margin-top: 6px; margin-right: 6px; padding: 4px 10px;
+  border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.35);
+  background-color: rgba(255, 255, 255, 0.12); color: inherit;
+  font: inherit; cursor: pointer;
+}
+#sonda-fechar { margin-right: 0; padding: 4px 8px; }
