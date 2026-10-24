@@ -463,11 +463,19 @@ significa congelar a saída do shader, não renderizar uma cena sem fundo.
 
 | Estado | Política em produção |
 | --- | --- |
-| Inicialização | Carregar/compilar o shader e preparar a imagem fallback. Renderizar um quadro estático e recolher uma linha de base antes de animar. |
+| Inicialização | Carregar/compilar o shader e preparar a imagem fallback. Renderizar um quadro estático e recolher uma linha de base antes de animar. O **primeiro fotograma nunca pede mais do que `min(DPR nativo, 2)`** ao aparelho. |
 | Animação normal | Tentar no máximo **20 atualizações/renderizações por segundo** (intervalo-alvo de 50 ms). Não executar a animação em cadência maior. |
+| Ocioso e sem falhas | Enquanto nada falhou, o pixelRatio **sobe 20% a cada três janelas boas**, até ao DPR nativo — é assim que um aparelho bom chega à resolução nativa em ~30 s. |
 | Sobrecarga persistente | Reduzir primeiro o pixelRatio em passos limitados, mantendo o teto no DPR nativo e o piso inicial em `1`; reavaliar após cada alteração. |
+| Recuperação depois de uma falha | **+5%** a cada três janelas boas, limitada a 95% do último valor que deu problema. |
 | Ainda sobrecarregado | Reduzir para **15 FPS** (intervalo-alvo de 66,7 ms), sem descer a uma cadência menor. |
 | Ainda instável | Parar a animação e manter o último quadro shader estável; se o shader falhar, mostrar a imagem fallback. |
+
+O primeiro fotograma a `min(DPR nativo, 2)` vem de uma medição no telemóvel fraco (Android 10,
+PowerVR GE8320, `411 × 748`, DPR `2,63`): a **2,625** a página desenhava **38,7 quadros/s** com um
+terço das atualizações atrasadas; a **1,945** desenhava **57,3**. Começar no nativo custava ~15 s de
+arrasto até a escada reagir; começar em 2 não custa nada — quem aguenta sobe, quem não aguenta nunca
+chega lá.
 
 Os 20/15 FPS e o piso 1 são **valores iniciais de ensaio**, não garantias de fluidez nem limites já
 aprovados para todos os aparelhos. No protótipo anterior, reduzir o pixelRatio no PowerVR GE8320

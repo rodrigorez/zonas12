@@ -59,6 +59,25 @@ function policyChecks() {
   check.check('a 60 Hz, a política fica em 20 atualizações/s', goodStatus.cadence === 20, JSON.stringify(goodStatus));
   check.check('a 60 Hz, o pixelRatio não desce', goodStatus.pixelRatio === 2, String(goodStatus.pixelRatio));
 
+  // O primeiro fotograma pede no máximo 2 e nunca acima do DPR do aparelho; a partir daí a escada sobe
+  // até ao nativo, e é o único caminho para lá chegar (medido no telemóvel fraco: a 2,625 desenhava
+  // 38,7 quadros/s, a 1,945 desenhava 57,3).
+  const climbResolution = fakeResolution(3);
+  const climbClock = { now: 0 };
+  const climb = createPolicy({ resolution: climbResolution, clock: () => climbClock.now });
+  check.check('o primeiro fotograma num DPR 3 pede 2, e o renderer fica nesse valor',
+    climb.status().pixelRatio === 2 && climbResolution.ratio() === 2,
+    'política=' + climb.status().pixelRatio + ', renderer=' + climbResolution.ratio());
+  let climbNow = 0;
+  while (climbNow <= 60000) { climbClock.now = climbNow; climb.frame(climbNow); climbNow += 1000 / 60; }
+  check.check('sem degradação, a escada sobe até ao DPR do aparelho',
+    climb.status().pixelRatio === 3 && climbResolution.ratio() === 3,
+    'política=' + climb.status().pixelRatio + ' em 60 s');
+  const lowResolution = fakeResolution(1.17);
+  const low = createPolicy({ resolution: lowResolution, clock: () => 0 });
+  check.check('num ecrã de DPR 1,17 o primeiro fotograma fica no nativo',
+    low.status().pixelRatio === 1.17, String(low.status().pixelRatio));
+
   // A mesma política, com atualizações medidas de 5 em 5 segundos: a taxa nunca passa de 20/s.
   const rateClock = { now: 0 };
   const rate = createPolicy({ clock: () => rateClock.now });

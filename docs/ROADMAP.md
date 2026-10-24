@@ -4368,6 +4368,15 @@ shader novo só é instalado se compilar e entregar **19 de 20** atualizações/
 imagem de reserva em qualquer sala. Detalhes e o formato real estão no README, em «Política do fundo
 shader em produção».
 
+**Emenda de 2026-10-24 (medida num telemóvel fraco, Android 10, DPR 2,63):** o primeiro fotograma
+passou a pedir **`min(DPR nativo, 2)`** em vez do DPR nativo, e a escada sobe a partir daí (20% a cada
+três janelas boas enquanto nada falhou, 5% sob o último valor que falhou, teto no DPR do aparelho). O
+motivo está medido: a **2,625** a mesma página desenhava **38,7 quadros/s** com **73 atrasos em 228
+atualizações**; a **1,945** desenhava **57,3** — e o custo era só o arranque, porque a escada só
+reagia depois de duas janelas de 3 s. Começar em 2 tira esse arranque e não limita ninguém: um
+aparelho que aguente sobe até ao nativo em ~30 s (`shader.mjs` verifica as três coisas — arranca em
+2 num DPR 3, chega a 3 em 60 s sem degradação, e fica no nativo num DPR 1,17).
+
 **Comportamento pretendido**
 
 1. Manter um asset de imagem válido como fallback de cada fundo shader e prepará-lo antes de trocar

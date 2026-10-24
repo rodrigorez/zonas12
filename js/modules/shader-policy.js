@@ -29,7 +29,15 @@ export const SHADER_POLICY = {
   badToStepDown: 2,        // persistent means two consecutive bad steps
   goodToStepUp: 3,         // three good steps before the pixelRatio is allowed back up
   ratioStep: 0.2,          // a reduction of 20% of the current ratio, towards the floor of 1
-  ratioRecovery: 0.05      // and 5% back, never reaching the value that already went badly
+  ratioRecovery: 0.05,     // and 5% back, never reaching the value that already went badly
+  // The first frame never asks the device for more than this (measured on the weak phone: at the
+  // native 2.625 the page drew 38.7 frames/s with a third of the updates late; at 1.945 it drew 57.3).
+  // The ladder climbs from here up to the device's own DPR, so the ceiling is still the device's.
+  firstRatio: 2,
+  // While nothing has ever gone badly, the climb is quick (20% per three good steps) — the ceiling is
+  // unknown and there is no reason to take a minute and a half to find it. After the first bad step the
+  // cautious 5% applies, under the value that failed.
+  ratioClimb: 0.2
 };
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -42,7 +50,11 @@ export function createPolicy(options) {
   const startedAt = clock();
 
   let cadence = settings.reducedMotion === true ? 0 : defaults.targetFps;
-  let ratio = resolution ? clamp(resolution.get(), resolution.min, resolution.max) : defaults.minPixelRatio;
+  let ratio = resolution
+    ? clamp(Math.min(resolution.max, defaults.firstRatio), resolution.min, resolution.max)
+    : defaults.minPixelRatio;
+  // The first frame has to be the one the policy says it is: the renderer is born at the device's DPR.
+  if (resolution && Math.abs(resolution.get() - ratio) > 0.001) resolution.set(ratio);
   let badAt = 0;
   let badSteps = 0;
   let goodSteps = 0;
@@ -102,7 +114,7 @@ export function createPolicy(options) {
       if (resolution && goodSteps >= defaults.goodToStepUp && ratio < resolution.max - 0.001) {
         const ceiling = badAt ? Math.min(resolution.max, badAt * 0.95) : resolution.max;
         if (ratio < ceiling - 0.001) {
-          ratio = Math.min(ceiling, ratio * (1 + defaults.ratioRecovery));
+          ratio = Math.min(ceiling, ratio * (1 + (badAt ? defaults.ratioRecovery : defaults.ratioClimb)));
           resolution.set(ratio);
           goodSteps = 0;
           note('subiu pr', { pixelRatio: +ratio.toFixed(3), p95: +stats.p95.toFixed(1) });
