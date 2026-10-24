@@ -65,7 +65,8 @@ function relatorio(estado, taxa, fps) {
 }
 
 // O resumo de uma linha é o que se escreve à mão quando copiar é difícil: mundo, cadência, pixelRatio,
-// quadros, atrasos e ecrã/dpr — os seis números que decidem o A/B e a escada. Cabe num SMS.
+// quadros, atrasos, ecrã/dpr e quantos eventos a escada já fez — os números que decidem o A/B e se a
+// política está a convergir (a contagem pára de crescer) ou a procurar (continua a crescer). Cabe num SMS.
 function resumo(estado, taxa, fps) {
   const policy = estado.policy;
   const numero = (valor, casas) => (valor === null || valor === undefined ? '—' : valor.toFixed(casas));
@@ -75,6 +76,7 @@ function resumo(estado, taxa, fps) {
     ' ' + numero(fps, 1) +
     ' ' + (policy ? policy.late : '—') +
     ' ' + innerWidth + 'x' + innerHeight + '/' + (Math.round(devicePixelRatio * 100) / 100) +
+    ' e' + (policy && policy.events ? policy.events.length : 0) +
     (taxa === null ? '' : ' (' + numero(taxa, 1) + '/s)');
 }
 
