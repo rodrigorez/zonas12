@@ -3240,7 +3240,7 @@ fechada dos dois lados: o que os instrumentos medem e o que quem usa vê. **Marc
 
 ---
 
-### Fase 7 — O que os documentos prometem e o código não faz (plano, 2026-10-24)
+### Fase 7 — O que os documentos prometem e o código não faz (fechada, 2026-10-25)
 
 - **Entregável:** fechar o **inventário de 2026-10-24** — as sete coisas que o README e este
   roadmap documentam (ou pedem em §1 e §7) e que o código não constrói, mais as três afirmações que
@@ -3294,7 +3294,7 @@ fechada dos dois lados: o que os instrumentos medem e o que quem usa vê. **Marc
 | Bloco | O que entrega | O que fecha |
 | --- | --- | --- |
 | **B1** | As **duas** afirmações falsas que restavam no README — «o editor não grava» e «vídeo 360º como fundo é melhoria» — corrigidas, e «Melhorias Planejadas» a apontar para esta fase em vez de prometer o que já existe. **Feito com o plano (2026-10-24)** | a documentação desactualizada |
-| **B2** | `i18n/en.json` com as **164** chaves de `pt.json`; `?lang=en` deixa de cair no português. **Feito em 2026-10-25** — o `tools/regression/i18n.mjs` compara chaves, marcadores e frases, e abre a exposição e o editor em inglês (**9 de 9**) | a lacuna do catálogo |
+| **B2** | `i18n/en.json` com as chaves de `pt.json` — **164** no dia do plano, **203** no fecho, porque cada bloco seguinte acrescentou as suas; `?lang=en` deixa de cair no português. **Feito em 2026-10-25** — o `tools/regression/i18n.mjs` compara chaves, marcadores e frases, e abre a exposição e o editor em inglês (**9 de 9**) | a lacuna do catálogo |
 | **B3** | Editor: **exclusão em lote por dimensão**, com confirmação e **um** instantâneo de desfazer. **Feito em 2026-10-25** — um comando apaga as N obras da dimensão, a pergunta diz quantas são, e o «Desfazer» devolve-as todas juntas (`lote.mjs`, **8 de 8**) | a nota «não entrou» do B6 da Fase 4 |
 | **B4** | Editor: **catálogo de assets** editável (`id`, `path`, `type`, `alt` por língua), com a **L9** e a **L14** a medir cada alteração. **Feito em 2026-10-25** — o painel dos assets vem logo depois do mundo (o catálogo é parte do mundo), o `id` só se pergunta na inserção, e apagar um asset em uso é recusado com a contagem (`assets.mjs`, **10 de 10**) | «o editor não cria assets» |
 | **B5** | Dimensão `kind: "color"`: fundo plano no renderer, oferecido pelo painel da dimensão. **Feito em 2026-10-25** — a esfera do fundo leva um `MeshBasicMaterial` com a cor do dado, o painel ganha o tipo e o campo da cor, e a lei L1 passa a exigir raio como nos outros fundos | o aviso «no flat background» |
@@ -3302,19 +3302,19 @@ fechada dos dois lados: o que os instrumentos medem e o que quem usa vê. **Marc
 | **B7** | Obra `kind: "model"` (GLTF) e `kind: "text"` (texto 3D), com posição/rotação/tamanho como as outras. **Feito em 2026-10-25** — o GLTF vem do catálogo (tipo `model`, `<a-asset-item>`) e o `size` escala-o; o texto é desenhado num canvas e vai para um plano, sem fonte externa | as duas primeiras coisas do **R9** |
 | **B8** | Portais com **movimento e rotação animados**, declarados no dado. **Feito em 2026-10-25** — `spin` (roda sobre um eixo) e `orbit` (dá a volta a um círculo e vira-se com ele), com o período em segundos; a colisão continua a ser lida do mundo, por isso a travessia acontece onde a porta **está**; o `prefers-reduced-motion` do visitante pára-as, e uma porta em movimento não pode ser a porta de chegada (`motion.mjs`, **6 de 6**; T4/T9 nas 5 páginas + `example` com uma porta a rodar: **255/0** e **20** ciclos) | o «fica para depois» da §1 |
 | **B9** | Fundos shader: o A/B controlado fecha o **R14**; a política **20 → 15 FPS → estático** atrás de flag fecha o **R15**; `kind: "shader"` no esquema com `shaderId` de lista interna, `fallbackAsset` validado e piso de pixelRatio **1** | **R14** e **R15** |
-| **B10** | README, §14 e o fecho com o que cada bloco mediu | a verificação da fase |
+| **B10** | README, §14 e o fecho com o que cada bloco mediu. **Feito em 2026-10-25** — o quadro do fecho está abaixo, com as oito metas e o número de cada uma | a verificação da fase |
 
-**Estado a 2026-10-25:** **B1**, **B2** e **B9** estão feitos, e o **B9 passou a produção** por
-decisão do autor: as três salas correm shader (`scene1` → `grade-neon`, `scene2` → `por-do-sol`,
-`scene3` → `nuvens`), com o panorama como `fallbackAsset` e `?shader=0` como escape. O B9 entregou
-ainda o `kind: "shader"` com `shaderId` de lista interna, a política `20 → 15 FPS → estático` (piso
-de pixelRatio **1**), o fixture `?scene=shader`, o instrumento `tools/regression/shader.mjs` (**36**
-verificações) e o **validador/instalador** `tools/shader/` (compila, mede e recusa abaixo de **19 de
-20** atualizações/s). O **A/B nos três aparelhos não foi registado**, logo **R14/R15 continuam
-abertos** — a decisão de produção está tomada com o teste do autor (telemóvel fraco e desktop), e
-não se declara fechado o que não foi medido.
+**Estado a 2026-10-25 — os dez blocos estão feitos.** O **B9 passou a produção** por decisão do
+autor: as três salas correm shader (`scene1` → `grade-neon`, `scene2` → `por-do-sol`, `scene3` →
+`nuvens`), com o panorama como `fallbackAsset` e `?shader=0` como escape, o `kind: "shader"` no
+esquema com `shaderId` de lista interna, a política `20 → 15 FPS → estático` (piso de pixelRatio
+**1**), o fixture `?scene=shader`, o instrumento `tools/regression/shader.mjs` e o
+**validador/instalador** `tools/shader/` (compila, mede e recusa abaixo de **19 de 20**
+atualizações/s). O **A/B nos três aparelhos não foi registado**, logo **R14/R15 continuam abertos** —
+a decisão de produção está tomada com o teste do autor (telemóvel fraco e desktop), e não se declara
+fechado o que não foi medido. O que cada bloco mediu está no quadro do fecho, mais abaixo.
 
-O **B2** fechou em 2026-10-25: `i18n/en.json` tem as **164** chaves de `pt.json`, pela mesma ordem, e
+O **B2** fechou em 2026-10-25: `i18n/en.json` tem as chaves de `pt.json`, pela mesma ordem, e
 `tools/regression/i18n.mjs` (**9 de 9**) prova quatro coisas — as chaves são as mesmas, nenhuma
 tradução está vazia, os marcadores `{nome}` batem certo nas duas línguas e as frases traduzidas não
 ficaram iguais às portuguesas — e abre a exposição e o editor com `?lang=en` para confirmar a língua
@@ -3333,11 +3333,6 @@ desaparece ao corrigi-lo. Ficou também uma chave que faltava desde a Fase 4 (`e
 um `portalDebug.data()` no editor: o `state` do núcleo tem o que está construído, e um instrumento que
 mede o editor precisa do dado.
 
-O **B8** fechou no mesmo dia: uma porta pode andar (**D59**), com dois tipos declarados no dado
-(`spin` e `orbit`), e o movimento respeita o `prefers-reduced-motion` do visitante. A cena que os doze
-testes percorrem (`example`) passou a ter uma porta a rodar, e os números da Fase 6 mantiveram-se —
-T4 **255/0** fora da moldura e T9 **20** ciclos, nas 5 páginas mais o fixture. Falta o **B10**.
-
 O **B5**, o **B6** e o **B7** fecharam em 2026-10-25, com um fixture para os quatro valores (**D56**,
 **D57**, **D58**): `data/worlds/r9.json` (abre-se com `?scene=r9`, não é uma sala) tem uma dimensão
 `kind: "color"`, uma obra `image`, uma `model` (GLTF de 8 vértices em `assets/models/caixa-r9.gltf`,
@@ -3348,27 +3343,52 @@ vértices, o plano do texto com textura de 1239 px, e o clique que **sai** da p�
 campo da cor, o endereço só com `link`, o texto só na obra de texto, e **nenhum rótulo é uma chave
 crua** (o `editor.artwork.asset` era — faltava no catálogo desde a Fase 4, e ninguém o via porque o
 painel das obras só se desenha quando há obras). O `laws-selftest` passou de **21** para **22** avarias
-(a D30 deu lugar às leis de cada valor) e o `all.mjs` passou a **13** baterias por omissão mais as
-arquivadas.
+(a D30 deu lugar às leis de cada valor) e o `all.mjs` passou a **19** baterias com `--full`.
+
+O **B8** fechou no mesmo dia: uma porta pode andar (**D59**), com dois tipos declarados no dado
+(`spin` e `orbit`), e o movimento respeita o `prefers-reduced-motion` do visitante. A cena que os doze
+testes percorrem (`example`) passou a ter uma porta a rodar, e os números da Fase 6 mantiveram-se —
+T4 **255/0** fora da moldura e T9 **20** ciclos, nas 5 páginas mais o fixture. Falta o **B10**.
+
+#### Fecho: o que cada bloco mediu (2026-10-25)
+
+| Meta | Como se mediu | Medido |
+| --- | --- | --- |
+| **M1** nenhuma afirmação falsa no README | leitura das três frases da auditoria | **0** — as duas que restavam caíram no **B1** |
+| **M2** as duas línguas dizem o mesmo | `tools/regression/i18n.mjs`, chaves e `?lang=en` | **203 de 203** chaves nas duas, **0** avisos, **9 de 9** verificações |
+| **M3** o lote é uma operação | `tools/regression/lote.mjs` no fixture `example` | **1** comando, **1** instantâneo (5 obras de uma vez, as 2 da outra dimensão intactas), **8 de 8** |
+| **M4** o catálogo é editável | `tools/regression/assets.mjs` | criar, alterar e remover; a **L9** aparece e desaparece com o caminho; **0** erros de consola; **10 de 10** |
+| **M5** os quatro valores do R9 são construídos | `r9.mjs` (a cena) e `editor-r9.mjs` (os painéis), mais `laws-selftest` | fundo `color` com a cor do dado, malha do GLTF com **8** vértices, plano de texto com textura de **1239 px**, o clique a **sair** da página — **6 de 6** e **8 de 8**; avisos do R9 a **0** |
+| **M6** os portais animam por dado | T4 e T9 nas 5 páginas com a porta a rodar do `example` | T4 **255/0** (nada fora da moldura), T9 **20** ciclos, portas e nós a voltar ao que eram |
+| **M7** o shader não passa de 20 FPS | `shader.mjs` e a sonda de campo | cadência **20/s** com p95 sob a meta; política 20 → 15 → estático medida; **falta o terceiro aparelho** do R14 |
+| **M8** a verificação não regride | `node tools/regression/all.mjs --full` | **19 de 19** baterias, **718,9 s**; doze **35/35**, portas **6/6**, costura **12/12**, leis **22/22**, `validate` **0** |
+
+**O que fica aberto, e porquê:** o **R14**/**R15** continuam abertos. A produção do shader foi
+decidida com o teste do autor (telemóvel fraco e desktop), mas o A/B controlado pede **três**
+aparelhos e o terceiro não estava na mesa — não se declara medido o que não foi medido. O plano da fase
+previu-o: «se o A/B não passar, a fase fecha sem produção de shader e o R14/R15 ficam abertos com o
+número que faltou». Aqui a produção ficou (por decisão do autor, com o par `shader × imagem` medido em
+dois), e o que falta é o terceiro número.
+
 
 #### Metas de sucesso
 
 | # | Meta | Como se mede | Alvo |
 | --- | --- | --- | --- |
 | M1 | Nenhuma afirmação falsa no README | `grep` das três frases substituídas | **0** ocorrências |
-| M2 | As duas línguas dizem o mesmo | chaves de `pt.json` contra `en.json`, e `?lang=en` | **164 de 164** chaves, **0** avisos |
+| M2 | As duas línguas dizem o mesmo | chaves de `pt.json` contra `en.json`, e `?lang=en` | **203 de 203** chaves, **0** avisos |
 | M3 | O lote é uma operação | editor: excluir as **4** obras de uma dimensão | **1** comando, **1** instantâneo, `validate` **0** |
 | M4 | O catálogo é editável | editor: criar, alterar e remover um asset | os seletores acompanham; **0** erros de consola; **L9**/**L14** a avisar quando o ficheiro falta |
 | M5 | Os quatro valores do R9 são construídos | `laws-selftest` e um fixture com os quatro | avisos do R9 a **0**; o fixture constrói o que o nome promete |
 | M6 | Os portais animam por dado | T9 (**20** ciclos) e T4 nas 5 páginas | os números da Fase 6 mantêm-se: T4 **255/0**, T9 **20** ciclos |
 | M7 | O shader não passa de 20 FPS | os **3** aparelhos do **R14** | **≤ 20** atualizações/s; **15** FPS só sob degradação persistente; estático ao fim |
-| M8 | A verificação não regride | `node tools/regression/all.mjs` | **4 de 4**, **35 de 35**, **12 de 12**, **8 de 8**, **21 de 21**, `validate` **0** |
+| M8 | A verificação não regride | `node tools/regression/all.mjs` | **19 de 19** com `--full`, **35 de 35**, **12 de 12**, **22 de 22**, `validate` **0** |
 
 #### Aceitação da fase
 
 1. **A linha de base intacta:** `node tools/regression/all.mjs` verde, com os números da Fase 6
    (**4 de 4**; **35** verificações nos doze, **20** nas portas/chegadas, **21** nas leis).
-2. **As duas línguas:** **164 de 164** chaves e nenhum aviso em `?lang=en`.
+2. **As duas línguas:** **203 de 203** chaves e nenhum aviso em `?lang=en`.
 3. **O que o esquema promete é construído:** um fixture com uma obra `model`, uma obra `text`, uma
    dimensão `color` e um `link` a navegar — medido no browser, não no validador.
 4. **O editor:** o lote por dimensão e o catálogo de assets medidos no painel, com **0** erros de
@@ -4304,6 +4324,14 @@ módulos **não** carregam numa página sem a UI da exposição.
 **Plano:** entra na **Fase 7**, bloco **B9** (§9). O que a fecha é o A/B controlado nos três
 aparelhos; a produção foi adotada antes desse registo, por decisão do autor, com a escada do R15 e o
 `fallbackAsset` como rede.
+
+**Estado a 2026-10-25 (fecho da Fase 7):** a fase fechou e este número **não**: o par `shader ×
+imagem` está medido em **dois** aparelhos (o telemóvel fraco do autor e o desktop — §14, registo do
+R14) e falta o **terceiro** (Adreno 630). A fase fechou como o plano previu — com o que foi medido
+declarado e o que faltou registado —, e não se dá por fechado um A/B de três com dois. Tudo o resto do
+R14 e do R15 está entregue e medido: a política 20 → 15 FPS → estático, o piso de pixelRatio **1**, a
+primeira frame a `min(DPR, 2)` com a escada a subir, a bisseção do teto, o validador `tools/shader/` e
+a sonda de campo com que o autor lê os números no telemóvel.
 
 **Estado a 2026-10-24 (B9):** o shader é o **fundo de produção** das três salas — `scene1` →
 `grade-neon`, `scene2` → `por-do-sol`, `scene3` → `nuvens` —, com o panorama como `fallbackAsset` e

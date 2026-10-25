@@ -40,8 +40,8 @@ zonas12/
 │                       `example` (o mundo sai do **endereço**: `/` é o portão, `/scene1/` é a
 │                       primeira sala; o `?scene=<mundo>` continua a forçar um deles, para os testes)
 ├── i18n/
-│   ├── pt.json         textos da interface: 193 chaves (176 delas do editor), lidas por js/i18n.js
-│   └── en.json         as mesmas 193 chaves em inglês (?lang=en); um teste compara as duas
+│   ├── pt.json         textos da interface: 203 chaves (186 delas do editor), lidas por js/i18n.js
+│   └── en.json         as mesmas 203 chaves em inglês (?lang=en); um teste compara as duas
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos, mundos e página de edição)
 ├── assets/
@@ -306,7 +306,7 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 | Desfazer, «alterado» e guarda de saída | Editar → desfazer (**50** instantâneos do JSON, **D35**) → exportar; a marca «alterado» e o aviso antes de fechar com alterações que não saíram num ficheiro (**D32**); e a exportação **recusa** um mundo com erros — valida tudo antes de exportar |
 | As leis no editor | O editor corre o **mesmo** `validation.js` e responde às duas perguntas que eram só da linha de comando: o asset existe (**L9**) e a imagem mede 2:1 (**L14**). Num mundo saudável o relatório diz `Erros: 0 · Avisos: 0 · Por verificar: 0` |
 | Gravação direta | Com o **servidor da ferramenta** (`node tools/server/serve.mjs`) o editor ganha o botão «Gravar»: escreve o mundo em `data/worlds/` com o **mesmo** validador, uma cópia de segurança antes e escrita atómica (**D48–D51**); sem servidor o botão não aparece e o «Exportar» fica como estava |
-| Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**193** chaves) e, em inglês, de `i18n/en.json` (as mesmas **193**), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` escolhe a língua e uma chave que falte cai no português com **1** aviso |
+| Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**203** chaves) e, em inglês, de `i18n/en.json` (as mesmas **203**), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` escolhe a língua e uma chave que falte cai no português com **1** aviso |
 | Portas de mundo | A travessia de uma porta de mundo **navega** para o endereço do destino e o visitante aparece **atrás** da porta que lá se declara a chegada (`arrivalFrom`), na direcção em que vinha — o regresso é **um passo** (L16/L17/L19). Como cada mundo é uma **página** (D24), a chegada **arranca a exposição sozinha** (`?from=`, D37): o botão «ATIVAR EXPOSIÇÃO» fica para a primeira visita e volta se a câmara for recusada. E a porta que volta ao portão mostra a **realidade ao vivo** pela janela (**D38**): a sala declara uma dimensão `kind: "camera"`, que não desenha nada, e o rectângulo fica transparente sobre o vídeo — vê-se a câmara dos **dois lados**, que é o que a porta mostrava na Fase 3 |
 | Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID está no dado (`"id"`) e, na cena construída, em `data-dimension`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
 | Grafo de dimensões | Portais bidirecionais entre duas dimensões, com uma **dimensão ativa** global; dentro de cada mundo é o que resta do grafo antigo, e o **grafo de mundos** é conferido pela linha de comando (alcançabilidade a partir do portão) |
@@ -677,9 +677,10 @@ portas, grafo todo alcançável a partir do portão, **L19** sem falhas, **4** a
 em 250 ms) — os dois são da v0.0.6 e nem a Fase 4 nem a Fase 6 lhes tocaram. O **T1**, que aqui
 faltava, passou a ser medido pela verificação da Fase 6 (ver o ponto seguinte).
 
-**A Fase 6 — os testes por um comando (medido a 2026-10-24).** `node tools/regression/all.mjs` corre
-o validador, as leis, os doze e as portas/chegada e devolve um código de saída: **4 de 4** baterias
-em **119,3 s**; com `--full`, as sete baterias arquivadas juntam-se e dão **11 de 11** em **551,4 s**.
+**A Fase 6 — os testes por um comando (medido a 2026-10-24, e estendido na Fase 7).** Hoje
+`node tools/regression/all.mjs` corre o validador, as leis, os doze, as portas/chegada e as duas
+línguas, e devolve um código de saída: **5 de 5** baterias em **128,5 s**; com `--full`, as catorze
+arquivadas juntam-se e dão **19 de 19** em **718,9 s**.
 
 - **O T1, agora automatizado** (`tools/regression/traversal-tests.mjs`): as **12** portas dos 5
   mundos — **10** navegam uma vez e chegam ao destino com `?from=<origem>`, **2** mudam a dimensão
@@ -716,6 +717,39 @@ correção, e medido de novo: **5 de 5** — a primeira visita fica com o botão
 uma sala por uma porta entra sozinha (**0** pedidos); o portão por uma porta arranca sozinho com **1**
 pedido e stream; e, com a câmara a rejeitar, o botão **volta** com a mensagem. A bateria dos doze
 manteve os números no portão, na cidade e no fixture.
+
+**A Fase 7 — o que os documentos prometiam e o código não fazia (fechada a 2026-10-25).** Dez
+blocos, cada um com o seu número, e a mesma regra da Fase 6: o que não foi medido não se declara
+fechado. O que a fase entregou:
+
+- **B1** — as duas afirmações falsas que restavam no README (com o plano)
+- **B2** — o catálogo em duas línguas: `i18n/en.json` com as **203** chaves de `pt.json`, e o
+  `tools/regression/i18n.mjs` a comparar chaves, marcadores e frases, mais `?lang=en` na exposição e
+  no editor — **9 de 9**. A bateria corre **por omissão**: uma chave nova que entre só no `pt.json` é
+  uma frase portuguesa a aparecer a quem abrir em inglês (foi assim que se encontrou o
+  `editor.artwork.asset`, em falta desde a Fase 4)
+- **B3** — o lote por dimensão: um comando apaga as obras de uma dimensão, a pergunta diz quantas
+  são, e o «Desfazer» devolve-as todas juntas — **8 de 8**
+- **B4** — o catálogo de assets editável (`id`, `path`, `type`, `alt` por língua), com a **L9** a
+  aparecer ao escrever um caminho que não existe e a desaparecer ao corrigi-lo — **10 de 10**
+- **B5**/**B6**/**B7** — os quatro valores que a **D30** dava como validados e não construídos:
+  dimensão `kind: "color"` (**D56**), `interaction: "link"` a **navegar** (**D57**) e obra
+  `kind: "model"` (GLTF) e `"text"` (**D58**). O fixture é `data/worlds/r9.json`, que se abre com
+  `?scene=r9` — **6 de 6** na cena e **8 de 8** nos painéis
+- **B8** — os portais em movimento (**D59**): `spin` e `orbit`, com o período em segundos, a colisão
+  lida do mundo (a travessia acontece onde a porta **está**) e o `prefers-reduced-motion` a pará-los
+  — **6 de 6**; e os doze testes com uma porta a rodar no fixture, nos números da Fase 6
+- **B9** — o shader em produção, já descrito acima
+- **B10** — este fecho
+
+No caminho, três decisões nasceram do telemóvel do autor e não do plano (**D52** o giroscópio,
+**D53** a janela ao vivo, **D54**/**D55** a travessia), e a costura das nuvens ficou estável: o destino
+passou a ser congelado antes de se medir o corte, porque o quadro da ponte já era capturado com os
+shaders parados — comparar com um destino a animar media o tempo que passou, não o corte. De
+**0,34–0,56** para **0,41** em duas corridas seguidas.
+
+**O que fica aberto:** o **R14**/**R15**, o A/B do shader nos **três** aparelhos — há dois medidos
+(o telemóvel fraco e o desktop) e falta o terceiro.
 
 **A porta do portão mostra a realidade (D38, o B12).** O autor reparou que, na cidade, a porta de onde
 veio aparecia só como pórtico. É verdade e era o dado (`window: none` desde a **D29**), mas a
@@ -756,13 +790,14 @@ dois sítios.
 - O cursor do A-Frame não leva teste de stencil (é elemento de interface).
 - A dimensão 0 não tem conteúdo 3D: dentro das janelas que a mostram vê-se a imagem real
   da câmara (o canvas é transparente).
-- **O formato aceita mais do que a cena constrói, e o validador agora di-lo.** Obras de
-  `kind: "model"` ou `"text"`, fundos de dimensão `kind: "color"` e `interaction: "link"` **passam a
-  validação** mas não são construídos como o nome promete (uma obra sai sempre como painel com a
-  textura do `asset`, e um `link` abre o endereço **dentro do modal**) — desde o B9 o validador
-  **avisa** e o editor **não oferece** nenhum deles (decisão **D30**, pendência **R9** fechada).
-- **O editor não cria assets**: o catálogo (`assets` do mundo) é dado do ficheiro, e um mundo novo
-  começa com o catálogo que se lhe escrever — o editor escolhe entre os assets que o mundo já tem.
+- **O editor cria assets e apaga obras em lote, desde a Fase 7**: o painel dos assets edita o
+  catálogo do mundo (**B4**) e o painel da dimensão apaga as obras de uma dimensão de uma vez
+  (**B3**). Um mundo novo continua a começar com o catálogo que se lhe escrever — criar a **pasta**
+  de um mundo é da linha de comando (**D31**), e isso não mudou.
+- **O que o esquema promete é construído**: obras `kind: "model"` (GLTF) e `"text"`, fundos de
+  dimensão `kind: "color"` e `interaction: "link"` a navegar entraram na cena na Fase 7
+  (**D56**–**D58**). O aviso do validador que os denunciava saiu com eles, e o editor passou a
+  oferecê-los. Uma porta pode andar (**D59**), e o movimento respeita o `prefers-reduced-motion`.
 - **A pré-visualização não navega**: atravessar uma porta de mundo dentro do editor não muda de
   página (aviso na consola); o editor serve para arrumar a sala, não para a visitar (**D32**).
 - **O editor grava pelo servidor da ferramenta, e só quando ele responde** (**D48–D51**): sem
@@ -1369,14 +1404,16 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 | Bateria | O que responde |
 | --- | --- |
 | `tools/scene/validate.mjs` | os 6 mundos, as leis, o grafo das portas e os arranques |
-| `tools/scene/laws-selftest.mjs` | 21 avarias injectadas, todas detectadas, com o controlo limpo |
+| `tools/scene/laws-selftest.mjs` | **22** avarias injectadas, todas detectadas, com o controlo limpo |
 | `tools/regression/twelve-tests.mjs` | **T2–T12** nas 5 páginas (**35** verificações) |
-| `tools/regression/traversal-tests.mjs` | **T1** (as 12 portas) e **T7/T11** (as 8 chegadas) |
+| `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) |
+| `tools/regression/i18n.mjs` | as duas línguas: chaves, marcadores e `?lang=en` nas duas páginas |
 
-`--full` acrescenta as baterias arquivadas das Fases 4 e 5 (a costura das travessias, a ponte de
-imagem, a chegada por uma porta, os rótulos, o botão, a transição) e a da **Fase 7** (o fundo shader,
-que mede a política e as duas páginas com uma) — cada uma abre um Chrome e juntas somam minutos, por
-isso não são o `default`.
+`--full` acrescenta as baterias arquivadas das Fases 4, 5 e 7 — a costura das travessias, a ponte de
+imagem, a chegada por uma porta, os rótulos, o botão, a transição, o fundo shader (que mede a política
+e as duas páginas com uma), os quatro valores do R9 na cena e nos painéis, o lote por dimensão, o
+catálogo de assets e os portais em movimento — cada uma abre um Chrome e juntas somam minutos, por
+isso não são o `default`. Com `--full` são **19** baterias.
 
 Cada bateria continua a poder correr sozinha, com os argumentos que ela própria documenta — é o que
 se usa quando se está a investigar um número.
@@ -1517,24 +1554,26 @@ O que se lê no painel da sonda, na linha `giroscópio`: `ligado · tremor 0.04`
 
 ## Melhorias Planejadas
 
-Desde 2026-10-24 estas melhorias têm fase e blocos no roadmap: a **Fase 7** (§9 de
-[docs/ROADMAP.md](docs/ROADMAP.md)) — estão implementados o **B1** (só documentação), o **B2** (o
-catálogo em duas línguas), o **B3**/**B4** (o lote por dimensão e o catálogo de assets no editor), o
-**B5**/**B6**/**B7** (os quatro valores que o esquema prometia e a cena não construía) e o **B9**
-(shader em produção, com validador); falta o **B8** (portais animados) e o fecho.
+A **Fase 7** (§9 de [docs/ROADMAP.md](docs/ROADMAP.md)) fechou em **2026-10-25**: os dez blocos estão
+feitos e cada um mediu o seu número. O que continua aberto é o **R14**/**R15** — o A/B do shader nos
+**três** aparelhos, do qual existem dois.
 
 - **Fundos shader** (**R14**/**R15**, bloco **B9**): em produção desde 2026-10-24 — shader por
   omissão, `?shader=0` para a imagem de reserva, validador em `tools/shader/` e a política
   20 → 15 FPS → estático; falta o **A/B controlado nos três aparelhos**
-- **Portais com movimento e rotação animados**, definidos na cena (bloco **B8**)
 - **Um fundo 360º em vídeo**: a capacidade **já existe** (`kind: "video"` anima com
   `THREE.VideoTexture`), mas nenhum mundo a usa — falta o asset, não o código
 
 Fora da Fase 7, e sem data:
 
-- **As baterias arquivadas por omissão**: hoje `node tools/regression/all.mjs` corre as quatro que
-  decidem uma alteração e deixa as sete da Fase 4/5 atrás de `--full`, porque cada uma abre um
-  Chrome; juntá-las num só browser (uma sessão, sete medições) poria as **11** em minutos
+- **As baterias arquivadas por omissão**: hoje `node tools/regression/all.mjs` corre as cinco que
+  decidem uma alteração e deixa as catorze da Fase 4/5/7 atrás de `--full`, porque cada uma abre um
+  Chrome; juntá-las num só browser (uma sessão, catorze medições) poria as **19** em minutos
+
+**Fechado na Fase 7:** o catálogo em duas línguas (**B2**), o que o esquema prometia e a cena não
+construía — **D56** (fundo de cor), **D57** (`link` a navegar), **D58** (modelo GLTF e texto) —, o
+lote por dimensão e o catálogo de assets no editor (**B3**/**B4**), os portais animados (**D59**) e a
+verificação dos dois lados da exposição com **19** baterias (§ «Como Usar»).
 
 **Fechado na Fase 4:** a **página de edição** (§ acima), o **retrato do portão** (decidido: não se
 faz — a ausência é honesta, **R10**) e a **orientação da chegada** no céu (resolvida por dado: as
