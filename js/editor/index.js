@@ -326,8 +326,15 @@ function requestedWorld() {
 export async function startEditor() {
   // The same handle the console and the instruments use in the exhibition (docs/ROADMAP.md section
   // 10), with one difference that matters: `preview: true` says the navigation is off in this page, so
-  // an instrument that builds a scene here does not turn it back on (D32).
-  window.portalDebug = { state: state, world: null, preview: true };
+  // an instrument that builds a scene here does not turn it back on (D32). `data()` é o mundo que está
+  // a ser editado: o `state` do núcleo tem o que está **construído**, e uma bateria que mede o editor
+  // precisa do dado — é o dado que o «Exportar» escreve e o validador lê.
+  window.portalDebug = {
+    state: state,
+    world: null,
+    preview: true,
+    data: () => (currentWorld() ? currentWorld().data : null)
+  };
 
   // A pergunta da D49, antes de a barra mostrar o que quer que seja: uma página servida por um host
   // estático recebe **404** e o «Gravar» nunca aparece — o «Exportar» que sempre existiu fica igual.

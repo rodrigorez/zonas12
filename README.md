@@ -40,8 +40,8 @@ zonas12/
 │                       `example` (o mundo sai do **endereço**: `/` é o portão, `/scene1/` é a
 │                       primeira sala; o `?scene=<mundo>` continua a forçar um deles, para os testes)
 ├── i18n/
-│   ├── pt.json         textos da interface: 173 chaves (156 delas do editor), lidas por js/i18n.js
-│   └── en.json         as mesmas 173 chaves em inglês (?lang=en); um teste compara as duas
+│   ├── pt.json         textos da interface: 193 chaves (176 delas do editor), lidas por js/i18n.js
+│   └── en.json         as mesmas 193 chaves em inglês (?lang=en); um teste compara as duas
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos, mundos e página de edição)
 ├── assets/
@@ -306,7 +306,7 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 | Desfazer, «alterado» e guarda de saída | Editar → desfazer (**50** instantâneos do JSON, **D35**) → exportar; a marca «alterado» e o aviso antes de fechar com alterações que não saíram num ficheiro (**D32**); e a exportação **recusa** um mundo com erros — valida tudo antes de exportar |
 | As leis no editor | O editor corre o **mesmo** `validation.js` e responde às duas perguntas que eram só da linha de comando: o asset existe (**L9**) e a imagem mede 2:1 (**L14**). Num mundo saudável o relatório diz `Erros: 0 · Avisos: 0 · Por verificar: 0` |
 | Gravação direta | Com o **servidor da ferramenta** (`node tools/server/serve.mjs`) o editor ganha o botão «Gravar»: escreve o mundo em `data/worlds/` com o **mesmo** validador, uma cópia de segurança antes e escrita atómica (**D48–D51**); sem servidor o botão não aparece e o «Exportar» fica como estava |
-| Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**173** chaves) e, em inglês, de `i18n/en.json` (as mesmas **173**), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` escolhe a língua e uma chave que falte cai no português com **1** aviso |
+| Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**193** chaves) e, em inglês, de `i18n/en.json` (as mesmas **193**), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` escolhe a língua e uma chave que falte cai no português com **1** aviso |
 | Portas de mundo | A travessia de uma porta de mundo **navega** para o endereço do destino e o visitante aparece **atrás** da porta que lá se declara a chegada (`arrivalFrom`), na direcção em que vinha — o regresso é **um passo** (L16/L17/L19). Como cada mundo é uma **página** (D24), a chegada **arranca a exposição sozinha** (`?from=`, D37): o botão «ATIVAR EXPOSIÇÃO» fica para a primeira visita e volta se a câmara for recusada. E a porta que volta ao portão mostra a **realidade ao vivo** pela janela (**D38**): a sala declara uma dimensão `kind: "camera"`, que não desenha nada, e o rectângulo fica transparente sobre o vídeo — vê-se a câmara dos **dois lados**, que é o que a porta mostrava na Fase 3 |
 | Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID está no dado (`"id"`) e, na cena construída, em `data-dimension`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
 | Grafo de dimensões | Portais bidirecionais entre duas dimensões, com uma **dimensão ativa** global; dentro de cada mundo é o que resta do grafo antigo, e o **grafo de mundos** é conferido pela linha de comando (alcançabilidade a partir do portão) |
@@ -1519,15 +1519,13 @@ O que se lê no painel da sonda, na linha `giroscópio`: `ligado · tremor 0.04`
 
 Desde 2026-10-24 estas melhorias têm fase e blocos no roadmap: a **Fase 7** (§9 de
 [docs/ROADMAP.md](docs/ROADMAP.md)) — estão implementados o **B1** (só documentação), o **B2** (o
-catálogo em duas línguas), o **B5**/**B6**/**B7** (os quatro valores que o esquema prometia e a cena
-não construía) e o **B9** (shader em produção, com validador); os restantes blocos não.
+catálogo em duas línguas), o **B3**/**B4** (o lote por dimensão e o catálogo de assets no editor), o
+**B5**/**B6**/**B7** (os quatro valores que o esquema prometia e a cena não construía) e o **B9**
+(shader em produção, com validador); falta o **B8** (portais animados) e o fecho.
 
 - **Fundos shader** (**R14**/**R15**, bloco **B9**): em produção desde 2026-10-24 — shader por
   omissão, `?shader=0` para a imagem de reserva, validador em `tools/shader/` e a política
   20 → 15 FPS → estático; falta o **A/B controlado nos três aparelhos**
-- **O catálogo de assets no editor** (bloco **B4**): hoje é dado do ficheiro — o editor escolhe
-  entre os assets que o mundo já tem e não cria nenhum
-- **A exclusão em lote por dimensão** (bloco **B3**): os painéis só excluem individualmente
 - **Portais com movimento e rotação animados**, definidos na cena (bloco **B8**)
 - **Um fundo 360º em vídeo**: a capacidade **já existe** (`kind: "video"` anima com
   `THREE.VideoTexture`), mas nenhum mundo a usa — falta o asset, não o código

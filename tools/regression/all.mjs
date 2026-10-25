@@ -44,6 +44,9 @@ const ARQUIVADAS = [
   // Fase 7 (B5/B6/B7): os quatro valores do R9, medidos na cena e nos painéis do editor.
   { nome: 'os quatro valores do R9 (B5/B6/B7)', script: 'tools/regression/r9.mjs' },
   { nome: 'o editor com os quatro valores (B5/B6/B7)', script: 'tools/regression/editor-r9.mjs' },
+  // Fase 7 (B3/B4): o lote por dimensão e o catálogo de assets editável.
+  { nome: 'a exclusão em lote por dimensão (B3)', script: 'tools/regression/lote.mjs' },
+  { nome: 'o catálogo de assets editável (B4)', script: 'tools/regression/assets.mjs' },
   { nome: 'a costura das travessias (D46)', script: 'tools/regression/seam.mjs' },
   { nome: 'a orientação do telemóvel (D52)', script: 'tools/regression/orientation.mjs' },
   { nome: 'a chegada por uma porta (D37)', script: 'tools/regression/camera-arrival.mjs' },

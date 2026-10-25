@@ -3295,8 +3295,8 @@ fechada dos dois lados: o que os instrumentos medem e o que quem usa vê. **Marc
 | --- | --- | --- |
 | **B1** | As **duas** afirmações falsas que restavam no README — «o editor não grava» e «vídeo 360º como fundo é melhoria» — corrigidas, e «Melhorias Planejadas» a apontar para esta fase em vez de prometer o que já existe. **Feito com o plano (2026-10-24)** | a documentação desactualizada |
 | **B2** | `i18n/en.json` com as **164** chaves de `pt.json`; `?lang=en` deixa de cair no português. **Feito em 2026-10-25** — o `tools/regression/i18n.mjs` compara chaves, marcadores e frases, e abre a exposição e o editor em inglês (**9 de 9**) | a lacuna do catálogo |
-| **B3** | Editor: **exclusão em lote por dimensão**, com confirmação e **um** instantâneo de desfazer | a nota «não entrou» do B6 da Fase 4 |
-| **B4** | Editor: **catálogo de assets** editável (`id`, `path`, `type`, `alt` por língua), com a **L9** e a **L14** a medir cada alteração | «o editor não cria assets» |
+| **B3** | Editor: **exclusão em lote por dimensão**, com confirmação e **um** instantâneo de desfazer. **Feito em 2026-10-25** — um comando apaga as N obras da dimensão, a pergunta diz quantas são, e o «Desfazer» devolve-as todas juntas (`lote.mjs`, **8 de 8**) | a nota «não entrou» do B6 da Fase 4 |
+| **B4** | Editor: **catálogo de assets** editável (`id`, `path`, `type`, `alt` por língua), com a **L9** e a **L14** a medir cada alteração. **Feito em 2026-10-25** — o painel dos assets vem logo depois do mundo (o catálogo é parte do mundo), o `id` só se pergunta na inserção, e apagar um asset em uso é recusado com a contagem (`assets.mjs`, **10 de 10**) | «o editor não cria assets» |
 | **B5** | Dimensão `kind: "color"`: fundo plano no renderer, oferecido pelo painel da dimensão. **Feito em 2026-10-25** — a esfera do fundo leva um `MeshBasicMaterial` com a cor do dado, o painel ganha o tipo e o campo da cor, e a lei L1 passa a exigir raio como nos outros fundos | o aviso «no flat background» |
 | **B6** | `interaction: "link"` a **navegar** para o endereço, em vez de o mostrar no modal. **Feito em 2026-10-25** — o componente do clique ganhou o modo, o painel oferece a interacção e o campo do endereço | a terceira coisa do **R9** |
 | **B7** | Obra `kind: "model"` (GLTF) e `kind: "text"` (texto 3D), com posição/rotação/tamanho como as outras. **Feito em 2026-10-25** — o GLTF vem do catálogo (tipo `model`, `<a-asset-item>`) e o `size` escala-o; o texto é desenhado num canvas e vai para um plano, sem fonte externa | as duas primeiras coisas do **R9** |
@@ -3323,6 +3323,17 @@ nova que entre só no `pt.json` é uma frase portuguesa a aparecer a quem abrir 
 `editor.dimension.kind.shader` perdeu o «(ensaio)» que já não era verdade desde a produção do B9.
 
 Os restantes blocos não começaram.
+
+O **B3** e o **B4** fecharam também em 2026-10-25. O lote por dimensão sai como **uma** alteração
+(o `change` guarda o texto de antes uma só vez), a pergunta diz quantas obras vão sair, e o «Desfazer»
+devolve-as todas — medido no fixture `example`, que tem 5 obras na dimensão 0 e 2 na 1, para que
+«apagar esta dimensão» não se confunda com «apagar todas». O catálogo de assets ganhou um painel
+próprio: `id` (só na inserção), `path`, `type` (imagem, vídeo, modelo) e `alt` por língua; apagar um
+asset que o dado ainda nomeia é recusado com a contagem de usos, e cada alteração faz o validador
+voltar a perguntar pelo ficheiro — é assim que a L9 aparece ao escrever um caminho que não existe e
+desaparece ao corrigi-lo. Ficou também uma chave que faltava desde a Fase 4 (`editor.artwork.asset`) e
+um `portalDebug.data()` no editor: o `state` do núcleo tem o que está construído, e um instrumento que
+mede o editor precisa do dado.
 
 O **B5**, o **B6** e o **B7** fecharam em 2026-10-25, com um fixture para os quatro valores (**D56**,
 **D57**, **D58**): `data/worlds/r9.json` (abre-se com `?scene=r9`, não é uma sala) tem uma dimensão

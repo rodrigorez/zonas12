@@ -225,6 +225,34 @@ function card(dimension, context, data, artworks, portals) {
 
   const pointingArtworks = artworks[dimension.id] || 0;
   const pointingPortals = portals[dimension.id] || 0;
+
+  // B3 (Fase 7): a exclusão em lote por dimensão, que era a nota «não entrou» do B6 da Fase 4. Sai
+  // como **uma** alteração — o `change` guarda o texto de antes uma só vez, por isso o «Desfazer»
+  // devolve as N obras juntas e não uma de cada vez. A pergunta é a do browser: uma operação
+  // destrutiva merece um «sim» explícito, e a contagem vai na pergunta para não haver surpresa.
+  if (pointingArtworks > 0) {
+    button(box, {
+      labelKey: 'editor.dimension.deleteMany',
+      name: 'dimension.' + dimension.id + '.deleteMany',
+      onClick: async () => {
+        const alvo = (data.artworks || []).filter((artwork) => artwork.dimension === dimension.id);
+        if (alvo.length === 0) return;
+        const pergunta = t('editor.dimension.deleteManyConfirm', {
+          count: alvo.length, id: dimension.id
+        });
+        if (typeof window.confirm === 'function' && !window.confirm(pergunta)) return;
+        data.artworks = data.artworks.filter((artwork) => artwork.dimension !== dimension.id);
+        await context.change({ rebuild: true });
+        context.rerender();
+        // A linha de estado é onde o autor já está a olhar (é o mesmo sítio dos outros avisos do
+        // editor), e dizer quantas obras saíram é o recibo da operação.
+        context.message(t('editor.dimension.deleteManyDone', {
+          count: alvo.length, id: dimension.id
+        }));
+      }
+    });
+  }
+
   if (pointingArtworks > 0 || pointingPortals > 0) {
     note(box, t('editor.dimension.blockedBy', {
       id: dimension.id,
