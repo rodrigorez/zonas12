@@ -374,6 +374,27 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     // The only thing that crosses the boundary, besides the address, is the slug of this world: the
     // destination uses it to choose which door the visitor appears behind (law L17).
     if (worldSlug) url.searchParams.set('from', worldSlug);
+    // D54: o que fica no ecrã até a página seguinte pintar é o **destino**, não a sala que se deixa.
+    // No instante da travessia o fundo congela (o mesmo mecanismo do `prefers-reduced-motion`) e a
+    // câmara **encosta à janela** — 5 cm do lado de onde vem, porque a janela é uma máscara no plano
+    // da porta: de lá ela enche o ecrã e o que se vê é o outro lado. Sem isto, o visitante via a sala
+    // de origem a animar durante a espera, e era isso que ele descrevia como «vejo o ambiente onde
+    // eu estava» antes de o destino aparecer.
+    if (window.portalDebug && typeof window.portalDebug.freezeShaders === 'function') {
+      window.portalDebug.freezeShaders();
+    }
+    const centro = new THREE.Vector3();
+    this.el.object3D.getWorldPosition(centro);
+    const frente = new THREE.Vector3(0, 0, 1)
+      .applyQuaternion(this.el.object3D.getWorldQuaternion(new THREE.Quaternion()));
+    const onde = playerCamera.worldPosition(new THREE.Vector3());
+    const lado = onde
+      ? (Math.sign((onde.x - centro.x) * frente.x + (onde.z - centro.z) * frente.z) || 1)
+      : 1;
+    playerCamera.enterWindow({
+      x: centro.x + frente.x * lado * 0.05,
+      z: centro.z + frente.z * lado * 0.05
+    });
     // The image bridge (D43): this page leaves the last frame it is showing for the one that
     // arrives, which paints it before it has a scene. `js/arrival-frame.js` is a classic script
     // because it has to run before the first paint and a module cannot — so it is reached through

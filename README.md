@@ -603,11 +603,13 @@ transição, a travessia e o retrato das portas (D37 a D47) — têm baterias pr
 ser acreditado, não medido.
 
 **A travessia — o salto no corte, nas 6 portas com retrato** (`tools/regression/seam.mjs`, meta
-**0,50**, e a referência é que um passo a caminhar muda a imagem em ~1): gate 0 **0,42**, gate 1
-**0,19**, scene1 3 **0,18**, scene2 4 **0,47**, scene2 6 **0,13**, scene3 7 **0,22** — **12 de 12**
+**0,50**, e a referência é que um passo a caminhar muda a imagem em ~1): gate 0 **0,31**, gate 1
+**0,23**, scene1 3 **0,32**, scene2 4 **0,31**, scene2 6 **0,41**, scene3 7 **0,27** — **12 de 12**
 verificações, contra **5 de 12** com a geometria anterior (0,70 a 1,49). Desde a Fase 7 a chegada é
 comparada no **primeiro fotograma depois de a ponte sair**, e não 8 s depois: com fundos animados, o
-que se via mais tarde era um instante qualquer da animação e não o corte. Os três instrumentos que
+que se via mais tarde era um instante qualquer da animação e não o corte. E desde o **D54** a câmara
+**encosta à janela** no instante da travessia: o que fica no ecrã até a página seguinte pintar é o
+destino, não a sala que se deixa. Os três instrumentos que
 dizem **porque** está certo também ficaram no repositório: o conversor do retrato volta do cubo com
 **0,39** de diferença e deslocamento **0** (`ida-e-volta.mjs`), a ponte a mostrar o mesmo conteúdo
 custa **0,00** (`piso-ponte.mjs`) e a ponte e a chegada estão sobrepostas a **dx=0, dy=0**

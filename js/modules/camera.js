@@ -64,6 +64,17 @@ export const playerCamera = {
     if (!element) return false;
     element.object3D.position.set(position.x, position.y, position.z);
     return true;
+  },
+
+  // O instante da travessia (D54): a câmara encosta à janela que se está a atravessar e **mantém a
+  // direcção do olhar**. A janela é uma máscara no plano da porta, por isso de lá ela enche o ecrã —
+  // e o que fica no ecrã até a página seguinte pintar é o destino, não a sala que se deixa. Não há
+  // regresso desta chamada: quem a faz está a navegar para fora da página.
+  enterWindow: function (position) {
+    const element = playerElement();
+    if (!element) return false;
+    element.object3D.position.set(position.x, element.object3D.position.y, position.z);
+    return true;
   }
 };
 
