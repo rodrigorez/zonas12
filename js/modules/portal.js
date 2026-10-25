@@ -44,6 +44,31 @@ export function setNavigation(enabled) {
   navigationEnabled = enabled !== false;
 }
 
+// A última travessia, para a sonda de campo (D55). Fica em `sessionStorage` porque é o único
+// armazenamento que a navegação leva consigo e que a página seguinte consegue ler: a memória do
+// módulo morre com o documento que atravessou.
+const TRAVERSAL_KEY = 'zonas12.travessia';
+
+function recordTraversal(record) {
+  try {
+    sessionStorage.setItem(TRAVERSAL_KEY, JSON.stringify(record));
+  } catch (error) {
+    // Sem armazenamento (modo privado de alguns browsers) não há registo — e não é motivo para
+    // deixar de atravessar.
+  }
+}
+
+// O que a última travessia registou, ou `null` quando não houve nenhuma. A sonda mostra-o: na página
+// de chegada ele diz que a travessia foi pedida e há quanto tempo; na página de origem, que o pedido
+// não chegou a sair — a diferença entre os dois é a resposta ao defeito.
+export function traversalRecord() {
+  try {
+    return JSON.parse(sessionStorage.getItem(TRAVERSAL_KEY) || 'null');
+  } catch (error) {
+    return null;
+  }
+}
+
 // Reused vectors: the driver and the collision run every frame and must not allocate.
 const _worldPoint = new THREE.Vector3();
 const _boxPoint = new THREE.Vector3();
@@ -374,32 +399,59 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     // The only thing that crosses the boundary, besides the address, is the slug of this world: the
     // destination uses it to choose which door the visitor appears behind (law L17).
     if (worldSlug) url.searchParams.set('from', worldSlug);
+    // O registo da travessia (sonda). Quem sai escreve-o um instante antes de sair e quem chega lê-o:
+    // é a única prova que fica de uma travessia, porque o documento que a pediu já não existe quando
+    // se quer saber o que ela fez. Sem ele, um aparelho que atravessa e não muda de página não deixa
+    // rasto nenhum — e o defeito não se distingue de o visitante não ter chegado à porta.
     // D54: o que fica no ecrã até a página seguinte pintar é o **destino**, não a sala que se deixa.
     // No instante da travessia o fundo congela (o mesmo mecanismo do `prefers-reduced-motion`) e a
     // câmara **encosta à janela** — 5 cm do lado de onde vem, porque a janela é uma máscara no plano
     // da porta: de lá ela enche o ecrã e o que se vê é o outro lado. Sem isto, o visitante via a sala
     // de origem a animar durante a espera, e era isso que ele descrevia como «vejo o ambiente onde
     // eu estava» antes de o destino aparecer.
-    if (window.portalDebug && typeof window.portalDebug.freezeShaders === 'function') {
-      window.portalDebug.freezeShaders();
+    // A preparação está dentro de um `try`: um erro a congelar ou a capturar não pode deixar o
+    // visitante preso no mundo que ele já atravessou. O passo que conta — sair da página — acontece
+    // sempre; o que falhou fica escrito no registo para a sonda o mostrar.
+    const registo = {};
+    try {
+      if (window.portalDebug && typeof window.portalDebug.freezeShaders === 'function') {
+        window.portalDebug.freezeShaders();
+      }
+      const centro = new THREE.Vector3();
+      this.el.object3D.getWorldPosition(centro);
+      const frente = new THREE.Vector3(0, 0, 1)
+        .applyQuaternion(this.el.object3D.getWorldQuaternion(new THREE.Quaternion()));
+      const onde = playerCamera.worldPosition(new THREE.Vector3());
+      const lado = onde
+        ? (Math.sign((onde.x - centro.x) * frente.x + (onde.z - centro.z) * frente.z) || 1)
+        : 1;
+      registo.encosto = Boolean(playerCamera.enterWindow({
+        x: centro.x + frente.x * lado * 0.05,
+        z: centro.z + frente.z * lado * 0.05
+      }));
+      // The image bridge (D43): this page leaves the last frame it is showing for the one that
+      // arrives, which paints it before it has a scene. `js/arrival-frame.js` is a classic script
+      // because it has to run before the first paint and a module cannot — so it is reached through
+      // the window, and a host without it navigates exactly as before.
+      if (window.arrivalFrame) {
+        registo.captura = Boolean(window.arrivalFrame.capture());
+        // ...e o mesmo quadro fica por cima desta cena enquanto ela espera (D55): a ponte só existe
+        // do outro lado, e a espera medida num telemóvel foi de 4,7 s.
+        registo.cobertura = Boolean(window.arrivalFrame.cover());
+      }
+    } catch (error) {
+      registo.erro = (error && error.message) || String(error);
     }
-    const centro = new THREE.Vector3();
-    this.el.object3D.getWorldPosition(centro);
-    const frente = new THREE.Vector3(0, 0, 1)
-      .applyQuaternion(this.el.object3D.getWorldQuaternion(new THREE.Quaternion()));
-    const onde = playerCamera.worldPosition(new THREE.Vector3());
-    const lado = onde
-      ? (Math.sign((onde.x - centro.x) * frente.x + (onde.z - centro.z) * frente.z) || 1)
-      : 1;
-    playerCamera.enterWindow({
-      x: centro.x + frente.x * lado * 0.05,
-      z: centro.z + frente.z * lado * 0.05
+    recordTraversal({
+      de: worldSlug || '',
+      porta: this.data.id,
+      para: this.data.target || '',
+      encosto: registo.encosto === true,
+      captura: registo.captura === true,
+      cobertura: registo.cobertura === true,
+      erro: registo.erro || '',
+      em: Date.now()
     });
-    // The image bridge (D43): this page leaves the last frame it is showing for the one that
-    // arrives, which paints it before it has a scene. `js/arrival-frame.js` is a classic script
-    // because it has to run before the first paint and a module cannot — so it is reached through
-    // the window, and a host without it navigates exactly as before.
-    if (window.arrivalFrame) window.arrivalFrame.capture();
     window.location.assign(url.href);
   }
 });

@@ -80,14 +80,17 @@ const sonda = (site) =>
 const estado = `(() => {
   let marca = null;
   let chegada = null;
+  let travessia = null;
   try { marca = JSON.parse(sessionStorage.getItem(${JSON.stringify(MARCA)}) || 'null'); } catch (error) {}
   try { chegada = JSON.parse(sessionStorage.getItem(${JSON.stringify(MARCA_CHEGADA)}) || 'null'); } catch (error) {}
+  try { travessia = JSON.parse(sessionStorage.getItem('zonas12.travessia') || 'null'); } catch (error) {}
   return {
     mundo: window.portalDebug && window.portalDebug.world,
     url: location.pathname + location.search,
     dimensao: window.portalDebug && window.portalDebug.state.activeDimension,
     marca: marca,
-    chegada: chegada
+    chegada: chegada,
+    travessia: travessia
   };
 })()`;
 
@@ -161,6 +164,15 @@ function verificarPorta(result, mundo, porta, medida) {
     result.check(nome + ' (navega para ' + porta.action.target + ') atravessa-se uma vez e chega lá',
       marca.porta === porta.id && marca.navegacoes === 1 && chegou && voltou,
       'travessias=' + marca.navegacoes + ', mundo=' + medida.depois.mundo + ', url=' + medida.depois.url);
+    // D55: o registo que a sonda mostra. Sem ele, uma travessia que fica a meio é indistinguível de
+    // o visitante não ter chegado à porta — e foi assim que um atravessar sem mudar de página passou
+    // por «não aconteceu nada» no telemóvel.
+    const registo = medida.depois.travessia || {};
+    result.check(nome + ' deixa o registo da travessia para a sonda, já preparado',
+      registo.porta === porta.id && registo.para === porta.action.target &&
+        registo.encosto === true && registo.captura === true && registo.cobertura === true &&
+        !registo.erro,
+      JSON.stringify(registo));
     return;
   }
   const janela = medida.resultado || {};

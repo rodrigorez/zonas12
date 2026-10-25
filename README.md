@@ -1489,6 +1489,13 @@ se escrever à mão quando copiar do telemóvel é difícil. Sem o parâmetro n�
 exposição não sabe que a sonda existe. O painel não é interface (não sai do catálogo `i18n`): é um
 instrumento, como as baterias de `tools/`.
 
+A linha **travessia** (**D55**) diz o que a última porta atravessada fez: de que mundo e porta saiu,
+para onde, se encostou à janela, se capturou o quadro, se tapou o ecrã com ele e — se alguma coisa
+falhou — o erro. Quem sai escreve-a antes de sair, por isso ela aparece **nas duas páginas**: na de
+chegada nomeia a travessia que trouxe o visitante; na de origem, o mesmo registo com o mundo errado é
+a prova de que o pedido não saiu. É o que se lê quando «atravessei e continuo a ver a sala de onde
+vim».
+
 ### 9. No telemóvel, o sensor de orientação
 
 O `look-controls` do A-Frame faz do telemóvel uma janela para a cena: rodar o aparelho roda a vista.

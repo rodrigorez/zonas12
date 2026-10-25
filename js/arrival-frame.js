@@ -37,6 +37,11 @@
 
   let shown = null;
   let guard = null;
+  // O quadro que esta página acabou de guardar (D55): é o mesmo que a página seguinte vai pintar, e
+  // serve para o pôr **também** por cima desta cena enquanto ela espera. Uma imagem, dois usos.
+  let lastFrame = null;
+  let covered = null;
+  let coverGuard = null;
   // O instante do shader que a ponte trouxe (D53), lido uma vez em `restore`.
   let bridgedTime = null;
   // A descodificação da imagem que a ponte mostra. `hide()` espera por ela: tirar o quadro antes de
@@ -83,7 +88,9 @@
         drawCover(context, video, video.videoWidth, video.videoHeight, frame.width, frame.height);
       }
       context.drawImage(canvas, 0, 0, frame.width, frame.height);
-      sessionStorage.setItem(KEY, frame.toDataURL('image/jpeg', QUALITY));
+      const data = frame.toDataURL('image/jpeg', QUALITY);
+      lastFrame = data;
+      sessionStorage.setItem(KEY, data);
       sessionStorage.setItem(AT, String(Date.now()));
       // O instante do shader vai com o quadro: sem ele a chegada recomeçaria no quadro estático e a
       // animação do destino saltava no corte (medido: 0,98 a 4,39 onde a meta é 0,50).
@@ -96,6 +103,36 @@
       // página que chega comporta-se como antes.
       return false;
     }
+  }
+
+  // D55: enquanto a página seguinte não chega, o ecrã fica **por cima desta cena** com o quadro do
+  // destino — o mesmo que a ponte vai pintar do outro lado. Foi medido no telemóvel do autor: entre
+  // atravessar e o destino aparecer passaram **4,7 s**, e nesse tempo o dedo no D-pad (ou o aparelho
+  // a rodar) tirava a câmara de dentro da janela em ~100 ms, devolvendo a sala de onde ele vinha.
+  // O quadro tapa a cena, mas não o toque (`pointer-events: none`), e sai sozinho no mesmo teto da
+  // ponte se a navegação não chegar — uma travessia que falha não pode deixar uma imagem presa.
+  function cover() {
+    if (!lastFrame || covered) return false;
+    const image = document.createElement('img');
+    image.className = 'ultimo-quadro ultimo-quadro-acima';
+    image.alt = '';
+    image.setAttribute('aria-hidden', 'true');
+    image.src = lastFrame;
+    document.body.appendChild(image);
+    covered = image;
+    coverGuard = setTimeout(removeCover, GUARD);
+    return true;
+  }
+
+  function removeCover() {
+    if (coverGuard) {
+      clearTimeout(coverGuard);
+      coverGuard = null;
+    }
+    if (!covered) return;
+    const image = covered;
+    covered = null;
+    if (image.parentNode) image.parentNode.removeChild(image);
   }
 
   function restore() {
@@ -127,6 +164,7 @@
   }
 
   function hide() {
+    removeCover();
     if (guard) {
       clearTimeout(guard);
       guard = null;
@@ -151,6 +189,8 @@
   // `js/app.js` chama `hide` quando há cena; um hospedeiro sem este ficheiro não parte nada.
   window.arrivalFrame = {
     capture: capture,
+    // O quadro do destino por cima da cena que está a sair (D55).
+    cover: cover,
     hide: hide,
     element: function () {
       return shown;

@@ -28,6 +28,13 @@ html, body {
   object-fit: cover; z-index: 2; pointer-events: none;
 }
 
+/* O mesmo quadro, mas por cima da cena (D55): é o que fica no ecrã da página que **está a sair**
+   enquanto a seguinte carrega. Por baixo da cena (o z-index de cima) serviria de pouco — a sala de
+   onde se vem continuaria a desenhar-se por cima dele. */
+.ultimo-quadro-acima {
+  z-index: 20;
+}
+
 /* Elementos AR 3D */
 #container-3d {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;

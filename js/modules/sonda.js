@@ -54,6 +54,22 @@ function orientacao() {
     ' (' + estado.samples + ' amostras)';
 }
 
+// A última travessia (D55): quem a pediu escreveu-a antes de sair, por isso ela aparece nas duas
+// páginas — na de chegada com o destino certo, na de origem com o pedido que não chegou a sair. É a
+// diferença entre as duas que responde a «atravessei e continuo a ver a sala de onde vim».
+function travessia() {
+  const registo = window.portalDebug.traversal ? window.portalDebug.traversal() : null;
+  if (!registo) return '— (nenhuma nesta sessão)';
+  const marcas = [];
+  if (registo.encosto) marcas.push('encosto');
+  if (registo.captura) marcas.push('captura');
+  if (registo.cobertura) marcas.push('ecrã tapado');
+  if (registo.erro) marcas.push('erro: ' + String(registo.erro).slice(0, 32));
+  const segundos = Math.max(0, Math.round((Date.now() - (registo.em || Date.now())) / 1000));
+  return (registo.de || '?') + ' porta ' + registo.porta + ' → ' + (registo.para || '?') +
+    ' · ' + (marcas.length ? marcas.join(' · ') : 'sem preparação') + ' · há ' + segundos + 's';
+}
+
 function relatorio(estado, taxa, fps) {
   const fundo = (estado.backgrounds || []).find((item) => item.dimension === 0) || {};
   const policy = estado.policy;
@@ -61,6 +77,7 @@ function relatorio(estado, taxa, fps) {
     'zonas12 · sonda',
     linha('mundo', String(window.portalDebug.world)),
     linha('endereço', location.pathname + location.search),
+    linha('travessia', travessia()),
     linha('fundo', fundo.mode + (fundo.shaderId ? ' · ' + fundo.shaderId : '') +
       (fundo.requested !== fundo.mode ? ' (pedido: ' + fundo.requested + ')' : '')),
     linha('modo', policy ? policy.mode + ' · cadência ' + policy.cadence + '/s' : 'sem política (imagem)'),

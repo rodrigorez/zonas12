@@ -14,7 +14,7 @@ import {
 } from './core/index.js';
 import { startSession, cameraAlreadyAllowed, cameraFirstFrame, showStartButton, showLoading } from './modules/camera.js';
 import { closeArtwork, toggleArtworkLabels } from './modules/artwork.js';
-import { startFrameDriver } from './modules/portal.js';
+import { startFrameDriver, traversalRecord } from './modules/portal.js';
 import { shaderStatus, freezeShaders } from './modules/dimension.js';
 // A sonda de campo (R14): só desenha alguma coisa com `?sonda=1`, e é o que permite ler os números
 // num telemóvel, onde não há consola.
@@ -47,6 +47,9 @@ window.portalDebug = {
   // How the phone's orientation sensor was judged (D52): whether the magic-window stayed on, and the
   // noise floor that decided it.
   orientation: () => orientationStatus(),
+  // A última travessia que esta sessão pediu (D55): a página que sai escreve-a e a que chega lê-a,
+  // por isso é o que diz se um atravessar sem mudar de página ficou a meio.
+  traversal: () => traversalRecord(),
   // The tests compare captures of the same scene (R16): a background that animates changes every
   // pixel between them. This is the lever that stops it, and it is the visitor's own
   // `prefers-reduced-motion` mechanism.
