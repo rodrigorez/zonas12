@@ -60,6 +60,14 @@ function imageMaterial(texture) {
   }, stencilWrite));
 }
 
+// O fundo liso (D56): uma cor em vez de um panorama. É o caso mais simples dos fundos — não há
+// imagem para descodificar nem shader para compilar, por isso não tem queda nem política de cadência.
+function flatMaterial(color) {
+  return new THREE.MeshBasicMaterial(Object.assign({
+    color: new THREE.Color(color), side: THREE.BackSide, depthWrite: false
+  }, stencilWrite));
+}
+
 function shaderMaterial(definition) {
   return new THREE.ShaderMaterial(Object.assign({
     uniforms: { uTime: { value: 2 } },
@@ -98,7 +106,9 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     fallback: { type: 'selector' },
     // The works and doors of a door's window, with transparency, drawn over the live shader (D53):
     // the second layer of the same dimension — same stencil, same registry, same release.
-    cutout: { type: 'selector' }
+    cutout: { type: 'selector' },
+    // O fundo liso (D56): a cor de uma dimensão `kind: "color"`, quando não há imagem nem shader.
+    color: { type: 'color', default: '' }
   },
   // A-Frame calls `update` right after `init` (and whenever the attribute changes), so building
   // the sphere here avoids building it twice.
@@ -108,7 +118,8 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
 
     const definition = this.data.shader ? shaderById(this.data.shader) : null;
     const source = this.data.src;
-    if (!definition && !source) return;
+    const flat = definition || source ? '' : (this.data.color || '');
+    if (!definition && !source && !flat) return;
     this.el.setAttribute('data-dimension', this.data.dimension);
     this.el.classList.add('dimension-' + this.data.dimension);
 
@@ -131,10 +142,16 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     }
     if (!this.material) {
       const fallback = this.data.fallback || source;
-      if (!fallback) return;
-      this.material = imageMaterial(textureFrom(fallback));
+      if (fallback) {
+        this.material = imageMaterial(textureFrom(fallback));
+      } else if (flat) {
+        this.material = flatMaterial(flat);
+      } else {
+        return;
+      }
       this.shaderActive = false;
     }
+    this.flatColor = flat || null;
 
     const sphere = new THREE.Mesh(new THREE.SphereGeometry(this.data.radius, 64, 64), this.material);
     sphere.name = 'dimension-' + this.data.dimension + '-panorama';
@@ -167,8 +184,9 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     const component = this;
     this.entry = () => ({
       dimension: component.data.dimension,
-      requested: component.data.shader ? 'shader' : 'image',
-      mode: component.shaderActive ? 'shader' : 'image',
+      requested: component.data.shader ? 'shader' : (component.flatColor ? 'color' : 'image'),
+      mode: component.shaderActive ? 'shader' : (component.flatColor ? 'color' : 'image'),
+      color: component.flatColor,
       shaderId: component.shaderActive ? component.data.shader : null
     });
     backgrounds.push(this.entry);
@@ -259,6 +277,7 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     }
     this.policy = null;
     this.shaderActive = false;
+    this.flatColor = null;
   },
   remove: function () {
     this.release();
@@ -296,6 +315,9 @@ export function createDimension(dimension, parent) {
     if (dimension.cutout) settings.cutout = '#' + dimension.cutout;
   } else if (dimension.kind === 'shader') {
     if (dimension.fallbackAsset) settings.src = '#' + dimension.fallbackAsset;
+  } else if (dimension.kind === 'color') {
+    // O fundo liso (D56): a cor é o dado; não há asset para pedir ao `<a-assets>`.
+    if (dimension.color) settings.color = dimension.color;
   } else if (dimension.asset) {
     settings.src = '#' + dimension.asset;
   }

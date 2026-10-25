@@ -131,10 +131,20 @@ AFRAME.registerComponent('cursor-listener', {
 });
 
 AFRAME.registerComponent(OPENING_COMPONENT, {
-  schema: { url: { type: 'string' } },
+  schema: {
+    url: { type: 'string' },
+    // O que o clique faz (D57): `modal` abre a obra na janela da exposição; `link` **navega** para o
+    // endereço. Era o que faltava do R9 — o endereço validava e aparecia dentro do modal, e quem o
+    // punha num mundo queria sair para fora dele.
+    mode: { type: 'string', default: 'modal' }
+  },
   init: function () {
     this.el.addEventListener('click', () => {
       if (!this.canInteract()) return;
+      if (this.data.mode === 'link') {
+        if (this.data.url) window.location.assign(this.data.url);
+        return;
+      }
       openArtwork(this.data.url);
     });
   },
@@ -165,6 +175,8 @@ AFRAME.registerComponent(ARTWORK_COMPONENT, {
     this.el.setAttribute('data-dimension', this.data.dimension);
     this.el.classList.add('dimension-' + this.data.dimension);
     this.el.addEventListener('loaded', () => this.applyStencil());
+    // Um `kind: "model"` só tem malha quando o GLTF chega (D58): o evento é o que a traz.
+    this.el.addEventListener('model-loaded', () => this.applyStencil());
     if (this.el.getObject3D('mesh')) this.applyStencil();
     if (this.data.labelAlways) this.showLabel(true);
   },
@@ -193,7 +205,10 @@ AFRAME.registerComponent(ARTWORK_COMPONENT, {
     if (!mesh) return;
     const drawOrder = state.drawOrder;
     mesh.traverse((node) => {
-      if (node.isMesh && node.material) {
+      // `model-loaded` chega depois de `loaded`: registar duas vezes a mesma malha deixaria uma
+      // entrada órfã no núcleo, e ela seria configurada depois de o objeto já não existir (A4).
+      if (node.isMesh && node.material && !node.userData.registeredByArtwork) {
+        node.userData.registeredByArtwork = true;
         node.renderOrder = drawOrder.artwork;
         node.name = 'dimension-' + this.data.dimension + '-artwork';
         registerContent(this.data.dimension, node, 'artwork');
@@ -212,7 +227,15 @@ AFRAME.registerComponent(ARTWORK_COMPONENT, {
     const mesh = this.el.getObject3D('mesh');
     if (!mesh) return;
     mesh.traverse((node) => {
-      if (node.isMesh && node.material) unregisterContent(this.data.dimension, node);
+      if (!node.isMesh || !node.material) return;
+      unregisterContent(this.data.dimension, node);
+      // O plano de um `kind: "text"` é construído por este módulo (D58): a geometria e o material são
+      // da obra, e ninguém mais os liberta. A malha de um GLTF é do `gltf-model`, que trata disso.
+      if (node.userData.owned) {
+        if (node.geometry) node.geometry.dispose();
+        if (node.material.map) node.material.map.dispose();
+        node.material.dispose();
+      }
     });
   }
 });
@@ -231,25 +254,86 @@ export function toggleArtworkLabels() {
 
 // ---- the artwork as data (Fase 3) ----
 
+// Uma obra `kind: "text"` (D58): o texto é desenhado num canvas e o desenho vai para um plano com
+// transparência. Sem fonte externa de propósito — o `text` do A-Frame vai buscar uma fonte à rede, e a
+// exposição tem de abrir sem rede e sem um aviso na consola (T8).
+const TEXT_FONT_PX = 96;
+const TEXT_MAX_WIDTH_PX = 2048;
+
+function textTexture(text) {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  const font = '700 ' + TEXT_FONT_PX + 'px system-ui, "Segoe UI", Roboto, sans-serif';
+  context.font = font;
+  const padding = Math.round(TEXT_FONT_PX * 0.25);
+  const measured = Math.ceil(context.measureText(text).width);
+  canvas.width = Math.min(TEXT_MAX_WIDTH_PX, Math.max(TEXT_FONT_PX, measured + padding * 2));
+  canvas.height = Math.round(TEXT_FONT_PX * 1.6);
+  // Redimensionar o canvas esquece o estado do desenho, a fonte incluída.
+  context.font = font;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillStyle = '#f6eded';
+  context.fillText(text, canvas.width / 2, canvas.height / 2, canvas.width - padding * 2);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+// O plano do texto: a malha é construída aqui, como a do fundo de uma dimensão, e o componente a
+// registra no núcleo como qualquer outra obra. `owned` diz ao `remove` que a geometria e o material
+// são desta obra e não do A-Frame.
+function textMesh(text, size) {
+  const width = size[0];
+  const height = size[1];
+  const geometry = new THREE.PlaneGeometry(width, height);
+  const material = new THREE.MeshBasicMaterial({
+    map: textTexture(text),
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.userData.owned = true;
+  return mesh;
+}
+
 // Creates the entity of one artwork of the scene data. The `artwork` it receives is the data with
 // the address to open already resolved, when there is one: with `interaction: 'modal'` the
 // address comes from the assets catalogue (D20, so the file is named once) and the builder is the
 // one that knows the catalogue.
 //
+// O que a obra **é** vem do `kind` (D58): uma imagem ou um vídeo são uma caixa com a textura; um
+// `model` é a malha do GLTF do catálogo, e o `size` escala-a por eixo; um `text` é um plano com o
+// texto desenhado. As três aceitam posição, rotação e tamanho como as outras.
+//
 // A subtlety of the two names: `asset` is the id of the entry in `<a-assets>` — the catalogue id
 // the builder gives the <img>/<video> — and it becomes the `#id` selector the material loads.
 export function createArtwork(artwork, parent, derived = {}) {
-  const el = document.createElement('a-box');
+  const kind = artwork.kind || 'image';
+  const el = document.createElement(kind === 'image' || kind === 'video' ? 'a-box' : 'a-entity');
   el.setAttribute('class', 'interactable');
   // The id in the DOM, like a portal's and a dimension's: it is what the editor uses to find the
   // element of the artwork it is changing without rebuilding the world (Fase 4, D33).
   el.setAttribute('data-artwork-id', artwork.id);
-  el.setAttribute('src', '#' + artwork.asset);
-  el.setAttribute('width', artwork.size[0]);
-  el.setAttribute('height', artwork.size[1]);
-  el.setAttribute('depth', artwork.size[2]);
   el.setAttribute('position', vector(artwork.position));
   if (artwork.rotation) el.setAttribute('rotation', vector(artwork.rotation));
+
+  if (kind === 'image' || kind === 'video') {
+    el.setAttribute('src', '#' + artwork.asset);
+    el.setAttribute('width', artwork.size[0]);
+    el.setAttribute('height', artwork.size[1]);
+    el.setAttribute('depth', artwork.size[2]);
+  } else if (kind === 'model') {
+    // O GLTF do catálogo, escalado pelo `size`: um modelo não tem «largura em metros» como uma
+    // fotografia, e um fator por eixo é o que se lê no dado.
+    el.setAttribute('gltf-model', '#' + artwork.asset);
+    el.setAttribute('scale', vector(artwork.size));
+  } else if (kind === 'text') {
+    const text = derived.text || artwork.asset || '';
+    if (text) el.setObject3D('mesh', textMesh(text, artwork.size));
+  }
+
   const settings = { dimension: artwork.dimension };
   // The name in the debug view (D40) and where it sits, which the builder knows because it has the
   // size of the work.
@@ -258,7 +342,8 @@ export function createArtwork(artwork, parent, derived = {}) {
   settings.labelY = artwork.size[1] / 2;
   el.setAttribute(ARTWORK_COMPONENT, settings);
   if (artwork.url) {
-    el.setAttribute(OPENING_COMPONENT, { url: artwork.url });
+    const mode = artwork.interaction === 'link' ? 'link' : 'modal';
+    el.setAttribute(OPENING_COMPONENT, { url: artwork.url, mode: mode });
   }
   parent.appendChild(el);
   return el;

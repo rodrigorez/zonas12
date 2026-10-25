@@ -7,7 +7,8 @@
 // down before the next one goes up: two built scenes at once would double the textures in memory for
 // no gain, since only one is ever shown.
 import { buildScene, withDefaults, addressToOpen, portalLabel, artworkLabel } from '../scene/scene-builder.js';
-import { SCENE } from '../scene/schema.js';
+import { SCENE, textIn } from '../scene/schema.js';
+import { currentLanguage } from '../i18n.js';
 import { startFrameDriver } from '../modules/portal.js';
 import { createDimension, removeDimension } from '../modules/dimension.js';
 import { createArtwork, removeArtwork } from '../modules/artwork.js';
@@ -101,7 +102,9 @@ export function replaceArtwork(artwork, catalogue) {
   data.url = addressToOpen(data, catalogue);
   const created = createArtwork(data, previewElement(), {
     label: artworkLabel(data, built.scene && built.scene.dimensions),
-    labelAlways: true
+    labelAlways: true,
+    // O texto de uma obra `kind: "text"`, na língua da página (D57).
+    text: textIn(data.text, currentLanguage())
   });
   built.elements.artworks.push(created);
   return created;

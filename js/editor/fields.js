@@ -77,8 +77,25 @@ export function textField(host, options) {
   };
 }
 
-export function selectField(host, options) {
-  const select = document.createElement('select');
+// Um campo de cor (`<input type="color">`), que escreve `#rrggbb` — o formato que o dado guarda e que
+// o `THREE.Color` lê. Existe para o fundo liso de uma dimensão (D56); qualquer outro sítio que peça
+// uma cor usa este.
+export function colorField(host, options) {
+  const input = document.createElement('input');
+  input.type = 'color';
+  input.name = nameOf(options);
+  input.value = options.value || '#000000';
+  input.addEventListener('input', () => options.onChange(input.value));
+  const box = caption(host, options);
+  box.appendChild(input);
+  return {
+    element: box,
+    input: input,
+    set: (value) => { input.value = value || '#000000'; }
+  };
+}
+
+export function selectField(host, options) {  const select = document.createElement('select');
   select.name = nameOf(options);
   for (const entry of options.options) {
     const option = document.createElement('option');

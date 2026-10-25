@@ -26,7 +26,7 @@ import { ROOT } from './harness.mjs';
 
 const NUCLEO = [
   { nome: 'o dado: os 6 mundos, as leis, o grafo e os arranques', script: 'tools/scene/validate.mjs' },
-  { nome: 'as leis: 21 avarias injectadas e o controlo limpo', script: 'tools/scene/laws-selftest.mjs' }
+  { nome: 'as leis: 22 avarias injectadas e o controlo limpo', script: 'tools/scene/laws-selftest.mjs' }
 ];
 
 const CENA = [
@@ -41,6 +41,9 @@ const ARQUIVADAS = [
   // Fase 7 (B9): a política do shader sem GPU e as duas páginas com uma. Abre um Chrome, como as
   // outras desta lista.
   { nome: 'o fundo shader (R14/R15)', script: 'tools/regression/shader.mjs' },
+  // Fase 7 (B5/B6/B7): os quatro valores do R9, medidos na cena e nos painéis do editor.
+  { nome: 'os quatro valores do R9 (B5/B6/B7)', script: 'tools/regression/r9.mjs' },
+  { nome: 'o editor com os quatro valores (B5/B6/B7)', script: 'tools/regression/editor-r9.mjs' },
   { nome: 'a costura das travessias (D46)', script: 'tools/regression/seam.mjs' },
   { nome: 'a orientação do telemóvel (D52)', script: 'tools/regression/orientation.mjs' },
   { nome: 'a chegada por uma porta (D37)', script: 'tools/regression/camera-arrival.mjs' },

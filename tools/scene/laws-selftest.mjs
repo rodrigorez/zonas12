@@ -134,27 +134,45 @@ const cases = [
     inject: (copy) => { copy.portals.push(navigatingDoor({})); }
   },
   {
-    law: 'D30',
-    what: 'an artwork of a kind the scene does not build',
-    expect: 'not built',
-    level: 'warning',
-    inject: (copy) => { copy.artworks[0].kind = 'text'; }
-  },
-  {
-    law: 'D30',
-    what: 'an interaction the scene does not act on',
-    expect: 'instead of navigating',
-    level: 'warning',
+    // A D30 listou quatro valores que validavam e não eram construídos. A Fase 7 construiu-os
+    // (B5/B6/B7), e o que resta destes três casos são as leis que o formato sempre teve por trás
+    // deles: cada valor continua a ter o que exigir, e é isso que se injecta agora.
+    law: 'B7',
+    what: 'a text artwork without its text',
+    expect: 'needs its text',
     inject: (copy) => {
-      copy.artworks[0].interaction = 'link';
-      copy.artworks[0].url = 'https://example.org/obra';
+      copy.artworks[0].kind = 'text';
+      delete copy.artworks[0].asset;
     }
   },
   {
-    law: 'D30',
-    what: 'a background colour the scene does not paint',
-    expect: 'no flat background',
+    law: 'B6',
+    what: 'a link interaction without an address',
+    expect: 'interaction "link" needs a url',
+    inject: (copy) => {
+      copy.artworks[0].interaction = 'link';
+      delete copy.artworks[0].url;
+    }
+  },
+  {
+    law: 'B5',
+    what: 'a flat background without a colour',
+    expect: 'without a colour',
     level: 'warning',
+    inject: (copy) => {
+      const dimension = copy.dimensions[0];
+      dimension.kind = 'color';
+      dimension.radius = 120;
+      delete dimension.asset;
+      delete dimension.shaderId;
+      delete dimension.fallbackAsset;
+      delete dimension.color;
+    }
+  },
+  {
+    law: 'B5',
+    what: 'a flat background with no radius at all',
+    expect: 'a flat background needs a radius',
     inject: (copy) => {
       const dimension = copy.dimensions[0];
       dimension.kind = 'color';

@@ -181,7 +181,10 @@ export async function buildScene(scene, options = {}) {
     data.url = addressToOpen(data, catalogue);
     elements.artworks.push(createArtwork(data, parent, {
       label: artworkLabel(data, scene.dimensions, language),
-      labelAlways: options.labels === true
+      labelAlways: options.labels === true,
+      // O texto de uma obra `kind: "text"`, na língua pedida (D58). A queda para a língua de origem é
+      // a mesma de todo o texto de conteúdo (D12).
+      text: textIn(data.text, language)
     }));
   }
 
@@ -248,14 +251,19 @@ function createAssets(catalogue, parent, language) {
 
   for (const [id, asset] of Object.entries(catalogue)) {
     const isVideo = asset.type === 'video';
-    const el = document.createElement(isVideo ? 'video' : 'img');
+    // Um modelo é um `<a-asset-item>` (o `gltf-model` lê o ficheiro por ele), e não um `<img>` (D58).
+    const isModel = asset.type === 'model';
+    const el = document.createElement(isModel ? 'a-asset-item' : (isVideo ? 'video' : 'img'));
     el.setAttribute('id', id);
     el.setAttribute('src', asset.path);
     el.setAttribute('crossorigin', 'anonymous');
 
     const description = textIn(asset.alt, language);
-    // A <video> has no alt: the description of a video goes on the title.
-    if (description) el.setAttribute(isVideo ? 'title' : 'alt', description);
+    // A <video> has no alt: the description of a video goes on the title. An `a-asset-item` has
+    // neither, and `data-alt` keeps the description with the file for whoever reads the DOM.
+    if (description) {
+      el.setAttribute(isModel ? 'data-alt' : (isVideo ? 'title' : 'alt'), description);
+    }
 
     if (isVideo) {
       el.setAttribute('autoplay', '');
@@ -275,6 +283,17 @@ function createAssets(catalogue, parent, language) {
 function waitForAsset(el) {
   return new Promise((resolve) => {
     const done = () => resolve();
+    if (el.tagName === 'A-ASSET-ITEM') {
+      // Um modelo carrega pelo `<a-asset-item>`: `loaded` quando o ficheiro está lido, `error` quando
+      // não está. Esperar por ele é o que impede o `gltf-model` de ser lido antes de o ficheiro
+      // existir (D58).
+      if (el.hasLoaded) done();
+      else {
+        el.addEventListener('loaded', done, { once: true });
+        el.addEventListener('error', done, { once: true });
+      }
+      return;
+    }
     if (el.tagName === 'VIDEO') {
       // HAVE_CURRENT_DATA: there is a frame to paint, which is what a texture needs.
       if (el.readyState >= 2) done();

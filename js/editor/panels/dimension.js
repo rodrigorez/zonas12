@@ -1,12 +1,10 @@
 // The dimension panel: the four things section 7 of the roadmap asks of a dimension — insert, change,
 // maintain, delete.
 //
-// What it does not offer is as deliberate as what it does (D30): `kind: "color"` validates and is not
-// built by the scene, so the panel does not offer it; and the id is only asked for on insert, because
-// changing it would leave every artwork and door pointing at a dimension that no longer has that name.
-//
-// `kind: "shader"` **is** offered (Fase 7, R14/R15): the scene builds it behind the trial's flag, and
-// the panel edits what the format carries — the shader of the internal list and the image fallback.
+// What it offers follows what the scene builds (D30 revisada na Fase 7): `kind: "shader"` (B9) e
+// `kind: "color"` (B5) são construídos pelo renderer e por isso aparecem aqui. O id é perguntado só
+// na inserção, porque mudá-lo deixaria cada obra e cada porta a apontar para uma dimensão que já não
+// tem esse nome.
 //
 // Every edit writes the model first and then applies it: a geometry change re-creates **that entity**
 // (D33), and a change of structure (insert, delete) rebuilds the scene, because the ids in the rest of
@@ -15,17 +13,18 @@ import { t } from '../../i18n.js';
 import { LANGUAGES } from '../../scene/schema.js';
 import { SHADERS } from '../../modules/shaders.js';
 import * as preview from '../preview.js';
-import { heading, textField, numberField, selectField, button, note, debounce } from '../fields.js';
+import { heading, textField, numberField, selectField, colorField, button, note, debounce } from '../fields.js';
 
 // Law L15: 448…511 belong to the portraits the builder derives, so a declared dimension may not use
 // them — the camera would end up inside a portrait.
 const DECLARED_MAX = 447;
 
-const KINDS = ['image', 'video', 'shader', 'camera'];
+const KINDS = ['image', 'video', 'shader', 'color', 'camera'];
 const KIND_LABEL = {
   image: 'editor.dimension.kind.image',
   video: 'editor.dimension.kind.video',
   shader: 'editor.dimension.kind.shader',
+  color: 'editor.dimension.kind.color',
   camera: 'editor.dimension.kind.camera'
 };
 
@@ -184,17 +183,28 @@ function card(dimension, context, data, artworks, portals) {
     }
   });
 
+  // O fundo liso (D56): a cor, quando o tipo é `color` e não há imagem para mostrar.
+  const colorFieldBox = colorField(box, {
+    name: 'dimension.' + dimension.id + '.color',
+    labelKey: 'editor.dimension.color',
+    value: dimension.color || '#101018',
+    onChange: (value) => { dimension.color = value; geometry(); }
+  });
+
   const assetBox = assetField.element;
   const radiusBox = radiusField.element;
   const shaderBox = shaderField.element;
   const fallbackBox = fallbackField.element;
+  const colorBox = colorFieldBox.element;
   const onlyWhenBackground = () => {
     const shader = dimension.kind === 'shader';
     const camera = dimension.kind === 'camera';
-    assetBox.hidden = camera || shader;
+    const flat = dimension.kind === 'color';
+    assetBox.hidden = camera || shader || flat;
     radiusBox.hidden = camera;
     shaderBox.hidden = !shader;
     fallbackBox.hidden = !shader;
+    colorBox.hidden = !flat;
   };
   onlyWhenBackground();
 
@@ -293,14 +303,23 @@ function insertForm(context, data) {
     onChange: () => {}
   });
 
+  const color = colorField(box, {
+    name: 'dimension.new.color',
+    labelKey: 'editor.dimension.color',
+    value: '#101018',
+    onChange: () => {}
+  });
+
   // What a kind needs changes what is asked: one background per kind (the rules of the format say the
   // same, so the panel is not inventing a rule of its own).
   const syncFields = () => {
     const isShader = kind.input.value === 'shader';
     const isCamera = kind.input.value === 'camera';
-    asset.element.hidden = isShader || isCamera;
+    const isFlat = kind.input.value === 'color';
+    asset.element.hidden = isShader || isCamera || isFlat;
     shader.element.hidden = !isShader;
     fallback.element.hidden = !isShader;
+    color.element.hidden = !isFlat;
     radius.element.hidden = isCamera;
   };
 
@@ -351,6 +370,8 @@ function insertForm(context, data) {
       if (dimension.kind === 'shader') {
         if (shader.input.value) dimension.shaderId = shader.input.value;
         if (fallback.input.value) dimension.fallbackAsset = fallback.input.value;
+      } else if (dimension.kind === 'color') {
+        dimension.color = color.input.value;
       } else if (dimension.kind !== 'camera') {
         if (asset.input.value) dimension.asset = asset.input.value;
       }

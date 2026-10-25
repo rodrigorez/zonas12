@@ -821,7 +821,14 @@ uma obra é opcional: é texto de conteúdo, e quem o lê é o editor (Fase 4).
 **Nota (Fase 7):** uma dimensão pode ser `kind: "shader"`, com `shaderId` (id da **lista interna**,
 nunca GLSL) e `fallbackAsset` (uma imagem do catálogo) no lugar de `asset` — o exemplo acima
 continua válido para os fundos de imagem, que são a reserva. A cadência e o pixelRatio não estão no
-dado: são da política (`js/modules/shader-policy.js`).
+dado: são da política (`js/modules/shader-policy.js`). Uma dimensão pode também ser
+`kind: "color"`, e aí o fundo é a `color` do dado, sem asset nenhum (D56).
+
+**Nota (Fase 7, obras):** o `kind` de uma obra é campo do dado e decide o que ela é (D58): `image`,
+`video` e `model` mostram um ficheiro do catálogo — e um `model` é um GLTF, com o `size` a funcionar
+como escala por eixo; `text` **não tem asset** e o conteúdo está no `text`, por língua. Por isso o
+`asset` deixou de ser obrigatório em todas: as regras do esquema dizem qual tipo o pede. Uma obra com
+`interaction: "link"` **navega** para o seu `url` (D57), em vez de o mostrar no modal.
 
 **Causa/consequência:** passar a dados obrigou a que o `index.html` deixasse de ter entidades (foi
 a Fase 3) e que o editor saiba escrever este formato (é a Fase 4). O ganho: criar uma dimensão
@@ -3290,9 +3297,9 @@ fechada dos dois lados: o que os instrumentos medem e o que quem usa vê. **Marc
 | **B2** | `i18n/en.json` com as **164** chaves de `pt.json`; `?lang=en` deixa de cair no português. **Feito em 2026-10-25** — o `tools/regression/i18n.mjs` compara chaves, marcadores e frases, e abre a exposição e o editor em inglês (**9 de 9**) | a lacuna do catálogo |
 | **B3** | Editor: **exclusão em lote por dimensão**, com confirmação e **um** instantâneo de desfazer | a nota «não entrou» do B6 da Fase 4 |
 | **B4** | Editor: **catálogo de assets** editável (`id`, `path`, `type`, `alt` por língua), com a **L9** e a **L14** a medir cada alteração | «o editor não cria assets» |
-| **B5** | Dimensão `kind: "color"`: fundo plano no renderer, oferecido pelo painel da dimensão | o aviso «no flat background» |
-| **B6** | `interaction: "link"` a **navegar** para o endereço, em vez de o mostrar no modal | a terceira coisa do **R9** |
-| **B7** | Obra `kind: "model"` (GLTF) e `kind: "text"` (texto 3D), com posição/rotação/tamanho como as outras | as duas primeiras coisas do **R9** |
+| **B5** | Dimensão `kind: "color"`: fundo plano no renderer, oferecido pelo painel da dimensão. **Feito em 2026-10-25** — a esfera do fundo leva um `MeshBasicMaterial` com a cor do dado, o painel ganha o tipo e o campo da cor, e a lei L1 passa a exigir raio como nos outros fundos | o aviso «no flat background» |
+| **B6** | `interaction: "link"` a **navegar** para o endereço, em vez de o mostrar no modal. **Feito em 2026-10-25** — o componente do clique ganhou o modo, o painel oferece a interacção e o campo do endereço | a terceira coisa do **R9** |
+| **B7** | Obra `kind: "model"` (GLTF) e `kind: "text"` (texto 3D), com posição/rotação/tamanho como as outras. **Feito em 2026-10-25** — o GLTF vem do catálogo (tipo `model`, `<a-asset-item>`) e o `size` escala-o; o texto é desenhado num canvas e vai para um plano, sem fonte externa | as duas primeiras coisas do **R9** |
 | **B8** | Portais com **movimento e rotação animados**, declarados no dado | o «fica para depois» da §1 |
 | **B9** | Fundos shader: o A/B controlado fecha o **R14**; a política **20 → 15 FPS → estático** atrás de flag fecha o **R15**; `kind: "shader"` no esquema com `shaderId` de lista interna, `fallbackAsset` validado e piso de pixelRatio **1** | **R14** e **R15** |
 | **B10** | README, §14 e o fecho com o que cada bloco mediu | a verificação da fase |
@@ -3316,6 +3323,19 @@ nova que entre só no `pt.json` é uma frase portuguesa a aparecer a quem abrir 
 `editor.dimension.kind.shader` perdeu o «(ensaio)» que já não era verdade desde a produção do B9.
 
 Os restantes blocos não começaram.
+
+O **B5**, o **B6** e o **B7** fecharam em 2026-10-25, com um fixture para os quatro valores (**D56**,
+**D57**, **D58**): `data/worlds/r9.json` (abre-se com `?scene=r9`, não é uma sala) tem uma dimensão
+`kind: "color"`, uma obra `image`, uma `model` (GLTF de 8 vértices em `assets/models/caixa-r9.gltf`,
+com o buffer embutido), uma `text` e uma com `interaction: "link"`. O `tools/regression/r9.mjs`
+(**6 de 6**) mede a cena construída — a esfera do fundo com a cor do dado, a malha do GLTF com 8
+vértices, o plano do texto com textura de 1239 px, e o clique que **sai** da página — e o
+`tools/regression/editor-r9.mjs` (**8 de 8**) mede os painéis: os quatro tipos, as três interacções, o
+campo da cor, o endereço só com `link`, o texto só na obra de texto, e **nenhum rótulo é uma chave
+crua** (o `editor.artwork.asset` era — faltava no catálogo desde a Fase 4, e ninguém o via porque o
+painel das obras só se desenha quando há obras). O `laws-selftest` passou de **21** para **22** avarias
+(a D30 deu lugar às leis de cada valor) e o `all.mjs` passou a **13** baterias por omissão mais as
+arquivadas.
 
 #### Metas de sucesso
 
@@ -3997,6 +4017,9 @@ alteram comportamento.
 | D53 | A janela de uma porta mostra o destino **ao vivo**, e o que a ponte leva | Com o fundo shader, o retrato do D46 (uma fotografia) passou a ver-se **parado** ao lado de uma sala que anima. A janela de uma porta `preview` passa a desenhar o **shader do destino ao vivo** — o `shaderId` vem no dado e o validador exige que seja o da dimensão 0 do destino — **mais um recorte** do mesmo retrato, com o fundo transparente, que traz as obras e as portas. Sem o recorte a janela animava mas as obras apareciam de repente no corte (medido: **1,0 a 4,4** onde a meta é 0,50); com ele a costura voltou a **0,23 a 0,41** e a janela mexe-se. O instante do shader **viaja com a ponte** (`zonas12.tempoShader`, mesma validade e uso único do quadro): a chegada continua a animação de onde a janela ia. Com `?shader=0` a janela volta a ser o retrato inteiro — o mesmo caminho de reserva da sala. O retrato e o recorte saem do mesmo comando (`tools/scene/portrait.mjs`), para não poderem divergir |
 | D54 | A travessia mostra o destino desde o primeiro instante | O que ficava no ecrã entre o clique e a página seguinte pintar era a **sala que se deixava, ainda a animar** — o autor descreveu-o como «vejo o ambiente onde eu estava» antes de o destino aparecer. No instante da travessia o fundo **congela** (o mecanismo do `prefers-reduced-motion`) e a câmara **encosta à janela**, 5 cm do lado de onde vem: a janela é uma máscara no plano da porta, e de lá enche o ecrã — o quadro que fica, e o que a ponte guarda, é o **destino**. Chegar ao centro da janela não serve e foi medido: em cima do plano a máscara não tem área em vista e vê-se a sala outra vez (a ponte dava **67,0** de salto); a 5 cm volta a **0,32**. A direcção do olhar não se toca — quem atravessa já está a olhar para dentro |
 | D55 | A travessia deixa registo, e o destino fica no ecrã até ele chegar | O vídeo do autor mostra uma travessia em que o ecrã mostra o destino e, a seguir, a sala de onde ele vinha outra vez — **4,7 s** entre atravessar e o destino aparecer, medidos no vídeo (telemóvel, D-pad a fundo). Três coisas ficaram dessa leitura. **1)** O quadro que a ponte guarda passa a ficar também **por cima da página que sai** (`.ultimo-quadro-acima`, z-index acima da cena): enquanto a página seguinte não pinta, o ecrã mostra o destino, e nem o D-pad nem o sensor tiram o visitante de lá — sem isto, 100 ms de dedo no D-pad chegavam para a câmara sair da janela e voltar a ver-se a sala de origem. **2)** A preparação da travessia (congelar, encostar, capturar) está dentro de um `try` e a saída acontece **sempre**: uma excepção em qualquer das três deixava o visitante preso no mundo que ele já tinha atravessado, sem erro que se visse no telemóvel. **3)** O que ela fez fica escrito em `sessionStorage` (`zonas12.travessia`: de que mundo, que porta, para onde, encosto, captura, ecrã tapado e o erro se houve) e a sonda mostra-o — na página de chegada nomeia a travessia que trouxe o visitante, na de origem o mesmo registo com o mundo errado é a prova de que o pedido não saiu. O `seam` continua a comparar a ponte com o primeiro quadro do destino, por isso a régua do corte não ficou mais fácil |
+| D56 | A dimensão `kind: "color"` pinta um fundo liso | Era o primeiro dos quatro valores que a D30 dava como validados e não construídos. A esfera do fundo é a mesma das outras dimensões — o mesmo stencil, o mesmo registo, o mesmo `release` — e o que muda é o material: um `MeshBasicMaterial` com a cor do dado em vez de uma textura. Não há imagem para descodificar nem shader para compilar, por isso não tem reserva nem política de cadência, e o `shaderStatus()` passa a dizer `mode: "color"` e a cor. A lei L1 passa a exigir raio a este fundo como aos outros: sem ele a esfera não tem tamanho e o validador diz porquê. O painel da dimensão oferece o tipo desde o mesmo dia — o que a cena constrói, o painel oferece |
+| D57 | Um `interaction: "link"` navega para o endereço | O terceiro valor da D30, e o único que **levava o visitante a sair** da exposição — até aqui o endereço aparecia dentro do modal, o que num quiosque é uma parede. O componente do clique ganhou um modo: `modal` abre a janela da exposição, `link` faz `location.assign` para o endereço do dado. A escolha do modo é do dado (`interaction`), o construtor traduz, e o painel oferece as três interacções com o campo do endereço — que só aparece com `link`, a única em que significa alguma coisa. O `notBuilt` que existia no catálogo saiu: já não há nada a bloquear |
+| D58 | Uma obra pode ser um modelo GLTF ou um texto | As duas primeiras coisas da D30, fechadas juntas porque partilham a pergunta «o que é uma obra». O `kind` deixou de ser derivado do asset e passou a ser campo do dado, com regras no esquema: `image`, `video` e `model` pedem um asset do seu tipo; `text` **proíbe** o asset e pede o `text` por língua. O modelo vem do catálogo (`type: "model"`, um `<a-asset-item>`, e o `size` escala-o por eixo — um GLTF não tem «largura em metros»). O texto é desenhado num canvas e aplicado a um plano com transparência: **sem fonte externa**, porque o `text` do A-Frame vai buscar a fonte à rede e a exposição tem de abrir sem rede e com a consola limpa (T8). Um `applyStencil` protegido contra o segundo registo foi preciso: o `model-loaded` chega depois do `loaded`, e registar duas vezes deixaria uma entrada órfã no núcleo (A4) |
 
 **D48 a D51 fechadas em 2026-10-23** — a **Fase 5** (a gravação direta), que a Fase 4 tinha deixado
 condicionada à fricção de exportar. O que se decidiu, e o que se recusou: **um** servidor de

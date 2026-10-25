@@ -41,7 +41,7 @@ const EYE_HEIGHT = 1.6;
 // The shape of the name of an asset file (law L10): assets/<type>/<name>.<ext>, all lowercase, with
 // the hyphens the D7 rule uses. It is a warning and not an error because a file in the wrong place
 // still loads — what is lost is the folder being searchable.
-const ASSET_FILE = /^assets\/(panoramas|artworks|video|previews)\/[a-z0-9]+(?:-[a-z0-9]+)*\.(?:jpg|jpeg|png|webp|mp4|webm)$/;
+const ASSET_FILE = /^assets\/(panoramas|artworks|video|models|previews)\/[a-z0-9]+(?:-[a-z0-9]+)*\.(?:jpg|jpeg|png|webp|mp4|webm|gltf|glb)$/;
 
 // The measurements of the scene, so a caller can print them without walking the data again.
 export function summarise(scene) {
@@ -137,6 +137,9 @@ export function validateScene(scene, options = {}) {
     if (dimension.kind === 'color' && !dimension.color) {
       warn(`${where}: kind "color" without a colour — the background will be black`);
     }
+    if (dimension.kind === 'color' && typeof dimension.radius !== 'number') {
+      err(`${where}: a flat background needs a radius — law L1 (the background is a sphere like the others)`);
+    }
     // ---- L15: the band of ids that belongs to the derived dimensions ----
     if (Number.isInteger(dimension.id) && dimension.id >= DERIVED_DIMENSION_BASE) {
       err(`${where}: the declared id ${dimension.id} is inside the band reserved for the derived ` +
@@ -165,11 +168,14 @@ export function validateScene(scene, options = {}) {
   for (const artwork of scene.artworks || []) {
     const where = `artworks[${artwork.id}]`;
     const asset = artwork.asset ? assets[artwork.asset] : null;
-    if (artwork.kind === 'image' || artwork.kind === 'video') {
+    if (artwork.kind === 'image' || artwork.kind === 'video' || artwork.kind === 'model') {
       if (!artwork.asset) err(`${where}: kind "${artwork.kind}" needs an asset`);
       else if (asset && asset.type !== artwork.kind) {
         err(`${where}: kind "${artwork.kind}" with an asset of type "${asset.type}" — one of the two is wrong`);
       }
+    }
+    if (artwork.kind === 'text' && !artwork.text) {
+      err(`${where}: kind "text" needs its text (the content of the work, per language)`);
     }
     if (artwork.interaction === 'link' && !artwork.url) {
       err(`${where}: interaction "link" needs a url (an external address, which is not an asset)`);
@@ -180,28 +186,12 @@ export function validateScene(scene, options = {}) {
     }
   }
 
-  // ---- D30: what the shape accepts and the scene does not build ----
+  // ---- D30, fechada na Fase 7 ----
   //
-  // These four values validate on purpose — the format is one step ahead of the code — but a file that
-  // uses them is relying on something the builder ignores. Before D30 the validator accepted them in
-  // silence and the author was left guessing why the scene did not change; now it says so, and the
-  // editor does not offer them (docs/ROADMAP.md, D30).
-  for (const artwork of scene.artworks || []) {
-    if (artwork.kind === 'model' || artwork.kind === 'text') {
-      warn(`artworks[${artwork.id}]: kind "${artwork.kind}" is validated and not built — every artwork is ` +
-        `drawn as a textured box today (D30)`);
-    }
-    if (artwork.interaction === 'link') {
-      warn(`artworks[${artwork.id}]: interaction "link" is validated and the scene shows the address in the ` +
-        `modal instead of navigating (D30)`);
-    }
-  }
-  for (const dimension of dimensions) {
-    if (dimension.kind === 'color') {
-      warn(`dimensions[${dimension.id}]: kind "color" is validated and the scene has no flat background — ` +
-        `the dimension has no panorama to draw (D30)`);
-    }
-  }
+  // Os quatro valores que a D30 listou como «validados e não construídos» — obra `model` e `text`,
+  // dimensão `color` e `interaction: "link"` — passaram a ser construídos (B5, B6 e B7). O aviso que
+  // aqui os denunciava saiu com eles: um aviso que já não aponta para nada é ruído no relatório, e o
+  // T8 mede o ruído.
 
   // ---- L4: arriving must not fall inside another box (chain crossings) ----
   const portals = (scene.portals || []).filter((portal) => Array.isArray(portal.position) && Array.isArray(portal.box));

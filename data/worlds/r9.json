@@ -1,0 +1,164 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "r9",
+    "name": {
+      "pt": "Ensaio dos quatro valores do R9",
+      "en": "Trial of the four R9 values"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": false
+    }
+  },
+  "assets": {
+    "foto-r9": {
+      "path": "assets/artworks/eiffel.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Fotografia de ensaio",
+        "en": "Trial photograph"
+      }
+    },
+    "caixa-r9": {
+      "path": "assets/models/caixa-r9.gltf",
+      "type": "model",
+      "alt": {
+        "pt": "Caixa de ensaio em GLTF",
+        "en": "Trial box in GLTF"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "color",
+      "color": "#101a2c",
+      "radius": 100,
+      "name": {
+        "pt": "Fundo liso de ensaio",
+        "en": "Trial flat background"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "foto-r9",
+      "position": [
+        -3.5,
+        1.6,
+        -8
+      ],
+      "rotation": [
+        0,
+        20,
+        0
+      ],
+      "size": [
+        3,
+        2,
+        0.1
+      ],
+      "interaction": "none",
+      "title": {
+        "pt": "Imagem",
+        "en": "Image"
+      }
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "model",
+      "asset": "caixa-r9",
+      "position": [
+        0,
+        1.6,
+        -8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        2,
+        2,
+        2
+      ],
+      "interaction": "none",
+      "title": {
+        "pt": "Modelo",
+        "en": "Model"
+      }
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "text",
+      "text": {
+        "pt": "Texto desenhado no plano",
+        "en": "Text drawn on the plane"
+      },
+      "position": [
+        3.5,
+        1.6,
+        -8
+      ],
+      "rotation": [
+        0,
+        -20,
+        0
+      ],
+      "size": [
+        4,
+        1.5,
+        0.1
+      ],
+      "interaction": "none",
+      "title": {
+        "pt": "Texto",
+        "en": "Text"
+      }
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "foto-r9",
+      "position": [
+        0,
+        1.6,
+        -14
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        2,
+        1.5,
+        0.1
+      ],
+      "interaction": "link",
+      "url": "https://rodrigorez.github.io/zonas12/",
+      "title": {
+        "pt": "Ligação externa",
+        "en": "External link"
+      }
+    }
+  ],
+  "portals": []
+}
