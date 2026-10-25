@@ -52,8 +52,7 @@ export function createPolicy(options) {
   const clock = settings.clock || (() => performance.now());
   const startedAt = clock();
 
-  let cadence = settings.reducedMotion === true ? 0 : defaults.targetFps;
-  let ratio = resolution
+  let cadence = settings.reducedMotion === true ? 0 : defaults.targetFps;  let ratio = resolution
     ? clamp(Math.min(resolution.max, defaults.firstRatio), resolution.min, resolution.max)
     : defaults.minPixelRatio;
   // The first frame has to be the one the policy says it is: the renderer is born at the device's DPR.
@@ -78,7 +77,12 @@ export function createPolicy(options) {
   let nextUpdateAt = animateFrom;
   let cadenceChanged = false;
   let decision = false;
-  let animationTime = defaults.staticTime;
+  // O tempo do shader começa no quadro estático — ou **onde a ponte o deixou** (D53): a chegada por
+  // uma porta continua a animação que a janela mostrava, e é isso que faz o corte não se ver. Sem
+  // ponte (primeira visita, recarregar) começa no estático, como sempre.
+  let animationTime = typeof settings.startTime === 'number' && settings.startTime >= 0
+    ? settings.startTime
+    : defaults.staticTime;
 
   // Per step: how many updates were delivered, how many were late, and the frame times observed.
   let delivered = 0;
@@ -270,6 +274,8 @@ export function createPolicy(options) {
         pixelRatio: +ratio.toFixed(3),
         updates: totals.updates,
         late: totals.late,
+        // O `uTime` que o fundo está a desenhar: é o que a ponte leva para a página que chega (D53).
+        time: +animationTime.toFixed(3),
         events: events.slice(-20)
       };
     }
@@ -291,7 +297,11 @@ export function shaderPolicy(resolution) {
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
     : false;
-  pagePolicy = createPolicy({ resolution, reducedMotion });
+  // O tempo que a ponte trouxe (D53): a janela da porta que se atravessou mostrava o shader do
+  // destino num instante, e a chegada continua a partir dele em vez de recomeçar no estático.
+  const bridge = typeof window !== 'undefined' ? window.arrivalFrame : null;
+  const startTime = bridge && typeof bridge.shaderTime === 'function' ? bridge.shaderTime() : undefined;
+  pagePolicy = createPolicy({ resolution, reducedMotion, startTime });
   if (typeof window !== 'undefined' && window.matchMedia) {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (query.addEventListener) {

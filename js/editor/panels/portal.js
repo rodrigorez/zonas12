@@ -14,6 +14,7 @@
 // dimensions exist (one per unique portrait, D26). Everything else re-creates just that door (D33).
 import { t, currentLanguage } from '../../i18n.js';
 import { textIn, LANGUAGES } from '../../scene/schema.js';
+import { SHADER_IDS } from '../../modules/shaders.js';
 import {
   WINDOW_KINDS, ACTION_KINDS, isLegalCombination, isLegalDoor, validateDoor
 } from '../../modules/portal-kinds.js';
@@ -373,6 +374,22 @@ function windowAxis(box, portal, context, data) {
         axis.radius = value;
         await context.change({ rebuild: true });
       }, 400)
+    });
+
+    // D53: a janela pode desenhar o fundo do destino **ao vivo** em vez do retrato. O retrato fica
+    // como reserva (`?shader=0`), por isso o campo é uma escolha e não uma substituição.
+    selectField(box, {
+      name: 'portal.' + portal.id + '.window.shaderId',
+      labelKey: 'editor.portal.previewShader',
+      value: axis.shaderId || '',
+      options: [{ value: '', label: t('editor.field.none') }]
+        .concat(SHADER_IDS.map((id) => ({ value: id, label: id }))),
+      onChange: async (value) => {
+        if (value) axis.shaderId = value;
+        else delete axis.shaderId;
+        await context.change({ rebuild: true });
+        context.rerender();
+      }
     });
   }
 }

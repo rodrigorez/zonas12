@@ -212,12 +212,19 @@ export const SCENE = {
           // With 'preview', the portrait: a name of the assets catalogue (D20, never a path) and
           // the radius of its sphere. A smaller radius is a stronger parallax (D14).
           asset: { type: 'asset' },
-          radius: { type: 'number', positive: true }
+          radius: { type: 'number', positive: true },
+          // With 'preview', the shader the window draws **live** (D53): the destination world's own
+          // background, so the window animates like the room instead of showing a frozen photograph.
+          // The portrait stays as its fallback (`?shader=0`, or a driver that refuses the program).
+          shaderId: { type: 'enum', oneOf: SHADER_IDS },
+          // …and the **cutout**: the same view as the portrait but transparent where the background
+          // was, drawn over the live shader so the works and the doors are there at the crossing.
+          cutout: { type: 'asset' }
         },
         rules: [
-          { when: { kind: 'dimension-pair' }, require: ['dimensionA', 'dimensionB'], forbid: ['asset', 'radius'] },
+          { when: { kind: 'dimension-pair' }, require: ['dimensionA', 'dimensionB'], forbid: ['asset', 'radius', 'shaderId', 'cutout'] },
           { when: { kind: 'preview' }, require: ['asset', 'radius'], forbid: ['dimensionA', 'dimensionB'] },
-          { when: { kind: 'none' }, forbid: ['dimensionA', 'dimensionB', 'asset', 'radius'] }
+          { when: { kind: 'none' }, forbid: ['dimensionA', 'dimensionB', 'asset', 'radius', 'shaderId', 'cutout'] }
         ]
       },
       // The second axis: what the traversal does. `target` is the slug of the world this door

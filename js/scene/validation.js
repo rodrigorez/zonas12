@@ -248,6 +248,18 @@ export function validateScene(scene, options = {}) {
           `destination is never loaded live)`);
       }
     }
+
+    // D53: uma janela que desenha o fundo do destino ao vivo precisa do recorte — sem ele as obras e
+    // as portas do outro lado não estão lá, e ao atravessar aparecem de repente (medido: a costura
+    // sobe de 0,3 para 1,0 a 4,4 na meta de 0,50).
+    if (windowAxis.kind === 'preview' && windowAxis.shaderId) {
+      if (!windowAxis.cutout) {
+        err(`${where}: the window draws "${windowAxis.shaderId}" live and has no cutout — the works ` +
+          `and the doors of the destination would be missing (D53)`);
+      } else if (!assets[windowAxis.cutout]) {
+        err(`${where}: the cutout "${windowAxis.cutout}" is not in the assets catalogue (D20)`);
+      }
+    }
   }
 
   // ---- L17: at most one arrival door per world of origin ----

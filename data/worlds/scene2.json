@@ -68,6 +68,22 @@
         "pt": "Retrato do mundo Céu 360º, visto da porta",
         "en": "Portrait of the Sky 360º world, seen from the door"
       }
+    },
+    "recorte-scene1-de-scene2": {
+      "path": "assets/previews/recorte-scene1-de-scene2.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the City 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
+    },
+    "recorte-scene3-de-scene2": {
+      "path": "assets/previews/recorte-scene3-de-scene2.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Céu 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Sky 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -193,7 +209,9 @@
       "window": {
         "kind": "preview",
         "asset": "retrato-cidade",
-        "radius": 120
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene1-de-scene2"
       },
       "action": {
         "kind": "navigate",
@@ -275,7 +293,9 @@
       "window": {
         "kind": "preview",
         "asset": "retrato-ceu",
-        "radius": 120
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene2"
       },
       "action": {
         "kind": "navigate",

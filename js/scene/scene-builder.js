@@ -127,7 +127,9 @@ export async function buildScene(scene, options = {}) {
   for (const portal of scene.portals || []) {
     const axis = portal.window || {};
     if (axis.kind !== 'preview' || !axis.asset) continue;
-    const key = axis.asset + '@' + axis.radius;
+    // Duas portas partilham a esfera quando mostram o mesmo retrato, com o mesmo raio **e o mesmo
+    // shader** (D53): uma textura, um valor de stencil, um desenho.
+    const key = axis.asset + '@' + axis.radius + '@' + (axis.shaderId || '') + '@' + (axis.cutout || '');
     if (portraits.has(key)) continue;
     const id = DERIVED_DIMENSION_BASE + portraits.size;
     if (id >= MAX_DIMENSIONS) {
@@ -136,7 +138,14 @@ export async function buildScene(scene, options = {}) {
     }
     const el = createDimension({
       id,
-      kind: 'image',
+      // D53: com um shader nomeado, a janela desenha o fundo do destino **ao vivo** e o **recorte**
+      // (as obras e as portas, com transparência) por cima — a janela anima e o que se vê através
+      // dela é o que se vê ao chegar. Sem shader (ou com `?shader=0`) é o retrato, como antes, e o
+      // retrato é também a reserva do shader quando o driver recusa o programa.
+      kind: axis.shaderId ? 'shader' : 'image',
+      shaderId: axis.shaderId,
+      fallbackAsset: axis.shaderId ? axis.asset : undefined,
+      cutout: axis.shaderId ? axis.cutout : undefined,
       asset: axis.asset,
       radius: axis.radius,
       followCamera: false,
@@ -178,7 +187,9 @@ export async function buildScene(scene, options = {}) {
 
   for (const portal of scene.portals || []) {
     const axis = portal.window || {};
-    const previewDimension = axis.kind === 'preview' ? portraits.get(axis.asset + '@' + axis.radius) : undefined;
+    const previewDimension = axis.kind === 'preview'
+      ? portraits.get(axis.asset + '@' + axis.radius + '@' + (axis.shaderId || '') + '@' + (axis.cutout || ''))
+      : undefined;
     const data = withDefaults(portal, SCENE.portals);
     elements.portals.push(createPortal(data, parent, {
       previewDimension: previewDimension,

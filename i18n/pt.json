@@ -124,6 +124,7 @@
     "editor.portal.pairB": "Dimensão B",
     "editor.portal.previewAsset": "Retrato (asset)",
     "editor.portal.previewRadius": "Raio do retrato (m)",
+  "editor.portal.previewShader": "Fundo ao vivo (shader)",
     "editor.portal.target": "Mundo de destino",
     "editor.portal.arrivalFrom": "Chegada do mundo",
     "editor.world.panelTitle": "Mundo",

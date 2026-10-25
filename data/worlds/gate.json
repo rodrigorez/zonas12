@@ -36,6 +36,22 @@
         "pt": "Retrato do mundo Praia, visto da porta",
         "en": "Portrait of the Beach world, seen from the door"
       }
+    },
+    "recorte-scene1-de-gate": {
+      "path": "assets/previews/recorte-scene1-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the City 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
+    },
+    "recorte-scene2-de-gate": {
+      "path": "assets/previews/recorte-scene2-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Praia, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Beach world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -83,7 +99,9 @@
       "window": {
         "kind": "preview",
         "asset": "retrato-cidade",
-        "radius": 120
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene1-de-gate"
       },
       "action": {
         "kind": "navigate",
@@ -124,7 +142,9 @@
       "window": {
         "kind": "preview",
         "asset": "retrato-praia",
-        "radius": 120
+        "radius": 120,
+        "shaderId": "por-do-sol",
+        "cutout": "recorte-scene2-de-gate"
       },
       "action": {
         "kind": "navigate",

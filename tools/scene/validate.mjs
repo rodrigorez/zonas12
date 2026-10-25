@@ -118,6 +118,44 @@ if (worlds.size > 1) {
     console.log(`  warning: ${gap.from} -> ${gap.to}: portals[${gap.portals.join(', ')}] and no door of ` +
       `"${gap.to}" says it is the arrival from "${gap.from}" — the visitor starts where the camera says`);
   }
+
+  // D53: a janela de uma porta de mundo que desenha o fundo do destino **ao vivo** tem de nomear o
+  // shader que o destino desenha. Um shader trocado aqui não é um detalhe: a porta passaria a mentir
+  // sobre a sala do outro lado, e é a única coisa que ela promete.
+  const desencontros = [];
+  const silenciosas = [];
+  for (const scene of rooms) {
+    for (const portal of scene.portals || []) {
+      const janela = portal.window || {};
+      const alvo = portal.action && portal.action.target;
+      if (janela.kind !== 'preview' || !alvo) continue;
+      const destino = rooms.find((outro) => outro.world.slug === alvo);
+      if (!destino) continue;
+      const dimensao = (destino.dimensions || []).find((entrada) => entrada.id === 0) || {};
+      if (!janela.shaderId) {
+        if (dimensao.kind === 'shader') {
+          silenciosas.push(`${scene.world.slug} portas[${portal.id}]: a janela mostra o retrato "${janela.asset}" ` +
+            `e "${alvo}" desenha "${dimensao.shaderId}" — a janela fica parada (D53)`);
+        }
+        continue;
+      }
+      if (dimensao.kind !== 'shader') {
+        desencontros.push(`${scene.world.slug} portas[${portal.id}]: a janela desenha "${janela.shaderId}" ` +
+          `mas "${alvo}" não tem shader (dimensão 0 é "${dimensao.kind}")`);
+        continue;
+      }
+      if (dimensao.shaderId !== janela.shaderId) {
+        desencontros.push(`${scene.world.slug} portas[${portal.id}]: a janela desenha "${janela.shaderId}" ` +
+          `e "${alvo}" desenha "${dimensao.shaderId}"`);
+      }
+    }
+  }
+  console.log('windows: ' + (desencontros.length === 0
+    ? 'every live window names the shader its destination draws (D53)'
+    : `${desencontros.length} window(s) naming another shader (D53)`));
+  for (const desencontro of desencontros) console.error(`  error: ${desencontro}`);
+  if (desencontros.length) failed++;
+  for (const silenciosa of silenciosas) console.log(`  warning: ${silenciosa}`);
 }
 
 // ---- os arranques (D28) ----

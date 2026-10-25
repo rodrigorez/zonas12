@@ -625,9 +625,20 @@ export async function checkPortrait(options = {}) {
   try {
     for (const porta of portas) {
       const entradas = state.dimensions[porta.data.previewDimension] || [];
-      const entrada = entradas.find((e) => e.material && e.material.map) || entradas[0];
+      // Uma janela com shader (D53) não tem `map` nem `color`: o que se muda é o tempo do shader, e o
+      // teste continua a fazer a mesma pergunta — mudar a janela muda os pixels dentro dela e nenhum
+      // fora. O fundo da sala está congelado (R16), por isso a única coisa que mexe é o que aqui se
+      // pede.
+      const entrada = entradas.find((e) => e.material && (e.material.map || e.material.isShaderMaterial)) || entradas[0];
       if (!entrada || !entrada.material) continue;
-      const corOriginal = entrada.material.color.getHex();
+      const material = entrada.material;
+      const ehShader = Boolean(material.isShaderMaterial);
+      const corOriginal = ehShader ? null : material.color.getHex();
+      const tempoOriginal = ehShader ? material.uniforms.uTime.value : null;
+      const mudar = (ligado) => {
+        if (ehShader) material.uniforms.uTime.value = ligado ? tempoOriginal + 3.7 : tempoOriginal;
+        else material.color.setHex(ligado ? 0xff00ff : corOriginal);
+      };
       const mundo = new THREE.Vector3();
       porta.el.object3D.getWorldPosition(mundo);
       for (const distancia of distancias) {
@@ -638,11 +649,11 @@ export async function checkPortrait(options = {}) {
         const moldura = rectDaMoldura(porta, camera, gl);
         desenhar(sceneEl, camera);
         const antes = lerTudo(gl);
-        entrada.material.color.setHex(0xff00ff);
+        mudar(true);
         await proximoFrame();
         desenhar(sceneEl, camera);
         const tingido = lerTudo(gl);
-        entrada.material.color.setHex(corOriginal);
+        mudar(false);
         await proximoFrame();
         const dentroDaJanela = contarMudancas(antes, tingido, janela).dentroMuda;
         const fora = contarFora(antes, tingido, moldura || janela);

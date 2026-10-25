@@ -76,6 +76,14 @@
         "pt": "Retrato do mundo Praia, visto da porta",
         "en": "Portrait of the Beach world, seen from the door"
       }
+    },
+    "recorte-scene2-de-scene1": {
+      "path": "assets/previews/recorte-scene2-de-scene1.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Praia, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Beach world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -286,7 +294,9 @@
       "window": {
         "kind": "preview",
         "asset": "retrato-praia",
-        "radius": 120
+        "radius": 120,
+        "shaderId": "por-do-sol",
+        "cutout": "recorte-scene2-de-scene1"
       },
       "action": {
         "kind": "navigate",

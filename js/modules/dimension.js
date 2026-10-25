@@ -95,7 +95,10 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     shader: { type: 'string', default: '' },
     // The image a shader dimension falls back to: loaded with every other asset before the build, so
     // swapping to it does not wait for the network.
-    fallback: { type: 'selector' }
+    fallback: { type: 'selector' },
+    // The works and doors of a door's window, with transparency, drawn over the live shader (D53):
+    // the second layer of the same dimension — same stencil, same registry, same release.
+    cutout: { type: 'selector' }
   },
   // A-Frame calls `update` right after `init` (and whenever the attribute changes), so building
   // the sphere here avoids building it twice.
@@ -141,6 +144,26 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     this.el.setObject3D('panorama', sphere);
     registerContent(this.data.dimension, sphere, 'panorama');
 
+    // O recorte da janela (D53): as obras e as portas do destino, por cima do shader ao vivo. É uma
+    // esfera ligeiramente menor, transparente e sem escrita de profundidade — desenha-se depois do
+    // fundo (o `transparent` do material põe-no no passe certo) e dentro do mesmo stencil.
+    if (this.data.cutout && this.shaderActive) {
+      const overlayMaterial = new THREE.MeshBasicMaterial({
+        map: textureFrom(this.data.cutout),
+        transparent: true,
+        depthWrite: false,
+        side: THREE.BackSide
+      });
+      const overlay = new THREE.Mesh(
+        new THREE.SphereGeometry(this.data.radius * 0.98, 64, 64), overlayMaterial);
+      overlay.name = 'dimension-' + this.data.dimension + '-recorte';
+      overlay.renderOrder = state.drawOrder.panorama;
+      overlay.frustumCulled = false;
+      this.overlay = overlay;
+      this.el.setObject3D('recorte', overlay);
+      registerContent(this.data.dimension, overlay, 'panorama');
+    }
+
     const component = this;
     this.entry = () => ({
       dimension: component.data.dimension,
@@ -156,6 +179,15 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     const source = this.data.fallback;
     if (!source || !this.sphere) return;
     console.warn('[shader] ' + reason + '; the background falls back to its image');
+    // A imagem de reserva já traz as obras e as portas: o recorte sai, senão ficavam duas vezes.
+    if (this.overlay) {
+      unregisterContent(this.data.dimension, this.overlay);
+      this.el.removeObject3D('recorte');
+      this.overlay.geometry.dispose();
+      this.overlay.material.map.dispose();
+      this.overlay.material.dispose();
+      this.overlay = null;
+    }
     const material = imageMaterial(textureFrom(source));
     this.sphere.material = material;
     if (this.material) {
@@ -201,6 +233,14 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
   // nobody else releases them: the entity leaving the scene takes the entry out of the registry
   // and gives the GPU memory back.
   release: function () {
+    if (this.overlay) {
+      unregisterContent(this.data.dimension, this.overlay);
+      this.el.removeObject3D('recorte');
+      this.overlay.geometry.dispose();
+      if (this.overlay.material.map) this.overlay.material.map.dispose();
+      this.overlay.material.dispose();
+      this.overlay = null;
+    }
     if (this.sphere) {
       unregisterContent(this.data.dimension, this.sphere);
       this.el.removeObject3D('panorama');
@@ -251,6 +291,9 @@ export function createDimension(dimension, parent) {
   if (shader && shadersEnabled()) {
     settings.shader = shader.id;
     if (dimension.fallbackAsset) settings.fallback = '#' + dimension.fallbackAsset;
+    // O recorte da janela (D53): as obras e as portas do destino, com transparência, por cima do
+    // shader ao vivo. É a segunda camada da mesma dimensão — o mesmo stencil, o mesmo registo.
+    if (dimension.cutout) settings.cutout = '#' + dimension.cutout;
   } else if (dimension.kind === 'shader') {
     if (dimension.fallbackAsset) settings.src = '#' + dimension.fallbackAsset;
   } else if (dimension.asset) {

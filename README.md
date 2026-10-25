@@ -366,6 +366,10 @@ portais com stencil e ajuste automático do pixelRatio.
   **obras e as portas**: a `2048 × 1024` a costura fica em **0,13 a 0,47** nas seis portas. São **6**
   ficheiros, **772 kB** no total, **8 MiB** de textura cada, e a **L14** deixa de ter o que avisar
   (`validate.mjs`: `Erros: 0 · Avisos: 0` nos seis mundos).
+- **Além do retrato, cada porta tem um recorte (D53).** O mesmo desenho, sem o fundo e com
+  transparência (`recorte-<porta>.png`, 2:1, **133 a 155 kB** cada): é o que a janela compõe sobre o
+  shader **ao vivo** do destino, para a janela animar sem perder as obras e as portas. O retrato
+  inteiro fica como reserva — `?shader=0`, ou um driver que recusa o programa.
 - A produção configura `THREE.LinearFilter` e desativa mipmaps em
   `js/modules/dimension.js`; manter isso consistente ao trocar ou otimizar a textura e validar a
   qualidade visual antes de alterar o filtro.

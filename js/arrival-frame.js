@@ -18,6 +18,9 @@
 
   const KEY = 'zonas12.ultimoQuadro';
   const AT = 'zonas12.ultimoQuadroEm';
+  // O tempo do shader que estava desenhado (D53): a página que chega continua a animação de onde ela
+  // ia, e o corte deixa de se ver. É da mesma ponte, com a mesma validade e o mesmo uso único.
+  const TIME = 'zonas12.tempoShader';
   // A ponte vale segundos, não minutos: uma imagem mais velha do que isto é de outra visita e mais
   // vale o ecrã de sempre do que um quadro fora de contexto.
   const MAX_AGE = 20000;
@@ -34,6 +37,8 @@
 
   let shown = null;
   let guard = null;
+  // O instante do shader que a ponte trouxe (D53), lido uma vez em `restore`.
+  let bridgedTime = null;
   // A descodificação da imagem que a ponte mostra. `hide()` espera por ela: tirar o quadro antes de
   // ele estar descodificado é mostrar o preto do `#container-video` que a ponte existe para evitar
   // (R17). O `decode()` explícito também pede a descodificação **cedo** — um `<img>` que ainda não
@@ -80,6 +85,11 @@
       context.drawImage(canvas, 0, 0, frame.width, frame.height);
       sessionStorage.setItem(KEY, frame.toDataURL('image/jpeg', QUALITY));
       sessionStorage.setItem(AT, String(Date.now()));
+      // O instante do shader vai com o quadro: sem ele a chegada recomeçaria no quadro estático e a
+      // animação do destino saltava no corte (medido: 0,98 a 4,39 onde a meta é 0,50).
+      const policy = window.portalDebug && window.portalDebug.shader ? window.portalDebug.shader().policy : null;
+      if (policy && typeof policy.time === 'number') sessionStorage.setItem(TIME, String(policy.time));
+      else sessionStorage.removeItem(TIME);
       return true;
     } catch (error) {
       // Sem quota, sem `sessionStorage` (Safari em navegação privada): a viagem segue sem ponte e a
@@ -91,16 +101,21 @@
   function restore() {
     let data = null;
     let when = 0;
+    let tempo = null;
     try {
       data = sessionStorage.getItem(KEY);
       when = Number(sessionStorage.getItem(AT) || 0);
+      const guardado = sessionStorage.getItem(TIME);
+      tempo = guardado === null ? null : Number(guardado);
       // Lida uma vez e apagada: um recarregamento a seguir não mostra o quadro de uma visita antiga.
       sessionStorage.removeItem(KEY);
       sessionStorage.removeItem(AT);
+      sessionStorage.removeItem(TIME);
     } catch (error) {
       return null;
     }
     if (!data || !when || Date.now() - when > MAX_AGE) return null;
+    if (Number.isFinite(tempo) && tempo >= 0) bridgedTime = tempo;
     const image = document.createElement('img');
     image.className = 'ultimo-quadro';
     image.alt = '';
@@ -139,6 +154,10 @@
     hide: hide,
     element: function () {
       return shown;
+    },
+    // O tempo do shader que a página que saiu estava a desenhar, ou `null` quando não veio ponte.
+    shaderTime: function () {
+      return bridgedTime;
     }
   };
 })();
