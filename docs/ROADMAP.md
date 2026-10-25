@@ -3287,7 +3287,7 @@ fechada dos dois lados: o que os instrumentos medem e o que quem usa vê. **Marc
 | Bloco | O que entrega | O que fecha |
 | --- | --- | --- |
 | **B1** | As **duas** afirmações falsas que restavam no README — «o editor não grava» e «vídeo 360º como fundo é melhoria» — corrigidas, e «Melhorias Planejadas» a apontar para esta fase em vez de prometer o que já existe. **Feito com o plano (2026-10-24)** | a documentação desactualizada |
-| **B2** | `i18n/en.json` com as **160** chaves de `pt.json`; `?lang=en` deixa de cair no português | a lacuna do catálogo |
+| **B2** | `i18n/en.json` com as **164** chaves de `pt.json`; `?lang=en` deixa de cair no português. **Feito em 2026-10-25** — o `tools/regression/i18n.mjs` compara chaves, marcadores e frases, e abre a exposição e o editor em inglês (**9 de 9**) | a lacuna do catálogo |
 | **B3** | Editor: **exclusão em lote por dimensão**, com confirmação e **um** instantâneo de desfazer | a nota «não entrou» do B6 da Fase 4 |
 | **B4** | Editor: **catálogo de assets** editável (`id`, `path`, `type`, `alt` por língua), com a **L9** e a **L14** a medir cada alteração | «o editor não cria assets» |
 | **B5** | Dimensão `kind: "color"`: fundo plano no renderer, oferecido pelo painel da dimensão | o aviso «no flat background» |
@@ -3297,24 +3297,32 @@ fechada dos dois lados: o que os instrumentos medem e o que quem usa vê. **Marc
 | **B9** | Fundos shader: o A/B controlado fecha o **R14**; a política **20 → 15 FPS → estático** atrás de flag fecha o **R15**; `kind: "shader"` no esquema com `shaderId` de lista interna, `fallbackAsset` validado e piso de pixelRatio **1** | **R14** e **R15** |
 | **B10** | README, §14 e o fecho com o que cada bloco mediu | a verificação da fase |
 
-**Estado a 2026-10-24:** **B1** e **B9** estão feitos, e o **B9 passou a produção** por decisão do
-autor: as três salas correm shader (`scene1` → `grade-neon`, `scene2` → `por-do-sol`, `scene3` →
-`nuvens`), com o panorama como `fallbackAsset` e `?shader=0` como escape. O B9 entregou ainda o
-`kind: "shader"` com `shaderId` de lista interna, a política `20 → 15 FPS → estático` (piso de
-pixelRatio **1**), o fixture `?scene=shader`, o instrumento `tools/regression/shader.mjs` (**36**
+**Estado a 2026-10-25:** **B1**, **B2** e **B9** estão feitos, e o **B9 passou a produção** por
+decisão do autor: as três salas correm shader (`scene1` → `grade-neon`, `scene2` → `por-do-sol`,
+`scene3` → `nuvens`), com o panorama como `fallbackAsset` e `?shader=0` como escape. O B9 entregou
+ainda o `kind: "shader"` com `shaderId` de lista interna, a política `20 → 15 FPS → estático` (piso
+de pixelRatio **1**), o fixture `?scene=shader`, o instrumento `tools/regression/shader.mjs` (**36**
 verificações) e o **validador/instalador** `tools/shader/` (compila, mede e recusa abaixo de **19 de
 20** atualizações/s). O **A/B nos três aparelhos não foi registado**, logo **R14/R15 continuam
 abertos** — a decisão de produção está tomada com o teste do autor (telemóvel fraco e desktop), e
-não se declara fechado o que não foi medido. Os restantes blocos não começaram. O `pt.json` tem agora
-**163** chaves (as três do painel da dimensão), o que o **B2** tem de traduzir: a meta M2 passa a ser
-«todas as chaves», não as 160 do inventário de 2026-10-24.
+não se declara fechado o que não foi medido.
+
+O **B2** fechou em 2026-10-25: `i18n/en.json` tem as **164** chaves de `pt.json`, pela mesma ordem, e
+`tools/regression/i18n.mjs` (**9 de 9**) prova quatro coisas — as chaves são as mesmas, nenhuma
+tradução está vazia, os marcadores `{nome}` batem certo nas duas línguas e as frases traduzidas não
+ficaram iguais às portuguesas — e abre a exposição e o editor com `?lang=en` para confirmar a língua
+da página e a ausência de avisos do catálogo. A bateria corre **por omissão** no `all.mjs`: uma chave
+nova que entre só no `pt.json` é uma frase portuguesa a aparecer a quem abrir em inglês. O rótulo
+`editor.dimension.kind.shader` perdeu o «(ensaio)» que já não era verdade desde a produção do B9.
+
+Os restantes blocos não começaram.
 
 #### Metas de sucesso
 
 | # | Meta | Como se mede | Alvo |
 | --- | --- | --- | --- |
 | M1 | Nenhuma afirmação falsa no README | `grep` das três frases substituídas | **0** ocorrências |
-| M2 | As duas línguas dizem o mesmo | chaves de `pt.json` contra `en.json`, e `?lang=en` | **160 de 160** chaves, **0** avisos |
+| M2 | As duas línguas dizem o mesmo | chaves de `pt.json` contra `en.json`, e `?lang=en` | **164 de 164** chaves, **0** avisos |
 | M3 | O lote é uma operação | editor: excluir as **4** obras de uma dimensão | **1** comando, **1** instantâneo, `validate` **0** |
 | M4 | O catálogo é editável | editor: criar, alterar e remover um asset | os seletores acompanham; **0** erros de consola; **L9**/**L14** a avisar quando o ficheiro falta |
 | M5 | Os quatro valores do R9 são construídos | `laws-selftest` e um fixture com os quatro | avisos do R9 a **0**; o fixture constrói o que o nome promete |
@@ -3326,7 +3334,7 @@ não se declara fechado o que não foi medido. Os restantes blocos não começar
 
 1. **A linha de base intacta:** `node tools/regression/all.mjs` verde, com os números da Fase 6
    (**4 de 4**; **35** verificações nos doze, **20** nas portas/chegadas, **21** nas leis).
-2. **As duas línguas:** **160 de 160** chaves e nenhum aviso em `?lang=en`.
+2. **As duas línguas:** **164 de 164** chaves e nenhum aviso em `?lang=en`.
 3. **O que o esquema promete é construído:** um fixture com uma obra `model`, uma obra `text`, uma
    dimensão `color` e um `link` a navegar — medido no browser, não no validador.
 4. **O editor:** o lote por dimensão e o catálogo de assets medidos no painel, com **0** erros de

@@ -45,7 +45,7 @@
     "editor.dimension.kind": "Tipo de fundo",
     "editor.dimension.kind.image": "Imagem 360º",
     "editor.dimension.kind.video": "Vídeo 360º",
-    "editor.dimension.kind.shader": "Fundo shader (ensaio)",
+    "editor.dimension.kind.shader": "Fundo shader",
     "editor.dimension.kind.camera": "Câmara real",
     "editor.dimension.asset": "Asset do fundo",
     "editor.dimension.shader": "Shader",

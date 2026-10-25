@@ -31,7 +31,10 @@ const NUCLEO = [
 
 const CENA = [
   { nome: 'a cena: os doze testes (T2–T12) nas 5 páginas', script: 'tools/regression/twelve-tests.mjs' },
-  { nome: 'as portas: o T1 e a chegada (T7/T11)', script: 'tools/regression/traversal-tests.mjs' }
+  { nome: 'as portas: o T1 e a chegada (T7/T11)', script: 'tools/regression/traversal-tests.mjs' },
+  // Fase 7 (B2): as duas línguas dizem o mesmo. Corre por omissão porque uma chave nova que entre só
+  // no `pt.json` é uma frase portuguesa a aparecer a quem abrir em inglês.
+  { nome: 'as duas línguas (B2)', script: 'tools/regression/i18n.mjs' }
 ];
 
 const ARQUIVADAS = [
