@@ -45,6 +45,8 @@ export const DIMENSION_KINDS = ['image', 'video', 'color', 'camera', 'shader'];
 export const CONTENT_KINDS = ['image', 'video', 'model', 'text'];
 export const INTERACTIONS = ['modal', 'link', 'none'];
 export const TRIGGER_KINDS = ['plane', 'box'];
+// O movimento de uma porta (D59): rodar em torno de um eixo seu, ou dar a volta a um círculo.
+export const MOTION_KINDS = ['spin', 'orbit'];
 
 // A field descriptor:
 //   type      'int' | 'number' | 'string' | 'boolean' | 'vec3' | 'text' | 'asset'
@@ -258,7 +260,27 @@ export const SCENE = {
       // Which world this door is the arrival door for (D14, law L17): a visitor coming from that
       // world appears behind it. Optional — without it, arriving uses the position the camera
       // declares, and the validator warns.
-      arrivalFrom: { type: 'string' }
+      arrivalFrom: { type: 'string' },
+      // Movimento animado (D59, Fase 7 B8): até aqui uma porta era estática, e a §1 dizia «portais em
+      // movimento animado fica para depois». `spin` roda a porta em torno de um eixo seu; `orbit`
+      // faz-lhe dar a volta a um círculo de `radius` em torno de onde ela está, virando-se com o
+      // círculo. O `period` é o tempo de uma volta completa, em segundos. O `prefers-reduced-motion`
+      // do visitante pára tudo, como pára o shader.
+      motion: {
+        type: 'object',
+        fields: {
+          kind: { type: 'enum', oneOf: MOTION_KINDS, required: true },
+          period: { type: 'number', positive: true, default: 20 },
+          // O eixo da rotação, como três números que valem 0 ou 1: [0,1,0] é o eixo vertical, que é o
+          // que uma porta a girar no chão usa.
+          axis: { type: 'vec3', default: [0, 1, 0] },
+          radius: { type: 'number', positive: true }
+        },
+        rules: [
+          { when: { kind: 'spin' }, forbid: ['radius'] },
+          { when: { kind: 'orbit' }, require: ['radius'] }
+        ]
+      }
     }
   }
 };

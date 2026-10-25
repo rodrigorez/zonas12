@@ -131,6 +131,14 @@ async function medir(browser, site, alvo) {
           // compositor ainda mostra: dois `requestAnimationFrame` chegam para a cena se pintar.
           await browser.evaluate('new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))')
             .catch(() => { /* a página vai-se embora */ });
+          // O fundo do destino pára antes de se medir a costura. O quadro da ponte foi capturado com os
+          // shaders **congelados** (D54), por isso comparar com um destino a animar media o tempo que
+          // passou e não o corte: era isso que fazia o `scene2 → scene3` variar entre 0,34 e 0,56 sem
+          // nada mudar no código. Congelar aqui põe os dois lados no mesmo instante.
+          await browser.evaluate('(() => { if (window.portalDebug && window.portalDebug.freezeShaders) window.portalDebug.freezeShaders(); return true; })()')
+            .catch(() => { /* sem política (fundo de imagem): nada a congelar */ });
+          await browser.evaluate('new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))')
+            .catch(() => { /* a página vai-se embora */ });
           depoisDaPonte = await browser.screenshot(ESCALA);
         }
         amostras.push({ t: Date.now() - inicio, mean: shot.mean, blocks: shot.blocks, saiu: saiu });

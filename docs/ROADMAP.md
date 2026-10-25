@@ -3300,7 +3300,7 @@ fechada dos dois lados: o que os instrumentos medem e o que quem usa vê. **Marc
 | **B5** | Dimensão `kind: "color"`: fundo plano no renderer, oferecido pelo painel da dimensão. **Feito em 2026-10-25** — a esfera do fundo leva um `MeshBasicMaterial` com a cor do dado, o painel ganha o tipo e o campo da cor, e a lei L1 passa a exigir raio como nos outros fundos | o aviso «no flat background» |
 | **B6** | `interaction: "link"` a **navegar** para o endereço, em vez de o mostrar no modal. **Feito em 2026-10-25** — o componente do clique ganhou o modo, o painel oferece a interacção e o campo do endereço | a terceira coisa do **R9** |
 | **B7** | Obra `kind: "model"` (GLTF) e `kind: "text"` (texto 3D), com posição/rotação/tamanho como as outras. **Feito em 2026-10-25** — o GLTF vem do catálogo (tipo `model`, `<a-asset-item>`) e o `size` escala-o; o texto é desenhado num canvas e vai para um plano, sem fonte externa | as duas primeiras coisas do **R9** |
-| **B8** | Portais com **movimento e rotação animados**, declarados no dado | o «fica para depois» da §1 |
+| **B8** | Portais com **movimento e rotação animados**, declarados no dado. **Feito em 2026-10-25** — `spin` (roda sobre um eixo) e `orbit` (dá a volta a um círculo e vira-se com ele), com o período em segundos; a colisão continua a ser lida do mundo, por isso a travessia acontece onde a porta **está**; o `prefers-reduced-motion` do visitante pára-as, e uma porta em movimento não pode ser a porta de chegada (`motion.mjs`, **6 de 6**; T4/T9 nas 5 páginas + `example` com uma porta a rodar: **255/0** e **20** ciclos) | o «fica para depois» da §1 |
 | **B9** | Fundos shader: o A/B controlado fecha o **R14**; a política **20 → 15 FPS → estático** atrás de flag fecha o **R15**; `kind: "shader"` no esquema com `shaderId` de lista interna, `fallbackAsset` validado e piso de pixelRatio **1** | **R14** e **R15** |
 | **B10** | README, §14 e o fecho com o que cada bloco mediu | a verificação da fase |
 
@@ -3322,8 +3322,6 @@ da página e a ausência de avisos do catálogo. A bateria corre **por omissão*
 nova que entre só no `pt.json` é uma frase portuguesa a aparecer a quem abrir em inglês. O rótulo
 `editor.dimension.kind.shader` perdeu o «(ensaio)» que já não era verdade desde a produção do B9.
 
-Os restantes blocos não começaram.
-
 O **B3** e o **B4** fecharam também em 2026-10-25. O lote por dimensão sai como **uma** alteração
 (o `change` guarda o texto de antes uma só vez), a pergunta diz quantas obras vão sair, e o «Desfazer»
 devolve-as todas — medido no fixture `example`, que tem 5 obras na dimensão 0 e 2 na 1, para que
@@ -3334,6 +3332,11 @@ voltar a perguntar pelo ficheiro — é assim que a L9 aparece ao escrever um ca
 desaparece ao corrigi-lo. Ficou também uma chave que faltava desde a Fase 4 (`editor.artwork.asset`) e
 um `portalDebug.data()` no editor: o `state` do núcleo tem o que está construído, e um instrumento que
 mede o editor precisa do dado.
+
+O **B8** fechou no mesmo dia: uma porta pode andar (**D59**), com dois tipos declarados no dado
+(`spin` e `orbit`), e o movimento respeita o `prefers-reduced-motion` do visitante. A cena que os doze
+testes percorrem (`example`) passou a ter uma porta a rodar, e os números da Fase 6 mantiveram-se —
+T4 **255/0** fora da moldura e T9 **20** ciclos, nas 5 páginas mais o fixture. Falta o **B10**.
 
 O **B5**, o **B6** e o **B7** fecharam em 2026-10-25, com um fixture para os quatro valores (**D56**,
 **D57**, **D58**): `data/worlds/r9.json` (abre-se com `?scene=r9`, não é uma sala) tem uma dimensão
@@ -4031,6 +4034,7 @@ alteram comportamento.
 | D56 | A dimensão `kind: "color"` pinta um fundo liso | Era o primeiro dos quatro valores que a D30 dava como validados e não construídos. A esfera do fundo é a mesma das outras dimensões — o mesmo stencil, o mesmo registo, o mesmo `release` — e o que muda é o material: um `MeshBasicMaterial` com a cor do dado em vez de uma textura. Não há imagem para descodificar nem shader para compilar, por isso não tem reserva nem política de cadência, e o `shaderStatus()` passa a dizer `mode: "color"` e a cor. A lei L1 passa a exigir raio a este fundo como aos outros: sem ele a esfera não tem tamanho e o validador diz porquê. O painel da dimensão oferece o tipo desde o mesmo dia — o que a cena constrói, o painel oferece |
 | D57 | Um `interaction: "link"` navega para o endereço | O terceiro valor da D30, e o único que **levava o visitante a sair** da exposição — até aqui o endereço aparecia dentro do modal, o que num quiosque é uma parede. O componente do clique ganhou um modo: `modal` abre a janela da exposição, `link` faz `location.assign` para o endereço do dado. A escolha do modo é do dado (`interaction`), o construtor traduz, e o painel oferece as três interacções com o campo do endereço — que só aparece com `link`, a única em que significa alguma coisa. O `notBuilt` que existia no catálogo saiu: já não há nada a bloquear |
 | D58 | Uma obra pode ser um modelo GLTF ou um texto | As duas primeiras coisas da D30, fechadas juntas porque partilham a pergunta «o que é uma obra». O `kind` deixou de ser derivado do asset e passou a ser campo do dado, com regras no esquema: `image`, `video` e `model` pedem um asset do seu tipo; `text` **proíbe** o asset e pede o `text` por língua. O modelo vem do catálogo (`type: "model"`, um `<a-asset-item>`, e o `size` escala-o por eixo — um GLTF não tem «largura em metros»). O texto é desenhado num canvas e aplicado a um plano com transparência: **sem fonte externa**, porque o `text` do A-Frame vai buscar a fonte à rede e a exposição tem de abrir sem rede e com a consola limpa (T8). Um `applyStencil` protegido contra o segundo registo foi preciso: o `model-loaded` chega depois do `loaded`, e registar duas vezes deixaria uma entrada órfã no núcleo (A4) |
+| D59 | Uma porta pode andar, e o dado diz como | A §1 dizia «portais em movimento animado (fica para depois)»; a Fase 7 emendou-a. O `motion` do portal tem dois tipos — `spin`, que roda a porta sobre um eixo seu (`axis`, um vetor de 0/1), e `orbit`, que a faz dar a volta a um círculo de `radius` em torno de onde ela está e a vira com o círculo —, e um `period` em segundos por volta. Três promessas antigas continuam verdadeiras, e é isso que a lei e o instrumento provam: a colisão é lida do **mundo** (`portalGroup.worldToLocal` a cada quadro), por isso a travessia acontece onde a porta está e não onde o ficheiro a escreveu; o `prefers-reduced-motion` do visitante pára-a no instante em que está, como pára o shader; e uma porta em movimento **não pode** ser a porta de chegada (`arrivalFrom`) — o ponto de chegada vem do dado estático, e a L16 provaria uma coisa enquanto a cena fazia outra. O relógio é o do A-Frame (`tick(time)`) e não o `performance.now()`: a mesma cena anima o mesmo num quadro lento, e o instrumento pode perguntar «onde está a porta aos 10 s» e obter sempre a mesma resposta |
 
 **D48 a D51 fechadas em 2026-10-23** — a **Fase 5** (a gravação direta), que a Fase 4 tinha deixado
 condicionada à fricção de exportar. O que se decidiu, e o que se recusou: **um** servidor de

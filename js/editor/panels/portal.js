@@ -244,6 +244,91 @@ function card(portal, context, data) {
   windowAxis(box, portal, context, data);
   actionAxis(box, portal, context, data);
 
+  // O movimento animado (D59, B8). Os três campos seguem o tipo: `spin` pergunta o eixo, `orbit`
+  // pergunta o raio, e nenhum dos dois aparece quando a porta está parada.
+  const motion = portal.motion || {};
+  const motionKind = selectField(box, {
+    name: 'portal.' + portal.id + '.motion.kind',
+    labelKey: 'editor.portal.motion',
+    value: motion.kind || '',
+    options: ['', 'spin', 'orbit'].map((kind) => ({
+      value: kind,
+      label: kind === '' ? t('editor.portal.motion.none')
+        : t(kind === 'spin' ? 'editor.portal.motion.spin' : 'editor.portal.motion.orbit')
+    })),
+    onChange: (kind) => {
+      if (!kind) {
+        delete portal.motion;
+      } else {
+        if (!portal.motion) portal.motion = { period: 20 };
+        portal.motion.kind = kind;
+        // O que cada tipo não usa sai do dado: o esquema recusa um `radius` numa porta que roda e um
+        // eixo numa porta que dá a volta (as regras do formato), e um painel não escreve o que o
+        // validador vai recusar.
+        if (kind === 'orbit') delete portal.motion.axis;
+        else if (portal.motion.radius !== undefined) delete portal.motion.radius;
+      }
+      applyGeometry();
+      context.change();
+      context.rerender();
+    }
+  });
+
+  const motionPeriod = numberField(box, {
+    name: 'portal.' + portal.id + '.motion.period',
+    labelKey: 'editor.portal.motionPeriod',
+    value: typeof motion.period === 'number' ? motion.period : 20,
+    min: 1,
+    step: 1,
+    onChange: (value) => {
+      if (!portal.motion) return;
+      portal.motion.period = value;
+      applyGeometry();
+    }
+  });
+
+  const AXES = [
+    { value: '0,1,0', labelKey: 'editor.portal.motionAxis.y' },
+    { value: '1,0,0', labelKey: 'editor.portal.motionAxis.x' },
+    { value: '0,0,1', labelKey: 'editor.portal.motionAxis.z' }
+  ];
+  const axisAtual = Array.isArray(motion.axis) || (motion.axis && typeof motion.axis === 'object')
+    ? [motion.axis.x || 0, motion.axis.y || 0, motion.axis.z || 0].join(',')
+    : '0,1,0';
+  const motionAxis = selectField(box, {
+    name: 'portal.' + portal.id + '.motion.axis',
+    labelKey: 'editor.portal.motionAxis',
+    value: axisAtual,
+    options: AXES.map((axis) => ({ value: axis.value, label: t(axis.labelKey) })),
+    onChange: (value) => {
+      if (!portal.motion) return;
+      portal.motion.axis = value.split(',').map(Number);
+      applyGeometry();
+    }
+  });
+
+  const motionRadius = numberField(box, {
+    name: 'portal.' + portal.id + '.motion.radius',
+    labelKey: 'editor.portal.motionRadius',
+    value: typeof motion.radius === 'number' ? motion.radius : 3,
+    min: 0.5,
+    step: 0.5,
+    onChange: (value) => {
+      if (!portal.motion) return;
+      portal.motion.radius = value;
+      applyGeometry();
+    }
+  });
+
+  const syncMotion = () => {
+    const kind = (portal.motion && portal.motion.kind) || '';
+    motionPeriod.element.hidden = kind === '';
+    motionAxis.element.hidden = kind !== 'spin';
+    motionRadius.element.hidden = kind !== 'orbit';
+  };
+  syncMotion();
+  motionKind.input.addEventListener('change', syncMotion);
+
   textField(box, {
     name: 'portal.' + portal.id + '.arrivalFrom',
     labelKey: 'editor.portal.arrivalFrom',

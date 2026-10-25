@@ -256,6 +256,15 @@ export function validateScene(scene, options = {}) {
   const arrivalDoors = new Map();
   for (const portal of scene.portals || []) {
     if (typeof portal.arrivalFrom !== 'string') continue;
+    // D59: uma porta que se mexe não pode ser a porta de chegada. O ponto de chegada é calculado do
+    // dado (`js/scene/arrival.js`), e o dado de uma porta em movimento descreve onde ela estava no
+    // instante em que o ficheiro foi escrito — a L16 provaria uma coisa e a cena faria outra, com o
+    // visitante a aparecer dentro da caixa em movimento.
+    if (portal.motion && portal.motion.kind) {
+      err(`portals[${portal.id}]: it is the arrival door of "${portal.arrivalFrom}" and it declares ` +
+        `motion "${portal.motion.kind}" — a moving door cannot be the one a visitor arrives behind (D59)`);
+      continue;
+    }
     const previous = arrivalDoors.get(portal.arrivalFrom);
     if (previous !== undefined) {
       err(`portals[${portal.id}]: it is the arrival door of "${portal.arrivalFrom}", and so is ` +

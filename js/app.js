@@ -14,7 +14,7 @@ import {
 } from './core/index.js';
 import { startSession, cameraAlreadyAllowed, cameraFirstFrame, showStartButton, showLoading } from './modules/camera.js';
 import { closeArtwork, toggleArtworkLabels } from './modules/artwork.js';
-import { startFrameDriver, traversalRecord } from './modules/portal.js';
+import { startFrameDriver, traversalRecord, freezeMotion } from './modules/portal.js';
 import { shaderStatus, freezeShaders } from './modules/dimension.js';
 // A sonda de campo (R14): só desenha alguma coisa com `?sonda=1`, e é o que permite ler os números
 // num telemóvel, onde não há consola.
@@ -52,8 +52,15 @@ window.portalDebug = {
   traversal: () => traversalRecord(),
   // The tests compare captures of the same scene (R16): a background that animates changes every
   // pixel between them. This is the lever that stops it, and it is the visitor's own
-  // `prefers-reduced-motion` mechanism.
-  freezeShaders: freezeShaders
+  // `prefers-reduced-motion` mechanism. Uma porta em movimento (D59) é a mesma história: o lever pára
+  // as duas coisas, porque quem o puxa quer o ecrã parado e não meio parado.
+  freezeShaders: () => {
+    const stopped = freezeShaders();
+    freezeMotion(true);
+    return stopped;
+  },
+  // O movimento das portas, sozinho (D59), para um instrumento que só olha para elas.
+  freezeMotion: (frozen) => freezeMotion(frozen)
 };
 
 // Development keyboard shortcuts: one listener for the whole scene, walking the portal

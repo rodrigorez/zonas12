@@ -73,6 +73,24 @@ export function traversalRecord() {
 const _worldPoint = new THREE.Vector3();
 const _boxPoint = new THREE.Vector3();
 
+// Os instrumentos e o `prefers-reduced-motion` precisam de parar o movimento das portas (D59): uma
+// captura que compara dois instantes não pode ter uma porta a andar pelo meio. Fica aqui, no módulo,
+// porque é o módulo que anima — quem pergunta não tem de conhecer as portas uma a uma.
+let motionFrozen = false;
+
+// O visitante que pediu menos movimento fica com as portas paradas (D59), como fica com o shader: é o
+// mesmo pedido do sistema, e uma porta a andar à volta da sala é exactamente o que ele pediu para não
+// ver. Lido uma vez, à carga do módulo: o `prefers-reduced-motion` de uma página não muda a meio.
+if (typeof window !== 'undefined' && typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  motionFrozen = true;
+}
+
+export function freezeMotion(frozen) {
+  motionFrozen = frozen !== false;
+  return motionFrozen;
+}
+
 // A-Frame's vec3 in the object form of setAttribute needs { x, y, z }: an array there is read as
 // an object with no axes and falls back to the default, silently (measured in A-Frame 1.8,
 // utils/coordinates.js parse). The data writes vectors as arrays, so the factories below
@@ -122,7 +140,12 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     label: { type: 'string', default: '' },
     // Whether the name starts visible. The exhibition shows it with the debug key; the editor's
     // preview, which has no key of its own, shows it from the start (it is a tool, D3).
-    labelAlways: { type: 'boolean', default: false }
+    labelAlways: { type: 'boolean', default: false },
+    // O movimento animado (D59). Vazio é uma porta parada, que é o que quase todas são.
+    motionKind: { type: 'string', default: '', oneOf: ['', 'spin', 'orbit'] },
+    motionPeriod: { type: 'number', default: 20 },
+    motionAxis: { type: 'vec3', default: { x: 0, y: 1, z: 0 } },
+    motionRadius: { type: 'number', default: 0 }
   },
   init: function () {
     let id = this.data.id;
@@ -262,8 +285,50 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     this.maskMat.stencilRef = value;
   },
   // A-Frame calls this when the attribute changes; the box and the debug box are always built
-  // from the same values.
-  update: function () { this.configureBox(); },
+  // from the same values. O movimento (D59) parte sempre da pose do dado: guardar a base aqui é o
+  // que faz `tick` animar **em torno** da porta que o ficheiro descreve e não à volta de si mesma.
+  update: function () {
+    this.configureBox();
+    this.basePosition = this.el.object3D.position.clone();
+    this.baseRotation = this.el.object3D.rotation.clone();
+  },
+  // O movimento animado (D59): uma volta completa a cada `motionPeriod` segundos. O relógio é o do
+  // A-Frame (`time`, em ms) e não o `performance.now()` — assim a mesma cena anima o mesmo com um
+  // quadro lento, e a bateria pode perguntar «onde está a porta aos 10 s» e obter sempre o mesmo.
+  //
+  // O `prefers-reduced-motion` do visitante e o `freezeMotion` dos instrumentos param o movimento no
+  // **instante em que estão**: a porta fica onde está, como o shader fica no quadro em que estava.
+  animate: function (time) {
+    const kind = this.data.motionKind;
+    if (!kind || motionFrozen || this.data.motionPeriod <= 0) return;
+    const period = this.data.motionPeriod * 1000;
+    const phase = (time % period) / period;
+    if (!this.basePosition) {
+      this.basePosition = this.el.object3D.position.clone();
+      this.baseRotation = this.el.object3D.rotation.clone();
+    }
+    const base = this.baseRotation;
+    if (kind === 'spin') {
+      // A volta aplica-se sobre o eixo escolhido, somada à rotação do dado.
+      const axis = this.data.motionAxis;
+      const turn = phase * Math.PI * 2;
+      this.el.object3D.rotation.set(
+        base.x + turn * axis.x,
+        base.y + turn * axis.y,
+        base.z + turn * axis.z
+      );
+      return;
+    }
+    const radius = this.data.motionRadius;
+    const angle = phase * Math.PI * 2;
+    this.el.object3D.position.set(
+      this.basePosition.x + Math.cos(angle) * radius,
+      this.basePosition.y,
+      this.basePosition.z + Math.sin(angle) * radius
+    );
+    // Vira-se com o círculo: a janela olha sempre para fora do centro que ela descreve.
+    this.el.object3D.rotation.set(base.x, base.y + angle, base.z);
+  },
   configureBox: function () {
     const box = this.data.box;
     const position = this.data.boxPosition;
@@ -459,8 +524,11 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
 // One pass per frame for the whole scene: every portal detects its own traversal and the core
 // decides what each window shows. A single place decides, so several portals never disagree.
 AFRAME.registerComponent('portal-driver', {
-  tick: function () {
+  tick: function (time) {
     state.portals.slice().forEach(function (portal) {
+      // O movimento vem antes da colisão: a caixa é lida do mundo, por isso a porta é detectada onde
+      // ela **está** neste quadro e não onde o ficheiro a escreveu (D59).
+      portal.animate(time);
       portal.detectTraversal();
     });
 
@@ -523,6 +591,14 @@ export function createPortal(portal, parent, derived = {}) {
   if (portal.frame) {
     if (portal.frame.color) settings.frameColor = portal.frame.color;
     if (typeof portal.frame.thickness === 'number') settings.frameThickness = portal.frame.thickness;
+  }
+  // O movimento animado (D59). Os valores que o dado não escrever ficam com os defaults do componente
+  // (uma volta em 20 s, no eixo vertical), e o `radius` só existe em `orbit`.
+  if (portal.motion && portal.motion.kind) {
+    settings.motionKind = portal.motion.kind;
+    if (typeof portal.motion.period === 'number') settings.motionPeriod = portal.motion.period;
+    if (portal.motion.axis) settings.motionAxis = vector(portal.motion.axis);
+    if (typeof portal.motion.radius === 'number') settings.motionRadius = portal.motion.radius;
   }
 
   const el = document.createElement('a-entity');

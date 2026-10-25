@@ -47,6 +47,8 @@ const ARQUIVADAS = [
   // Fase 7 (B3/B4): o lote por dimensão e o catálogo de assets editável.
   { nome: 'a exclusão em lote por dimensão (B3)', script: 'tools/regression/lote.mjs' },
   { nome: 'o catálogo de assets editável (B4)', script: 'tools/regression/assets.mjs' },
+  // Fase 7 (B8): as portas em movimento.
+  { nome: 'os portais em movimento (B8)', script: 'tools/regression/motion.mjs' },
   { nome: 'a costura das travessias (D46)', script: 'tools/regression/seam.mjs' },
   { nome: 'a orientação do telemóvel (D52)', script: 'tools/regression/orientation.mjs' },
   { nome: 'a chegada por uma porta (D37)', script: 'tools/regression/camera-arrival.mjs' },

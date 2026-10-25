@@ -48,6 +48,16 @@
         "pt": "Fundo liso de ensaio",
         "en": "Trial flat background"
       }
+    },
+    {
+      "id": 1,
+      "kind": "color",
+      "color": "#203020",
+      "radius": 100,
+      "name": {
+        "pt": "Segundo fundo liso",
+        "en": "Second flat background"
+      }
     }
   ],
   "artworks": [
@@ -160,5 +170,108 @@
       }
     }
   ],
-  "portals": []
+  "portals": [
+    {
+      "id": 0,
+      "ownedBy": 0,
+      "position": [
+        -6,
+        0,
+        -20
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "width": 3,
+      "height": 4,
+      "box": [
+        3,
+        4,
+        1
+      ],
+      "boxPosition": [
+        0,
+        2,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.2
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "enter-window"
+      },
+      "motion": {
+        "kind": "spin",
+        "period": 12,
+        "axis": [
+          0,
+          1,
+          0
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "ownedBy": 0,
+      "position": [
+        6,
+        0,
+        -20
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "width": 3,
+      "height": 4,
+      "box": [
+        3,
+        4,
+        1
+      ],
+      "boxPosition": [
+        0,
+        2,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.2
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "enter-window"
+      },
+      "motion": {
+        "kind": "orbit",
+        "period": 24,
+        "radius": 3
+      }
+    }
+  ]
 }
