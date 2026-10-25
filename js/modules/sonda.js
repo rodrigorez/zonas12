@@ -45,7 +45,9 @@ function orientacao() {
   const estado = window.portalDebug.orientation ? window.portalDebug.orientation() : null;
   if (!estado) return '—';
   if (estado.jitter === null || estado.jitter === undefined) {
-    return (estado.tracking === false ? 'desligado' : 'a medir') + ' · ' + (estado.reason || '');
+    if (estado.reason === 'a medir') return 'a medir (6 s)';
+    if (estado.reason === 'sem amostras') return 'sem sensor (nenhum evento)';
+    return (estado.tracking === false ? 'desligado' : 'ligado') + ' · ' + (estado.reason || '');
   }
   return (estado.tracking ? 'ligado' : 'desligado') +
     ' · tremor ' + estado.jitter.toFixed(2) +
