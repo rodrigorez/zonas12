@@ -7,20 +7,23 @@
 // take it from and a `model` has one, from the catalogue.
 import { t, currentLanguage } from '../../i18n.js';
 import { textIn, LANGUAGES } from '../../scene/schema.js';
+import { artworkPageHref } from '../../scene/artwork-page.js';
 import { playerCamera } from '../../modules/camera.js';
 import * as preview from '../preview.js';
 import { heading, textField, numberField, selectField, button, note, vec3Field, debounce } from '../fields.js';
 
-const KINDS = ['image', 'video', 'model', 'text'];
+const KINDS = ['image', 'video', 'model', 'text', 'site'];
 const KIND_LABEL = {
   image: 'editor.artwork.kind.image',
   video: 'editor.artwork.kind.video',
   model: 'editor.artwork.kind.model',
-  text: 'editor.artwork.kind.text'
+  text: 'editor.artwork.kind.text',
+  site: 'editor.artwork.kind.site'
 };
 
-const INTERACTIONS = ['modal', 'link', 'none'];
+const INTERACTIONS = ['page', 'modal', 'link', 'none'];
 const INTERACTION_LABEL = {
+  page: 'editor.artwork.interaction.page',
   modal: 'editor.artwork.interaction.modal',
   none: 'editor.artwork.interaction.none',
   link: 'editor.artwork.interaction.link'
@@ -40,7 +43,6 @@ function catalogueAssets(data, kind) {
     .filter(([, asset]) => asset && asset.type === wanted)
     .map(([id, asset]) => ({ id: id, type: asset.type }));
 }
-
 function nextId(artworks) {
   return (artworks || []).reduce((biggest, artwork) => Math.max(biggest, Number(artwork.id) || 0), -1) + 1;
 }
@@ -197,6 +199,59 @@ function card(artwork, context, data, dimensions) {
     textFields.forEach((field) => { field.element.hidden = !isText; });
   };
   syncFields();
+
+  // A ficha da obra (D60): quem a fez e o que ela é, por língua, e o site que a ficha tenta embutir.
+  // Sem estes campos a ficha abria sem autor e sem uma linha sobre a obra.
+  const authorFields = LANGUAGES.map((language) => textField(box, {
+    name: 'artwork.' + artwork.id + '.author.' + language,
+    label: t('editor.artwork.authorIn', { language: language }),
+    value: artwork.author ? artwork.author[language] : '',
+    onChange: (text) => {
+      if (!artwork.author) artwork.author = {};
+      if (text.trim() === '') delete artwork.author[language];
+      else artwork.author[language] = text;
+      if (Object.keys(artwork.author).length === 0) delete artwork.author;
+      apply();
+    }
+  }));
+
+  const synopsisFields = LANGUAGES.map((language) => textField(box, {
+    name: 'artwork.' + artwork.id + '.synopsis.' + language,
+    label: t('editor.artwork.synopsisIn', { language: language }),
+    value: artwork.synopsis ? artwork.synopsis[language] : '',
+    onChange: (text) => {
+      if (!artwork.synopsis) artwork.synopsis = {};
+      if (text.trim() === '') delete artwork.synopsis[language];
+      else artwork.synopsis[language] = text;
+      if (Object.keys(artwork.synopsis).length === 0) delete artwork.synopsis;
+      apply();
+    }
+  }));
+
+  textField(box, {
+    name: 'artwork.' + artwork.id + '.site',
+    labelKey: 'editor.artwork.site',
+    value: artwork.site || '',
+    onChange: (value) => {
+      if (value.trim()) artwork.site = value.trim();
+      else delete artwork.site;
+      apply();
+    }
+  });
+
+  // Abre no browser a ficha que o dado produz — o mesmo caminho que a cena usaria (D60). É o que
+  // permite ao autor ver a página sem ir à exposição.
+  const mundo = (context.world() && context.world().world && context.world().world.slug) || '';
+  button(box, {
+    labelKey: 'editor.artwork.openPage',
+    name: 'artwork.' + artwork.id + '.page',
+    disabled: !mundo,
+    onClick: () => {
+      if (!mundo) return;
+      const href = artworkPageHref(mundo, artwork.id, currentLanguage());
+      if (href) window.open(href, '_blank', 'noopener');
+    }
+  });
 
   for (const language of LANGUAGES) {
     textField(box, {

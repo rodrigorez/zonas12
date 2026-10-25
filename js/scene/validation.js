@@ -177,12 +177,26 @@ export function validateScene(scene, options = {}) {
     if (artwork.kind === 'text' && !artwork.text) {
       err(`${where}: kind "text" needs its text (the content of the work, per language)`);
     }
+    // Uma obra `site` é uma página (D60): o `site` é o que ela mostra, e o `asset` — quando existe — é
+    // a imagem que fica no lugar dela. Um site que não é um endereço não é um site.
+    if (artwork.kind === 'site') {
+      if (!artwork.site) err(`${where}: kind "site" needs its site (the address the page tries to embed)`);
+      else if (!/^https?:\/\//i.test(artwork.site)) {
+        err(`${where}: site "${artwork.site}" is not an http(s) address`);
+      }
+      if (artwork.asset && asset && asset.type !== 'image') {
+        err(`${where}: the asset of a "site" work is the image that stands in for it, so it has to be an image`);
+      }
+    }
+    if (artwork.site && !/^https?:\/\//i.test(artwork.site)) {
+      err(`${where}: site "${artwork.site}" is not an http(s) address`);
+    }
     if (artwork.interaction === 'link' && !artwork.url) {
       err(`${where}: interaction "link" needs a url (an external address, which is not an asset)`);
     }
     if (artwork.interaction !== 'link' && artwork.url) {
       err(`${where}: url is only for interaction "link" — with "${artwork.interaction}" the url comes from the ` +
-        `asset catalogue (D20), and having both is the duplication A6 closed`);
+        `asset catalogue (D20) or from the ficha (D60), and having both is the duplication A6 closed`);
     }
   }
 

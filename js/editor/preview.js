@@ -99,7 +99,11 @@ export function replaceArtwork(artwork, catalogue) {
   const data = withDefaults(artwork, SCENE.artworks);
   // The address an artwork opens is derived from the catalogue, never written in the data (D20) — and
   // it is the builder's own function, so the preview cannot open something the exhibition would not.
-  data.url = addressToOpen(data, catalogue);
+  // A ficha (D60) precisa também do mundo e da língua, e o editor sabe os dois.
+  data.url = addressToOpen(data, catalogue, {
+    world: built.scene && built.scene.world ? built.scene.world.slug : null,
+    language: currentLanguage()
+  });
   const created = createArtwork(data, previewElement(), {
     label: artworkLabel(data, built.scene && built.scene.dimensions),
     labelAlways: true,

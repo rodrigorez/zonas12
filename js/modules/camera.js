@@ -26,7 +26,11 @@ const MOBILE_SPEED = 0.1;
 const CAMERA_RIG = {
   lookControls: { pointerLockEnabled: false },
   wasdControls: { acceleration: 45 },
-  cursor: { color: '#ffffff', opacity: 0.8, objects: '.interactable' }
+  // `fuse: false` explícito: no A-Frame o cursor **funde-se por omissão num telemóvel**, e um
+  // visitante que olhasse para uma obra durante 1,5 s abria-a sem tocar em nada. Com o modal isso era
+  // um janela que se fechava; desde a D60 é uma **mudança de página** — um olhar tirava o visitante da
+  // exposição. Um toque continua a abrir a obra; o que deixa de haver é a obra a abrir-se sozinha.
+  cursor: { color: '#ffffff', opacity: 0.8, objects: '.interactable', fuse: false }
 };
 
 const held = { forward: false, backward: false, left: false, right: false };

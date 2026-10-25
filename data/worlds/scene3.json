@@ -96,7 +96,7 @@
         3,
         0.1
       ],
-      "interaction": "modal"
+      "interaction": "page"
     },
     {
       "id": 9,
@@ -118,7 +118,7 @@
         3,
         0.1
       ],
-      "interaction": "modal"
+      "interaction": "page"
     }
   ],
   "portals": [

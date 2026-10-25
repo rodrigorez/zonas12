@@ -23,6 +23,8 @@ import { validateScene, unreachableWorlds, missingArrivals } from '../../js/scen
 import { checkArranques } from './arranques.mjs';
 import { diskQuestions } from './disk.mjs';
 import { ENTRY_WORLD } from '../../js/modules/portal-kinds.js';
+import { artworkPagePath } from '../../js/scene/artwork-page.js';
+import { pageFingerprint } from '../artwork/build.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
@@ -93,6 +95,37 @@ for (const file of files) {
   for (const warning of report.warnings) console.log(`  warning: ${warning}`);
   for (const error of report.errors) console.error(`  error: ${error}`);
   if (!report.ok) failed++;
+}
+
+// L20 (D60): a ficha de cada obra existe e não está velha. A ficha é gerada
+// (`tools/artwork/build.mjs`) e regista no próprio ficheiro o resumo do dado com que foi feita; aqui
+// compara-se esse resumo com o dado de agora. Sem esta lei a ficha era uma cópia que envelhece em
+// silêncio — o mesmo defeito que a D20 fechou para os endereços, só que numa página inteira.
+const fichas = [];
+for (const scene of validated) {
+  const slug = scene.world && scene.world.slug;
+  for (const artwork of scene.artworks || []) {
+    const path = artworkPagePath(slug, artwork.id);
+    const file = join(root, path);
+    const esperado = pageFingerprint(scene, artwork);
+    if (!existsSync(file)) {
+      fichas.push(`${path} não existe — corre \`node tools/artwork/build.mjs\``);
+      continue;
+    }
+    const html = readFileSync(file, 'utf8');
+    const achado = /data-ficha="([0-9a-f]+)"/.exec(html);
+    if (!achado) fichas.push(`${path} não diz de que dado foi feita — regenera-a`);
+    else if (achado[1] !== esperado) {
+      fichas.push(`${path} está velha: o dado mudou desde que foi gerada (${achado[1]} → ${esperado})`);
+    }
+  }
+}
+console.log('fichas de obra: ' + (fichas.length === 0
+  ? 'todas em dia (L20)'
+  : `${fichas.length} desactualizada(s) (L20)`));
+for (const linha of fichas) {
+  console.error(`  error: ${linha}`);
+  failed++;
 }
 
 // O grafo: todas as salas têm de ser alcançáveis a partir do portão (D14). Vale a pena só quando

@@ -78,9 +78,10 @@ function verificar(result, pagina, report, ruido) {
     ', ruido=' + t5.ruidoNoMesmoDesenho);
 
   const t6 = testes.T6 || {};
-  result.check(nome + ' · T6: o clique na obra abre o modal (ou não há obras aqui)',
+  result.check(nome + ' · T6: o clique na obra abre o modal, ou leva à ficha (D60)',
     t6.passou === true || t6.aplicavel === false,
-    t6.aplicavel === false ? 'não aplicável: ' + t6.porque : 'src=' + t6.src);
+    t6.aplicavel === false ? 'não aplicável: ' + t6.porque
+      : (t6.modo === 'page' ? 'ficha: ' + t6.url : 'src=' + t6.src));
 
   const t9 = testes.T9 || {};
   const igual = t9.antes && t9.depois &&

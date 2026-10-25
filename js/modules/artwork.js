@@ -133,15 +133,16 @@ AFRAME.registerComponent('cursor-listener', {
 AFRAME.registerComponent(OPENING_COMPONENT, {
   schema: {
     url: { type: 'string' },
-    // O que o clique faz (D57): `modal` abre a obra na janela da exposição; `link` **navega** para o
-    // endereço. Era o que faltava do R9 — o endereço validava e aparecia dentro do modal, e quem o
-    // punha num mundo queria sair para fora dele.
+    // O que o clique faz (D57/D60): `modal` abre a obra na janela da exposição, `page` **navega para a
+    // ficha da obra** (a página gerada, no mesmo separador), `link` navega para o endereço. Era o que
+    // faltava do R9 — o endereço validava e aparecia dentro do modal, e quem o punha num mundo queria
+    // sair para fora dele.
     mode: { type: 'string', default: 'modal' }
   },
   init: function () {
     this.el.addEventListener('click', () => {
       if (!this.canInteract()) return;
-      if (this.data.mode === 'link') {
+      if (this.data.mode === 'page' || this.data.mode === 'link') {
         if (this.data.url) window.location.assign(this.data.url);
         return;
       }
@@ -342,7 +343,9 @@ export function createArtwork(artwork, parent, derived = {}) {
   settings.labelY = artwork.size[1] / 2;
   el.setAttribute(ARTWORK_COMPONENT, settings);
   if (artwork.url) {
-    const mode = artwork.interaction === 'link' ? 'link' : 'modal';
+    // O modo vem da interacção: `page` leva à ficha (D60), `link` ao endereço, o resto ao modal.
+    const mode = artwork.interaction === 'page' ? 'page'
+      : (artwork.interaction === 'link' ? 'link' : 'modal');
     el.setAttribute(OPENING_COMPONENT, { url: artwork.url, mode: mode });
   }
   parent.appendChild(el);

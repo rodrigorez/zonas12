@@ -104,6 +104,7 @@
     "editor.artwork.rotation": "Rotação (graus)",
     "editor.artwork.size": "Tamanho (largura, altura, espessura)",
     "editor.artwork.interaction": "Interacção",
+    "editor.artwork.interaction.page": "Abrir a ficha da obra",
     "editor.artwork.interaction.modal": "Abrir no modal",
     "editor.artwork.interaction.none": "Sem clique",
     "editor.artwork.interaction.link": "Ligação externa",
@@ -204,6 +205,11 @@
     "editor.error.exportBlocked": "Não exportado: {count} erro(s) no mundo. O ficheiro exportado é o que se commita, e um mundo com erros não passa no validador.",
     "editor.error.saveBlocked": "Não gravado: {count} erro(s) no mundo. É a mesma regra do exportar — o que se grava é o que se commita.",
     "editor.error.saveFailed": "Não foi possível gravar {file}: {message}",
-    "editor.error.saveNotFromDisk": "Gravar só substitui um mundo que veio de data/worlds/ — exporte este e ponha-o lá (D31)."
+    "editor.error.saveNotFromDisk": "Gravar só substitui um mundo que veio de data/worlds/ — exporte este e ponha-o lá (D31).",
+    "editor.artwork.authorIn": "Autor ({language})",
+    "editor.artwork.synopsisIn": "Sinopse ({language})",
+    "editor.artwork.site": "Site da obra",
+    "editor.artwork.openPage": "Abrir a ficha da obra",
+    "editor.artwork.kind.site": "Página (site da obra)"
   }
 }

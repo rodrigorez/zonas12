@@ -429,9 +429,26 @@ export async function checkArtworkClick(options = {}) {
     ? {
       tag: cursor.intersectedEl.tagName,
       dimensao: (cursor.intersectedEl.getAttribute('dimensional-material') || {}).dimension,
-      url: (cursor.intersectedEl.getAttribute('open-artwork') || {}).url || null
+      url: (cursor.intersectedEl.getAttribute('open-artwork') || {}).url || null,
+      modo: (cursor.intersectedEl.getAttribute('open-artwork') || {}).mode || null
     }
     : null;
+
+  // D60: uma obra com `interaction: "page"` abre a **ficha** — navegar. Clicar aqui levava a página
+  // com ela e deixava a bateria a meio, por isso o que se mede é o endereço que o clique usaria: ele
+  // tem de acabar em `obras/<id>.html`, e que o clique navegue mesmo é o que a bateria da ficha faz.
+  if (apontado && apontado.modo === 'page') {
+    const id = cursor.intersectedEl.getAttribute('data-artwork-id');
+    const esperado = 'obras/' + id + '.html';
+    return {
+      obra: mesh.name,
+      dimensao: dimensao,
+      apontado: apontado,
+      modo: 'page',
+      url: apontado.url,
+      passou: typeof apontado.url === 'string' && apontado.url.indexOf(esperado) >= 0
+    };
+  }
 
   enviar('mousedown');
   await new Promise((resolve) => setTimeout(resolve, 60));

@@ -22,6 +22,7 @@ import { createArtwork, removeArtwork } from '../modules/artwork.js';
 import { createPortal, removePortal, setWorld, setNavigation } from '../modules/portal.js';
 import { ENTRY_WORLD } from '../modules/portal-kinds.js';
 import { arrivalPoint } from './arrival.js';
+import { artworkPageHref } from './artwork-page.js';
 import { t } from '../i18n.js';
 
 // Fills in the defaults the schema declares, so that the rest of this file — and the factories —
@@ -178,7 +179,8 @@ export async function buildScene(scene, options = {}) {
 
   for (const artwork of scene.artworks || []) {
     const data = withDefaults(artwork, SCENE.artworks);
-    data.url = addressToOpen(data, catalogue);
+    // O mundo e a língua são o que a ficha precisa para se nomear (D60).
+    data.url = addressToOpen(data, catalogue, { world: options.world || (scene.world && scene.world.slug), language: language });
     elements.artworks.push(createArtwork(data, parent, {
       label: artworkLabel(data, scene.dimensions, language),
       labelAlways: options.labels === true,
@@ -231,12 +233,22 @@ function arrivalDoor(scene, from) {
   return (scene.portals || []).find((portal) => portal.arrivalFrom === from) || null;
 }
 
-// What an artwork opens, if it opens anything: an external address when `interaction` is `link`,
-// and otherwise the file the catalogue has for its asset (D20 — the artwork names the asset once
-// and the address derives from it, here, in one place). Exported because the editor re-creates one
-// artwork at a time and has to resolve the same address the same way (Fase 4, D33).
-export function addressToOpen(artwork, catalogue) {
+// What an artwork opens, if it opens anything: the **ficha** of the artwork when the interaction is
+// `page` (D60 — derived in the one place that names the file, js/scene/artwork-page.js), an external
+// address when it is `link`, and otherwise the file the catalogue has for its asset (D20 — the
+// artwork names the asset once and the address derives from it, here, in one place). Exported because
+// the editor re-creates one artwork at a time and has to resolve the same address the same way
+// (Fase 4, D33).
+//
+// `context` é o que o sítio precisa para escrever o endereço da ficha: o mundo e a língua. Sem ele não
+// há ficha a apontar — e é por isso que o chamador o passa sempre, em vez de o adivinhar aqui.
+export function addressToOpen(artwork, catalogue, context) {
   if (artwork.interaction === 'link') return artwork.url || null;
+  if (artwork.interaction === 'page') {
+    const slug = context && context.world;
+    if (!slug) return null;
+    return artworkPageHref(slug, artwork.id, context.language);
+  }
   if (artwork.interaction !== 'modal') return null;
   const asset = catalogue[artwork.asset];
   return asset && asset.path ? asset.path : null;

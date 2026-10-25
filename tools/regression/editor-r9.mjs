@@ -58,11 +58,11 @@ async function main() {
       };
     })()`).catch((error) => ({ erro: error.message }));
 
-    result.check('o painel da obra oferece os quatro tipos',
-      Array.isArray(paineis.tipos) && paineis.tipos.join(',') === 'image,video,model,text',
+    result.check('o painel da obra oferece os cinco tipos',
+      Array.isArray(paineis.tipos) && paineis.tipos.join(',') === 'image,video,model,text,site',
       JSON.stringify(paineis.tipos));
-    result.check('e as três interacções, com a ligação incluída',
-      Array.isArray(paineis.interaccoes) && paineis.interaccoes.join(',') === 'modal,link,none',
+    result.check('e as quatro interacções, com a ficha e a ligação incluídas',
+      Array.isArray(paineis.interaccoes) && paineis.interaccoes.join(',') === 'page,modal,link,none',
       JSON.stringify(paineis.interaccoes));
     result.check('a obra de texto mostra o texto e esconde o asset',
       paineis.textoVisivel === true && paineis.assetDoTextoEscondido === true,

@@ -83,8 +83,16 @@
       ],
       "interaction": "none",
       "title": {
-        "pt": "Imagem",
-        "en": "Image"
+        "pt": "Torre ao entardecer",
+        "en": "Tower at dusk"
+      },
+      "author": {
+        "pt": "Autor de ensaio",
+        "en": "Trial author"
+      },
+      "synopsis": {
+        "pt": "Uma fotografia de ensaio, só para a ficha ter o que mostrar: imagem, título, autor e sinopse.",
+        "en": "A trial photograph, only so the page has something to show: image, title, author and synopsis."
       }
     },
     {
@@ -109,8 +117,16 @@
       ],
       "interaction": "none",
       "title": {
-        "pt": "Modelo",
-        "en": "Model"
+        "pt": "Caixa de ensaio",
+        "en": "Trial box"
+      },
+      "author": {
+        "pt": "Autor de ensaio",
+        "en": "Trial author"
+      },
+      "synopsis": {
+        "pt": "Um modelo GLTF mínimo (oito vértices) para provar que uma obra pode ser uma malha.",
+        "en": "A minimal GLTF model (eight vertices) to prove an artwork can be a mesh."
       }
     },
     {
@@ -138,14 +154,22 @@
       ],
       "interaction": "none",
       "title": {
-        "pt": "Texto",
-        "en": "Text"
+        "pt": "Texto de ensaio",
+        "en": "Trial text"
+      },
+      "author": {
+        "pt": "Autor de ensaio",
+        "en": "Trial author"
+      },
+      "synopsis": {
+        "pt": "O texto é o conteúdo da obra: desenhado num canvas e aplicado a um plano.",
+        "en": "The text is the content of the artwork: drawn on a canvas and applied to a plane."
       }
     },
     {
       "id": 3,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "foto-r9",
       "position": [
         0,
@@ -165,9 +189,18 @@
       "interaction": "link",
       "url": "https://rodrigorez.github.io/zonas12/",
       "title": {
-        "pt": "Ligação externa",
-        "en": "External link"
-      }
+        "pt": "Ligação para a exposição",
+        "en": "Link to the exhibition"
+      },
+      "author": {
+        "pt": "Autor de ensaio",
+        "en": "Trial author"
+      },
+      "synopsis": {
+        "pt": "Uma obra que leva a um site: a ficha tenta embuti-lo e deixa sempre o botão para o abrir numa aba nova.",
+        "en": "An artwork that leads to a site: the page tries to embed it and always leaves a button to open it in a new tab."
+      },
+      "site": "https://rodrigorez.github.io/zonas12/"
     }
   ],
   "portals": [

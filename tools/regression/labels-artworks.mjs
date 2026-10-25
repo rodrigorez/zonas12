@@ -61,12 +61,12 @@ async function main() {
 
   try {
     const esperado = {
-      scene1: ['#0 · galeriaFoto1 · Cidade 360º · modal', '#1 · galeriaFoto2 · Cidade 360º · modal',
-        '#2 · video · Cidade 360º · modal', '#3 · praia · Cidade 360º · modal',
-        '#4 · skycloud · Cidade 360º · modal'],
-      scene2: ['#5 · skycloud · Praia · modal', '#6 · galeriaFoto2 · Praia · modal',
-        '#7 · galeriaFoto1 · Praia · modal'],
-      scene3: ['#8 · praia · Céu 360º · modal', '#9 · cidade-360 · Céu 360º · modal']
+      scene1: ['#0 · galeriaFoto1 · Cidade 360º · page', '#1 · galeriaFoto2 · Cidade 360º · page',
+        '#2 · video · Cidade 360º · page', '#3 · praia · Cidade 360º · page',
+        '#4 · skycloud · Cidade 360º · page'],
+      scene2: ['#5 · skycloud · Praia · page', '#6 · galeriaFoto2 · Praia · page',
+        '#7 · galeriaFoto1 · Praia · page'],
+      scene3: ['#8 · praia · Céu 360º · page', '#9 · cidade-360 · Céu 360º · page']
     };
 
     for (const [slug, from] of [['scene1', 'gate'], ['scene2', 'scene1'], ['scene3', 'scene2']]) {
@@ -128,7 +128,7 @@ async function main() {
       for (let i = 0; i < 10; i++) {
         const data = builder.withDefaults(model, schema.SCENE.artworks);
         data.id = 99;
-        made.push(artwork.createArtwork(data, scene, { label: '#99 · teste · Praia · modal', labelAlways: true }));
+        made.push(artwork.createArtwork(data, scene, { label: '#99 · teste · Praia · page', labelAlways: true }));
       }
       await new Promise((done) => setTimeout(done, 700));
       return {

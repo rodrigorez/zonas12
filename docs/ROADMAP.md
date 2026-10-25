@@ -3410,6 +3410,43 @@ dois), e o que falta é o terceiro número.
 | O `en.json` divergir do `pt.json` | Baixa | um teste compara as chaves; a tradução não acrescenta nem remove nenhuma |
 | O catálogo de assets abrir a porta a caminhos fora do sítio | Média | validar `path` contra a raiz do projeto e os tipos de `ASSET_KINDS`; a L9 continua a recusar o que falta |
 
+### Fase 8 — A ficha da obra (2026-10-25)
+
+- **Entregável:** cada obra passa a ter uma **página própria** — a ficha, no modelo do
+  `galerias/obra7.html` das Zonas 11 (nome da exposição, «voltar», o meio da obra, título, autor,
+  sinopse). Decidido com o autor em 2026-10-25 (**D60**).
+- **O que não muda:** a obra continua a ser dado do mundo e nada é escrito à mão por obra; a
+  exposição continua estática e sem build (**D1**); a ficha é gerada, e a Lei **L20** impede que ela
+  envelheça em silêncio.
+- **As decisões do autor:** **um HTML por obra**, gerado pela ferramenta (como as Zonas 11); o clique
+  **substitui a página** (a ficha abre no mesmo separador e o «voltar» traz a sala); e o `site` de uma
+  obra é **tentado em iframe**, com a imagem da obra como reserva.
+
+| Bloco | O que entrega | O que fecha |
+| --- | --- | --- |
+| **C1** | O dado: `author`, `synopsis` e `site` por obra (texto por língua os dois primeiros), o tipo `site` no catálogo e em `CONTENT_KINDS`, e a interacção `page` | o que a ficha precisa de saber |
+| **C2** | `tools/artwork/build.mjs`: escreve `<slug>/obras/<id>.html` por obra, com o meio por tipo, as duas línguas e o «voltar»; `css/obra.css` | a página que não existe |
+| **C3** | O clique na sala: `interaction: "page"` navega para a ficha; as salas de produção passam a usá-la; o T6 passa a medir o endereço da ficha | a ligação sala ↔ ficha |
+| **C4** | A lei **L20**: a ficha existe e o resumo com que foi gerada é o do dado de agora | a ficha velha |
+| **C5** | `tools/regression/obra.mjs`: os cinco tipos, as três camadas do site, a língua, o «voltar» e a consola | a verificação |
+| **C6** | Editor: `author`, `synopsis`, `site` no painel da obra e um botão «abrir a ficha» | o preenchimento |
+| **C7** | README, §14 e o fecho | a documentação |
+
+**Metas:** **N1** cada obra tem ficha e ela está em dia (L20 a **0** avarias); **N2** os cinco tipos
+mostram o meio que prometem; **N3** o «voltar» cai no mundo da obra; **N4** `?lang=en` diz o mesmo em
+inglês; **N5** o `all.mjs --full` continua verde.
+
+**Fecho (2026-10-25):** todos os blocos entregues, e medido: **21** fichas geradas para os **6**
+mundos (as do `gate` não existem porque o portão não tem obras), `obra.mjs` **32 de 32**, L20 a
+recusar uma ficha velha em `--check`, `validate` a **0** e `all.mjs --full` a **20 de 20** em
+**721,9 s**. A ficha do `scene1` mostra o título que existe (o `title` do dado ou, sem ele, o id do
+asset): as obras de produção ainda não têm `author`/`synopsis`, e a bateria di-lo em nota em vez de
+inventar — é o editor que as preenche (C6).
+
+**Riscos:** um site que recusa ser embutido não é detetável pela página (mitigação: a imagem por baixo
+e o botão sempre visível, e é isso que a bateria mede); e a ficha é um ficheiro gerado, que pode ficar
+para trás do dado (mitigação: a L20, que compara o resumo escrito no ficheiro com o dado).
+
 ---
 
 ## 10. Testes de regressão (a rede de segurança)
@@ -4055,6 +4092,7 @@ alteram comportamento.
 | D57 | Um `interaction: "link"` navega para o endereço | O terceiro valor da D30, e o único que **levava o visitante a sair** da exposição — até aqui o endereço aparecia dentro do modal, o que num quiosque é uma parede. O componente do clique ganhou um modo: `modal` abre a janela da exposição, `link` faz `location.assign` para o endereço do dado. A escolha do modo é do dado (`interaction`), o construtor traduz, e o painel oferece as três interacções com o campo do endereço — que só aparece com `link`, a única em que significa alguma coisa. O `notBuilt` que existia no catálogo saiu: já não há nada a bloquear |
 | D58 | Uma obra pode ser um modelo GLTF ou um texto | As duas primeiras coisas da D30, fechadas juntas porque partilham a pergunta «o que é uma obra». O `kind` deixou de ser derivado do asset e passou a ser campo do dado, com regras no esquema: `image`, `video` e `model` pedem um asset do seu tipo; `text` **proíbe** o asset e pede o `text` por língua. O modelo vem do catálogo (`type: "model"`, um `<a-asset-item>`, e o `size` escala-o por eixo — um GLTF não tem «largura em metros»). O texto é desenhado num canvas e aplicado a um plano com transparência: **sem fonte externa**, porque o `text` do A-Frame vai buscar a fonte à rede e a exposição tem de abrir sem rede e com a consola limpa (T8). Um `applyStencil` protegido contra o segundo registo foi preciso: o `model-loaded` chega depois do `loaded`, e registar duas vezes deixaria uma entrada órfã no núcleo (A4) |
 | D59 | Uma porta pode andar, e o dado diz como | A §1 dizia «portais em movimento animado (fica para depois)»; a Fase 7 emendou-a. O `motion` do portal tem dois tipos — `spin`, que roda a porta sobre um eixo seu (`axis`, um vetor de 0/1), e `orbit`, que a faz dar a volta a um círculo de `radius` em torno de onde ela está e a vira com o círculo —, e um `period` em segundos por volta. Três promessas antigas continuam verdadeiras, e é isso que a lei e o instrumento provam: a colisão é lida do **mundo** (`portalGroup.worldToLocal` a cada quadro), por isso a travessia acontece onde a porta está e não onde o ficheiro a escreveu; o `prefers-reduced-motion` do visitante pára-a no instante em que está, como pára o shader; e uma porta em movimento **não pode** ser a porta de chegada (`arrivalFrom`) — o ponto de chegada vem do dado estático, e a L16 provaria uma coisa enquanto a cena fazia outra. O relógio é o do A-Frame (`tick(time)`) e não o `performance.now()`: a mesma cena anima o mesmo num quadro lento, e o instrumento pode perguntar «onde está a porta aos 10 s» e obter sempre a mesma resposta |
+| D60 | Cada obra tem uma ficha, uma página gerada | O autor descreveu-a e deu o exemplo das Zonas 11 (`galerias/obra7.html`): nome da exposição, botão «voltar», o meio da obra, título, autor, sinopse. Na zonas12 a ficha é **uma página estática por obra**, escrita pela ferramenta `tools/artwork/build.mjs` a partir do mundo — `«<slug>/obras/<id>.html»` —, porque escrever N ficheiros à mão é a duplicação que a D20 fechou para os endereços. Decidiu-se que o clique na sala **substitui a página**: a ficha abre no mesmo separador (`interaction: "page"`, o novo valor por omissão das salas de produção) e o «voltar» traz a exposição, com o endereço derivado num sítio só (`js/scene/artwork-page.js`). O meio depende do `kind`: `image`, `video`, `model` (o GLTF no próprio A-Frame da exposição) e `text` mostram o ficheiro; `site` — o tipo novo, para jogos e esculturas interactivas — **tenta embutir** o site num iframe com a imagem da obra por baixo e o botão «Abrir o site» sempre visível. Um site que recusa ser embutido responde com um erro do browser que nenhuma página consegue detetar, e é por isso que o botão não depende do `load`: é a saída garantida. A lei **L20** compara o resumo que a ficha regista (`data-ficha`) com o dado de agora, para a página não envelhecer em silêncio |
 
 **D48 a D51 fechadas em 2026-10-23** — a **Fase 5** (a gravação direta), que a Fase 4 tinha deixado
 condicionada à fricção de exportar. O que se decidiu, e o que se recusou: **um** servidor de

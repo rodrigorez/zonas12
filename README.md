@@ -40,8 +40,8 @@ zonas12/
 │                       `example` (o mundo sai do **endereço**: `/` é o portão, `/scene1/` é a
 │                       primeira sala; o `?scene=<mundo>` continua a forçar um deles, para os testes)
 ├── i18n/
-│   ├── pt.json         textos da interface: 203 chaves (186 delas do editor), lidas por js/i18n.js
-│   └── en.json         as mesmas 203 chaves em inglês (?lang=en); um teste compara as duas
+│   ├── pt.json         textos da interface: 209 chaves (192 delas do editor), lidas por js/i18n.js
+│   └── en.json         as mesmas 209 chaves em inglês (?lang=en); um teste compara as duas
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos, mundos e página de edição)
 ├── assets/
@@ -306,7 +306,7 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 | Desfazer, «alterado» e guarda de saída | Editar → desfazer (**50** instantâneos do JSON, **D35**) → exportar; a marca «alterado» e o aviso antes de fechar com alterações que não saíram num ficheiro (**D32**); e a exportação **recusa** um mundo com erros — valida tudo antes de exportar |
 | As leis no editor | O editor corre o **mesmo** `validation.js` e responde às duas perguntas que eram só da linha de comando: o asset existe (**L9**) e a imagem mede 2:1 (**L14**). Num mundo saudável o relatório diz `Erros: 0 · Avisos: 0 · Por verificar: 0` |
 | Gravação direta | Com o **servidor da ferramenta** (`node tools/server/serve.mjs`) o editor ganha o botão «Gravar»: escreve o mundo em `data/worlds/` com o **mesmo** validador, uma cópia de segurança antes e escrita atómica (**D48–D51**); sem servidor o botão não aparece e o «Exportar» fica como estava |
-| Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**203** chaves) e, em inglês, de `i18n/en.json` (as mesmas **203**), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` escolhe a língua e uma chave que falte cai no português com **1** aviso |
+| Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**209** chaves) e, em inglês, de `i18n/en.json` (as mesmas **209**), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` escolhe a língua e uma chave que falte cai no português com **1** aviso |
 | Portas de mundo | A travessia de uma porta de mundo **navega** para o endereço do destino e o visitante aparece **atrás** da porta que lá se declara a chegada (`arrivalFrom`), na direcção em que vinha — o regresso é **um passo** (L16/L17/L19). Como cada mundo é uma **página** (D24), a chegada **arranca a exposição sozinha** (`?from=`, D37): o botão «ATIVAR EXPOSIÇÃO» fica para a primeira visita e volta se a câmara for recusada. E a porta que volta ao portão mostra a **realidade ao vivo** pela janela (**D38**): a sala declara uma dimensão `kind: "camera"`, que não desenha nada, e o rectângulo fica transparente sobre o vídeo — vê-se a câmara dos **dois lados**, que é o que a porta mostrava na Fase 3 |
 | Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID está no dado (`"id"`) e, na cena construída, em `data-dimension`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
 | Grafo de dimensões | Portais bidirecionais entre duas dimensões, com uma **dimensão ativa** global; dentro de cada mundo é o que resta do grafo antigo, e o **grafo de mundos** é conferido pela linha de comando (alcançabilidade a partir do portão) |
@@ -750,6 +750,24 @@ shaders parados — comparar com um destino a animar media o tempo que passou, n
 
 **O que fica aberto:** o **R14**/**R15**, o A/B do shader nos **três** aparelhos — há dois medidos
 (o telemóvel fraco e o desktop) e falta o terceiro.
+
+**A Fase 8 — a ficha de cada obra (2026-10-25).** O autor descreveu a página de obra que queria e deu
+o exemplo das Zonas 11; ficou decidido em **D60**: **uma página estática por obra**, gerada pela
+ferramenta a partir do mundo, em `<mundo>/obras/<id>.html`. O clique numa obra passa a abrir essa
+ficha **no mesmo separador** (`interaction: "page"`), e o «voltar» traz a exposição. O meio depende do
+tipo: imagem, vídeo, modelo (o GLTF no próprio A-Frame) e texto mostram o ficheiro; e o tipo novo
+`site` — para jogos e esculturas interactivas — **tenta embutir** o site, com a imagem da obra por
+baixo e o botão «Abrir o site» sempre visível.
+
+O que se mediu: `obra.mjs` **32 de 32** (os cinco tipos, as três camadas do `site`, `?lang=en`, o
+«voltar» a cair na sala certa, a consola limpa), a lei **L20** a recusar uma ficha velha, o `validate`
+a **0** e o `all.mjs --full` a **20 de 20**. O rótulo de cada obra passou a dizer `page`.
+
+Duas coisas que esta fase corrigiu e que não se viam: o endereço da ficha tem de levar o **slug**
+(as páginas usam `<base href="../">` dentro da sala, por isso a base é sempre a raiz — o mesmo truque
+da porta de mundo), e o cursor do A-Frame, que num telemóvel **se funde por omissão**: quem olhasse
+para uma obra durante 1,5 s abria-a sem tocar em nada. Com o modal isso era uma janela; com a ficha
+seria uma mudança de página, portanto o `fuse` passou a `false` e a obra abre só a um toque.
 
 **A porta do portão mostra a realidade (D38, o B12).** O autor reparou que, na cidade, a porta de onde
 veio aparecia só como pórtico. É verdade e era o dado (`window: none` desde a **D29**), mas a
@@ -1409,11 +1427,15 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 | `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) |
 | `tools/regression/i18n.mjs` | as duas línguas: chaves, marcadores e `?lang=en` nas duas páginas |
 
-`--full` acrescenta as baterias arquivadas das Fases 4, 5 e 7 — a costura das travessias, a ponte de
-imagem, a chegada por uma porta, os rótulos, o botão, a transição, o fundo shader (que mede a política
-e as duas páginas com uma), os quatro valores do R9 na cena e nos painéis, o lote por dimensão, o
-catálogo de assets e os portais em movimento — cada uma abre um Chrome e juntas somam minutos, por
-isso não são o `default`. Com `--full` são **19** baterias.
+`--full` acrescenta as baterias arquivadas das Fases 4, 5, 7 e 8 — a costura das travessias, a ponte
+de imagem, a chegada por uma porta, os rótulos, o botão, a transição, o fundo shader (que mede a
+política e as duas páginas com uma), os quatro valores do R9 na cena e nos painéis, o lote por
+dimensão, o catálogo de assets, os portais em movimento e a ficha das obras — cada uma abre um Chrome
+e juntas somam minutos, por isso não são o `default`. Com `--full` são **20** baterias.
+
+Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
+repositório: `node tools/artwork/build.mjs` gera as fichas de obra (a lei **L20** do validador recusa
+uma ficha velha) e `node tools/scene/new-world.mjs <slug>` cria a pasta e o arranque de um mundo.
 
 Cada bateria continua a poder correr sozinha, com os argumentos que ela própria documenta — é o que
 se usa quando se está a investigar um número.

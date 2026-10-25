@@ -104,6 +104,7 @@
     "editor.artwork.rotation": "Rotation (degrees)",
     "editor.artwork.size": "Size (width, height, thickness)",
     "editor.artwork.interaction": "Interaction",
+    "editor.artwork.interaction.page": "Open the artwork page",
     "editor.artwork.interaction.modal": "Open in the modal",
     "editor.artwork.interaction.none": "No click",
     "editor.artwork.interaction.link": "External link",
@@ -204,6 +205,11 @@
     "editor.error.exportBlocked": "Not exported: {count} error(s) in the world. The exported file is the one that gets committed, and a world with errors does not pass the validator.",
     "editor.error.saveBlocked": "Not saved: {count} error(s) in the world. It is the same rule as exporting — what gets saved is what gets committed.",
     "editor.error.saveFailed": "Could not save {file}: {message}",
-    "editor.error.saveNotFromDisk": "Saving only replaces a world that came from data/worlds/ — export this one and put it there (D31)."
+    "editor.error.saveNotFromDisk": "Saving only replaces a world that came from data/worlds/ — export this one and put it there (D31).",
+    "editor.artwork.authorIn": "Author ({language})",
+    "editor.artwork.synopsisIn": "Synopsis ({language})",
+    "editor.artwork.site": "Artwork site",
+    "editor.artwork.openPage": "Open the artwork page",
+    "editor.artwork.kind.site": "Page (artwork site)"
   }
 }
