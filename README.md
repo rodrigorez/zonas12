@@ -804,11 +804,33 @@ existe agora:
   identifica (sem a língua nem o cache-busting), e o script é injetado por este módulo, não colado no
   HTML — uma só forma de medir.
 
-Medido: `obra.mjs` **51 de 51** (a tabela das plataformas, o endereço e a leitura do endereço, o
-`page_view` com e sem ID, o script injetado, os cinco meios, o «voltar», a obra que não existe, a
-consola), `validate` a **0** com a lei **L20** a olhar para a página única e a **L21** para o formato
-do ID, o T6 a apontar para `obra.html?mundo=…&id=…` e o `all.mjs --full` a **20 de 20** em
+Medido: `obra.mjs` **59 de 59** (a tabela das plataformas, o endereço e a leitura do endereço, o
+`page_view` com e sem ID, o script injetado, o meio pedido e o desenhado, o «voltar», a obra que não
+existe, a consola), `validate` a **0** com a lei **L20** a olhar para a página única e a **L21** para o
+formato do ID, o T6 a apontar para `obra.html?mundo=…&id=…` e o `all.mjs --full` a **20 de 20** em
 **731,7 s**.
+
+**O exemplo que o autor pediu (antes do texto definitivo).** `data/obras.exemplo.csv` traz as dez obras
+com texto de exemplo — uma com tudo, uma só com título, uma em vídeo, uma com **site** e uma sem
+tradução inglesa — e corre-se com `--file`, sem tocar na folha a sério:
+
+```sh
+node tools/artwork/from-csv.mjs --file data/obras.exemplo.csv
+```
+
+Foi este exemplo que apanhou dois defeitos que as baterias não podiam ver, porque o site do fixture é
+nosso e perdoa tudo:
+
+- o `iframe` levava **`referrerpolicy="no-referrer"`**, e o YouTube recusa embutir sem referrer (erro
+  **153**). A página de erro do YouTube **carrega como se tivesse corrido bem** — o `load` dispara, a
+  capa sai de trás e o visitante fica a olhar para um erro do YouTube. Passou a
+  `strict-origin-when-cross-origin`, e a bateria mede o atributo (é a causa, já que o efeito não é
+  detetável);
+- o **modelo** desenhava-se com o A-Frame do CDN **antes** do resto da ficha: se o CDN demorasse, a
+  página morria a meio e ficava só com o nome da exposição e o «voltar». Agora o meio é a única parte
+  que pode falhar, tem um limite de **8 s**, e uma falha cai na capa — o título, o autor e a sinopse
+  aparecem sempre. A bateria passou a medir as duas coisas em separado: o meio que a obra **pede** e o
+  que foi **desenhado**.
 
 O que isto custa, dito: **sem JavaScript a ficha não mostra a obra**. Antes cada ficha era HTML
 pronto; agora é desenhada do dado, como a própria exposição (que também não existe sem JavaScript).
@@ -1480,8 +1502,9 @@ e juntas somam minutos, por isso não são o `default`. Com `--full` são **20**
 
 Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
 repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.csv` e escreve nos mundos o dado das
-obras (título, autor, sinopse, site e capa), e `node tools/scene/new-world.mjs <slug>` cria a pasta e
-o arranque de um mundo.
+obras (título, autor, sinopse, site e capa) — com `--file` corre outra folha, e é assim que se vê o
+exemplo (`data/obras.exemplo.csv`) sem tocar na definitiva —, e `node tools/scene/new-world.mjs <slug>`
+cria a pasta e o arranque de um mundo.
 
 Cada bateria continua a poder correr sozinha, com os argumentos que ela própria documenta — é o que
 se usa quando se está a investigar um número.

@@ -16,14 +16,15 @@ import { artworkPageRequest, artworkBackHref } from './scene/artwork-page.js';
 import { startAnalytics, pageLocation } from './scene/analytics.js';
 import { initI18n, t, languageFromUrl } from './i18n.js';
 
-const AF3_VERSION = '1.8.0';
+const AFRAME_VERSION = '1.8.0';
 const SITE_LOAD_TIMEOUT = 4000;
 const host = document.getElementById('ficha');
 const request = artworkPageRequest(window.location.search);
 
-// O que a ficha é, para os instrumentos: `mundo`, `id`, `kind` e o meio desenhado. A bateria lê isto
-// em vez de adivinhar pelo desenho, e um endereço inválido diz-se aqui em vez de dar um erro na consola.
-window.obraDebug = { request: request, world: null, artworkId: null, kind: null, medium: null };
+// O que a ficha é, para os instrumentos: `mundo`, `id`, `kind`, o meio que a obra pediu (`planned`) e
+// o que foi desenhado (`medium` — diferente quando o meio falhou e ficou a capa). A bateria lê isto em
+// vez de adivinhar pelo desenho, e um endereço inválido diz-se aqui em vez de dar um erro na consola.
+window.obraDebug = { request: request, world: null, artworkId: null, kind: null, medium: null, planned: null };
 
 function row(className) {
   const element = document.createElement('div');
@@ -64,13 +65,18 @@ function titleOf(artwork) {
   return { [ORIGIN_LANGUAGE]: artwork.asset || ('#' + artwork.id) };
 }
 
-async function loadAframe() {
-  if (window.AFRAME) return;
-  await new Promise((resolve, reject) => {
+// O A-Frame vem do CDN, como na exposição. Se não chegar (rede lenta, CDN em baixo), a ficha **não**
+// pode ficar sem o resto: há um limite e há um meio de reserva.
+const AFRAME_TIMEOUT = 8000;
+
+function loadAframe() {
+  if (window.AFRAME) return Promise.resolve();
+  return new Promise((resolve, reject) => {
     const script = document.createElement('script');
-    script.src = 'https://aframe.io/releases/' + AF3_VERSION + '/aframe.min.js';
-    script.onload = resolve;
-    script.onerror = () => reject(new Error('A-Frame could not be loaded'));
+    script.src = 'https://aframe.io/releases/' + AFRAME_VERSION + '/aframe.min.js';
+    const timer = setTimeout(() => reject(new Error('A-Frame não carregou em ' + AFRAME_TIMEOUT + ' ms')), AFRAME_TIMEOUT);
+    script.onload = () => { clearTimeout(timer); resolve(); };
+    script.onerror = () => { clearTimeout(timer); reject(new Error('A-Frame não carregou')); };
     document.head.appendChild(script);
   });
 }
@@ -96,7 +102,11 @@ async function drawMedium(world, artwork, language) {
     frame.title = textIn(artwork.title, ORIGIN_LANGUAGE) || '';
     frame.src = embed.src;
     frame.loading = 'lazy';
-    frame.referrerPolicy = 'no-referrer';
+    // Sem `referrerpolicy="no-referrer"`: o YouTube recusa embutir sem referrer (erro 153, uma página
+    // de erro que carrega como se tivesse corrido bem e nenhuma página consegue detetar). O defeito
+    // apareceu no primeiro exemplo com um site a sério; o `strict-origin-when-cross-origin` que os
+    // browsers usam por omissão manda só a origem, que é tudo o que o embed precisa.
+    frame.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
     frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms allow-presentation');
     if (embed.allow) frame.setAttribute('allow', embed.allow);
     if (embed.fullscreen) frame.setAttribute('allowfullscreen', '');
@@ -164,8 +174,7 @@ async function drawMedium(world, artwork, language) {
   return 'none';
 }
 
-function notFound(worldName, slug) {
-  if (worldName) {
+function notFound(worldName, slug) {  if (worldName) {
     const exhibition = row('linha exposicao');
     exhibition.textContent = worldName;
   }
@@ -176,6 +185,20 @@ function notFound(worldName, slug) {
   box.appendChild(paragraph);
   backLink(slug);
   document.title = t('artwork.page.notFound');
+}
+
+// O meio de reserva, quando o que a obra pedia não pôde ser desenhado: a capa, se for uma imagem, e
+// nada se nem isso houver. É o que impede um modelo sem A-Frame de deixar a ficha em branco.
+function fallbackMedium(world, artwork, language) {
+  const box = row('linha meio');
+  const cover = coverImage(world, artwork, language);
+  if (cover) {
+    box.setAttribute('data-meio', 'image');
+    box.appendChild(cover);
+    return 'image';
+  }
+  box.setAttribute('data-meio', 'none');
+  return 'none';
 }
 
 async function start() {
@@ -212,7 +235,16 @@ async function start() {
 
   backLink(request.world);
 
-  const medium = await drawMedium(world, artwork, language);
+  // O meio é a única parte que pode falhar (o A-Frame vem do CDN). Uma falha aqui não pode levar o
+  // resto da ficha com ela: a obra fica com a capa e a página diz o nome, o autor e a sinopse.
+  window.obraDebug.planned = artwork.kind;
+  let medium;
+  try {
+    medium = await drawMedium(world, artwork, language);
+  } catch (error) {
+    console.warn('[obra] ' + (error && error.message ? error.message : error));
+    medium = fallbackMedium(world, artwork, language);
+  }
 
   const titleRow = row('linha');
   const titleText = document.createElement('span');

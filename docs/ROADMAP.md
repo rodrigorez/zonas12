@@ -3464,17 +3464,32 @@ substituído: as **21** fichas geradas e o `tools/artwork/build.mjs` saíram, e 
 | **C10** | `data/obras.csv` + `tools/artwork/from-csv.mjs` (`--check`, valida antes de escrever) | o preenchimento do dado |
 | **C11** | Lei **L20** refeita (página única, e a pasta `obras/` proibida) e **L21** (o formato do ID da GA), o campo no painel do mundo e as chaves novas nas duas línguas | a lei e o editor |
 
-**Fecho da terceira passagem, medido:** `obra.mjs` **51 de 51** (a tabela das plataformas, o endereço
-e a leitura do endereço, o `page_view` com e sem ID, o script injetado, os cinco meios, o «voltar» no
-cimo e no fundo, a obra que não existe, a consola), `validate` a **0**, `i18n` a **9 de 9** com
-**214** chaves por língua, o T6 a apontar para `obra.html?mundo=…&id=…` e o `all.mjs --full` a
-**20 de 20** em **731,7 s**. O `from-csv` correu duas vezes seguidas sobre o CSV por preencher sem escrever nada (é
-idempotente) e, com duas linhas preenchidas à experiência, escreveu título, autor, sinopse e site,
-transformou a obra num `site` e voltou atrás com o CSV em branco.
+**Fecho da terceira passagem, medido:** `obra.mjs` **59 de 59** (a tabela das plataformas, o endereço
+e a leitura do endereço, o `page_view` com e sem ID, o script injetado, o meio **pedido** e o
+**desenhado**, o «voltar» no cimo e no fundo, a obra que não existe, a consola), `validate` a **0**,
+`i18n` a **9 de 9** com **214** chaves por língua, o T6 a apontar para `obra.html?mundo=…&id=…` e o
+`all.mjs --full` a **20 de 20** em **731,7 s**. O `from-csv` correu duas vezes seguidas sobre o CSV por
+preencher sem escrever nada (é idempotente) e, com o exemplo preenchido, escreveu título, autor,
+sinopse e site, transformou uma obra num `site` e voltou atrás com o CSV em branco.
+
+**O exemplo antes do definitivo (`data/obras.exemplo.csv`, `--file`):** o autor pediu para ver o
+formato e a página antes de escrever o texto a sério. O exemplo tem as dez obras com texto de exemplo
+— uma completa, uma só com título, uma em vídeo, uma com site e uma sem tradução inglesa — e corre-se
+com `--file`, sem tocar na folha definitiva. Apanhou **dois** defeitos que nenhuma bateria podia ver,
+porque o site do fixture é nosso e perdoa tudo:
+
+- **`referrerpolicy="no-referrer"`** no iframe: o YouTube recusa embutir sem referrer (**erro 153**) e
+  a página de erro dele **carrega como se tivesse corrido bem** (o `load` dispara, a capa sai de trás,
+  e fica um erro do YouTube à vista). Passou a `strict-origin-when-cross-origin`; a bateria mede o
+  atributo, que é a causa — o efeito não é detetável por nenhuma página;
+- o **modelo** esperava pelo A-Frame do CDN antes de desenhar o resto: um CDN lento deixava a ficha
+  só com o nome da exposição e o «voltar». Agora o meio é a única parte que pode falhar, com um
+  limite de **8 s** e a capa como reserva — título, autor e sinopse aparecem sempre.
 
 **Riscos:** um site que recusa ser embutido não é detetável pela página (mitigação: a imagem por baixo
-e o botão sempre visível, e é isso que a bateria mede); e a ficha é um ficheiro gerado, que pode ficar
-para trás do dado (mitigação: a L20, que compara o resumo escrito no ficheiro com o dado).
+e o botão sempre visível, e é isso que a bateria mede; e um embed que exija referrer, como o YouTube,
+tem de o receber — foi o erro 153); e a ficha depende do dado do mundo em tempo de execução, por isso
+um mundo que não carregue diz «obra não encontrada» em vez de ficar em branco.
 
 ---
 

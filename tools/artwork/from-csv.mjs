@@ -9,6 +9,8 @@
 //
 //   node tools/artwork/from-csv.mjs             lê data/obras.csv e escreve nos mundos o que mudou
 //   node tools/artwork/from-csv.mjs --check     não escreve: diz o que mudaria (código 1 se houver)
+//   node tools/artwork/from-csv.mjs --file data/obras.exemplo.csv
+//                                               usa outra folha (o exemplo, sem tocar na definitiva)
 //
 // O CSV é simples de propósito: uma linha por obra, a primeira coluna o mundo (o slug), a segunda o
 // `id` da obra, e o resto o que a ficha mostra. Uma linha que começa por `#` é um comentário, para o
@@ -32,8 +34,14 @@ import { validateScene } from '../../js/scene/validation.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..');
-const CSV = join(root, 'data', 'obras.csv');
 const CHECK = process.argv.includes('--check');
+
+// A folha por omissão é a definitiva; `--file <caminho>` serve para correr um exemplo (o
+// `data/obras.exemplo.csv`) sem tocar no que o autor está a preencher.
+const fileArgument = process.argv.indexOf('--file');
+const CSV = fileArgument > 0 && process.argv[fileArgument + 1]
+  ? join(root, process.argv[fileArgument + 1])
+  : join(root, 'data', 'obras.csv');
 
 const COLUMNS = ['mundo', 'id', 'titulo_pt', 'titulo_en', 'autor', 'sinopse_pt', 'sinopse_en', 'site', 'capa'];
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|webp|avif|gif)$/i;

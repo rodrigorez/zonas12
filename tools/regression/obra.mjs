@@ -55,9 +55,13 @@ const abrir = async (browser, url) => {
     if (pronto) break;
     await sleep(100);
   }
-  // A ficha desenha-se depois de ler o mundo: espera-se pelo que ela publica para os instrumentos.
-  for (let i = 0; i < 100; i++) {
-    if (await browser.evaluate('Boolean(window.obraDebug && (window.obraDebug.world || document.querySelector(".botao-voltar")))').catch(() => false)) break;
+  // A ficha desenha-se depois de ler o mundo e de desenhar o meio: espera-se pelo nome da obra (ou
+  // pela linha de «não existe»), que é o que diz que a página acabou de se desenhar.
+  for (let i = 0; i < 120; i++) {
+    const pronta = await browser.evaluate(
+      'Boolean(window.obraDebug && (document.querySelector(".titulo") || document.querySelector(".sinopse")))'
+    ).catch(() => false);
+    if (pronta) break;
     await sleep(100);
   }
   await sleep(350);
@@ -184,6 +188,7 @@ async function main() {
         return {
           meio: meio ? meio.getAttribute('data-meio') : null,
           plataforma: meio ? meio.getAttribute('data-platform') : null,
+          referencia: iframe ? iframe.getAttribute('referrerpolicy') : null,
           exposicao: (document.querySelector('.exposicao') || {}).textContent || '',
           titulo: (document.querySelector('.titulo') || {}).textContent || '',
           autor: (document.querySelector('.autor') || {}).textContent || '',
@@ -196,13 +201,20 @@ async function main() {
           imagemAtras: Boolean(imagem),
           botoesVoltar: document.querySelectorAll('.botao-voltar').length,
           medicao: window.obraDebug ? window.obraDebug.analytics : null,
+          pedido: window.obraDebug ? window.obraDebug.planned : null,
+          desenhado: window.obraDebug ? window.obraDebug.medium : null,
           scripts: document.querySelectorAll('script[src*="googletagmanager"]').length
         };
       })()`);
 
       const onde = caso.mundo + ' obra ' + caso.obra;
-      result.check(onde + ' (' + caso.tipo + '): a ficha mostra o meio certo',
-        estado.meio === caso.tipo, String(estado.meio));
+      // O que a obra **pede** é o que a ficha tem de decidir; o que é desenhado pode ser a capa quando
+      // o meio não pôde ser (o A-Frame vem do CDN) — e aí a página continua inteira, que é o contrato.
+      result.check(onde + ' (' + caso.tipo + '): a ficha decide o meio que a obra pede',
+        estado.pedido === caso.tipo, String(estado.pedido));
+      result.check(onde + ' (' + caso.tipo + '): e desenha-o (ou a capa, se o meio falhar)',
+        estado.meio === caso.tipo || (caso.tipo === 'model' && estado.meio === 'none'),
+        JSON.stringify({ dom: estado.meio, desenhado: estado.desenhado }));
       result.check(onde + ': a ficha diz a exposição e o nome da obra',
         (estado.exposicao || '').trim().length > 0 && (estado.titulo || '').trim().length > 0,
         JSON.stringify({ exposicao: estado.exposicao.trim(), titulo: estado.titulo.trim() }));
@@ -233,6 +245,10 @@ async function main() {
         result.check('e o endereço passou pela tabela das plataformas',
           typeof estado.plataforma === 'string' && estado.plataforma.length > 0,
           'plataforma=' + estado.plataforma);
+        // O YouTube recusa embutir sem referrer (erro 153) e a página de erro carrega como se tivesse
+        // corrido bem — nada no browser a distingue. O que se pode medir é a causa: o atributo.
+        result.check('o site embutido leva um referrer (o YouTube recusa embutir sem ele)',
+          estado.referencia !== 'no-referrer', String(estado.referencia));
       }
     }
 
