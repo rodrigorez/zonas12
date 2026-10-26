@@ -111,7 +111,7 @@
     {
       "id": 5,
       "dimension": 0,
-      "kind": "site",
+      "kind": "image",
       "asset": "skycloud",
       "position": [
         -20,
@@ -140,13 +140,12 @@
       "author": {
         "pt": "autorB",
         "en": "autorB"
-      },
-      "site": "https://www.testeB.nada"
+      }
     },
     {
       "id": 6,
       "dimension": 0,
-      "kind": "site",
+      "kind": "image",
       "asset": "galeriaFoto2",
       "position": [
         0,
@@ -175,13 +174,12 @@
       "author": {
         "pt": "autorA, autorC",
         "en": "autorA, autorC"
-      },
-      "site": "https://www.testeC.nada"
+      }
     },
     {
       "id": 7,
       "dimension": 0,
-      "kind": "site",
+      "kind": "image",
       "asset": "galeriaFoto1",
       "position": [
         20,
@@ -210,8 +208,7 @@
       "author": {
         "pt": "autorC",
         "en": "autorC"
-      },
-      "site": "https://www.testeA.nada"
+      }
     }
   ],
   "portals": [

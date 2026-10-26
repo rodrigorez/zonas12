@@ -22,7 +22,9 @@
 //     que falte **não** se inventa — fica a que existe e o relatório diz qual falta;
 //   - `autor` é uma linha só e vai para as duas línguas (é um nome, não uma frase);
 //   - `site` preenchido faz da obra uma obra `site` (D60): a ficha embute-o e a capa passa a ser a
-//     imagem que fica por baixo do iframe;
+//     imagem que fica por baixo do iframe. **Vazio tira o site**: a obra volta ao que o ficheiro dela
+//     é (imagem, vídeo ou modelo) — é a única forma de desfazer, e é o que faz do CSV a fonte da
+//     verdade deste campo;
 //   - `capa` preenchida aponta a obra para um asset próprio (`capa-<id>`) com esse caminho, e o tipo
 //     vem da extensão do ficheiro. Vazio deixa a obra como está — é o que permite preencher só os
 //     textos e não tocar em nenhuma imagem.
@@ -152,6 +154,17 @@ export function applyRow(world, row, { exists }) {
     if (artwork.kind !== 'site') {
       artwork.kind = 'site';
       changes.push(`obra ${row.id}: passa a obra "site"`);
+    }
+  } else if (artwork.site) {
+    // Uma célula `site` vazia **tira** o site: o CSV é a fonte da verdade deste campo (ou a obra é uma
+    // página, ou não é). A obra volta ao que o ficheiro dela é — imagem, vídeo ou modelo.
+    delete artwork.site;
+    changes.push(`obra ${row.id}: deixa de ter site`);
+    const asset = artwork.asset ? (world.assets || {})[artwork.asset] : null;
+    const type = asset && asset.type ? asset.type : null;
+    if (artwork.kind === 'site' && (type === 'image' || type === 'video' || type === 'model')) {
+      artwork.kind = type;
+      changes.push(`obra ${row.id}: volta a obra "${type}"`);
     }
   }
 

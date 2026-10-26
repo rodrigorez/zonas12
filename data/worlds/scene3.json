@@ -79,7 +79,7 @@
     {
       "id": 8,
       "dimension": 0,
-      "kind": "site",
+      "kind": "image",
       "asset": "praia",
       "position": [
         -6,
@@ -108,13 +108,12 @@
       "author": {
         "pt": "autorA",
         "en": "autorA"
-      },
-      "site": "https://www.testeB.nada"
+      }
     },
     {
       "id": 9,
       "dimension": 0,
-      "kind": "site",
+      "kind": "image",
       "asset": "cidade-360",
       "position": [
         6,
@@ -143,8 +142,7 @@
       "author": {
         "pt": "autorB, autorC",
         "en": "autorB, autorC"
-      },
-      "site": "https://www.testeC.nada"
+      }
     }
   ],
   "portals": [

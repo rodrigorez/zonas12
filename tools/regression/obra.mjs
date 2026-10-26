@@ -43,6 +43,7 @@ const CASOS = [
   { mundo: 'r9', obra: 1, completo: true, pasta: false },
   { mundo: 'r9', obra: 2, completo: true, pasta: false },
   { mundo: 'r9', obra: 3, completo: true, pasta: false },
+  { mundo: 'exemplo-ficha', obra: 2, completo: true, pasta: false },
   { mundo: 'scene1', obra: 2, pasta: true },
   { mundo: 'scene1', obra: 0, pasta: true }
 ].map((caso) => Object.assign({ tipo: kindOf(caso.mundo, caso.obra) }, caso));

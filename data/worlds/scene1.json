@@ -84,6 +84,13 @@
         "pt": "Retrato do mundo Praia, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Beach world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "capa-2": {
+      "path": "assets/artworks/cidade-d0-video-quadro.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Vídeo de teste"
+      }
     }
   },
   "dimensions": [
@@ -111,7 +118,7 @@
     {
       "id": 0,
       "dimension": 0,
-      "kind": "site",
+      "kind": "image",
       "asset": "galeriaFoto1",
       "position": [
         -44,
@@ -140,13 +147,12 @@
       "author": {
         "pt": "autorA, autorB, AutorC",
         "en": "autorA, autorB, AutorC"
-      },
-      "site": "https://www.testeA.nada"
+      }
     },
     {
       "id": 1,
       "dimension": 0,
-      "kind": "site",
+      "kind": "image",
       "asset": "galeriaFoto2",
       "position": [
         -24,
@@ -175,14 +181,13 @@
       "author": {
         "pt": "autorA",
         "en": "autorA"
-      },
-      "site": "https://www.testeB.nada"
+      }
     },
     {
       "id": 2,
       "dimension": 0,
-      "kind": "video",
-      "asset": "video",
+      "kind": "site",
+      "asset": "capa-2",
       "position": [
         4,
         1.5,
@@ -200,22 +205,23 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Cidade em movimento",
-        "en": "City in motion"
+        "pt": "Vídeo de teste",
+        "en": "Test video"
       },
       "synopsis": {
-        "pt": "Texto provisório: esta obra é um vídeo, por isso fica sem site (a lei exige uma imagem de capa para uma obra com site).",
-        "en": "Provisional text: this work is a video, so it stays without a site (the law needs a cover image for a work with a site)."
+        "pt": "Texto provisório: esta obra é um vídeo, e o vídeo está no YouTube — a ficha embute-o e deixa sempre o botão para o abrir numa aba nova. A capa é um fotograma do vídeo, e é ela que fica no lugar dele se o embed não carregar.",
+        "en": "Provisional text: this work is a video, and the video is on YouTube — the page embeds it and always leaves the button to open it in a new tab. The cover is a frame of the video, and it is what stays in place of the embed if it does not load."
       },
       "author": {
         "pt": "autorB, autorC",
         "en": "autorB, autorC"
-      }
+      },
+      "site": "https://www.youtube.com/watch?v=Gzegts8LXaI"
     },
     {
       "id": 3,
       "dimension": 0,
-      "kind": "site",
+      "kind": "image",
       "asset": "praia",
       "position": [
         24,
@@ -244,13 +250,12 @@
       "author": {
         "pt": "autorC",
         "en": "autorC"
-      },
-      "site": "https://www.testeC.nada"
+      }
     },
     {
       "id": 4,
       "dimension": 0,
-      "kind": "site",
+      "kind": "image",
       "asset": "skycloud",
       "position": [
         44,
@@ -279,8 +284,7 @@
       "author": {
         "pt": "autorA, autorB",
         "en": "autorA, autorB"
-      },
-      "site": "https://www.testeA.nada"
+      }
     }
   ],
   "portals": [
