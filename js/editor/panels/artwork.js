@@ -239,8 +239,9 @@ function card(artwork, context, data, dimensions) {
     }
   });
 
-  // Abre no browser a ficha que o dado produz — o mesmo caminho que a cena usaria (D60). É o que
-  // permite ao autor ver a página sem ir à exposição.
+  // Abre no browser a ficha que o dado produz — o mesmo caminho que a cena usaria (D60/D62). É o que
+  // permite ao autor ver a página sem ir à exposição. A ficha lê o mundo do disco: o que estiver por
+  // gravar no editor não aparece nela.
   const mundo = (context.world() && context.world().world && context.world().world.slug) || '';
   button(box, {
     labelKey: 'editor.artwork.openPage',

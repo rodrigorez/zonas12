@@ -89,7 +89,17 @@ export const SCENE = {
       slug: { type: 'string', required: true },
       // The name of the room in each language. Optional, like every content text, and the
       // validator warns when it is missing: nobody shows it yet (the editor is Fase 4).
-      name: text
+      name: text,
+      // A medição desta sala (D62): o ID do Google Analytics desta exposição, porque o autor vai ter
+      // **uma propriedade por mundo** (e uma para o portão). Opcional e vazio enquanto as
+      // propriedades não existirem — sem ID não se carrega script nenhum, e é por isso que a falta
+      // não é um erro.
+      analytics: {
+        type: 'object',
+        fields: {
+          id: { type: 'string' }
+        }
+      }
     }
   },
 

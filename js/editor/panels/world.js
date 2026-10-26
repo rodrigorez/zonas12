@@ -79,6 +79,22 @@ export function render(host, context) {
     note(host, t('editor.world.slugMismatch', { file: openedAs, slug: declared }), 'nota bloqueio');
   }
 
+  // A medição desta sala (D62): o ID da GA4, que ainda não existe. Vazio é o estado normal — sem ID
+  // não se carrega script nenhum —, e é por isso que o painel explica o campo em vez de o exigir.
+  textField(host, {
+    name: 'world.analytics.id',
+    labelKey: 'editor.world.analytics',
+    value: (data.world && data.world.analytics && data.world.analytics.id) || '',
+    onChange: (value) => {
+      if (!data.world) data.world = {};
+      const id = value.trim();
+      if (id === '') delete data.world.analytics;
+      else data.world.analytics = { id };
+      context.change();
+    }
+  });
+  note(host, t('editor.world.analyticsHint'));
+
   doors(host, context, data, language);
   graph(host, context, data);
   newRoom(host, context, data);

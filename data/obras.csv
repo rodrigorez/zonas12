@@ -1,0 +1,28 @@
+# obras.csv — o dado das obras de producao, para preencher e importar.
+# Cada linha e uma obra: o que ela se chama, quem a fez, o que diz, o site (se tiver) e a capa.
+#
+# titulo_pt / titulo_en ... o nome da obra. Sem ele a ficha mostra o id do asset.
+# autor ................... quem fez a obra (uma linha, igual nas duas linguas).
+# sinopse_pt / sinopse_en .. o texto da ficha. Uma frase ou duas; o cartao cresce com ele.
+# site .................... o endereco da obra, se ela for um jogo ou uma escultura interactiva
+#                           (ex.: https://editor.p5js.org/fulano/full/AbC123). Vazio = obra sem site.
+#                           Com site, a ficha embute-o por cima da capa e mostra o botao
+#                           "Abrir o site". Sem site, a ficha mostra a capa (ou o video).
+# capa .................... o caminho da imagem que representa a obra, a partir da raiz do projeto
+#                           (ex.: assets/artworks/eiffel.jpg). Vazio = fica a que ja esta.
+#
+# Regras: as virgulas separam colunas, por isso um texto com virgula vai entre "aspas".
+# Uma linha que comeca por # e ignorada. Nao mudar a primeira coluna (mundo) nem a segunda (id).
+#
+# Depois de preencher: node tools/artwork/from-csv.mjs
+mundo,id,titulo_pt,titulo_en,autor,sinopse_pt,sinopse_en,site,capa
+scene1,0,,,,,,,assets/artworks/cidade-d0-bryan-goff.jpg
+scene1,1,,,,,,,assets/artworks/eiffel.jpg
+scene1,2,,,,,,,assets/video/cidade-d0-compequicolor.mp4
+scene1,3,,,,,,,assets/panoramas/praia-d0-praia.jpg
+scene1,4,,,,,,,assets/panoramas/ceu-d0-skycloud.jpg
+scene2,5,,,,,,,assets/panoramas/ceu-d0-skycloud.jpg
+scene2,6,,,,,,,assets/artworks/eiffel.jpg
+scene2,7,,,,,,,assets/artworks/cidade-d0-bryan-goff.jpg
+scene3,8,,,,,,,assets/panoramas/praia-d0-praia.jpg
+scene3,9,,,,,,,assets/panoramas/cidade-d0-forest.jpg

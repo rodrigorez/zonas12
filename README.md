@@ -753,7 +753,8 @@ shaders parados — comparar com um destino a animar media o tempo que passou, n
 
 **A Fase 8 — a ficha de cada obra (2026-10-25).** O autor descreveu a página de obra que queria e deu
 o exemplo das Zonas 11; ficou decidido em **D60**: **uma página estática por obra**, gerada pela
-ferramenta a partir do mundo, em `<mundo>/obras/<id>.html`. O clique numa obra passa a abrir essa
+ferramenta a partir do mundo, em `<mundo>/obras/<id>.html` — que a **D62** trocou depois por **uma
+página só** (mais adiante). O clique numa obra passa a abrir essa
 ficha **no mesmo separador** (`interaction: "page"`), e o «voltar» traz a exposição. O meio depende do
 tipo: imagem, vídeo, modelo (o GLTF no próprio A-Frame) e texto mostram o ficheiro; e o tipo novo
 `site` — para jogos e esculturas interactivas — **tenta embutir** o site, com a imagem da obra por
@@ -784,6 +785,34 @@ Duas coisas que esta fase corrigiu e que não se viam: o endereço da ficha tem 
 da porta de mundo), e o cursor do A-Frame, que num telemóvel **se funde por omissão**: quem olhasse
 para uma obra durante 1,5 s abria-a sem tocar em nada. Com o modal isso era uma janela; com a ficha
 seria uma mudança de página, portanto o `fuse` passou a `false` e a obra abre só a um toque.
+
+**A ficha é uma página só (D62).** Depois de a ficha estar no ar, o autor pediu duas coisas: o dado
+das obras entra por um **CSV** (título, autor, sinopse, o endereço da obra e a **capa**), e a ficha
+passa a ser **um ficheiro** que muda o conteúdo ao carregar em vez de vinte e um HTML gerados. O que
+existe agora:
+
+- **`obra.html`** na raiz — lê `?mundo=<slug>&id=<n>&lang=pt|en`, vai buscar o mundo e desenha a
+  ficha com o mesmo desenho das Zonas 11. Cada obra continua a ser **um endereço próprio**, que é o
+  que a medição precisa para distinguir as obras no relatório;
+- **`node tools/artwork/from-csv.mjs`** — lê `data/obras.csv` e escreve nos mundos o que mudou, com
+  `--check` para ver sem escrever. Recusa escrever um mundo que não passe as leis; a capa passa a ser
+  um asset próprio da obra (`capa-<id>`), e um `site` preenchido faz dela uma obra `site`;
+- **a medição** (`js/scene/analytics.js`) — o autor vai ter **uma propriedade GA4 por mundo** e uma
+  para o portão, e o ID mora no dado (`world.analytics.id`). Enquanto não houver IDs **não acontece
+  nada**: nem script, nem pedido, nem linha na consola — é o que mantém o T8 e o funcionamento
+  offline. Com um ID, a página vista sai **uma vez**, com o título da obra e o endereço que a
+  identifica (sem a língua nem o cache-busting), e o script é injetado por este módulo, não colado no
+  HTML — uma só forma de medir.
+
+Medido: `obra.mjs` **51 de 51** (a tabela das plataformas, o endereço e a leitura do endereço, o
+`page_view` com e sem ID, o script injetado, os cinco meios, o «voltar», a obra que não existe, a
+consola), `validate` a **0** com a lei **L20** a olhar para a página única e a **L21** para o formato
+do ID, o T6 a apontar para `obra.html?mundo=…&id=…` e o `all.mjs --full` a **20 de 20** em
+**731,7 s**.
+
+O que isto custa, dito: **sem JavaScript a ficha não mostra a obra**. Antes cada ficha era HTML
+pronto; agora é desenhada do dado, como a própria exposição (que também não existe sem JavaScript).
+Foi uma troca pedida pelo autor e está registada na decisão.
 
 **A porta do portão mostra a realidade (D38, o B12).** O autor reparou que, na cidade, a porta de onde
 veio aparecia só como pórtico. É verdade e era o dado (`window: none` desde a **D29**), mas a
@@ -1450,8 +1479,9 @@ dimensão, o catálogo de assets, os portais em movimento e a ficha das obras �
 e juntas somam minutos, por isso não são o `default`. Com `--full` são **20** baterias.
 
 Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
-repositório: `node tools/artwork/build.mjs` gera as fichas de obra (a lei **L20** do validador recusa
-uma ficha velha) e `node tools/scene/new-world.mjs <slug>` cria a pasta e o arranque de um mundo.
+repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.csv` e escreve nos mundos o dado das
+obras (título, autor, sinopse, site e capa), e `node tools/scene/new-world.mjs <slug>` cria a pasta e
+o arranque de um mundo.
 
 Cada bateria continua a poder correr sozinha, com os argumentos que ela própria documenta — é o que
 se usa quando se está a investigar um número.

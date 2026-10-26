@@ -9,6 +9,9 @@
     "artwork.back": "Back to the Gallery",
     "artwork.dialog": "Artwork open",
     "artwork.frameTitle": "Artwork open in an external page",
+    "artwork.page.back": "Back to the exhibition",
+    "artwork.page.openSite": "Open the artwork's site",
+    "artwork.page.notFound": "This artwork is not part of this exhibition.",
     "camera.error": "Could not access the camera. Please check the permissions.",
     "controls.group": "Movement controls",
     "controls.forward": "Forward",
@@ -210,6 +213,8 @@
     "editor.artwork.synopsisIn": "Synopsis ({language})",
     "editor.artwork.site": "Artwork site",
     "editor.artwork.openPage": "Open the artwork page",
-    "editor.artwork.kind.site": "Page (artwork site)"
+    "editor.artwork.kind.site": "Page (artwork site)",
+    "editor.world.analytics": "Google Analytics of this room (ID)",
+    "editor.world.analyticsHint": "Empty while the property does not exist: with no ID no script is loaded at all."
   }
 }

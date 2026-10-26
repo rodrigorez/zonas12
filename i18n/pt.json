@@ -9,6 +9,9 @@
     "artwork.back": "Voltar para a Galeria",
     "artwork.dialog": "Obra aberta",
     "artwork.frameTitle": "Obra aberta em página externa",
+    "artwork.page.back": "Voltar para a exposição",
+    "artwork.page.openSite": "Abrir o site da obra",
+    "artwork.page.notFound": "Esta obra não faz parte desta exposição.",
     "camera.error": "Não foi possível acessar a câmera. Por favor, verifique as permissões.",
     "controls.group": "Controlos de movimento",
     "controls.forward": "Avançar",
@@ -210,6 +213,8 @@
     "editor.artwork.synopsisIn": "Sinopse ({language})",
     "editor.artwork.site": "Site da obra",
     "editor.artwork.openPage": "Abrir a ficha da obra",
-    "editor.artwork.kind.site": "Página (site da obra)"
+    "editor.artwork.kind.site": "Página (site da obra)",
+    "editor.world.analytics": "Google Analytics desta sala (ID)",
+    "editor.world.analyticsHint": "Vazio enquanto a propriedade não existir: sem ID não se carrega script nenhum."
   }
 }

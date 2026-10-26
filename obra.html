@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- A ficha de uma obra (D62): **uma** página para todas as obras, que se desenha ao carregar a
+         partir de `?mundo=<slug>&id=<n>` e do dado do mundo. A base é a raiz da publicação, como na
+         exposição (D28), para os caminhos do catálogo servirem sem prefixo. -->
+    <base href="./" />
+    <title>Obra</title>
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="css/obra.css">
+    <script type="module" src="js/obra.js"></script>
+  </head>
+  <body>
+    <!-- O conteúdo é desenhado por `js/obra.js`: uma linha por assunto, como no template das Zonas 11
+         (D61) — nome da exposição, «voltar», o meio da obra, título, autor, sinopse, «voltar». -->
+    <main class="container" id="ficha"></main>
+  </body>
+</html>

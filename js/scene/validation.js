@@ -14,7 +14,8 @@
 //     door that navigates names a world that exists), L12 (no absolute paths), L13 (a portrait is a
 //     picture, never a live world), L14 (the 2:1 shape of a panorama, and its size — a warning only
 //     above the standard), L15 (the reserved band of ids), L16 and L17 (the arrival point, and one
-//     arrival door per origin) and L18 (the two axes combine legally).
+//     arrival door per origin), L18 (the two axes combine legally), L20 (the ficha of a work is one
+//     page, D62) and L21 (the measurement id of a room, when there is one, is a GA4 id).
 //   - the graph of the worlds, when the caller has all of them: the rooms nobody can reach
 //     (`unreachableWorlds`) and the doors whose destination says nothing about where the visitor
 //     comes from (`missingArrivals`, law L19).
@@ -88,6 +89,21 @@ export function validateScene(scene, options = {}) {
   const assets = scene.assets && typeof scene.assets === 'object' ? scene.assets : {};
   const dimensions = Array.isArray(scene.dimensions) ? scene.dimensions : [];
   const ids = new Set(dimensions.map((dimension) => dimension.id));
+
+  // ---- L21: a medição de uma sala, quando existe, tem a forma de um ID da GA4 (D62) ----
+  //
+  // Um ID mal escrito não dá erro em sítio nenhum: a GA ignora-o em silêncio e a exposição fica sem
+  // números sem ninguém dar por isso. Vazio é o estado normal (as propriedades ainda não existem).
+  const analytics = scene.world && scene.world.analytics;
+  if (analytics) {
+    const id = analytics.id;
+    if (typeof id === 'string' && id.trim() !== '' && !/^G-[A-Za-z0-9]{6,}$/.test(id.trim())) {
+      err(`world.analytics.id: "${id}" is not a GA4 measurement id (it looks like G-XXXXXXX) — law L21`);
+    }
+    if (typeof id !== 'string') {
+      err('world.analytics: the id has to be a string (empty while the property does not exist) — law L21');
+    }
+  }
 
   checkSceneFields(scene, err, warn, { assets, ids });
 

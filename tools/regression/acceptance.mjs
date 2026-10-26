@@ -434,19 +434,20 @@ export async function checkArtworkClick(options = {}) {
     }
     : null;
 
-  // D60: uma obra com `interaction: "page"` abre a **ficha** — navegar. Clicar aqui levava a página
-  // com ela e deixava a bateria a meio, por isso o que se mede é o endereço que o clique usaria: ele
-  // tem de acabar em `obras/<id>.html`, e que o clique navegue mesmo é o que a bateria da ficha faz.
+  // D60/D62: uma obra com `interaction: "page"` abre a **ficha** — navegar. Clicar aqui levava a
+  // página com ela e deixava a bateria a meio, por isso o que se mede é o endereço que o clique usaria:
+  // `obra.html?mundo=<slug>&id=<id>`, e que o clique navegue mesmo é o que a bateria da ficha faz.
   if (apontado && apontado.modo === 'page') {
     const id = cursor.intersectedEl.getAttribute('data-artwork-id');
-    const esperado = 'obras/' + id + '.html';
+    const esperado = 'id=' + id;
     return {
       obra: mesh.name,
       dimensao: dimensao,
       apontado: apontado,
       modo: 'page',
       url: apontado.url,
-      passou: typeof apontado.url === 'string' && apontado.url.indexOf(esperado) >= 0
+      passou: typeof apontado.url === 'string' &&
+        apontado.url.indexOf('obra.html?') >= 0 && apontado.url.indexOf(esperado) >= 0
     };
   }
 

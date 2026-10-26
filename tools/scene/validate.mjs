@@ -23,8 +23,7 @@ import { validateScene, unreachableWorlds, missingArrivals } from '../../js/scen
 import { checkArranques } from './arranques.mjs';
 import { diskQuestions } from './disk.mjs';
 import { ENTRY_WORLD } from '../../js/modules/portal-kinds.js';
-import { artworkPagePath } from '../../js/scene/artwork-page.js';
-import { pageFingerprint } from '../artwork/build.mjs';
+import { ARTWORK_PAGE_FILE, LEGACY_ARTWORK_FOLDER } from '../../js/scene/artwork-page.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
@@ -97,34 +96,29 @@ for (const file of files) {
   if (!report.ok) failed++;
 }
 
-// L20 (D60): a ficha de cada obra existe e não está velha. A ficha é gerada
-// (`tools/artwork/build.mjs`) e regista no próprio ficheiro o resumo do dado com que foi feita; aqui
-// compara-se esse resumo com o dado de agora. Sem esta lei a ficha era uma cópia que envelhece em
-// silêncio — o mesmo defeito que a D20 fechou para os endereços, só que numa página inteira.
-const fichas = [];
-for (const scene of validated) {
-  const slug = scene.world && scene.world.slug;
-  for (const artwork of scene.artworks || []) {
-    const path = artworkPagePath(slug, artwork.id);
-    const file = join(root, path);
-    const esperado = pageFingerprint(scene, artwork);
-    if (!existsSync(file)) {
-      fichas.push(`${path} não existe — corre \`node tools/artwork/build.mjs\``);
-      continue;
-    }
-    const html = readFileSync(file, 'utf8');
-    const achado = /data-ficha="([0-9a-f]+)"/.exec(html);
-    if (!achado) fichas.push(`${path} não diz de que dado foi feita — regenera-a`);
-    else if (achado[1] !== esperado) {
-      fichas.push(`${path} está velha: o dado mudou desde que foi gerada (${achado[1]} → ${esperado})`);
-    }
-  }
+// L20 (D62): a ficha é **uma página só**. Antes era uma página gerada por obra, com o resumo do dado
+// gravado no próprio ficheiro; agora `obra.html` desenha-se do mundo ao carregar, e o que há para
+// provar mudou de sítio: que a página existe, que carrega o módulo que a desenha, e que a pasta das
+// fichas antigas não voltou (duas fontes do mesmo conteúdo acabariam por discordar).
+const pagina = join(root, ARTWORK_PAGE_FILE);
+if (!existsSync(pagina)) {
+  console.error(`  error: ${ARTWORK_PAGE_FILE} não existe — é a ficha de todas as obras (L20)`);
+  failed++;
+} else {
+  const html = readFileSync(pagina, 'utf8');
+  const carrega = /<script[^>]+src="js\/obra\.js"/.test(html);
+  console.log('ficha da obra: ' + (carrega
+    ? `${ARTWORK_PAGE_FILE}, uma página para todas as obras (L20)`
+    : `${ARTWORK_PAGE_FILE} não carrega js/obra.js (L20)`));
+  if (!carrega) failed++;
 }
-console.log('fichas de obra: ' + (fichas.length === 0
-  ? 'todas em dia (L20)'
-  : `${fichas.length} desactualizada(s) (L20)`));
-for (const linha of fichas) {
-  console.error(`  error: ${linha}`);
+const antigas = readdirSync(root, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .filter((name) => existsSync(join(root, name, LEGACY_ARTWORK_FOLDER)));
+for (const name of antigas) {
+  console.error(`  error: ${name}/${LEGACY_ARTWORK_FOLDER}/ ainda existe — a ficha antiga (D60) foi ` +
+    `substituída por ${ARTWORK_PAGE_FILE} (D62); duas fontes acabam por discordar (L20)`);
   failed++;
 }
 

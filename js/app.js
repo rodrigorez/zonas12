@@ -22,7 +22,9 @@ import { startSonda } from './modules/sonda.js';
 import { orientationStatus } from './modules/orientation.js';
 import { validateScene } from './scene/validation.js';
 import { buildScene } from './scene/scene-builder.js';
-import { initI18n, languageFromUrl } from './i18n.js';
+import { textIn } from './scene/schema.js';
+import { startAnalytics, pageLocation } from './scene/analytics.js';
+import { initI18n, languageFromUrl, currentLanguage } from './i18n.js';
 // Registers the `ar-config` component. It lives in js/scene/ because the scene's renderer settings
 // are the scene's: the editor's preview needs the same ones (Fase 4), and two copies would be two
 // sources of the drawing rules (law L6).
@@ -134,6 +136,14 @@ async function buildFromData() {
   // they came through a door (D14).
   const from = new URLSearchParams(window.location.search).get('from');
   await buildScene(data, { from });
+
+  // A medição da sala (D62): uma propriedade por mundo, e o ID mora no dado. Sem ID não acontece
+  // nada — nenhum script, nenhum pedido, nenhuma linha na consola.
+  window.portalDebug.analytics = startAnalytics({
+    id: data.world && data.world.analytics && data.world.analytics.id,
+    title: textIn(data.world && data.world.name, currentLanguage()) || data.world.slug,
+    location: pageLocation(window.location.href, ['scene'])
+  });
   return true;
 }
 
