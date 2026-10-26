@@ -79,7 +79,7 @@
     {
       "id": 8,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "praia",
       "position": [
         -6,
@@ -104,12 +104,17 @@
       "synopsis": {
         "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
         "en": "Provisional text: the final synopsis of this work goes here."
-      }
+      },
+      "author": {
+        "pt": "autorA",
+        "en": "autorA"
+      },
+      "site": "https://www.testeB.nada"
     },
     {
       "id": 9,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "cidade-360",
       "position": [
         6,
@@ -134,7 +139,12 @@
       "synopsis": {
         "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
         "en": "Provisional text: the final synopsis of this work goes here."
-      }
+      },
+      "author": {
+        "pt": "autorB, autorC",
+        "en": "autorB, autorC"
+      },
+      "site": "https://www.testeC.nada"
     }
   ],
   "portals": [

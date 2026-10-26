@@ -19,6 +19,11 @@ import { initI18n, t, languageFromUrl } from './i18n.js';
 
 const AFRAME_VERSION = '1.8.0';
 const SITE_LOAD_TIMEOUT = 4000;
+// Um site que **não existe** (DNS que não resolve) não dá erro ao browser: o iframe dispara `load` com
+// a página de erro dele, em ~100 ms (medido: 97–136 ms, contra 623 ms de uma página real). Não há
+// forma de olhar para dentro de um iframe de outra origem, por isso o que se mede é o tempo — um site
+// verdadeiro não pinta em menos de um quarto de segundo. Abaixo disto, é a capa que fica.
+const INSTANT_LOAD_MS = 250;
 const host = document.getElementById('ficha');
 const request = artworkPageRequest(window.location.search);
 
@@ -121,7 +126,6 @@ async function drawMedium(world, artwork, language) {
     const frame = document.createElement('iframe');
     frame.className = 'meio-site-iframe';
     frame.title = textIn(artwork.title, ORIGIN_LANGUAGE) || '';
-    frame.src = embed.src;
     frame.loading = 'lazy';
     // Sem `referrerpolicy="no-referrer"`: o YouTube recusa embutir sem referrer (erro 153, uma página
     // de erro que carrega como se tivesse corrido bem e nenhuma página consegue detetar). O defeito
@@ -133,10 +137,18 @@ async function drawMedium(world, artwork, language) {
     if (embed.fullscreen) frame.setAttribute('allowfullscreen', '');
     // A imagem fica por baixo e só sai de lá quando o site carrega. Um site que **recusa** ser
     // embutido dispara o `load` na mesma, e contra isso nenhuma página pode fazer nada — o botão
-    // «Abrir o site» é a saída e está sempre lá.
-    frame.addEventListener('load', () => box.classList.add('carregado'));
+    // «Abrir o site» é a saída e está sempre lá. Um site que **não existe** também: e esse dispara
+    // o `load` quase instantaneamente (ver `INSTANT_LOAD_MS`), por isso o tempo é o que o distingue.
+    const startedAt = performance.now();
+    frame.addEventListener('load', () => {
+      if (performance.now() - startedAt < INSTANT_LOAD_MS) box.classList.add('falhou');
+      else box.classList.add('carregado');
+    });
     frame.addEventListener('error', () => box.classList.add('falhou'));
-    setTimeout(() => { if (!box.classList.contains('carregado')) box.classList.add('falhou'); }, SITE_LOAD_TIMEOUT);
+    setTimeout(() => {
+      if (!box.classList.contains('carregado')) box.classList.add('falhou');
+    }, SITE_LOAD_TIMEOUT);
+    frame.src = embed.src;
     box.appendChild(frame);
     return 'site';
   }

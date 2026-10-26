@@ -7,10 +7,11 @@ Zonas 11.
 Cada teste diz **o que fazer**, **o que se espera** e **o que enviar** se falhar. Um teste que não dá
 para fazer num aparelho está marcado — não é preciso forçar.
 
-> **Estado do dado hoje:** o `data/obras.csv` está preenchido com texto **provisório** — as obras de
-> produção têm título e sinopse (e **não** têm autor, porque não se inventa quem fez uma obra), por isso
-> a ficha mostra esses dois cartões e não o do autor. O mundo de **exemplo** (`exemplo-ficha`) é a
-> versão completa, com autor.
+> **Estado do dado hoje:** o `data/obras.csv` está preenchido com texto **provisório**, para aprovação:
+> as dez obras de produção têm título, **autor (um ou vários)** e sinopse, e **nove** têm um `site`
+> falso (`https://www.testeX.nada`). O site falso não carrega — é isso que mostra a **capa** com o botão
+> «Abrir o site» (o comportamento de reserva). A obra em vídeo (`scene1` `id=2`) ficou sem site: uma
+> obra com site tem de ter uma **imagem** de capa.
 
 ---
 
@@ -70,7 +71,7 @@ Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos
 | 2.2 | Abrir `…&id=3` | O YouTube toca **sem som** (mudo forçado); o botão azul existe e abre o site numa aba nova |
 | 2.3 | Girar o telemóvel para horizontal | A ficha continua legível (a coluna alarga até 800 px, não estica a 100%) |
 | 2.4 | Abrir `…&id=0&lang=en` | Inglês em todo o lado, como no computador |
-| 2.5 | Abrir a ficha de produção `…/obra.html?mundo=scene2&id=5` | Nome **«Céu»** e um cartão de sinopse provisória — o texto veio do CSV |
+| 2.5 | Abrir a ficha de produção `https://rodrigorez.github.io/zonas12/obra.html?mundo=scene2&id=5` | Nome **«Céu»**, autor provisório, sinopse provisória, e o **site falso** mostra a **capa** com o botão azul (não a página de erro do browser) |
 | 2.6 | Tocar em «Voltar» | Volta à sala certa, sem 404 |
 
 ## 3. A ficha ligada à exposição
@@ -135,12 +136,16 @@ Para cada falha, envia três coisas:
 ## O que já se sabe, e não é defeito
 
 - o **portão** tem **2 portais e nenhuma obra** — é a entrada, e as obras estão dentro das salas;
-- as obras de produção têm **título e sinopse provisórios** e **não têm autor** (não se inventa quem fez
-  uma obra): por isso a ficha não mostra o cartão do autor, e é o `data/obras.csv` que o preenche;
+- as obras de produção têm **título, autor e sinopse provisórios** e **nove delas um site falso**: por
+  isso a ficha mostra a capa com o botão «Abrir o site» (o site não existe, e é de propósito) — é o
+  `data/obras.csv` que muda tudo isto;
 - **não há medição a correr**: as propriedades GA4 ainda não existem, e sem ID a página não carrega
   script nenhum (é de propósito);
 - a ficha é **desenhada pelo browser**: sem JavaScript não mostra a obra (é o preço de ser um ficheiro
   só, a troca que foi pedida);
+- **um site que não existe** não dá erro ao browser (o iframe dispara `load` com a página de erro dele em
+  ~100 ms). A ficha mede o tempo e trata-o como falha: fica a **capa** com o botão «Abrir o site». É o
+  que se vê com os `www.testeX.nada` do CSV provisório;
 - num telemóvel **com** giroscópio, o olhar volta governado pelo sensor — o **ponto** (posição) é
   restaurado sempre, mas a direcção do olhar pode ser corrigida pelo aparelho no instante seguinte;
 - no site publicado o **editor não grava** (gravar precisa do servidor local, que valida e escreve no

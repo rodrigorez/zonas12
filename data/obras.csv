@@ -3,12 +3,16 @@
 # Cada linha é uma obra: o que ela se chama, quem a fez, o que diz, o site (se tiver) e a capa.
 #
 # titulo_pt / titulo_en ... o nome da obra. Sem ele a ficha mostra o id do asset.
-# autor ................... quem fez a obra (uma linha, igual nas duas línguas).
+# autor ................... quem fez a obra. **Mais do que um autor vai na mesma célula, separado por
+#                           vírgulas** (a célula fica entre aspas): "autorA, autorB, AutorC". A ficha
+#                           mostra-os pela ordem escrita e não os parte.
 # sinopse_pt / sinopse_en .. o texto da ficha. Uma frase ou duas; o cartão cresce com ele.
-# site .................... o endereço da obra, se ela for um jogo ou uma escultura interactiva
-#                           (ex.: https://editor.p5js.org/fulano/full/AbC123). Vazio = obra sem site.
-#                           Com site, a ficha embute-o por cima da capa e mostra o botão
-#                           "Abrir o site". Sem site, a ficha mostra a capa (ou o vídeo).
+# site .................... o endereço da obra, se ela for um jogo ou uma escultura interactiva.
+#                           Um endereço por obra, e **tem de começar por http:// ou https://** — a lei
+#                           L11/L21 do dado recusa o que não for um endereço, e sem esquema o browser
+#                           nem tenta carregar. Com site, a ficha embute-o por cima da capa e mostra o
+#                           botão "Abrir o site"; a capa tem de ser uma **imagem** (é ela que fica no
+#                           lugar do site).
 # capa .................... o caminho da imagem que representa a obra, a partir da raiz do projeto
 #                           (ex.: assets/artworks/eiffel.jpg). Vazio = fica a que já está.
 #
@@ -17,16 +21,17 @@
 #
 # Depois de preencher: node tools/artwork/from-csv.mjs
 #
-# NOTA: o texto abaixo é PROVISÓRIO — serve para o autor ver o circuito a funcionar de ponta a ponta
-# (CSV → importador → mundo → ficha). Substituir pelo texto definitivo e correr o importador outra vez.
+# NOTA: o texto abaixo é PROVISÓRIO — é para aprovação do circuito e do desenho da ficha, não é
+# conteúdo. Os autores e os sites são falsos: os sites não existem (de propósito), e é isso que faz
+# aparecer a capa com o botão "Abrir o site" quando o embed não carrega.
 mundo,id,titulo_pt,titulo_en,autor,sinopse_pt,sinopse_en,site,capa
-scene1,0,"Cidade ao entardecer","City at dusk",,"Texto provisório: a sinopse definitiva desta obra entra aqui, uma ou duas frases que dizem o que ela é.","Provisional text: the final synopsis of this work goes here, one or two sentences saying what it is.",,assets/artworks/cidade-d0-bryan-goff.jpg
-scene1,1,"A torre","The tower",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/artworks/eiffel.jpg
-scene1,2,"Cidade em movimento","City in motion",,"Texto provisório: esta obra é um vídeo, e a ficha mostra o leitor em vez da capa.","Provisional text: this work is a video, and the page shows the player instead of the cover.",,assets/video/cidade-d0-compequicolor.mp4
-scene1,3,"Praia","Beach",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/panoramas/praia-d0-praia.jpg
-scene1,4,"Céu de nuvens","Cloudy sky",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/panoramas/ceu-d0-skycloud.jpg
-scene2,5,"Céu","Sky",,"Texto provisório: a mesma imagem é obra em duas salas, e cada uma tem a sua ficha.","Provisional text: the same image is a work in two rooms, and each has its own page.",,assets/panoramas/ceu-d0-skycloud.jpg
-scene2,6,"A torre, na praia","The tower, at the beach",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/artworks/eiffel.jpg
-scene2,7,"Cidade, na praia","City, at the beach",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/artworks/cidade-d0-bryan-goff.jpg
-scene3,8,"Praia, no céu","Beach, in the sky",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/panoramas/praia-d0-praia.jpg
-scene3,9,"Floresta","Forest",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/panoramas/cidade-d0-forest.jpg
+scene1,0,"Cidade ao entardecer","City at dusk","autorA, autorB, AutorC","Texto provisório: a sinopse definitiva desta obra entra aqui, uma ou duas frases que dizem o que ela é.","Provisional text: the final synopsis of this work goes here, one or two sentences saying what it is.",https://www.testeA.nada,assets/artworks/cidade-d0-bryan-goff.jpg
+scene1,1,"A torre","The tower","autorA","Texto provisório: uma obra com um autor no CSV mostra um autor na ficha.","Provisional text: a work with one author in the CSV shows one author on the page.",https://www.testeB.nada,assets/artworks/eiffel.jpg
+scene1,2,"Cidade em movimento","City in motion","autorB, autorC","Texto provisório: esta obra é um vídeo, por isso fica sem site (a lei exige uma imagem de capa para uma obra com site).","Provisional text: this work is a video, so it stays without a site (the law needs a cover image for a work with a site).",,assets/video/cidade-d0-compequicolor.mp4
+scene1,3,"Praia","Beach","autorC","Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",https://www.testeC.nada,assets/panoramas/praia-d0-praia.jpg
+scene1,4,"Céu de nuvens","Cloudy sky","autorA, autorB","Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",https://www.testeA.nada,assets/panoramas/ceu-d0-skycloud.jpg
+scene2,5,"Céu","Sky","autorB","Texto provisório: a mesma imagem é obra em duas salas, e cada uma tem a sua ficha.","Provisional text: the same image is a work in two rooms, and each has its own page.",https://www.testeB.nada,assets/panoramas/ceu-d0-skycloud.jpg
+scene2,6,"A torre, na praia","The tower, at the beach","autorA, autorC","Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",https://www.testeC.nada,assets/artworks/eiffel.jpg
+scene2,7,"Cidade, na praia","City, at the beach","autorC","Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",https://www.testeA.nada,assets/artworks/cidade-d0-bryan-goff.jpg
+scene3,8,"Praia, no céu","Beach, in the sky","autorA","Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",https://www.testeB.nada,assets/panoramas/praia-d0-praia.jpg
+scene3,9,"Floresta","Forest","autorB, autorC","Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",https://www.testeC.nada,assets/panoramas/cidade-d0-forest.jpg

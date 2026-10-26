@@ -111,7 +111,7 @@
     {
       "id": 5,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "skycloud",
       "position": [
         -20,
@@ -136,12 +136,17 @@
       "synopsis": {
         "pt": "Texto provisório: a mesma imagem é obra em duas salas, e cada uma tem a sua ficha.",
         "en": "Provisional text: the same image is a work in two rooms, and each has its own page."
-      }
+      },
+      "author": {
+        "pt": "autorB",
+        "en": "autorB"
+      },
+      "site": "https://www.testeB.nada"
     },
     {
       "id": 6,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "galeriaFoto2",
       "position": [
         0,
@@ -166,12 +171,17 @@
       "synopsis": {
         "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
         "en": "Provisional text: the final synopsis of this work goes here."
-      }
+      },
+      "author": {
+        "pt": "autorA, autorC",
+        "en": "autorA, autorC"
+      },
+      "site": "https://www.testeC.nada"
     },
     {
       "id": 7,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "galeriaFoto1",
       "position": [
         20,
@@ -196,7 +206,12 @@
       "synopsis": {
         "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
         "en": "Provisional text: the final synopsis of this work goes here."
-      }
+      },
+      "author": {
+        "pt": "autorC",
+        "en": "autorC"
+      },
+      "site": "https://www.testeA.nada"
     }
   ],
   "portals": [

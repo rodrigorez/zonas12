@@ -111,7 +111,7 @@
     {
       "id": 0,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "galeriaFoto1",
       "position": [
         -44,
@@ -136,12 +136,17 @@
       "synopsis": {
         "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui, uma ou duas frases que dizem o que ela é.",
         "en": "Provisional text: the final synopsis of this work goes here, one or two sentences saying what it is."
-      }
+      },
+      "author": {
+        "pt": "autorA, autorB, AutorC",
+        "en": "autorA, autorB, AutorC"
+      },
+      "site": "https://www.testeA.nada"
     },
     {
       "id": 1,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "galeriaFoto2",
       "position": [
         -24,
@@ -164,9 +169,14 @@
         "en": "The tower"
       },
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
-        "en": "Provisional text: the final synopsis of this work goes here."
-      }
+        "pt": "Texto provisório: uma obra com um autor no CSV mostra um autor na ficha.",
+        "en": "Provisional text: a work with one author in the CSV shows one author on the page."
+      },
+      "author": {
+        "pt": "autorA",
+        "en": "autorA"
+      },
+      "site": "https://www.testeB.nada"
     },
     {
       "id": 2,
@@ -194,14 +204,18 @@
         "en": "City in motion"
       },
       "synopsis": {
-        "pt": "Texto provisório: esta obra é um vídeo, e a ficha mostra o leitor em vez da capa.",
-        "en": "Provisional text: this work is a video, and the page shows the player instead of the cover."
+        "pt": "Texto provisório: esta obra é um vídeo, por isso fica sem site (a lei exige uma imagem de capa para uma obra com site).",
+        "en": "Provisional text: this work is a video, so it stays without a site (the law needs a cover image for a work with a site)."
+      },
+      "author": {
+        "pt": "autorB, autorC",
+        "en": "autorB, autorC"
       }
     },
     {
       "id": 3,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "praia",
       "position": [
         24,
@@ -226,12 +240,17 @@
       "synopsis": {
         "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
         "en": "Provisional text: the final synopsis of this work goes here."
-      }
+      },
+      "author": {
+        "pt": "autorC",
+        "en": "autorC"
+      },
+      "site": "https://www.testeC.nada"
     },
     {
       "id": 4,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "skycloud",
       "position": [
         44,
@@ -256,7 +275,12 @@
       "synopsis": {
         "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
         "en": "Provisional text: the final synopsis of this work goes here."
-      }
+      },
+      "author": {
+        "pt": "autorA, autorB",
+        "en": "autorA, autorB"
+      },
+      "site": "https://www.testeA.nada"
     }
   ],
   "portals": [

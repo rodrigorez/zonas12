@@ -860,8 +860,10 @@ arranques). As capturas ficam em `.harness/imagenTeste/exemplo-ficha/`, fora do 
 que se espera e o que enviar se falhar, com todos os endereços para telemóvel e computador.
 
 **O CSV a funcionar de ponta a ponta.** O autor pediu para ver o circuito a trabalhar, e ele está
-preenchido com texto **provisório**: as dez obras de produção passaram a ter título (pt/en) e sinopse, e
-a ficha deixou de mostrar o id do asset. O caminho, que é o que fica para o texto definitivo:
+preenchido com texto **provisório**: as dez obras de produção passaram a ter título (pt/en), **autor
+(um ou vários, na mesma célula separados por vírgulas)** e sinopse, e **nove delas têm um `site`** — um
+endereço falso (`https://www.testeA.nada`), só para aprovação. O caminho, que é o que fica para o texto
+definitivo:
 
 ```sh
 # 1. editar data/obras.csv (título, autor, sinopse, site, capa)
@@ -870,14 +872,22 @@ node tools/artwork/from-csv.mjs           # 3. escreve nos mundos
 node tools/scene/validate.mjs             # 4. as leis do dado, depois de escrever
 ```
 
-O autor vê o resultado em `obra.html?mundo=scene1&id=0` (e `&lang=en` para a versão inglesa). O `autor`
-ficou **vazio** de propósito: não se inventa quem fez uma obra — sem ele, a ficha não mostra o cartão do
-autor, e é isso que se vê hoje.
+O autor vê o resultado em `obra.html?mundo=scene1&id=0` (e `&lang=en` para a versão inglesa). **Uma das
+dez obras ficou sem site**: a do vídeo (`scene1` obra 2). A lei exige que a capa de uma obra com site
+seja uma **imagem** — é ela que fica no lugar do site quando ele não carrega —, e um vídeo não serve.
 
-Do mesmo passo saiu uma correção na bateria **D40**: os nomes esperados estavam escritos à mão
-(`#0 · galeriaFoto1 · Cidade 360º · page`), por isso mudar um título no CSV era uma falha do
-instrumento em vez de uma mudança do dado. Passaram a ser calculados do `data/worlds/<slug>.json` —
-**21 de 21** outra vez, agora com os títulos novos.
+Do mesmo passo saíram duas correções:
+
+- **um site que não existe não dava erro**: o browser dispara o `load` do iframe com a **página de erro
+  dele** em ~100 ms (medido: 97–136 ms, contra 623 ms de uma página real), e a ficha mostrava o «site
+  não encontrado» do Chrome em vez da capa. Passou a haver um limite (`INSTANT_LOAD_MS`, 250 ms): abaixo
+  dele o site conta como falhado e é a **capa** que fica, com o botão «Abrir o site» sempre presente;
+- a bateria **D40** tinha os nomes esperados escritos à mão (`#0 · galeriaFoto1 · …`) e o `obra.mjs`
+  tinha o **tipo** de cada obra escrito à mão (`tipo: 'image'`). Mudar o CSV era uma falha dos
+  instrumentos em vez de uma mudança do dado: ambos passaram a ler o `data/worlds/<slug>.json`.
+
+Medido: `validate` **0**, `obra.mjs` **63 de 63**, `D40` **21 de 21**, `volta.mjs` **7 de 7**,
+`ficha-falhas` **3 de 3** e a suíte por omissão **5 de 5**.
 
 **Voltar ao sítio onde se estava (D63).** Abrir uma obra e voltar punha a câmara no **início do mundo**:
 quem estava de frente para uma obra, a três metros, tinha de caminhar outra vez até lá. Agora o clique

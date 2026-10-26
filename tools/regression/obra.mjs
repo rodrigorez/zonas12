@@ -20,20 +20,32 @@
 //
 //   node tools/regression/obra.mjs
 //
-import { serveProject, openBrowser, checks, sleep } from './harness.mjs';
+import { serveProject, openBrowser, checks, sleep, ROOT } from './harness.mjs';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { platformEmbed } from '../../js/scene/platform-embed.js';
 import { measurementIdWellFormed, gtagScriptUrl, pageLocation, startAnalytics } from '../../js/scene/analytics.js';
 import { artworkPageHref, artworkPageRequest, artworkBackHref } from '../../js/scene/artwork-page.js';
 
-// Os cinco meios e um vídeo de produção. `mundo` e `id` são o que o endereço leva.
+// O tipo de cada obra vem do **dado** (o `data/obras.csv` muda-o: uma obra com `site` passa a ser uma
+// obra `site`). Escrito à mão aqui, mudar o CSV era uma falha do instrumento em vez de uma mudança do
+// dado — a mesma lição da bateria D40.
+function kindOf(worldSlug, artworkId) {
+  const world = JSON.parse(readFileSync(join(ROOT, 'data', 'worlds', worldSlug + '.json'), 'utf8'));
+  const artwork = (world.artworks || []).find((item) => item.id === artworkId);
+  return artwork ? artwork.kind : null;
+}
+
+// Os cinco meios e duas obras de produção. `pasta` diz se o mundo tem pasta própria (uma sala) ou é
+// um fixture (que se abre por `?scene=`).
 const CASOS = [
-  { mundo: 'r9', obra: 0, tipo: 'image', completo: true, pasta: false },
-  { mundo: 'r9', obra: 1, tipo: 'model', completo: true, pasta: false },
-  { mundo: 'r9', obra: 2, tipo: 'text', completo: true, pasta: false },
-  { mundo: 'r9', obra: 3, tipo: 'site', completo: true, pasta: false },
-  { mundo: 'scene1', obra: 2, tipo: 'video', pasta: true },
-  { mundo: 'scene1', obra: 0, tipo: 'image', pasta: true }
-];
+  { mundo: 'r9', obra: 0, completo: true, pasta: false },
+  { mundo: 'r9', obra: 1, completo: true, pasta: false },
+  { mundo: 'r9', obra: 2, completo: true, pasta: false },
+  { mundo: 'r9', obra: 3, completo: true, pasta: false },
+  { mundo: 'scene1', obra: 2, pasta: true },
+  { mundo: 'scene1', obra: 0, pasta: true }
+].map((caso) => Object.assign({ tipo: kindOf(caso.mundo, caso.obra) }, caso));
 
 // A tabela das plataformas, medida sem browser: cada endereço tem de cair na plataforma certa e no
 // `src` que ela serve. Sem plataforma conhecida, o endereço passa tal e qual — nunca se inventa um

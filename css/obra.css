@@ -190,6 +190,10 @@ body {
 
 .meio-site.carregado > iframe { opacity: 1; }
 
+/* Um site que não carregou (ou que não existe) deixa a capa à vista: o iframe sai do caminho, e o
+ * botão «Abrir o site» continua a ser a saída. */
+.meio-site.falhou > iframe { opacity: 0; pointer-events: none; }
+
 .titulo {
   font-size: clamp(1.2rem, 3.5vw, 1.6rem);
   font-weight: bold;
