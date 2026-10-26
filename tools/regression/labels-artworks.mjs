@@ -1,5 +1,5 @@
-// A bateria do nome das obras (D40): o mesmo desenho das portas, com a mesma tecla — `#0 · galeriaFoto1 ·
-// Cidade 360º · modal`.
+// A bateria do nome das obras (D40): o mesmo desenho das portas, com a mesma tecla — `#0 · Cidade ao
+// entardecer · Cidade 360º · page` (o título do dado; sem título, o id do asset).
 //
 // O que se mede, nas três salas com obras:
 //   · sem a tecla D não há nome nenhum;
@@ -13,7 +13,9 @@
 //   · a consola fica limpa.
 //
 // Uso, da raiz do projeto: node tools/regression/labels-artworks.mjs
-import { serveProject, openBrowser, checks, sleep } from './harness.mjs';
+import { serveProject, openBrowser, checks, sleep, ROOT } from './harness.mjs';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const LARGURA = 1200;
 const ALTURA = 800;
@@ -60,14 +62,20 @@ async function main() {
   };
 
   try {
-    const esperado = {
-      scene1: ['#0 · galeriaFoto1 · Cidade 360º · page', '#1 · galeriaFoto2 · Cidade 360º · page',
-        '#2 · video · Cidade 360º · page', '#3 · praia · Cidade 360º · page',
-        '#4 · skycloud · Cidade 360º · page'],
-      scene2: ['#5 · skycloud · Praia · page', '#6 · galeriaFoto2 · Praia · page',
-        '#7 · galeriaFoto1 · Praia · page'],
-      scene3: ['#8 · praia · Céu 360º · page', '#9 · cidade-360 · Céu 360º · page']
-    };
+    // Os nomes esperados vêm do **dado**, não escritos aqui: o rótulo é `#id · título (ou o asset, sem
+    // título) · nome da sala · interacção` (D40). Escritos à mão, mudar um título no `data/obras.csv`
+    // passava a ser uma falha da bateria em vez de uma mudança do dado.
+    const esperado = {};
+    for (const slug of ['scene1', 'scene2', 'scene3']) {
+      const world = JSON.parse(readFileSync(join(ROOT, 'data', 'worlds', slug + '.json'), 'utf8'));
+      const sala = (world.world.name && world.world.name.pt) || slug;
+      esperado[slug] = (world.artworks || [])
+        .slice()
+        .sort((one, other) => one.id - other.id)
+        .map((artwork) => '#' + artwork.id + ' · ' +
+          ((artwork.title && artwork.title.pt) || artwork.asset || '-') + ' · ' +
+          sala + ' · ' + artwork.interaction);
+    }
 
     for (const [slug, from] of [['scene1', 'gate'], ['scene2', 'scene1'], ['scene3', 'scene2']]) {
       await open(site.base + '/?scene=' + slug + '&from=' + from + '&bust=' + bust + Math.random());

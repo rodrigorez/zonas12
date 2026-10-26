@@ -7,10 +7,10 @@ Zonas 11.
 Cada teste diz **o que fazer**, **o que se espera** e **o que enviar** se falhar. Um teste que não dá
 para fazer num aparelho está marcado — não é preciso forçar.
 
-> **Estado do dado hoje:** as obras de produção ainda não têm título, autor nem sinopse, por isso a
-> ficha delas mostra **o id do asset** (ex.: `galeriaFoto1`) como nome e **não tem cartão de
-> descrição**. Isso **não** é defeito: é o `data/obras.csv` por preencher — o mundo de **exemplo**
-> (`exemplo-ficha`) é onde se vê a ficha com o texto todo.
+> **Estado do dado hoje:** o `data/obras.csv` está preenchido com texto **provisório** — as obras de
+> produção têm título e sinopse (e **não** têm autor, porque não se inventa quem fez uma obra), por isso
+> a ficha mostra esses dois cartões e não o do autor. O mundo de **exemplo** (`exemplo-ficha`) é a
+> versão completa, com autor.
 
 ---
 
@@ -57,7 +57,7 @@ Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos
 | 1.7 | Abrir `/obra.html?mundo=exemplo-ficha&id=99` | Uma linha: **«Esta obra não faz parte desta exposição.»** e **um** botão «Voltar». Nada de obra desenhada, nada de imagem quebrada |
 | 1.7b | Alargar a janela ao máximo (ou ecrã 2560) e olhar para a imagem | A imagem ocupa **quase toda a largura do cartão** (≈ 90%), não um selo pequeno ao centro |
 | 1.8 | Clicar «Voltar» (no teste 1.1) | Cai em **`/?scene=exemplo-ficha`** — a sala de exemplo — e a sala arranca (botão «Ativar exposição» ou já a andar) |
-| 1.9 | Abrir `/obra.html?mundo=scene1&id=0` e clicar «Voltar» | Cai em **`/scene1/`**, com a cidade construída. Se o browser já tinha permissão de câmara, arranca sozinho; senão mostra «Ativar exposição» (**isso não é defeito**) |
+| 1.9 | Abrir `https://rodrigorez.github.io/zonas12/obra.html?mundo=scene1&id=0` e clicar «Voltar» | Cai em **`/scene1/`**, com a cidade construída. Se o browser já tinha permissão de câmara, arranca sozinho; senão mostra «Ativar exposição» (**isso não é defeito**) |
 | 1.10 | DevTools → **Network → Network request blocking**, acrescentar o padrão `data/worlds`, recarregar a ficha | Aparece **«Esta obra não faz parte desta exposição.»** com **um** botão «Voltar» (e não um ecrã em branco). Na consola pode haver um aviso — a página não pode ficar vazia |
 | 1.11 | Trocar o padrão bloqueado por `i18n`, recarregar | Aparece o **aviso escrito na própria página**: «Esta obra não faz parte desta exposição, ou a página não a conseguiu carregar. Volte ao início: exposição.» — sem cartões e com o link para a raiz |
 | 1.12 | Limpar os padrões bloqueados e recarregar | A ficha volta ao normal (teste 1.1) |
@@ -70,7 +70,7 @@ Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos
 | 2.2 | Abrir `…&id=3` | O YouTube toca **sem som** (mudo forçado); o botão azul existe e abre o site numa aba nova |
 | 2.3 | Girar o telemóvel para horizontal | A ficha continua legível (a coluna alarga até 800 px, não estica a 100%) |
 | 2.4 | Abrir `…&id=0&lang=en` | Inglês em todo o lado, como no computador |
-| 2.5 | Abrir a ficha de produção `/obra.html?mundo=scene2&id=5` | Nome da obra = **`skycloud`** (o id do asset) — é o estado actual do dado |
+| 2.5 | Abrir a ficha de produção `…/obra.html?mundo=scene2&id=5` | Nome **«Céu»** e um cartão de sinopse provisória — o texto veio do CSV |
 | 2.6 | Tocar em «Voltar» | Volta à sala certa, sem 404 |
 
 ## 3. A ficha ligada à exposição
@@ -135,8 +135,8 @@ Para cada falha, envia três coisas:
 ## O que já se sabe, e não é defeito
 
 - o **portão** tem **2 portais e nenhuma obra** — é a entrada, e as obras estão dentro das salas;
-- as obras de produção mostram o **id do asset** como nome e **não têm descrição**: falta preencher o
-  `data/obras.csv` (o mundo `exemplo-ficha` mostra como fica com texto);
+- as obras de produção têm **título e sinopse provisórios** e **não têm autor** (não se inventa quem fez
+  uma obra): por isso a ficha não mostra o cartão do autor, e é o `data/obras.csv` que o preenche;
 - **não há medição a correr**: as propriedades GA4 ainda não existem, e sem ID a página não carrega
   script nenhum (é de propósito);
 - a ficha é **desenhada pelo browser**: sem JavaScript não mostra a obra (é o preço de ser um ficheiro

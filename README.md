@@ -859,6 +859,26 @@ arranques). As capturas ficam em `.harness/imagenTeste/exemplo-ficha/`, fora do 
 **O guia de testes:** [docs/GUIA-DE-TESTES.md](docs/GUIA-DE-TESTES.md) — sete blocos com o que fazer, o
 que se espera e o que enviar se falhar, com todos os endereços para telemóvel e computador.
 
+**O CSV a funcionar de ponta a ponta.** O autor pediu para ver o circuito a trabalhar, e ele está
+preenchido com texto **provisório**: as dez obras de produção passaram a ter título (pt/en) e sinopse, e
+a ficha deixou de mostrar o id do asset. O caminho, que é o que fica para o texto definitivo:
+
+```sh
+# 1. editar data/obras.csv (título, autor, sinopse, site, capa)
+node tools/artwork/from-csv.mjs --check   # 2. o que mudaria, sem escrever
+node tools/artwork/from-csv.mjs           # 3. escreve nos mundos
+node tools/scene/validate.mjs             # 4. as leis do dado, depois de escrever
+```
+
+O autor vê o resultado em `obra.html?mundo=scene1&id=0` (e `&lang=en` para a versão inglesa). O `autor`
+ficou **vazio** de propósito: não se inventa quem fez uma obra — sem ele, a ficha não mostra o cartão do
+autor, e é isso que se vê hoje.
+
+Do mesmo passo saiu uma correção na bateria **D40**: os nomes esperados estavam escritos à mão
+(`#0 · galeriaFoto1 · Cidade 360º · page`), por isso mudar um título no CSV era uma falha do
+instrumento em vez de uma mudança do dado. Passaram a ser calculados do `data/worlds/<slug>.json` —
+**21 de 21** outra vez, agora com os títulos novos.
+
 **Voltar ao sítio onde se estava (D63).** Abrir uma obra e voltar punha a câmara no **início do mundo**:
 quem estava de frente para uma obra, a três metros, tinha de caminhar outra vez até lá. Agora o clique
 guarda o ponto de vista — **posição, olhar e dimensão** — e o «voltar» da ficha devolve-o (`?volta=1`).

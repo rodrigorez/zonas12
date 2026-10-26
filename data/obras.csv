@@ -1,28 +1,32 @@
-# obras.csv — o dado das obras de producao, para preencher e importar.
-# Cada linha e uma obra: o que ela se chama, quem a fez, o que diz, o site (se tiver) e a capa.
+# obras.csv — o dado das obras de produção, para preencher e importar.
+#
+# Cada linha é uma obra: o que ela se chama, quem a fez, o que diz, o site (se tiver) e a capa.
 #
 # titulo_pt / titulo_en ... o nome da obra. Sem ele a ficha mostra o id do asset.
-# autor ................... quem fez a obra (uma linha, igual nas duas linguas).
-# sinopse_pt / sinopse_en .. o texto da ficha. Uma frase ou duas; o cartao cresce com ele.
-# site .................... o endereco da obra, se ela for um jogo ou uma escultura interactiva
+# autor ................... quem fez a obra (uma linha, igual nas duas línguas).
+# sinopse_pt / sinopse_en .. o texto da ficha. Uma frase ou duas; o cartão cresce com ele.
+# site .................... o endereço da obra, se ela for um jogo ou uma escultura interactiva
 #                           (ex.: https://editor.p5js.org/fulano/full/AbC123). Vazio = obra sem site.
-#                           Com site, a ficha embute-o por cima da capa e mostra o botao
-#                           "Abrir o site". Sem site, a ficha mostra a capa (ou o video).
+#                           Com site, a ficha embute-o por cima da capa e mostra o botão
+#                           "Abrir o site". Sem site, a ficha mostra a capa (ou o vídeo).
 # capa .................... o caminho da imagem que representa a obra, a partir da raiz do projeto
-#                           (ex.: assets/artworks/eiffel.jpg). Vazio = fica a que ja esta.
+#                           (ex.: assets/artworks/eiffel.jpg). Vazio = fica a que já está.
 #
-# Regras: as virgulas separam colunas, por isso um texto com virgula vai entre "aspas".
-# Uma linha que comeca por # e ignorada. Nao mudar a primeira coluna (mundo) nem a segunda (id).
+# Regras: as vírgulas separam colunas, por isso um texto com vírgula vai entre "aspas".
+# Uma linha que começa por # é ignorada. Não mudar a primeira coluna (mundo) nem a segunda (id).
 #
 # Depois de preencher: node tools/artwork/from-csv.mjs
+#
+# NOTA: o texto abaixo é PROVISÓRIO — serve para o autor ver o circuito a funcionar de ponta a ponta
+# (CSV → importador → mundo → ficha). Substituir pelo texto definitivo e correr o importador outra vez.
 mundo,id,titulo_pt,titulo_en,autor,sinopse_pt,sinopse_en,site,capa
-scene1,0,,,,,,,assets/artworks/cidade-d0-bryan-goff.jpg
-scene1,1,,,,,,,assets/artworks/eiffel.jpg
-scene1,2,,,,,,,assets/video/cidade-d0-compequicolor.mp4
-scene1,3,,,,,,,assets/panoramas/praia-d0-praia.jpg
-scene1,4,,,,,,,assets/panoramas/ceu-d0-skycloud.jpg
-scene2,5,,,,,,,assets/panoramas/ceu-d0-skycloud.jpg
-scene2,6,,,,,,,assets/artworks/eiffel.jpg
-scene2,7,,,,,,,assets/artworks/cidade-d0-bryan-goff.jpg
-scene3,8,,,,,,,assets/panoramas/praia-d0-praia.jpg
-scene3,9,,,,,,,assets/panoramas/cidade-d0-forest.jpg
+scene1,0,"Cidade ao entardecer","City at dusk",,"Texto provisório: a sinopse definitiva desta obra entra aqui, uma ou duas frases que dizem o que ela é.","Provisional text: the final synopsis of this work goes here, one or two sentences saying what it is.",,assets/artworks/cidade-d0-bryan-goff.jpg
+scene1,1,"A torre","The tower",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/artworks/eiffel.jpg
+scene1,2,"Cidade em movimento","City in motion",,"Texto provisório: esta obra é um vídeo, e a ficha mostra o leitor em vez da capa.","Provisional text: this work is a video, and the page shows the player instead of the cover.",,assets/video/cidade-d0-compequicolor.mp4
+scene1,3,"Praia","Beach",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/panoramas/praia-d0-praia.jpg
+scene1,4,"Céu de nuvens","Cloudy sky",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/panoramas/ceu-d0-skycloud.jpg
+scene2,5,"Céu","Sky",,"Texto provisório: a mesma imagem é obra em duas salas, e cada uma tem a sua ficha.","Provisional text: the same image is a work in two rooms, and each has its own page.",,assets/panoramas/ceu-d0-skycloud.jpg
+scene2,6,"A torre, na praia","The tower, at the beach",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/artworks/eiffel.jpg
+scene2,7,"Cidade, na praia","City, at the beach",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/artworks/cidade-d0-bryan-goff.jpg
+scene3,8,"Praia, no céu","Beach, in the sky",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/panoramas/praia-d0-praia.jpg
+scene3,9,"Floresta","Forest",,"Texto provisório: a sinopse definitiva desta obra entra aqui.","Provisional text: the final synopsis of this work goes here.",,assets/panoramas/cidade-d0-forest.jpg

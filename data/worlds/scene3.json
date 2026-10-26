@@ -96,7 +96,15 @@
         3,
         0.1
       ],
-      "interaction": "page"
+      "interaction": "page",
+      "title": {
+        "pt": "Praia, no céu",
+        "en": "Beach, in the sky"
+      },
+      "synopsis": {
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
+        "en": "Provisional text: the final synopsis of this work goes here."
+      }
     },
     {
       "id": 9,
@@ -118,7 +126,15 @@
         3,
         0.1
       ],
-      "interaction": "page"
+      "interaction": "page",
+      "title": {
+        "pt": "Floresta",
+        "en": "Forest"
+      },
+      "synopsis": {
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
+        "en": "Provisional text: the final synopsis of this work goes here."
+      }
     }
   ],
   "portals": [

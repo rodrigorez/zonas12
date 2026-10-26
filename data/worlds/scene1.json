@@ -128,7 +128,15 @@
         3,
         0.1
       ],
-      "interaction": "page"
+      "interaction": "page",
+      "title": {
+        "pt": "Cidade ao entardecer",
+        "en": "City at dusk"
+      },
+      "synopsis": {
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui, uma ou duas frases que dizem o que ela é.",
+        "en": "Provisional text: the final synopsis of this work goes here, one or two sentences saying what it is."
+      }
     },
     {
       "id": 1,
@@ -150,7 +158,15 @@
         3,
         0.1
       ],
-      "interaction": "page"
+      "interaction": "page",
+      "title": {
+        "pt": "A torre",
+        "en": "The tower"
+      },
+      "synopsis": {
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
+        "en": "Provisional text: the final synopsis of this work goes here."
+      }
     },
     {
       "id": 2,
@@ -172,7 +188,15 @@
         3,
         0.1
       ],
-      "interaction": "page"
+      "interaction": "page",
+      "title": {
+        "pt": "Cidade em movimento",
+        "en": "City in motion"
+      },
+      "synopsis": {
+        "pt": "Texto provisório: esta obra é um vídeo, e a ficha mostra o leitor em vez da capa.",
+        "en": "Provisional text: this work is a video, and the page shows the player instead of the cover."
+      }
     },
     {
       "id": 3,
@@ -194,7 +218,15 @@
         3,
         0.1
       ],
-      "interaction": "page"
+      "interaction": "page",
+      "title": {
+        "pt": "Praia",
+        "en": "Beach"
+      },
+      "synopsis": {
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
+        "en": "Provisional text: the final synopsis of this work goes here."
+      }
     },
     {
       "id": 4,
@@ -216,7 +248,15 @@
         3,
         0.1
       ],
-      "interaction": "page"
+      "interaction": "page",
+      "title": {
+        "pt": "Céu de nuvens",
+        "en": "Cloudy sky"
+      },
+      "synopsis": {
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
+        "en": "Provisional text: the final synopsis of this work goes here."
+      }
     }
   ],
   "portals": [
