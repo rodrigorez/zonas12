@@ -3496,6 +3496,27 @@ e o botão sempre visível, e é isso que a bateria mede; e um embed que exija r
 tem de o receber — foi o erro 153); e a ficha depende do dado do mundo em tempo de execução, por isso
 um mundo que não carregue diz «obra não encontrada» em vez de ficar em branco.
 
+**O guia de testes (`docs/GUIA-DE-TESTES.md`).** O autor pediu um guia objectivo para testar no
+telemóvel e no computador. Escrevê-lo obrigou a verificar cada expectativa no código, e duas não se
+cumpriam:
+
+- o **«voltar» de um fixture** (`r9`, `exemplo-ficha`) apontava para `<slug>/`, uma pasta que não
+  existe: um 404 na cara do visitante. A ficha pergunta agora ao servidor se a pasta existe (um `HEAD`)
+  e, quando não existe, volta por `./?scene=<slug>` — o caminho pelo qual o fixture se abre. Medido:
+  `obra.mjs` **60 de 60** (dois dos quais são o «voltar» de uma sala e de um fixture, com o clique a
+  construir mesmo a cena);
+- **sem rede a ficha ficava em branco**: o catálogo de textos (`i18n/pt.json`) é a primeira coisa que
+  ela busca, e uma falha ali deixava a página sem nada escrito. O `obra.html` passa a trazer um **aviso
+  de reserva** escrito no ficheiro (que o `js/obra.js` tira do caminho antes de desenhar), e o
+  `initI18n` está dentro de um `try`: sem textos, é o aviso que fica; sem o mundo, é a linha «Esta obra
+  não faz parte desta exposição» com o «voltar». Bateria nova `ficha-falhas.mjs` — **3 de 3**, com os
+  pedidos bloqueados um a um (`/i18n/*`, depois `/data/worlds/*`) e um browser novo por caso, porque o
+  bloqueio do Chrome não se limpa de forma fiável na mesma sessão.
+
+O guia tem sete blocos: a ficha no computador (12 testes), a ficha no telemóvel (6), a ficha ligada à
+exposição (6), a regressão do que já funcionava (7), o CSV (6), o editor (5) — e, para cada falha, o
+que enviar (o endereço, o que se esperava, e o texto da sonda).
+
 ---
 
 ## 10. Testes de regressão (a rede de segurança)

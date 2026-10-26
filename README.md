@@ -856,6 +856,9 @@ Publicado ou local: `https://rodrigorez.github.io/zonas12/obra.html?mundo=exempl
 também com `?scene=exemplo-ficha`, e o validador sabe que não é uma sala (não entra no grafo nem nos
 arranques). As capturas ficam em `.harness/imagenTeste/exemplo-ficha/`, fora do repositório.
 
+**O guia de testes:** [docs/GUIA-DE-TESTES.md](docs/GUIA-DE-TESTES.md) — sete blocos com o que fazer, o
+que se espera e o que enviar se falhar, com todos os endereços para telemóvel e computador.
+
 O que isto custa, dito: **sem JavaScript a ficha não mostra a obra**. Antes cada ficha era HTML
 pronto; agora é desenhada do dado, como a própria exposição (que também não existe sem JavaScript).
 Foi uma troca pedida pelo autor e está registada na decisão.
@@ -1522,7 +1525,7 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 de imagem, a chegada por uma porta, os rótulos, o botão, a transição, o fundo shader (que mede a
 política e as duas páginas com uma), os quatro valores do R9 na cena e nos painéis, o lote por
 dimensão, o catálogo de assets, os portais em movimento e a ficha das obras — cada uma abre um Chrome
-e juntas somam minutos, por isso não são o `default`. Com `--full` são **20** baterias.
+e juntas somam minutos, por isso não são o `default`. Com `--full` são **21** baterias.
 
 Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
 repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.csv` e escreve nos mundos o dado das

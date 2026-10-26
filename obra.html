@@ -15,7 +15,18 @@
   </head>
   <body>
     <!-- O conteúdo é desenhado por `js/obra.js`: uma linha por assunto, como no template das Zonas 11
-         (D61) — nome da exposição, «voltar», o meio da obra, título, autor, sinopse, «voltar». -->
-    <main class="container" id="ficha"></main>
+         (D61) — nome da exposição, «voltar», o meio da obra, título, autor, sinopse, «voltar».
+
+         O bloco abaixo é o **aviso de reserva**: fica escrito no ficheiro para que a página nunca seja
+         um ecrã em branco — sem JavaScript, sem rede, ou com o catálogo de textos em falta, é isto que
+         o visitante lê. O `js/obra.js` tira-o do caminho antes de desenhar. -->
+    <main class="container" id="ficha">
+      <div class="linha">
+        <p class="sinopse">
+          Esta obra não faz parte desta exposição, ou a página não a conseguiu carregar.
+          Volte ao início: <a href="./">exposição</a>.
+        </p>
+      </div>
+    </main>
   </body>
 </html>

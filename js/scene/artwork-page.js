@@ -43,7 +43,9 @@ export function artworkPageRequest(search) {
 }
 
 // De onde a ficha volta: a pasta do mundo a que a obra pertence. A ficha vive na raiz, por isso é o
-// slug e uma barra — o endereço que o visitante conhece (D28). Sem mundo, a raiz, que é o portão.
+// slug e uma barra — o endereço que o visitante conhece (D28). Sem mundo, a raiz, que é o portão. É uma
+// **candidata**: um fixture (`r9`, `exemplo-ficha`) não tem pasta, e a ficha pergunta ao servidor se
+// ela existe antes de a usar (`backTarget`, em js/obra.js) — se não existir, volta por `?scene=<slug>`.
 export function artworkBackHref(worldSlug) {
   if (typeof worldSlug !== 'string' || !/^[a-z0-9-]+$/.test(worldSlug)) return './';
   return worldSlug + '/';

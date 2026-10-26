@@ -27,12 +27,12 @@ import { artworkPageHref, artworkPageRequest, artworkBackHref } from '../../js/s
 
 // Os cinco meios e um vídeo de produção. `mundo` e `id` são o que o endereço leva.
 const CASOS = [
-  { mundo: 'r9', obra: 0, tipo: 'image', completo: true },
-  { mundo: 'r9', obra: 1, tipo: 'model', completo: true },
-  { mundo: 'r9', obra: 2, tipo: 'text', completo: true },
-  { mundo: 'r9', obra: 3, tipo: 'site', completo: true },
-  { mundo: 'scene1', obra: 2, tipo: 'video' },
-  { mundo: 'scene1', obra: 0, tipo: 'image' }
+  { mundo: 'r9', obra: 0, tipo: 'image', completo: true, pasta: false },
+  { mundo: 'r9', obra: 1, tipo: 'model', completo: true, pasta: false },
+  { mundo: 'r9', obra: 2, tipo: 'text', completo: true, pasta: false },
+  { mundo: 'r9', obra: 3, tipo: 'site', completo: true, pasta: false },
+  { mundo: 'scene1', obra: 2, tipo: 'video', pasta: true },
+  { mundo: 'scene1', obra: 0, tipo: 'image', pasta: true }
 ];
 
 // A tabela das plataformas, medida sem browser: cada endereço tem de cair na plataforma certa e no
@@ -227,8 +227,9 @@ async function main() {
       } else if (!(estado.autor || '').trim()) {
         faltam.push(onde);
       }
-      result.check(onde + ': o «voltar» aponta para a pasta do mundo, no cimo e no fundo',
-        estado.voltar === caso.mundo + '/' && estado.botoesVoltar === 2,
+      result.check(onde + ': o «voltar» volta ao mundo (pasta, ou ?scene= num fixture), no cimo e no fundo',
+        estado.voltar === (caso.pasta ? caso.mundo + '/' : './?scene=' + caso.mundo) &&
+          estado.botoesVoltar === 2,
         JSON.stringify({ href: estado.voltar, botoes: estado.botoesVoltar }));
       result.check(onde + ': sem ID no mundo, a página não carrega medição nenhuma',
         Boolean(estado.medicao) && estado.medicao.started === false && estado.scripts === 0,
@@ -302,6 +303,26 @@ async function main() {
     result.check('o «voltar» da ficha cai no mundo a que a obra pertence',
       voltou.mundo === 'scene1' && /\/scene1\/$/.test(voltou.url) && voltou.cena === true,
       JSON.stringify(voltou));
+
+    // 6. O mesmo num fixture, que **não tem pasta**: o «voltar» tem de voltar por `?scene=`, e não
+    // dar 404 (foi o furo que o guia de testes apanhou).
+    await abrir(browser, site.base + '/' + artworkPageHref('r9', 0, 'pt') + '&bust=' + Date.now());
+    await browser.evaluate(`document.querySelector('.botao-voltar').click()`).catch(() => {});
+    for (let i = 0; i < 200; i++) {
+      const pronta = await browser.evaluate(
+        'Boolean(window.portalDebug && window.portalDebug.world === "r9" && document.querySelector("a-scene") && document.querySelector("a-scene").renderer)'
+      ).catch(() => false);
+      if (pronta) break;
+      await sleep(150);
+    }
+    const voltouFixture = await browser.evaluate(`({
+      mundo: window.portalDebug ? window.portalDebug.world : null,
+      busca: location.search,
+      cena: Boolean(document.querySelector('a-scene') && document.querySelector('a-scene').renderer)
+    })`);
+    result.check('o «voltar» de um fixture volta por ?scene=, e não a um 404',
+      voltouFixture.mundo === 'r9' && /scene=r9/.test(voltouFixture.busca) && voltouFixture.cena === true,
+      JSON.stringify(voltouFixture));
 
     if (faltam.length) {
       console.log('  note: obras sem autor (o dado ainda não tem): ' + faltam.join(', '));

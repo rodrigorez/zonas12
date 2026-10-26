@@ -49,8 +49,10 @@ const ARQUIVADAS = [
   { nome: 'o catálogo de assets editável (B4)', script: 'tools/regression/assets.mjs' },
   // Fase 7 (B8): as portas em movimento.
   { nome: 'os portais em movimento (B8)', script: 'tools/regression/motion.mjs' },
-  // Fase 8 (D60): a ficha de cada obra, uma página gerada.
-  { nome: 'a ficha da obra (D60)', script: 'tools/regression/obra.mjs' },
+  // Fase 8 (D60/D62): a ficha de cada obra, uma página que se desenha do dado — e o que ela mostra
+  // quando lhe falta o catálogo de textos ou o mundo.
+  { nome: 'a ficha da obra (D62)', script: 'tools/regression/obra.mjs' },
+  { nome: 'a ficha quando falta o que precisa (D62)', script: 'tools/regression/ficha-falhas.mjs' },
   { nome: 'a costura das travessias (D46)', script: 'tools/regression/seam.mjs' },
   { nome: 'a orientação do telemóvel (D52)', script: 'tools/regression/orientation.mjs' },
   { nome: 'a chegada por uma porta (D37)', script: 'tools/regression/camera-arrival.mjs' },

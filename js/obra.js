@@ -33,10 +33,26 @@ function row(className) {
   return element;
 }
 
-function backLink(worldSlug) {
+// Para onde volta a ficha. Uma sala é uma pasta (`<slug>/`, D28) — mas um fixture (`r9`,
+// `exemplo-ficha`) não tem pasta: abre-se com `?scene=<slug>`, e é para lá que o «voltar» tem de ir,
+// senão o botão dá 404. A pergunta é feita ao servidor (um HEAD ao endereço), porque só ele sabe se a
+// pasta existe.
+async function backTarget(slug) {
+  const folder = artworkBackHref(slug);
+  if (folder === './') return './';
+  try {
+    const response = await fetch(folder, { method: 'HEAD' });
+    if (response.ok) return folder;
+  } catch (error) {
+    // Sem resposta fica o `?scene=`: um 404 na cara do visitante nunca é a resposta.
+  }
+  return './?scene=' + encodeURIComponent(slug);
+}
+
+function backLink(href) {
   const link = document.createElement('a');
   link.className = 'botao-voltar';
-  link.href = artworkBackHref(worldSlug);
+  link.href = href;
   link.textContent = '← ' + t('artwork.page.back');
   host.appendChild(link);
   return link;
@@ -174,7 +190,8 @@ async function drawMedium(world, artwork, language) {
   return 'none';
 }
 
-function notFound(worldName, slug) {  if (worldName) {
+function notFound(worldName, backHref) {
+  if (worldName) {
     const exhibition = row('linha exposicao');
     exhibition.textContent = worldName;
   }
@@ -183,7 +200,7 @@ function notFound(worldName, slug) {  if (worldName) {
   paragraph.className = 'sinopse';
   paragraph.textContent = t('artwork.page.notFound');
   box.appendChild(paragraph);
-  backLink(slug);
+  backLink(backHref || './');
   document.title = t('artwork.page.notFound');
 }
 
@@ -202,11 +219,25 @@ function fallbackMedium(world, artwork, language) {
 }
 
 async function start() {
-  const language = await initI18n(request ? request.language || languageFromUrl() : languageFromUrl());
-  if (!request) {
-    notFound(null, null);
+  // O catálogo de textos primeiro (D12). Se ele não vier — rede em baixo, por exemplo — a página fica
+  // com o aviso que já está escrito no `obra.html`: um ecrã em branco nunca é a resposta.
+  let language;
+  try {
+    language = await initI18n(request ? request.language || languageFromUrl() : languageFromUrl());
+  } catch (error) {
+    console.warn('[obra] catálogo de textos indisponível: ' + (error && error.message ? error.message : error));
     return;
   }
+  // A partir daqui a ficha desenha-se: o aviso de reserva sai do caminho.
+  host.textContent = '';
+
+  if (!request) {
+    notFound(null, './');
+    return;
+  }
+
+  // Para onde o «voltar» leva, antes de tudo: uma sala é a pasta dela, um fixture é `?scene=`.
+  const back = await backTarget(request.world);
 
   let world;
   try {
@@ -215,14 +246,14 @@ async function start() {
     world = await response.json();
   } catch (error) {
     console.warn('[obra] ' + error.message);
-    notFound(null, request.world);
+    notFound(null, back);
     return;
   }
 
   const worldName = textIn(world.world && world.world.name, language) || request.world;
   const artwork = (world.artworks || []).find((item) => item.id === request.id);
   if (!artwork) {
-    notFound(worldName, request.world);
+    notFound(worldName, back);
     return;
   }
 
@@ -233,7 +264,7 @@ async function start() {
   const exhibition = row('linha exposicao');
   exhibition.textContent = worldName;
 
-  backLink(request.world);
+  backLink(back);
 
   // O meio é a única parte que pode falhar (o A-Frame vem do CDN). Uma falha aqui não pode levar o
   // resto da ficha com ela: a obra fica com a capa e a página diz o nome, o autor e a sinopse.
@@ -278,7 +309,7 @@ async function start() {
     host.appendChild(link);
   }
 
-  backLink(request.world);
+  backLink(back);
 
   document.title = title + ' — ' + worldName;
   window.obraDebug.world = request.world;
