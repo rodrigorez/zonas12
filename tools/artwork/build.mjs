@@ -53,6 +53,73 @@ const escapeHtml = (value) => String(value === null || value === undefined ? '' 
   .replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;');
 
+// --- as plataformas de mídia (o `platform-detector.js` das Zonas 11, resolvido na geração) ---
+//
+// As Zonas 11 detectam a plataforma no browser, à carga da página; aqui a conta é feita quando a ficha
+// é escrita, e o ficheiro já sai com o `src` certo. A lista é a mesma — YouTube (a maioria das obras),
+// o editor do p5.js, Vimeo, OpenProcessing e Shadertoy —, e o que não for nenhuma delas é embutido tal
+// e qual, que é o que a referência faz no fim.
+//
+// `mute=1` no YouTube em vez do `autoplay=1` sozinho da referência: um vídeo com som não arranca
+// sozinho em nenhum browser moderno, e o resultado seria um retângulo preto à espera de um clique.
+const PLATAFORMAS = [
+  {
+    id: 'youtube',
+    patterns: [/youtu\.be\/([^?&/]+)/, /youtube\.com\/watch\?v=([^&]+)/, /youtube\.com\/embed\/([^?&/]+)/],
+    embed: (id) => 'https://www.youtube.com/embed/' + id + '?controls=1&autoplay=1&mute=1&rel=0',
+    allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+    fullscreen: true
+  },
+  {
+    id: 'p5js',
+    patterns: [/editor\.p5js\.org\/.*\/full\/([^?&/]+)/],
+    embed: (id, url) => url,
+    allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+    fullscreen: true
+  },
+  {
+    id: 'vimeo',
+    patterns: [/vimeo\.com\/([0-9]+)(?:\/[a-zA-Z0-9]+)?/, /player\.vimeo\.com\/video\/([0-9]+)/],
+    embed: (id) => 'https://player.vimeo.com/video/' + id + '?autoplay=1&muted=1&color=FF5722',
+    allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+    fullscreen: true
+  },
+  {
+    id: 'openprocessing',
+    patterns: [/openprocessing\.org\/sketch\/([0-9]+)/],
+    embed: (id) => 'https://openprocessing.org/sketch/' + id + '/embed/',
+    allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+    fullscreen: true
+  },
+  {
+    id: 'shadertoy',
+    patterns: [/shadertoy\.com\/view\/([a-zA-Z0-9]+)/],
+    embed: (id) => 'https://shadertoy.com/embed/' + id + '?gui=false&paused=false',
+    allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+    fullscreen: true
+  }
+];
+
+// A plataforma de um endereço: `{ platform, src, allow, fullscreen }`. Sem plataforma conhecida,
+// `platform: 'site'` e o endereço tal e qual — nunca se inventa um embed que o site não serve.
+export function platformEmbed(url) {
+  const alvo = String(url || '');
+  for (const plataforma of PLATAFORMAS) {
+    for (const pattern of plataforma.patterns) {
+      const achado = alvo.match(pattern);
+      if (achado) {
+        return {
+          platform: plataforma.id,
+          src: plataforma.embed(achado[1], alvo),
+          allow: plataforma.allow,
+          fullscreen: plataforma.fullscreen
+        };
+      }
+    }
+  }
+  return { platform: 'site', src: alvo, allow: '', fullscreen: true };
+}
+
 // O texto de uma linha em todas as línguas, cada uma no seu elemento: a página mostra a pedida e
 // esconde as outras sem ir à rede. É o mesmo contrato do `data-i18n` da exposição, resolvido no
 // ficheiro porque a ficha é estática.
@@ -67,8 +134,8 @@ function porLingua(value, tag, className) {
   return partes.join('\n');
 }
 
-// O meio da obra. Cada tipo mostra o que o ficheiro permite; o `site` é a única coisa que não vem do
-// catálogo, e é a que a ficha tenta embutir (D60).
+// O meio da obra, numa linha do template. Cada tipo mostra o que o ficheiro permite; o `site` passa
+// pela tabela das plataformas e é o único que não vem do catálogo (D60).
 function media(artwork, catalogue, prefix) {
   const asset = artwork.asset ? catalogue[artwork.asset] : null;
   const caminho = asset && asset.path ? prefix + asset.path : null;
@@ -78,22 +145,23 @@ function media(artwork, catalogue, prefix) {
     : '';
 
   if (artwork.kind === 'video' && caminho) {
-    return '      <div class="meio">\n' +
+    return '      <div class="linha meio" data-meio="video">\n' +
       '        <video class="meio-video" controls playsinline preload="metadata">\n' +
       '          <source src="' + escapeHtml(caminho) + '">\n' +
       '        </video>\n' +
       '      </div>';
   }
   if (artwork.kind === 'image' && caminho) {
-    return '      <div class="meio">\n        ' + imagem + '\n      </div>';
+    return '      <div class="linha meio" data-meio="image">\n        ' + imagem + '\n      </div>';
   }
   if (artwork.kind === 'text') {
     // O texto é o conteúdo: a ficha compõe-no como uma folha, na língua pedida.
-    return '      <div class="meio meio-texto">\n' + porLingua(artwork.text, 'p', 'texto-da-obra') + '\n      </div>';
+    return '      <div class="linha meio meio-texto" data-meio="text">\n' +
+      porLingua(artwork.text, 'p', 'texto-da-obra') + '\n      </div>';
   }
   if (artwork.kind === 'model' && caminho) {
     // Um GLTF mostra-se na própria ficha, com o mesmo A-Frame da exposição (nenhuma dependência nova).
-    return '      <div class="meio">\n' +
+    return '      <div class="linha meio" data-meio="model">\n' +
       '        <a-scene embedded class="meio-modelo" vr-mode-ui="enabled: false">\n' +
       '          <a-entity gltf-model="' + escapeHtml(caminho) + '" rotation="0 25 0"\n' +
       '                    animation="property: rotation; to: 0 385 0; loop: true; dur: 24000; easing: linear"></a-entity>\n' +
@@ -103,19 +171,27 @@ function media(artwork, catalogue, prefix) {
       '        </a-scene>\n' +
       '      </div>';
   }
-  // Uma obra cujo conteúdo é uma **página** (jogo, escultura interactiva, o site da obra): o site fica
-  // por cima e a imagem da obra por baixo. Se o site não carregar em 4 s, a imagem é o que se vê — e o
-  // botão «Abrir o site» está sempre lá (D60).
+  // Uma obra cujo conteúdo é uma **página** (jogo, escultura interactiva, o site da obra): a
+  // plataforma é resolvida aqui e o embed vai escrito. A imagem da obra fica por baixo; se o site não
+  // carregar em 4 s, é ela que se vê — e o botão «Abrir o site» está sempre lá (D60).
   if (artwork.kind === 'site' && artwork.site) {
-    return '      <div class="meio meio-site" data-site="' + escapeHtml(artwork.site) + '">\n' +
+    const embed = platformEmbed(artwork.site);
+    const atributos = ['class="meio-site-iframe"',
+      'title="' + escapeHtml(textIn(artwork.title, ORIGIN_LANGUAGE) || '') + '"',
+      'src="' + escapeHtml(embed.src) + '"',
+      'loading="lazy"',
+      'referrerpolicy="no-referrer"',
+      'data-platform="' + embed.platform + '"',
+      'sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"'];
+    if (embed.allow) atributos.push('allow="' + embed.allow + '"');
+    if (embed.fullscreen) atributos.push('allowfullscreen');
+    return '      <div class="linha meio meio-site" data-meio="site" data-site="' +
+      escapeHtml(artwork.site) + '" data-platform="' + embed.platform + '">\n' +
       '        ' + (imagem || '<div class="meio-imagem meio-vazio" aria-hidden="true"></div>') + '\n' +
-      '        <iframe class="meio-site-iframe" title="' +
-      escapeHtml(textIn(artwork.title, ORIGIN_LANGUAGE) || '') + '" src="' + escapeHtml(artwork.site) + '"\n' +
-      '                loading="lazy" referrerpolicy="no-referrer"' +
-      ' sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>\n' +
+      '        <iframe ' + atributos.join(' ') + '></iframe>\n' +
       '      </div>';
   }
-  return '      <div class="meio">\n        ' + imagem + '\n      </div>';
+  return '      <div class="linha meio" data-meio="none">\n        ' + imagem + '\n      </div>';
 }
 
 // O nome da obra na ficha: o `title` do dado e, sem ele, o id do asset — não a descrição do ficheiro,
@@ -152,24 +228,24 @@ export function renderArtworkPage(world, artwork) {
     <link rel="stylesheet" href="../../css/obra.css">
   </head>
   <body>
-    <main class="ficha">
-      <p class="exposicao">${escapeHtml(nomeDoMundo)}</p>
+    <div class="container">
+      <div class="linha exposicao">${escapeHtml(nomeDoMundo)}</div>
 
-      <a class="voltar" href="../">&larr; ${voltar}</a>
+      <a class="botao-voltar" href="../">&larr; ${voltar}</a>
 
 ${media(artwork, catalogue, prefix)}
 
-      <h1 class="titulo">
-${porLingua(nome.valor, 'span', 'titulo-texto')}
-      </h1>
+      <div class="linha">
+${porLingua(nome.valor, 'span', 'titulo')}
+      </div>
 
-${porLingua(artwork.author, 'p', 'autor')}
+${autorOuNada(artwork)}
 
-${porLingua(artwork.synopsis, 'p', 'sinopse')}
+${sinopseOuNada(artwork)}
 
-${site ? '      <p class="site"><a class="botao-site" href="' + escapeHtml(site) +
-    '" target="_blank" rel="noopener noreferrer">Abrir o site da obra</a></p>\n' : ''}      <a class="voltar rodape" href="../">&larr; ${voltar}</a>
-    </main>
+${site ? '      <a class="botao-site" href="' + escapeHtml(site) +
+    '" target="_blank" rel="noopener noreferrer">Abrir o site da obra</a>\n' : ''}      <a class="botao-voltar" href="../">&larr; ${voltar}</a>
+    </div>
     <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
     <script>
       // A língua vem no endereço, como em todo o lado (D12): as duas estão escritas na página e esta
@@ -199,6 +275,18 @@ ${site ? '      <p class="site"><a class="botao-site" href="' + escapeHtml(site)
   </body>
 </html>
 `;
+}
+
+// As linhas de autor e de sinopse só existem quando há texto: um cartão vazio no meio da ficha não
+// diz «falta preencher», diz «não há nada» — e o autor vê a falta no editor, não aqui.
+function autorOuNada(artwork) {
+  const linhas = porLingua(artwork.author, 'p', 'autor');
+  return linhas ? '      <div class="linha">\n' + linhas + '\n      </div>\n' : '';
+}
+
+function sinopseOuNada(artwork) {
+  const linhas = porLingua(artwork.synopsis, 'p', 'sinopse');
+  return linhas ? '      <div class="linha">\n' + linhas + '\n      </div>\n' : '';
 }
 
 function loadWorlds() {

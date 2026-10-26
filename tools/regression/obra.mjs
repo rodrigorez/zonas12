@@ -9,23 +9,38 @@
 //   2. o site tem **as três camadas** — o site, a imagem da obra por baixo e o botão para o abrir
 //      numa aba nova (é a saída quando o site recusa ser embutido, e nada no browser a pode detetar);
 //   3. a língua vem no endereço: `?lang=en` mostra o inglês e esconde o português;
-//   4. o «voltar» leva ao mundo a que a obra pertence;
+//   4. o «voltar» leva ao mundo a que a obra pertence, e está no cimo e no fundo;
 //   5. a página não escreve erros na consola;
-//   6. a ficha que a **cena** aponta é a mesma que a ferramenta escreveu (L20, do lado do browser).
+//   6. a ficha que a **cena** aponta é a mesma que a ferramenta escreveu (L20, do lado do browser);
+//   7. a tabela das plataformas (herdada do zonas11) põe cada endereço no embed certo.
 //
 // Uso, da raiz do projeto:
 //
 //   node tools/regression/obra.mjs
 //
 import { serveProject, openBrowser, checks, sleep } from './harness.mjs';
+import { platformEmbed } from '../artwork/build.mjs';
+
+// A tabela das plataformas (herdada do `PlatformDetector` do zonas11), medida sem browser: cada
+// endereço tem de cair na plataforma certa e no `src` que ela serve. Sem plataforma conhecida, o
+// endereço passa tal e qual — nunca se inventa um embed que o site não dá.
+const TABELA = [
+  { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', plataforma: 'youtube', espera: 'youtube.com/embed/dQw4w9WgXcQ' },
+  { url: 'https://youtu.be/dQw4w9WgXcQ', plataforma: 'youtube', espera: 'youtube.com/embed/dQw4w9WgXcQ' },
+  { url: 'https://vimeo.com/76979871', plataforma: 'vimeo', espera: 'player.vimeo.com/video/76979871' },
+  { url: 'https://editor.p5js.org/fulano/full/AbC123', plataforma: 'p5js', espera: 'editor.p5js.org/fulano/full/AbC123' },
+  { url: 'https://openprocessing.org/sketch/1234567', plataforma: 'openprocessing', espera: 'openprocessing.org/sketch/1234567/embed/' },
+  { url: 'https://www.shadertoy.com/view/XsXXDn', plataforma: 'shadertoy', espera: 'shadertoy.com/embed/XsXXDn' },
+  { url: 'https://exemplo.example/obra/index.html', plataforma: 'site', espera: 'exemplo.example/obra/index.html' }
+];
 
 const CASOS = [
-  { mundo: 'r9', obra: 0, tipo: 'image', espera: '.meio-imagem', completo: true },
-  { mundo: 'r9', obra: 1, tipo: 'model', espera: '.meio-modelo', completo: true },
-  { mundo: 'r9', obra: 2, tipo: 'text', espera: '.meio-texto', completo: true },
-  { mundo: 'r9', obra: 3, tipo: 'site', espera: '.meio-site', completo: true },
-  { mundo: 'scene1', obra: 2, tipo: 'video', espera: '.meio-video' },
-  { mundo: 'scene1', obra: 0, tipo: 'image', espera: '.meio-imagem' }
+  { mundo: 'r9', obra: 0, tipo: 'image', espera: '[data-meio="image"]', completo: true },
+  { mundo: 'r9', obra: 1, tipo: 'model', espera: '[data-meio="model"]', completo: true },
+  { mundo: 'r9', obra: 2, tipo: 'text', espera: '[data-meio="text"]', completo: true },
+  { mundo: 'r9', obra: 3, tipo: 'site', espera: '[data-meio="site"]', completo: true },
+  { mundo: 'scene1', obra: 2, tipo: 'video', espera: '[data-meio="video"]' },
+  { mundo: 'scene1', obra: 0, tipo: 'image', espera: '[data-meio="image"]' }
 ];
 
 const abrir = async (browser, url) => {
@@ -46,26 +61,40 @@ async function main() {
   try {
     const ruido = browser.console.length;
 
+    for (const linha of TABELA) {
+      const embed = platformEmbed(linha.url);
+      result.check('a tabela das plataformas: ' + linha.plataforma,
+        embed.platform === linha.plataforma && embed.src.indexOf(linha.espera) >= 0,
+        JSON.stringify(embed).slice(0, 140));
+    }
+
     for (const caso of CASOS) {
       const url = site.base + '/' + caso.mundo + '/obras/' + caso.obra + '.html?bust=' + Date.now();
       await abrir(browser, url);
       const estado = await browser.evaluate(`(() => {
-        const meio = document.querySelector('.meio');
-        const voltar = document.querySelector('.voltar');
+        const meio = document.querySelector('[data-meio]');
+        const voltar = document.querySelector('.botao-voltar');
         const iframe = document.querySelector('.meio-site-iframe');
         const botao = document.querySelector('.botao-site');
         const imagem = document.querySelector('.meio-imagem');
         return {
-          meio: meio ? meio.className : null,
+          meio: meio ? meio.getAttribute('data-meio') : null,
           temEspera: Boolean(document.querySelector('${caso.espera}')),
-          titulo: (document.querySelector('.titulo') || {}).textContent || '',
-          autor: (document.querySelector('.autor') || {}).textContent || '',
+          plataforma: meio ? meio.getAttribute('data-platform') : null,
+          titulo: Array.from(document.querySelectorAll('.titulo'))
+            .filter((el) => !el.hidden).map((el) => el.textContent.trim()).join(' | '),
+          autor: Array.from(document.querySelectorAll('.autor'))
+            .filter((el) => !el.hidden).map((el) => el.textContent.trim()).join(' | '),
+          sinopse: Array.from(document.querySelectorAll('.sinopse'))
+            .filter((el) => !el.hidden).map((el) => el.textContent.trim()).join(' | '),
           voltar: voltar ? voltar.getAttribute('href') : null,
           iframe: iframe ? iframe.getAttribute('src') : null,
+          iframePermite: iframe ? iframe.getAttribute('allowfullscreen') !== null : null,
           botao: botao ? botao.getAttribute('href') : null,
           alvoDoBotao: botao ? botao.getAttribute('target') : null,
           imagemAtras: Boolean(imagem),
           temSinopse: Boolean(document.querySelector('.sinopse')),
+          botoesVoltar: document.querySelectorAll('.botao-voltar').length,
           ficha: document.documentElement.getAttribute('data-ficha')
         };
       })()`);
@@ -85,16 +114,22 @@ async function main() {
       }
       result.check(caso.mundo + ' obra ' + caso.obra + ': o «voltar» aponta para a pasta do mundo',
         estado.voltar === '../', String(estado.voltar));
+      result.check(caso.mundo + ' obra ' + caso.obra + ': o «voltar» está no cimo e no fundo',
+        estado.botoesVoltar === 2, 'botões=' + estado.botoesVoltar);
       result.check(caso.mundo + ' obra ' + caso.obra + ': a ficha diz de que dado foi feita (L20)',
         typeof estado.ficha === 'string' && estado.ficha.length === 16, String(estado.ficha));
 
       if (caso.tipo === 'site') {
         result.check('a ficha de um site tem as três camadas: o site, a imagem e o botão',
           typeof estado.iframe === 'string' && estado.iframe.indexOf('http') === 0 &&
+            estado.iframePermite === true &&
             estado.imagemAtras === true &&
             typeof estado.botao === 'string' && estado.botao.indexOf('http') === 0 &&
             estado.alvoDoBotao === '_blank',
           JSON.stringify({ iframe: estado.iframe, imagem: estado.imagemAtras, botao: estado.botao }));
+        result.check('e o endereço passou pela tabela das plataformas',
+          typeof estado.plataforma === 'string' && estado.plataforma.length > 0,
+          'plataforma=' + estado.plataforma);
       }
     }
 
@@ -105,7 +140,7 @@ async function main() {
         .filter((el) => !el.hidden).map((el) => el.textContent.trim());
       return {
         lingua: document.documentElement.lang,
-        titulo: visivel('.titulo-texto'),
+        titulo: visivel('.titulo'),
         autor: visivel('.autor')
       };
     })()`);
@@ -118,7 +153,7 @@ async function main() {
     // 4. O «voltar» navega mesmo para o mundo, e o mundo constrói-se. Numa sala de produção — uma
     // ficha de um fixture não tem pasta para onde voltar (D28: o fixture abre-se com `?scene=`).
     await abrir(browser, site.base + '/scene1/obras/0.html?bust=' + Date.now());
-    await browser.evaluate(`document.querySelector('.voltar').click()`).catch(() => {});
+    await browser.evaluate(`document.querySelector('.botao-voltar').click()`).catch(() => {});
     for (let i = 0; i < 200; i++) {
       if (await browser.evaluate('Boolean(window.portalDebug && window.portalDebug.world)').catch(() => false)) break;
       await sleep(150);

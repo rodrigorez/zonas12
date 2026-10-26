@@ -11,28 +11,34 @@
     <link rel="stylesheet" href="../../css/obra.css">
   </head>
   <body>
-    <main class="ficha">
-      <p class="exposicao">Ensaio dos quatro valores do R9</p>
+    <div class="container">
+      <div class="linha exposicao">Ensaio dos quatro valores do R9</div>
 
-      <a class="voltar" href="../">&larr; Voltar para a exposição</a>
+      <a class="botao-voltar" href="../">&larr; Voltar para a exposição</a>
 
-      <div class="meio">
+      <div class="linha meio" data-meio="image">
         <img class="meio-imagem" src="../../assets/artworks/eiffel.jpg" alt="Fotografia de ensaio">
       </div>
 
-      <h1 class="titulo">
-        <span class="titulo-texto" data-lang="pt">Torre ao entardecer</span>
-        <span class="titulo-texto" data-lang="en">Tower at dusk</span>
-      </h1>
+      <div class="linha">
+        <span class="titulo" data-lang="pt">Torre ao entardecer</span>
+        <span class="titulo" data-lang="en">Tower at dusk</span>
+      </div>
 
+      <div class="linha">
         <p class="autor" data-lang="pt">Autor de ensaio</p>
         <p class="autor" data-lang="en">Trial author</p>
+      </div>
 
+
+      <div class="linha">
         <p class="sinopse" data-lang="pt">Uma fotografia de ensaio, só para a ficha ter o que mostrar: imagem, título, autor e sinopse.</p>
         <p class="sinopse" data-lang="en">A trial photograph, only so the page has something to show: image, title, author and synopsis.</p>
+      </div>
 
-      <a class="voltar rodape" href="../">&larr; Voltar para a exposição</a>
-    </main>
+
+      <a class="botao-voltar" href="../">&larr; Voltar para a exposição</a>
+    </div>
     <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
     <script>
       // A língua vem no endereço, como em todo o lado (D12): as duas estão escritas na página e esta

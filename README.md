@@ -759,9 +759,25 @@ tipo: imagem, vídeo, modelo (o GLTF no próprio A-Frame) e texto mostram o fich
 `site` — para jogos e esculturas interactivas — **tenta embutir** o site, com a imagem da obra por
 baixo e o botão «Abrir o site» sempre visível.
 
-O que se mediu: `obra.mjs` **32 de 32** (os cinco tipos, as três camadas do `site`, `?lang=en`, o
-«voltar» a cair na sala certa, a consola limpa), a lei **L20** a recusar uma ficha velha, o `validate`
-a **0** e o `all.mjs --full` a **20 de 20**. O rótulo de cada obra passou a dizer `page`.
+O que se mediu: `obra.mjs` **46 de 46** (os cinco tipos, as três camadas do `site`, a tabela das
+plataformas, `?lang=en`, o «voltar» a cair na sala certa, a consola limpa), a lei **L20** a recusar uma
+ficha velha, o `validate` a **0** e o `all.mjs --full` a **20 de 20**. O rótulo de cada obra passou a
+dizer `page`.
+
+**A ficha veste as Zonas 11 (D61).** Depois de ver as primeiras fichas no ecrã, o autor pediu «a
+página de obras será com esta» e deu o `galerias/obra7.html`: o `css/obra.css` passou a ser o
+`obra-template.css` das Zonas 11 adaptado (preto, cartões `#1a1a1a`, acento `#FF5722`, Arial,
+`clamp()`, uma coluna de `clamp(320px, 90vw, 800px)` e uma linha por assunto) e o gerador ganhou a
+**tabela das plataformas** do `platform-detector.js` — um endereço de YouTube, p5.js, Vimeo,
+OpenProcessing ou Shadertoy é embutido no `embed` que a plataforma serve; um endereço desconhecido
+passa tal e qual, sem se inventar um embed que o site não dá. Três desvios conscientes: o YouTube leva
+**`mute=1`** (com som, o `autoplay` é bloqueado e a Zonas 11 ficavam com o cartão parado); o
+**`?from=`** das Zonas 11 **não** se copiou, porque na zonas12 esse parâmetro é a **porta de chegada**
+do mundo e voltar com ele faria a ficha anunciar uma chegada que não houve — o «voltar» é `../`, a
+pasta do mundo (D28); e a classe do cartão deixou de repetir a do texto (`.linha` + `data-meio`, em
+vez de `.linha titulo`), senão a `text-indent` da sinopse aplicava-se duas vezes. A bateria cresceu de
+**32** para **46** verificações, e duas delas apanharam defeitos reais: a sinopse com o recuo a dobrar
+e o `.botao-voltar` (um `<a>`) sem o texto centrado que o `<button>` das Zonas 11 tinha por omissão.
 
 Duas coisas que esta fase corrigiu e que não se viam: o endereço da ficha tem de levar o **slug**
 (as páginas usam `<base href="../">` dentro da sala, por isso a base é sempre a raiz — o mesmo truque

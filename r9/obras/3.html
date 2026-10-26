@@ -11,31 +11,36 @@
     <link rel="stylesheet" href="../../css/obra.css">
   </head>
   <body>
-    <main class="ficha">
-      <p class="exposicao">Ensaio dos quatro valores do R9</p>
+    <div class="container">
+      <div class="linha exposicao">Ensaio dos quatro valores do R9</div>
 
-      <a class="voltar" href="../">&larr; Voltar para a exposição</a>
+      <a class="botao-voltar" href="../">&larr; Voltar para a exposição</a>
 
-      <div class="meio meio-site" data-site="https://rodrigorez.github.io/zonas12/">
+      <div class="linha meio meio-site" data-meio="site" data-site="https://rodrigorez.github.io/zonas12/" data-platform="site">
         <img class="meio-imagem" src="../../assets/artworks/eiffel.jpg" alt="Fotografia de ensaio">
-        <iframe class="meio-site-iframe" title="Ligação para a exposição" src="https://rodrigorez.github.io/zonas12/"
-                loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+        <iframe class="meio-site-iframe" title="Ligação para a exposição" src="https://rodrigorez.github.io/zonas12/" loading="lazy" referrerpolicy="no-referrer" data-platform="site" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation" allowfullscreen></iframe>
       </div>
 
-      <h1 class="titulo">
-        <span class="titulo-texto" data-lang="pt">Ligação para a exposição</span>
-        <span class="titulo-texto" data-lang="en">Link to the exhibition</span>
-      </h1>
+      <div class="linha">
+        <span class="titulo" data-lang="pt">Ligação para a exposição</span>
+        <span class="titulo" data-lang="en">Link to the exhibition</span>
+      </div>
 
+      <div class="linha">
         <p class="autor" data-lang="pt">Autor de ensaio</p>
         <p class="autor" data-lang="en">Trial author</p>
+      </div>
 
+
+      <div class="linha">
         <p class="sinopse" data-lang="pt">Uma obra que leva a um site: a ficha tenta embuti-lo e deixa sempre o botão para o abrir numa aba nova.</p>
         <p class="sinopse" data-lang="en">An artwork that leads to a site: the page tries to embed it and always leaves a button to open it in a new tab.</p>
+      </div>
 
-      <p class="site"><a class="botao-site" href="https://rodrigorez.github.io/zonas12/" target="_blank" rel="noopener noreferrer">Abrir o site da obra</a></p>
-      <a class="voltar rodape" href="../">&larr; Voltar para a exposição</a>
-    </main>
+
+      <a class="botao-site" href="https://rodrigorez.github.io/zonas12/" target="_blank" rel="noopener noreferrer">Abrir o site da obra</a>
+      <a class="botao-voltar" href="../">&larr; Voltar para a exposição</a>
+    </div>
     <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
     <script>
       // A língua vem no endereço, como em todo o lado (D12): as duas estão escritas na página e esta

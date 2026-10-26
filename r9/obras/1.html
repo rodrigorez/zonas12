@@ -11,12 +11,12 @@
     <link rel="stylesheet" href="../../css/obra.css">
   </head>
   <body>
-    <main class="ficha">
-      <p class="exposicao">Ensaio dos quatro valores do R9</p>
+    <div class="container">
+      <div class="linha exposicao">Ensaio dos quatro valores do R9</div>
 
-      <a class="voltar" href="../">&larr; Voltar para a exposição</a>
+      <a class="botao-voltar" href="../">&larr; Voltar para a exposição</a>
 
-      <div class="meio">
+      <div class="linha meio" data-meio="model">
         <a-scene embedded class="meio-modelo" vr-mode-ui="enabled: false">
           <a-entity gltf-model="../../assets/models/caixa-r9.gltf" rotation="0 25 0"
                     animation="property: rotation; to: 0 385 0; loop: true; dur: 24000; easing: linear"></a-entity>
@@ -26,19 +26,25 @@
         </a-scene>
       </div>
 
-      <h1 class="titulo">
-        <span class="titulo-texto" data-lang="pt">Caixa de ensaio</span>
-        <span class="titulo-texto" data-lang="en">Trial box</span>
-      </h1>
+      <div class="linha">
+        <span class="titulo" data-lang="pt">Caixa de ensaio</span>
+        <span class="titulo" data-lang="en">Trial box</span>
+      </div>
 
+      <div class="linha">
         <p class="autor" data-lang="pt">Autor de ensaio</p>
         <p class="autor" data-lang="en">Trial author</p>
+      </div>
 
+
+      <div class="linha">
         <p class="sinopse" data-lang="pt">Um modelo GLTF mínimo (oito vértices) para provar que uma obra pode ser uma malha.</p>
         <p class="sinopse" data-lang="en">A minimal GLTF model (eight vertices) to prove an artwork can be a mesh.</p>
+      </div>
 
-      <a class="voltar rodape" href="../">&larr; Voltar para a exposição</a>
-    </main>
+
+      <a class="botao-voltar" href="../">&larr; Voltar para a exposição</a>
+    </div>
     <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
     <script>
       // A língua vem no endereço, como em todo o lado (D12): as duas estão escritas na página e esta

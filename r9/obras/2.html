@@ -11,29 +11,35 @@
     <link rel="stylesheet" href="../../css/obra.css">
   </head>
   <body>
-    <main class="ficha">
-      <p class="exposicao">Ensaio dos quatro valores do R9</p>
+    <div class="container">
+      <div class="linha exposicao">Ensaio dos quatro valores do R9</div>
 
-      <a class="voltar" href="../">&larr; Voltar para a exposição</a>
+      <a class="botao-voltar" href="../">&larr; Voltar para a exposição</a>
 
-      <div class="meio meio-texto">
+      <div class="linha meio meio-texto" data-meio="text">
         <p class="texto-da-obra" data-lang="pt">Texto desenhado no plano</p>
         <p class="texto-da-obra" data-lang="en">Text drawn on the plane</p>
       </div>
 
-      <h1 class="titulo">
-        <span class="titulo-texto" data-lang="pt">Texto de ensaio</span>
-        <span class="titulo-texto" data-lang="en">Trial text</span>
-      </h1>
+      <div class="linha">
+        <span class="titulo" data-lang="pt">Texto de ensaio</span>
+        <span class="titulo" data-lang="en">Trial text</span>
+      </div>
 
+      <div class="linha">
         <p class="autor" data-lang="pt">Autor de ensaio</p>
         <p class="autor" data-lang="en">Trial author</p>
+      </div>
 
+
+      <div class="linha">
         <p class="sinopse" data-lang="pt">O texto é o conteúdo da obra: desenhado num canvas e aplicado a um plano.</p>
         <p class="sinopse" data-lang="en">The text is the content of the artwork: drawn on a canvas and applied to a plane.</p>
+      </div>
 
-      <a class="voltar rodape" href="../">&larr; Voltar para a exposição</a>
-    </main>
+
+      <a class="botao-voltar" href="../">&larr; Voltar para a exposição</a>
+    </div>
     <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
     <script>
       // A língua vem no endereço, como em todo o lado (D12): as duas estão escritas na página e esta

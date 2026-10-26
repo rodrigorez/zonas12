@@ -1,65 +1,124 @@
-/* A ficha de uma obra (D60): uma página estática por obra, gerada por tools/artwork/build.mjs.
-   Escura como a exposição, para a travessia de uma para a outra não dar um salto de luz; o meio
-   manda no ecrã e o texto vem por baixo. */
+/* A ficha de uma obra (D60) — o template das Zonas 11, adaptado.
+ *
+ * A identidade visual é a da exposição anterior (`galerias/assets/css/obra-template.css`): preto
+ * absoluto, cartões `#1a1a1a`, acento `#FF5722`, Arial, tipografia fluida com `clamp()` e uma coluna
+ * centrada de `clamp(320px, 90vw, 800px)`. A estrutura também é a mesma: uma linha por assunto —
+ * exposição, botão voltar, o meio, título, autor, sinopse, botão voltar.
+ *
+ * O que muda em relação às Zonas 11: o cartão do meio sem margem (para a imagem encher), o plano do
+ * texto e o modelo (que lá não existiam), e a reserva do site — a imagem da obra atrás do iframe, para
+ * um site que não carregue não deixar um buraco.
+ */
 :root {
-  --fundo: #0b0e14;
-  --texto: #f2eef0;
-  --apagado: #9aa0ab;
-  --realce: #ff6b6b;
+  --color-bg: #000000;
+  --color-card: #1a1a1a;
+  --color-text: #ffffff;
+  --color-accent: #FF5722;
+  --color-accent-hover: #E64A19;
+
+  --padding: 4vw;
+  --gap: 2vw;
+  --border-radius: 12px;
+
+  --font-family: Arial, Helvetica, sans-serif;
+  --line-height: 1.6;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
+body {
   margin: 0;
-  min-height: 100%;
-  background: var(--fundo);
-  color: var(--texto);
-  font: 16px/1.55 system-ui, "Segoe UI", Roboto, sans-serif;
+  padding: 0;
+  font-family: var(--font-family);
+  background: var(--color-bg);
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: var(--line-height);
 }
 
-.ficha {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 24px 20px 56px;
+.container {
+  width: clamp(320px, 90vw, 800px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: var(--padding) calc(var(--padding) / 2);
+}
+
+.linha {
+  padding: var(--padding);
+  background: var(--color-card);
+  border-radius: var(--border-radius);
+  text-align: center;
 }
 
 .exposicao {
-  margin: 0 0 12px;
-  font-size: 0.78rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--apagado);
+  font-size: clamp(1.3rem, 4vw, 1.8rem);
+  font-weight: bold;
 }
 
-.voltar {
-  display: inline-block;
-  margin: 0 0 20px;
-  padding: 8px 14px;
-  border: 1px solid #2a3342;
-  border-radius: 999px;
-  color: var(--texto);
+/* O botão de voltar é um link com a forma do botão das Zonas 11. */
+.botao-voltar {
+  display: block;
+  width: 100%;
+  padding: 1.5em 1em;
+  background: var(--color-accent);
+  border-radius: 50px;
+  color: var(--color-text);
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-weight: bold;
+  text-align: center;
   text-decoration: none;
-  font-size: 0.86rem;
+  box-shadow: 0 4px 15px rgba(255, 87, 34, 0.4);
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
-.voltar:hover, .voltar:focus-visible {
-  border-color: var(--realce);
+.botao-voltar:hover,
+.botao-voltar:focus-visible {
+  background: var(--color-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 87, 34, 0.6);
   outline: none;
 }
 
-.voltar.rodape { margin: 32px 0 0; }
+.botao-voltar:active { transform: translateY(0); }
 
+/* O meio: a caixa do meio, com a forma do cartão das Zonas 11. */
 .meio {
   position: relative;
-  width: 100%;
-  background: #000;
-  border-radius: 14px;
+  padding: 0;
   overflow: hidden;
+  background: #000;
+  border-radius: var(--border-radius);
+}
+
+/* A imagem: o cartão mantém a margem e a fotografia encaixa na largura, como nas Zonas 11. */
+.linha[data-meio="image"],
+.linha[data-meio="none"] {
+  padding: var(--padding);
+  background: var(--color-card);
+}
+
+.meio-imagem {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Vídeo, modelo, texto e site: caixa 16/9 cheia, para o meio não dançar a carregar. */
+.linha[data-meio="video"],
+.linha[data-meio="model"],
+.linha[data-meio="text"],
+.linha[data-meio="site"] {
   aspect-ratio: 16 / 9;
 }
 
-.meio-imagem,
 .meio-video {
   display: block;
   width: 100%;
@@ -68,76 +127,113 @@ html, body {
   background: #000;
 }
 
-.meio-modelo {
+.meio iframe,
+.meio embed,
+.meio object {
   width: 100%;
-  height: 100%;
+  border: none;
+  border-radius: var(--border-radius);
 }
 
+.meio > iframe { height: 100%; }
+
+/* O modelo (GLTF) na própria página: o mesmo A-Frame da exposição. */
+.meio-modelo { width: 100%; height: 100%; }
+
+/* A obra de texto: o texto é o conteúdo, composto como numa folha. */
 .meio-texto {
   display: grid;
   place-items: center;
-  padding: 32px;
-  background: #11161f;
+  padding: 8%;
+  background: var(--color-card);
 }
 
 .texto-da-obra {
   margin: 0;
-  font-size: clamp(1.1rem, 3vw, 2rem);
-  font-weight: 700;
+  font-size: clamp(1.1rem, 3.4vw, 2rem);
+  font-weight: bold;
   text-align: center;
-  max-width: 40ch;
+  max-width: 34ch;
 }
 
-/* O site da obra: a imagem fica por baixo, o site por cima. Enquanto o site não carrega — ou se ele
-   nunca carregar — é a imagem que se vê. */
+/* Um site: o site por cima, a imagem da obra por baixo (a reserva quando ele não carrega). */
+.meio-site {
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+}
+
 .meio-site .meio-imagem,
 .meio-site .meio-vazio {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.meio-vazio { background: #11161f; }
+.meio-vazio { background: var(--color-card); }
 
-.meio-site-iframe {
+.meio-site > iframe {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  border: 0;
   opacity: 0;
   transition: opacity 180ms ease;
 }
 
-.meio-site.carregado .meio-site-iframe { opacity: 1; }
+.meio-site.carregado > iframe { opacity: 1; }
 
 .titulo {
-  margin: 24px 0 4px;
-  font-size: clamp(1.5rem, 4vw, 2.4rem);
-  line-height: 1.15;
+  font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+  font-weight: bold;
 }
 
 .autor {
-  margin: 0 0 18px;
-  color: var(--realce);
-  font-size: 1.02rem;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  font-weight: 500;
 }
 
 .sinopse {
-  margin: 0;
-  max-width: 70ch;
-  color: #d9d4d6;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  text-align: justify;
+  hyphens: auto;
+  line-height: 1.7;
+  text-indent: 2em;
 }
 
-.site { margin: 24px 0 0; }
-
+/* O botão do site da obra: azul, como o `.obra-link` das Zonas 11. */
 .botao-site {
-  display: inline-block;
-  padding: 10px 18px;
-  border-radius: 999px;
-  background: var(--realce);
-  color: #1a0a0c;
-  font-weight: 700;
+  display: block;
+  width: 100%;
+  padding: 1.5em 1em;
+  background: #2196F3;
+  border-radius: 50px;
+  color: var(--color-text);
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-weight: bold;
+  text-align: center;
   text-decoration: none;
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+  transition: background 0.3s ease, transform 0.2s ease;
 }
+
+.botao-site:hover,
+.botao-site:focus-visible {
+  background: #1976D2;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
+  outline: none;
+}
+
+.botao-site:active { transform: translateY(0); }
 
 [hidden] { display: none !important; }
+
+@media (max-width: 480px) {
+  .sinopse { font-size: 0.9rem; line-height: 1.8; }
+  .botao-voltar, .botao-site { padding: 1.8em 1.2em; font-size: 1.1rem; }
+}
