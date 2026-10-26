@@ -111,9 +111,10 @@ a-scene { width: 100% !important; height: 100% !important; background: transpare
   pointer-events: none;
 }
 
-/* A sonda de campo (R14). Só existe com `?sonda=1` — o módulo não a cria sem o parâmetro. Por cima de
-   tudo porque é uma ferramenta de medição: quem está a testar precisa de a ler, não de a ver bonita. */
-#sonda {
+/* A sonda de campo e o ensaio A/B (R14). Só existem com `?sonda=1` / `?ensaio=1` — os módulos não as
+   criam sem o parâmetro. Por cima de tudo porque são ferramentas de medição: quem está a testar precisa
+   de as ler, não de as ver bonitas. Partilham a caixa: são dois instrumentos do mesmo banco. */
+#sonda, #ensaio {
   position: fixed; top: 8px; left: 8px; z-index: 10001;
   max-width: min(92vw, 460px);
   padding: 8px 10px 6px;
@@ -122,17 +123,20 @@ a-scene { width: 100% !important; height: 100% !important; background: transpare
   font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 11px; line-height: 1.35;
   text-align: left;
 }
-#sonda-texto { margin: 0; white-space: pre-wrap; word-break: break-word; }
-#sonda-resumo {
+#sonda-texto, #ensaio-texto { margin: 0; white-space: pre-wrap; word-break: break-word; }
+#sonda-resumo, #ensaio-resumo {
   margin: 0 0 6px; padding-bottom: 5px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
   font-size: 15px; font-weight: 700; letter-spacing: 0.02em;
   white-space: normal; word-break: break-word;
 }
-#sonda-copiar, #sonda-fechar {
+#sonda-copiar, #sonda-fechar, #ensaio-copiar, #ensaio-repetir {
   margin-top: 6px; margin-right: 6px; padding: 4px 10px;
   border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.35);
   background-color: rgba(255, 255, 255, 0.12); color: inherit;
   font: inherit; cursor: pointer;
 }
+/* O resumo do ensaio A/B é mais alto do que o do painel sonda (dois lados e a comparação): num telemóvel
+   tem de se poder chegar ao botão de copiar sem perder o princípio do texto. */
+#ensaio { max-height: min(78vh, 620px); overflow-y: auto; }
 #sonda-fechar { margin-right: 0; padding: 4px 8px; }

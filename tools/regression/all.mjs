@@ -55,6 +55,9 @@ const ARQUIVADAS = [
   { nome: 'a ficha quando falta o que precisa (D62)', script: 'tools/regression/ficha-falhas.mjs' },
   { nome: 'o regresso ao ponto de onde se saiu (D63)', script: 'tools/regression/volta.mjs' },
   { nome: 'a capa por tentativas (D65)', script: 'tools/regression/capa.mjs' },
+  // R14: o ensaio A/B do fundo numa página — as duas fases, a recarga e o bloco único. É a bateria que
+  // guarda o instrumento com que o R14 se fecha nos três aparelhos.
+  { nome: 'o ensaio A/B do fundo (R14)', script: 'tools/regression/ensaio.mjs' },
   { nome: 'a costura das travessias (D46)', script: 'tools/regression/seam.mjs' },
   { nome: 'a orientação do telemóvel (D52)', script: 'tools/regression/orientation.mjs' },
   { nome: 'a chegada por uma porta (D37)', script: 'tools/regression/camera-arrival.mjs' },

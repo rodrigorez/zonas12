@@ -292,8 +292,13 @@ export function cameraFirstFrame() {
     finishFirstFrame = resolve;
     if (typeof video.requestVideoFrameCallback === 'function') {
       video.requestVideoFrameCallback(() => done('frame presented'));
+      // O `playing` **não** serve de atalho quando há `requestVideoFrameCallback`: ele chega antes do
+      // primeiro fotograma apresentado — medido em 3,8 ms numa travessia carregada (a bateria da ponte
+      // apanhou a imagem a sair aos 775,7 ms e o fotograma aos 779,5 ms). Quem espera pelo fotograma
+      // apresentado tem de esperar por ele; o `playing` fica para os browsers que não o sabem dizer.
+    } else {
+      video.addEventListener('playing', () => done('playing'), { once: true });
     }
-    video.addEventListener('playing', () => done('playing'), { once: true });
     video.addEventListener('error', () => done('error'), { once: true });
   });
   return firstFrame;

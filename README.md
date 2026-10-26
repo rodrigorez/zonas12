@@ -1600,8 +1600,9 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 `--full` acrescenta as baterias arquivadas das Fases 4, 5, 7 e 8 — a costura das travessias, a ponte
 de imagem, a chegada por uma porta, os rótulos, o botão, a transição, o fundo shader (que mede a
 política e as duas páginas com uma), os quatro valores do R9 na cena e nos painéis, o lote por
-dimensão, o catálogo de assets, os portais em movimento e a ficha das obras — cada uma abre um Chrome
-e juntas somam minutos, por isso não são o `default`. Com `--full` são **21** baterias.
+dimensão, o catálogo de assets, os portais em movimento, a ficha das obras e o **ensaio A/B do fundo**
+(`ensaio.mjs`, D66) — cada uma abre um Chrome e juntas somam minutos, por isso não são o `default`.
+Com `--full` são **24** baterias.
 
 Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
 repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.csv` e escreve nos mundos o dado das
@@ -1729,6 +1730,30 @@ chegada nomeia a travessia que trouxe o visitante; na de origem, o mesmo registo
 a prova de que o pedido não saiu. É o que se lê quando «atravessei e continuo a ver a sala de onde
 vim».
 
+### 8b. O ensaio A/B de uma vez (`?ensaio=1`)
+
+A sonda mostra **um** lado do par shader × imagem. Fechar o **R14** exige os dois, no mesmo aparelho e
+na mesma sala — e três aparelhos. `?ensaio=1` faz o par sozinho e devolve **um** bloco:
+
+```
+https://rodrigorez.github.io/zonas12/scene1/?ensaio=1
+```
+
+A página aquece 10 s, mede 45 s do shader, guarda o resultado na sessão do separador, **recarrega
+sozinha** com `?fase=imagem&shader=0`, mede a imagem e junta os dois lados. O painel diz em que fase
+está e quanto falta; no fim tem **Copiar** (o bloco inteiro) e **Repetir**. Leva ~2 minutos por
+aparelho e não precisa de consola nem de tocar em nada.
+
+O bloco traz, por fase: fundo (modo e `shaderId`), **quadros/s**, **pior quadro** e quantos passaram do
+dobro da mediana, cadência, atualizações, pixelRatio (com o mínimo e o máximo que a escada visitou),
+atrasos e eventos — mais a comparação dos dois lados, o aparelho e a **GPU**. As durações mudam-se no
+endereço: `?ensaio=1&segundos=30&aquecimento=5`.
+
+Porque o **pior quadro** e não só os quadros: numa máquina rápida o browser desenha ao ritmo do ecrã e
+os dois lados empatam (medido num portátil com RTX 4060: **165,3 → 164,3** quadros/s), o que não quer
+dizer que o shader seja grátis — quer dizer que ainda sobra. Num Android fraco os mesmos dois lados dão
+**45,5** contra **50,4**. É a diferença entre «não se mede» e «não custa».
+
 ### 9. No telemóvel, o sensor de orientação
 
 O `look-controls` do A-Frame faz do telemóvel uma janela para a cena: rodar o aparelho roda a vista.
@@ -1754,20 +1779,21 @@ feitos e cada um mediu o seu número. O que continua aberto é o **R14**/**R15**
 
 - **Fundos shader** (**R14**/**R15**, bloco **B9**): em produção desde 2026-10-24 — shader por
   omissão, `?shader=0` para a imagem de reserva, validador em `tools/shader/` e a política
-  20 → 15 FPS → estático; falta o **A/B controlado nos três aparelhos**
+  20 → 15 FPS → estático; falta o **A/B controlado nos três aparelhos** — com `?ensaio=1` (§8b) é
+  **um toque por aparelho**
 - **Um fundo 360º em vídeo**: a capacidade **já existe** (`kind: "video"` anima com
   `THREE.VideoTexture`), mas nenhum mundo a usa — falta o asset, não o código
 
 Fora da Fase 7, e sem data:
 
 - **As baterias arquivadas por omissão**: hoje `node tools/regression/all.mjs` corre as cinco que
-  decidem uma alteração e deixa as catorze da Fase 4/5/7 atrás de `--full`, porque cada uma abre um
-  Chrome; juntá-las num só browser (uma sessão, catorze medições) poria as **19** em minutos
+  decidem uma alteração e deixa as dezanove da Fase 4/5/7/8 atrás de `--full`, porque cada uma abre um
+  Chrome; juntá-las num só browser (uma sessão, dezanove medições) poria as **24** em minutos
 
 **Fechado na Fase 7:** o catálogo em duas línguas (**B2**), o que o esquema prometia e a cena não
 construía — **D56** (fundo de cor), **D57** (`link` a navegar), **D58** (modelo GLTF e texto) —, o
 lote por dimensão e o catálogo de assets no editor (**B3**/**B4**), os portais animados (**D59**) e a
-verificação dos dois lados da exposição com **19** baterias (§ «Como Usar»).
+verificação dos dois lados da exposição com **24** baterias (§ «Como Usar»).
 
 **Fechado na Fase 4:** a **página de edição** (§ acima), o **retrato do portão** (decidido: não se
 faz — a ausência é honesta, **R10**) e a **orientação da chegada** no céu (resolvida por dado: as

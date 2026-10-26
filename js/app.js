@@ -20,6 +20,8 @@ import { shaderStatus, freezeShaders } from './modules/dimension.js';
 // A sonda de campo (R14): só desenha alguma coisa com `?sonda=1`, e é o que permite ler os números
 // num telemóvel, onde não há consola.
 import { startSonda } from './modules/sonda.js';
+// O ensaio do A/B do fundo (R14): com `?ensaio=1` faz as duas fases e mostra um bloco só.
+import { startEnsaio } from './modules/ensaio.js';
 import { orientationStatus } from './modules/orientation.js';
 import { validateScene } from './scene/validation.js';
 import { buildScene } from './scene/scene-builder.js';
@@ -203,6 +205,10 @@ async function start() {
   // The field probe shows what the page is doing, for whoever is testing on a phone (R14). It is
   // created after the build, so it never measures a scene that does not exist yet.
   startSonda();
+  // O ensaio do A/B (R14): com `?ensaio=1` mede os dois lados do fundo sozinho, recarrega e mostra um
+  // bloco só. Também depois do build, pela mesma razão da sonda — e porque a segunda fase precisa de
+  // uma cena a desenhar para medir alguma coisa.
+  startEnsaio();
   if (auto) startSession({ arrival: true });
   // The image bridge has done its work once there is a scene to look at (D43): what the visitor sees
   // from here on is the world, and the frame that was covering the wait goes in the same frame — no

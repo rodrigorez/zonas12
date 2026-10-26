@@ -40,6 +40,9 @@ endereço é sempre `obra.html?mundo=<mundo>&id=<id>`; mudar o `id` muda a obra,
 Sonda de campo (números no ecrã): junta `?sonda=1` a qualquer endereço de sala, por exemplo
 `https://rodrigorez.github.io/zonas12/scene1/?sonda=1`.
 
+Ensaio A/B do fundo (**R14**, ~2 minutos por aparelho, bloco 7):
+`https://rodrigorez.github.io/zonas12/scene1/?ensaio=1`.
+
 Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos caminhos em
 `http://127.0.0.1:8123`.
 
@@ -122,6 +125,30 @@ Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos
 | 6.3 | Escrever `TESTE` nesse campo | Aparece o problema da lei **L21** (o ID tem de ser `G-XXXXXXX`) |
 | 6.4 | Trocar para `G-TESTE123` e gravar | O problema desaparece; o JSON passa a ter `world.analytics.id` |
 | 6.5 | Painel **Obra**, botão «abrir a ficha» | Abre `obra.html?mundo=scene1&id=<n>` numa aba nova |
+
+---
+
+## 7. O ensaio A/B do shader (R14) — os três aparelhos
+
+Este bloco não é sobre a ficha: é o número que falta para fechar o **R14** (o fundo shader). A página
+mede **sozinha** os dois lados do par — o shader e a imagem — e mostra um bloco só, para copiar.
+
+| # | O que fazer | O que se espera |
+| --- | --- | --- |
+| 7.1 | Abrir no **computador**: `https://rodrigorez.github.io/zonas12/scene1/?ensaio=1` | Um painel preto no canto: **«ensaio · fase 1/2 (shader) · a aquecer/medir · 55 s»** a descer de segundo a segundo. **Não tocar** na página | 
+| 7.2 | Esperar (~2 minutos, sem trocar de aba nem bloquear o ecrã) | A página **recarrega sozinha** (a fase 2, imagem) e o contador volta a descer. Depois aparece o bloco com **«--- fase 1 · shader ---»** e **«--- fase 2 · imagem ---»** |
+| 7.3 | Ler a última parte do bloco | **«--- comparação (imagem vs shader) ---»** com `quadros … /s → … /s` e `pior quadro … ms → … ms` |
+| 7.4 | Tocar em **Copiar** | O botão diz **«copiado»** e o bloco fica no teclado. Colá-lo aqui é o resultado do teste |
+| 7.5 | Repetir **7.1–7.4** no **telemóvel fraco** e no **telemóvel do Adreno 630** | O bloco traz o modelo da **GPU** e o ecrã de cada um — é isso que distingue os três registos |
+| 7.6 | Em qualquer aparelho, abrir `…/scene1/?ensaio=1&segundos=10&aquecimento=3` | O mesmo, em ~26 s: serve para ver que o protocolo funciona quando não se quer esperar 2 minutos |
+
+O que **conta** no resultado: os **quadros/s** de cada lado e o **pior quadro**. Num aparelho rápido os
+dois lados empatam (o browser desenha ao ritmo do ecrã) — isso **não** é falha, é o resultado. Num
+aparelho fraco vê-se a diferença.
+
+Cuidados que mudam o número: o aparelho **frio** (não a carregar e sem outras apps abertas), a mesma
+**sala**, o ecrã **ligado** todo o tempo, e o mesmo estado de `prefers-reduced-motion` se o sistema o
+tiver.
 
 ---
 
