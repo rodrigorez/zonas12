@@ -28,7 +28,8 @@
 //   - `capa` preenchida aponta a obra para um asset próprio (`capa-<id>`) com esse caminho, e o tipo
 //     vem da extensão do ficheiro. Também aceita **um endereço** (D64): `https://…` — a capa de uma
 //     obra cujo conteúdo está num site pode ser a imagem que esse site já serve. Vazio deixa a obra
-//     como está — é o que permite preencher só os textos e não tocar em nenhuma imagem.
+//     como está; **`-` tira a capa do dado** (D65: a ficha e a sala passam a usar a cadeia — o
+//     thumbnail do YouTube, depois a imagem padrão).
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -169,7 +170,19 @@ export function applyRow(world, row, { exists }) {
     }
   }
 
-  if (row.cover) {
+  if (row.cover === '-') {
+    // `-` quer dizer «esta obra não tem capa no CSV»: a cadeia do D65 fica com o thumbnail do YouTube
+    // (ou com a imagem padrão, se não houver site). É a forma de tirar uma capa que já estava no dado.
+    const key = `capa-${row.id}`;
+    if (artwork.asset === key) {
+      delete artwork.asset;
+      changes.push(`obra ${row.id}: deixa de ter capa no dado`);
+    }
+    if (world.assets && world.assets[key]) {
+      delete world.assets[key];
+      changes.push(`obra ${row.id}: catálogo sem "${key}"`);
+    }
+  } else if (row.cover) {
     const type = IMAGE_EXTENSIONS.test(row.cover) ? 'image' : (VIDEO_EXTENSIONS.test(row.cover) ? 'video' : null);
     if (!type) return { error: `obra ${row.id}: a capa "${row.cover}" não é uma imagem nem um vídeo conhecido` };
     if (artwork.kind === 'site' && type !== 'image') {

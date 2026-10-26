@@ -333,7 +333,12 @@ function textMesh(text, size) {
 // the builder gives the <img>/<video> — and it becomes the `#id` selector the material loads.
 export function createArtwork(artwork, parent, derived = {}) {
   const kind = artwork.kind || 'image';
-  const drawsItsImage = kind === 'image' || kind === 'video' || (kind === 'site' && Boolean(artwork.asset));
+  // A imagem que a obra desenha: a capa resolvida (D65 — o `<img>` que o construtor pôs em
+  // `<a-assets>` e que já tentou o YouTube, a capa do CSV e a imagem padrão) ou, sem ela, o asset
+  // que o dado nomeia (o caso de um vídeo, onde não há cadeia nenhuma a percorrer).
+  const coverId = typeof derived.coverId === 'string' && derived.coverId ? derived.coverId : null;
+  const drawsItsImage = kind === 'image' || kind === 'video' || (kind === 'site' && Boolean(coverId || artwork.asset));
+  const textureId = coverId || artwork.asset;
   const el = document.createElement(drawsItsImage ? 'a-box' : 'a-entity');
   el.setAttribute('class', 'interactable');
   // The id in the DOM, like a portal's and a dimension's: it is what the editor uses to find the
@@ -343,7 +348,7 @@ export function createArtwork(artwork, parent, derived = {}) {
   if (artwork.rotation) el.setAttribute('rotation', vector(artwork.rotation));
 
   if (drawsItsImage) {
-    el.setAttribute('src', '#' + artwork.asset);
+    el.setAttribute('src', '#' + textureId);
     el.setAttribute('width', artwork.size[0]);
     el.setAttribute('height', artwork.size[1]);
     el.setAttribute('depth', artwork.size[2]);

@@ -54,6 +54,7 @@ const ARQUIVADAS = [
   { nome: 'a ficha da obra (D62)', script: 'tools/regression/obra.mjs' },
   { nome: 'a ficha quando falta o que precisa (D62)', script: 'tools/regression/ficha-falhas.mjs' },
   { nome: 'o regresso ao ponto de onde se saiu (D63)', script: 'tools/regression/volta.mjs' },
+  { nome: 'a capa por tentativas (D65)', script: 'tools/regression/capa.mjs' },
   { nome: 'a costura das travessias (D46)', script: 'tools/regression/seam.mjs' },
   { nome: 'a orientação do telemóvel (D52)', script: 'tools/regression/orientation.mjs' },
   { nome: 'a chegada por uma porta (D37)', script: 'tools/regression/camera-arrival.mjs' },

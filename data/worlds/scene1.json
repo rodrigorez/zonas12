@@ -84,13 +84,6 @@
         "pt": "Retrato do mundo Praia, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Beach world, seen from the door (recorte, para a janela ao vivo)"
       }
-    },
-    "capa-2": {
-      "path": "https://i.ytimg.com/vi/Gzegts8LXaI/maxresdefault.jpg",
-      "type": "image",
-      "alt": {
-        "pt": "Capa da obra Vídeo de teste"
-      }
     }
   },
   "dimensions": [
@@ -187,7 +180,6 @@
       "id": 2,
       "dimension": 0,
       "kind": "site",
-      "asset": "capa-2",
       "position": [
         4,
         1.5,
@@ -209,8 +201,8 @@
         "en": "Test video"
       },
       "synopsis": {
-        "pt": "Texto provisório: esta obra é um vídeo, e o vídeo está no YouTube — a ficha embute-o e deixa sempre o botão para o abrir numa aba nova. A capa é o thumbnail do próprio vídeo, servido pelo YouTube, e é ela que fica no lugar dele se o embed não carregar.",
-        "en": "Provisional text: this work is a video, and the video is on YouTube — the page embeds it and always leaves the button to open it in a new tab. The cover is the video's own thumbnail, served by YouTube, and it is what stays in place of the embed if it does not load."
+        "pt": "Texto provisório: esta obra é um vídeo, e o vídeo está no YouTube — a ficha embute-o e deixa sempre o botão para o abrir numa aba nova. A capa é buscada ao YouTube a partir do endereço do próprio vídeo (D65); se falhar, aparece a imagem padrão que pede para avisar o administrador.",
+        "en": "Provisional text: this work is a video, and the video is on YouTube — the page embeds it and always leaves the button to open it in a new tab. The cover is fetched from YouTube using the video's own address (D65); if that fails, the default image appears asking to notify the administrator."
       },
       "author": {
         "pt": "autorB, autorC",

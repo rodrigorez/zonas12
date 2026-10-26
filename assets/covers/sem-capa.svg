@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img"
+     aria-label="Capa indisponível — avisar o administrador da galeria">
+  <rect width="1280" height="720" fill="#1a1a1a"/>
+  <rect x="24" y="24" width="1232" height="672" fill="none" stroke="#FF5722" stroke-width="4" stroke-dasharray="18 14"/>
+
+  <g transform="translate(640 250)">
+    <circle r="54" fill="none" stroke="#FF5722" stroke-width="10"/>
+    <rect x="-8" y="-26" width="16" height="34" rx="8" fill="#FF5722"/>
+    <circle cx="0" cy="24" r="9" fill="#FF5722"/>
+  </g>
+
+  <text x="640" y="400" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="54" font-weight="bold" fill="#ffffff">Capa indisponível</text>
+  <text x="640" y="452" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="30" fill="#ffffff">Avisar o administrador da galeria</text>
+
+  <text x="640" y="540" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="40" font-weight="bold" fill="#ffffff">Cover unavailable</text>
+  <text x="640" y="582" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="24" fill="#ffffff">Notify the gallery administrator</text>
+</svg>

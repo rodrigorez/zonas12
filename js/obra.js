@@ -14,6 +14,7 @@ import { textIn, ORIGIN_LANGUAGE } from './scene/schema.js';
 import { platformEmbed } from './scene/platform-embed.js';
 import { artworkPageRequest, artworkBackHref } from './scene/artwork-page.js';
 import { RETURN_PARAMETER } from './scene/return-pose.js';
+import { coverCandidates, DEFAULT_COVER } from './scene/cover.js';
 import { startAnalytics, pageLocation } from './scene/analytics.js';
 import { initI18n, t, languageFromUrl } from './i18n.js';
 
@@ -73,13 +74,33 @@ function assetPath(world, artwork) {
   return asset && asset.path ? asset : null;
 }
 
+// A capa da obra, pela cadeia do D65: o thumbnail do YouTube (quando o site é um vídeo), depois a
+// capa do CSV, depois a imagem padrão que pede para avisar o administrador. A troca é feita no `error`
+// do próprio `<img>` — é o único sinal que diz «não descodificou».
 function coverImage(world, artwork, language) {
+  const candidates = coverCandidates(artwork, world.assets);
   const asset = assetPath(world, artwork);
-  if (!asset || asset.type !== 'image') return null;
   const image = document.createElement('img');
   image.className = 'meio-imagem';
-  image.src = asset.path;
-  image.alt = textIn(asset.alt, language) || '';
+  image.alt = (asset && textIn(asset.alt, language)) || textIn(artwork.title, language) || '';
+  let index = 0;
+
+  const show = () => {
+    if (index < candidates.length) {
+      const candidate = candidates[index++];
+      image.dataset.capaDe = candidate.from;
+      image.src = candidate.src;
+      return;
+    }
+    // Sem mais candidatas: a imagem padrão, e o instrumento fica a saber que foi ela.
+    image.dataset.capaDe = 'padrao';
+    image.src = DEFAULT_COVER;
+  };
+
+  image.addEventListener('error', () => {
+    if (image.dataset.capaDe !== 'padrao' || image.getAttribute('src') !== DEFAULT_COVER) show();
+  });
+  show();
   return image;
 }
 
@@ -117,12 +138,8 @@ async function drawMedium(world, artwork, language) {
     box.setAttribute('data-meio', 'site');
     box.setAttribute('data-site', artwork.site);
     box.setAttribute('data-platform', embed.platform);
-    box.appendChild(coverImage(world, artwork, language) || (() => {
-      const empty = document.createElement('div');
-      empty.className = 'meio-imagem meio-vazio';
-      empty.setAttribute('aria-hidden', 'true');
-      return empty;
-    })());
+    // O `<img>` da capa resolvida: a cadeia do D65 já correu aqui, por isso ele é a capa.
+    box.appendChild(coverImage(world, artwork, language));
     const frame = document.createElement('iframe');
     frame.className = 'meio-site-iframe';
     frame.title = textIn(artwork.title, ORIGIN_LANGUAGE) || '';
@@ -197,14 +214,9 @@ async function drawMedium(world, artwork, language) {
   }
 
   const box = row('linha meio');
-  const cover = coverImage(world, artwork, language);
-  if (cover) {
-    box.setAttribute('data-meio', 'image');
-    box.appendChild(cover);
-    return 'image';
-  }
-  box.setAttribute('data-meio', 'none');
-  return 'none';
+  box.setAttribute('data-meio', 'image');
+  box.appendChild(coverImage(world, artwork, language));
+  return 'image';
 }
 
 function notFound(worldName, backHref) {
@@ -221,18 +233,13 @@ function notFound(worldName, backHref) {
   document.title = t('artwork.page.notFound');
 }
 
-// O meio de reserva, quando o que a obra pedia não pôde ser desenhado: a capa, se for uma imagem, e
-// nada se nem isso houver. É o que impede um modelo sem A-Frame de deixar a ficha em branco.
+// O meio de reserva, quando o que a obra pedia não pôde ser desenhado: a capa (que já traz a cadeia do
+// D65 e a imagem de aviso). É o que impede um modelo sem A-Frame de deixar a ficha em branco.
 function fallbackMedium(world, artwork, language) {
   const box = row('linha meio');
-  const cover = coverImage(world, artwork, language);
-  if (cover) {
-    box.setAttribute('data-meio', 'image');
-    box.appendChild(cover);
-    return 'image';
-  }
-  box.setAttribute('data-meio', 'none');
-  return 'none';
+  box.setAttribute('data-meio', 'image');
+  box.appendChild(coverImage(world, artwork, language));
+  return 'image';
 }
 
 async function start() {

@@ -859,13 +859,37 @@ arranques). As capturas ficam em `.harness/imagenTeste/exemplo-ficha/`, fora do 
 **O guia de testes:** [docs/GUIA-DE-TESTES.md](docs/GUIA-DE-TESTES.md) — sete blocos com o que fazer, o
 que se espera e o que enviar se falhar, com todos os endereços para telemóvel e computador.
 
+**A capa por tentativas (D65).** O autor pediu o método: buscar a capa ao YouTube; se não der, a capa
+indicada no CSV (opcional, local ou num endereço); e se nada der, uma imagem padrão a pedir para avisar
+o administrador. Ficou em `js/scene/cover.js`, com as três tentativas e a mesma cadeia na **ficha** e na
+**sala**:
+
+| Tentativa | De onde vem | Quando falha |
+| --- | --- | --- |
+| 1 | `i.ytimg.com/vi/<id>/hqdefault.jpg`, derivado do `site` quando é YouTube | não é YouTube, ou não carrega |
+| 2 | a `capa` do CSV (endereço ou ficheiro do projeto) | está vazia, ou não carrega |
+| 3 | `assets/covers/sem-capa.svg` — «Capa indisponível · avisar o administrador da galeria» | — |
+
+A troca acontece no `onerror` do `<img>`: é o único sinal que responde às duas perguntas ao mesmo tempo
+(existe? descodifica?). Uma célula `capa` com **`-`** tira a capa do dado — é assim que a obra de vídeo
+fica sem nada escrito e a cadeia começa no YouTube.
+
+Duas correções que a medição impôs: a malha da sala tem de **esperar** que a imagem esteja descodificada
+(sem isso a consola dizia «Texture marked for update but image is incomplete» — apanhado pela D40), e o
+`data-capa-de` em cada `<img>` diz qual tentativa ganhou, que é o que o instrumento lê.
+
+Medido: bateria nova `capa.mjs` **9 de 9** — o id sai de `watch?v=`, `youtu.be`, `embed/` e `shorts/`; a
+ordem das tentativas; e, no browser com pedidos bloqueados, **YouTube** com rede, **capa do CSV** com o
+YouTube bloqueado e **imagem padrão** com os dois bloqueados —, e o resto: `obra.mjs` **71 de 71**,
+`D40` **21 de 21**, `r9` **7 de 7**, `volta.mjs` **7 de 7**, `ficha-falhas` **3 de 3**, suíte por omissão
+**5 de 5**.
+
 **O CSV a funcionar de ponta a ponta.** O autor pediu para ver o circuito a trabalhar, e ele está
 preenchido com texto **provisório**: as dez obras de produção passaram a ter título (pt/en), **autor
 (um ou vários, na mesma célula separados por vírgulas)** e sinopse. **Uma** delas — a do vídeo, `scene1`
 obra 2 — tem `site`: um vídeo do YouTube, para exercitar o caminho de uma obra cujo conteúdo é uma
-página. A capa dela é o **thumbnail que o YouTube serve** (`i.ytimg.com/vi/<id>/maxresdefault.jpg`), e
-não um ficheiro copiado para o repositório: para isso o catálogo passou a aceitar **endereços** e não só
-caminhos locais (**D64**). O caminho, que é o que fica para o texto definitivo:
+página, e **nenhuma capa no dado** (`-`), para a cadeia do D65 começar no thumbnail do YouTube. O
+caminho, que é o que fica para o texto definitivo:
 
 ```sh
 # 1. editar data/obras.csv (título, autor, sinopse, site, capa)

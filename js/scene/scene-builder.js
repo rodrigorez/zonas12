@@ -18,6 +18,7 @@ import { SCENE, ORIGIN_LANGUAGE, textIn } from './schema.js';
 import { DERIVED_DIMENSION_BASE, MAX_DIMENSIONS } from '../core/index.js';
 import { createPlayerCamera, useRealCamera } from '../modules/camera.js';
 import { setReturnWorld } from './return-pose.js';
+import { coverCandidates, resolveCover, DEFAULT_COVER } from './cover.js';
 import { createDimension, removeDimension } from '../modules/dimension.js';
 import { createArtwork, removeArtwork } from '../modules/artwork.js';
 import { createPortal, removePortal, setWorld, setNavigation } from '../modules/portal.js';
@@ -181,6 +182,11 @@ export async function buildScene(scene, options = {}) {
     if (el) elements.dimensions.push(el);
   }
 
+  // A capa de cada obra, resolvida por tentativas (D65) **antes** de a malha ser criada: o thumbnail do
+  // YouTube quando o site é um vídeo, depois a capa do CSV, depois a imagem padrão que pede para avisar
+  // o administrador. Uma obra cuja imagem falha não pode ficar com uma parede preta na sala.
+  const covers = await resolveCovers(scene, language, parent);
+
   for (const artwork of scene.artworks || []) {
     const data = withDefaults(artwork, SCENE.artworks);
     // O mundo e a língua são o que a ficha precisa para se nomear (D60).
@@ -190,7 +196,9 @@ export async function buildScene(scene, options = {}) {
       labelAlways: options.labels === true,
       // O texto de uma obra `kind: "text"`, na língua pedida (D58). A queda para a língua de origem é
       // a mesma de todo o texto de conteúdo (D12).
-      text: textIn(data.text, language)
+      text: textIn(data.text, language),
+      // O `<img>` da capa resolvida, quando há uma (D65).
+      coverId: covers.get(data.id) || null
     }));
   }
 
@@ -256,6 +264,50 @@ export function addressToOpen(artwork, catalogue, context) {
   if (artwork.interaction !== 'modal') return null;
   const asset = catalogue[artwork.asset];
   return asset && asset.path ? asset.path : null;
+}
+
+// A capa de cada obra, por tentativas (D65): resolve a cadeia de `js/scene/cover.js` e devolve um mapa
+// `id da obra → id do <img>` que fica em `<a-assets>`. Só as obras que desenham uma **imagem** entram —
+// `image` (a obra é a imagem) e `site` (a imagem é a capa que fica por baixo da página). Uma obra
+// `video`, `model` ou `text` não tem capa: o que ela desenha é o que é.
+async function resolveCovers(scene, language, parent) {
+  const catalogue = scene.assets || {};
+  const covers = new Map();
+  const wanted = (scene.artworks || []).filter((artwork) => {
+    if (artwork.kind === 'site') return true;
+    return artwork.kind === 'image';
+  });
+  if (wanted.length === 0) return covers;
+
+  const container = parent.querySelector('a-assets') || parent.appendChild(document.createElement('a-assets'));
+  const loading = [];
+  for (const artwork of wanted) {
+    const candidates = coverCandidates(artwork, catalogue);
+    const resolved = candidates.length === 0
+      ? { src: DEFAULT_COVER, from: 'padrao' }
+      : await resolveCover(candidates);
+    const id = 'capa-' + artwork.id;
+    const el = document.createElement('img');
+    el.setAttribute('id', id);
+    el.setAttribute('src', resolved.src);
+    el.setAttribute('crossorigin', 'anonymous');
+    el.setAttribute('data-capa-de', resolved.from);
+    const asset = artwork.asset ? catalogue[artwork.asset] : null;
+    const description = (asset && textIn(asset.alt, language)) || textIn(artwork.title, language);
+    if (description) el.setAttribute('alt', description);
+    container.appendChild(el);
+    // A malha só pode ser criada depois de a imagem estar descodificada: sem esta espera, a textura é
+    // enviada para a GPU a meio e a consola diz «Texture marked for update but image is incomplete»
+    // (apanhado pela bateria D40 — duas texturas boas e uma incompleta no mesmo quadro).
+    loading.push(new Promise((resolve) => {
+      if (el.complete && el.naturalWidth > 0) { resolve(); return; }
+      el.addEventListener('load', () => resolve(), { once: true });
+      el.addEventListener('error', () => resolve(), { once: true });
+    }));
+    covers.set(artwork.id, id);
+  }
+  await Promise.all(loading);
+  return covers;
 }
 
 // The <a-assets> entries, from the catalogue: one place holds a path, so one place creates them.
