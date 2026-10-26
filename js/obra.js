@@ -13,6 +13,7 @@
 import { textIn, ORIGIN_LANGUAGE } from './scene/schema.js';
 import { platformEmbed } from './scene/platform-embed.js';
 import { artworkPageRequest, artworkBackHref } from './scene/artwork-page.js';
+import { RETURN_PARAMETER } from './scene/return-pose.js';
 import { startAnalytics, pageLocation } from './scene/analytics.js';
 import { initI18n, t, languageFromUrl } from './i18n.js';
 
@@ -37,16 +38,20 @@ function row(className) {
 // `exemplo-ficha`) não tem pasta: abre-se com `?scene=<slug>`, e é para lá que o «voltar» tem de ir,
 // senão o botão dá 404. A pergunta é feita ao servidor (um HEAD ao endereço), porque só ele sabe se a
 // pasta existe.
+//
+// O `?volta=1` (D63) é o que pede ao mundo para devolver o visitante **ao sítio onde estava** quando
+// abriu a obra — a posição e o olhar ficaram guardados na sessão do separador.
 async function backTarget(slug) {
   const folder = artworkBackHref(slug);
+  const volta = RETURN_PARAMETER + '=1';
   if (folder === './') return './';
   try {
     const response = await fetch(folder, { method: 'HEAD' });
-    if (response.ok) return folder;
+    if (response.ok) return folder + '?' + volta;
   } catch (error) {
     // Sem resposta fica o `?scene=`: um 404 na cara do visitante nunca é a resposta.
   }
-  return './?scene=' + encodeURIComponent(slug);
+  return './?scene=' + encodeURIComponent(slug) + '&' + volta;
 }
 
 function backLink(href) {

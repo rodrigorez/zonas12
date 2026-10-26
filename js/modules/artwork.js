@@ -7,8 +7,23 @@
 // (docs/ROADMAP.md, section 5.0).
 import { state, registerContent, unregisterContent } from '../core/index.js';
 import { createLabel, disposeLabel } from './label.js';
+import { playerCamera } from './camera.js';
+import { rememberPose } from '../scene/return-pose.js';
 
 const ARTWORK_COMPONENT = 'dimensional-material';
+// A obra que abre a ficha (D60) deixa o ponto de vista guardado (D63): o «voltar» da ficha devolve o
+// visitante ao sítio onde estava, e não ao início do mundo.
+function rememberBeforeLeaving() {
+  const pose = playerCamera.pose();
+  if (!pose) return false;
+  return rememberPose({
+    position: pose.position,
+    yaw: pose.yaw,
+    pitch: pose.pitch,
+    dimension: state.activeDimension
+  });
+}
+
 const OPENING_COMPONENT = 'open-artwork';
 
 // A-Frame's vec3 in the object form of setAttribute needs { x, y, z }: an array there is read as
@@ -143,7 +158,10 @@ AFRAME.registerComponent(OPENING_COMPONENT, {
     this.el.addEventListener('click', () => {
       if (!this.canInteract()) return;
       if (this.data.mode === 'page' || this.data.mode === 'link') {
-        if (this.data.url) window.location.assign(this.data.url);
+        if (!this.data.url) return;
+        // A ficha é uma página: antes de sair, guarda-se o ponto de vista (D63).
+        if (this.data.mode === 'page') rememberBeforeLeaving();
+        window.location.assign(this.data.url);
         return;
       }
       openArtwork(this.data.url);

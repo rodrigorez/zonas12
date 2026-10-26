@@ -8,29 +8,36 @@ Cada teste diz **o que fazer**, **o que se espera** e **o que enviar** se falhar
 para fazer num aparelho está marcado — não é preciso forçar.
 
 > **Estado do dado hoje:** as obras de produção ainda não têm título, autor nem sinopse, por isso a
-> ficha delas mostra **o id do asset** (ex.: `galeriaFoto1`) como nome. Isso **não** é defeito: é o
-> `data/obras.csv` por preencher. Para ver a ficha completa há o mundo de **exemplo**.
+> ficha delas mostra **o id do asset** (ex.: `galeriaFoto1`) como nome e **não tem cartão de
+> descrição**. Isso **não** é defeito: é o `data/obras.csv` por preencher — o mundo de **exemplo**
+> (`exemplo-ficha`) é onde se vê a ficha com o texto todo.
 
 ---
 
 ## 0. Endereços
 
-Publicado (`https://rodrigorez.github.io/zonas12`), que é o mesmo que o telemóvel vê:
+Publicado (`https://rodrigorez.github.io/zonas12`), que é o mesmo que o telemóvel vê. **Cada linha é o
+endereço completo** — é só abrir:
 
-| O que | Caminho a juntar ao endereço publicado |
+| O que | Endereço completo |
 | --- | --- |
-| Portão (entrada da exposição) | `/` |
-| Cidade 360º | `/scene1/` |
-| Praia | `/scene2/` |
-| Céu 360º | `/scene3/` |
-| **Ficha de exemplo — completa** | `/obra.html?mundo=exemplo-ficha&id=0` |
-| Ficha de exemplo — só título | `/obra.html?mundo=exemplo-ficha&id=1` |
-| Ficha de exemplo — vídeo | `/obra.html?mundo=exemplo-ficha&id=2` |
-| Ficha de exemplo — **com site** | `/obra.html?mundo=exemplo-ficha&id=3` |
-| Ficha de exemplo — em inglês | `/obra.html?mundo=exemplo-ficha&id=0&lang=en` |
-| Sala de exemplo (para clicar nas obras) | `/?scene=exemplo-ficha` |
-| Ficha **de produção** (sem metadados) | `/obra.html?mundo=scene1&id=0` (obras: `scene1` 0–4, `scene2` 5–7, `scene3` 8–9) |
-| Sonda de campo (números no ecrã) | junta `?sonda=1` a qualquer endereço de sala |
+| Portão (entrada da exposição, **2 portais e nenhuma obra**) | `https://rodrigorez.github.io/zonas12/` |
+| Cidade 360º (5 obras) | `https://rodrigorez.github.io/zonas12/scene1/` |
+| Praia (3 obras) | `https://rodrigorez.github.io/zonas12/scene2/` |
+| Céu 360º (2 obras, sem câmara) | `https://rodrigorez.github.io/zonas12/scene3/` |
+| **Ficha de exemplo — completa** (título, autor, sinopse) | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=0` |
+| Ficha de exemplo — **só com título** | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=1` |
+| Ficha de exemplo — **vídeo** | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=2` |
+| Ficha de exemplo — **com site** (YouTube) | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=3` |
+| Ficha de exemplo — **em inglês** | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=0&lang=en` |
+| **Sala** de exemplo (para clicar nas obras) | `https://rodrigorez.github.io/zonas12/?scene=exemplo-ficha` |
+| Ficha **de produção** (ainda sem metadados) | `https://rodrigorez.github.io/zonas12/obra.html?mundo=scene1&id=0` |
+
+As obras de produção, por mundo: `scene1` → `id=0…4`, `scene2` → `id=5,6,7`, `scene3` → `id=8,9`. O
+endereço é sempre `obra.html?mundo=<mundo>&id=<id>`; mudar o `id` muda a obra, e `&lang=en` é a língua.
+
+Sonda de campo (números no ecrã): junta `?sonda=1` a qualquer endereço de sala, por exemplo
+`https://rodrigorez.github.io/zonas12/scene1/?sonda=1`.
 
 Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos caminhos em
 `http://127.0.0.1:8123`.
@@ -48,6 +55,7 @@ Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos
 | 1.5 | Clicar **«Abrir o site da obra»** | Abre o YouTube **numa aba nova**; a ficha fica onde estava |
 | 1.6 | Abrir `…&id=0&lang=en` | Interface **e** conteúdo em inglês: «Ficha example», «Back to the exhibition», «Example · city at dusk» |
 | 1.7 | Abrir `/obra.html?mundo=exemplo-ficha&id=99` | Uma linha: **«Esta obra não faz parte desta exposição.»** e **um** botão «Voltar». Nada de obra desenhada, nada de imagem quebrada |
+| 1.7b | Alargar a janela ao máximo (ou ecrã 2560) e olhar para a imagem | A imagem ocupa **quase toda a largura do cartão** (≈ 90%), não um selo pequeno ao centro |
 | 1.8 | Clicar «Voltar» (no teste 1.1) | Cai em **`/?scene=exemplo-ficha`** — a sala de exemplo — e a sala arranca (botão «Ativar exposição» ou já a andar) |
 | 1.9 | Abrir `/obra.html?mundo=scene1&id=0` e clicar «Voltar» | Cai em **`/scene1/`**, com a cidade construída. Se o browser já tinha permissão de câmara, arranca sozinho; senão mostra «Ativar exposição» (**isso não é defeito**) |
 | 1.10 | DevTools → **Network → Network request blocking**, acrescentar o padrão `data/worlds`, recarregar a ficha | Aparece **«Esta obra não faz parte desta exposição.»** com **um** botão «Voltar» (e não um ecrã em branco). Na consola pode haver um aviso — a página não pode ficar vazia |
@@ -75,6 +83,10 @@ Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos
 | 3.4 | Na ficha, tocar em «Voltar» | Volta à sala onde estava |
 | 3.5 | Abrir `/?scene=exemplo-ficha` e olhar para a sala | **Quatro** obras em fila: aurora, torre, vídeo (fundo escuro) e a **quarta é a praia — a obra com site**. Se a quarta não aparecer, é falha (era um defeito: obras `site` não eram desenhadas) |
 | 3.6 | Tocar na obra da praia (a quarta) | Abre `…id=3`, com o YouTube |
+| 3.7 | **Voltar ao ponto (D63):** numa sala, caminhar com o D-pad (ou o teclado) até ficar **de frente para uma obra, longe do início**, e tocar nela | Abre a ficha |
+| 3.8 | Clicar «Voltar para a exposição» | Volta **ao sítio onde estava**, com o mesmo olhar — **não** ao início da sala. Se voltar ao princípio, é falha |
+| 3.9 | Repetir 3.7/3.8 numa segunda obra, noutro canto da sala | O mesmo: cada obra devolve o visitante ao ponto do clique |
+| 3.10 | Fechar o separador, abrir `/scene1/?volta=1` de novo | Começa no **início** da sala (o ponto é de um só regresso; não fica colado) |
 
 ## 4. Regressão rápida (o que já funcionava e não pode partir)
 
@@ -122,10 +134,14 @@ Para cada falha, envia três coisas:
 
 ## O que já se sabe, e não é defeito
 
-- as obras de produção mostram o **id do asset** como nome — falta preencher o CSV;
+- o **portão** tem **2 portais e nenhuma obra** — é a entrada, e as obras estão dentro das salas;
+- as obras de produção mostram o **id do asset** como nome e **não têm descrição**: falta preencher o
+  `data/obras.csv` (o mundo `exemplo-ficha` mostra como fica com texto);
 - **não há medição a correr**: as propriedades GA4 ainda não existem, e sem ID a página não carrega
   script nenhum (é de propósito);
 - a ficha é **desenhada pelo browser**: sem JavaScript não mostra a obra (é o preço de ser um ficheiro
   só, a troca que foi pedida);
+- num telemóvel **com** giroscópio, o olhar volta governado pelo sensor — o **ponto** (posição) é
+  restaurado sempre, mas a direcção do olhar pode ser corrigida pelo aparelho no instante seguinte;
 - no site publicado o **editor não grava** (gravar precisa do servidor local, que valida e escreve no
   disco).

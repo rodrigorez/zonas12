@@ -16,8 +16,11 @@
   --color-accent: #FF5722;
   --color-accent-hover: #E64A19;
 
-  --padding: 4vw;
-  --gap: 2vw;
+  /* O espaçamento é do **cartão**, não do ecrã: em `4vw` puro o recuo crescia com a janela enquanto a
+   * coluna parava nos 800 px, e num ecrã largo a imagem ficava pequena dentro de um cartão enorme
+   * (medido: 71% do cartão a 2560 px, contra 91% a 780). O `clamp` põe um tecto. */
+  --padding: clamp(16px, 4vw, 40px);
+  --gap: clamp(10px, 2vw, 18px);
   --border-radius: 12px;
 
   --font-family: Arial, Helvetica, sans-serif;

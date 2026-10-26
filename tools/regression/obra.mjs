@@ -227,8 +227,8 @@ async function main() {
       } else if (!(estado.autor || '').trim()) {
         faltam.push(onde);
       }
-      result.check(onde + ': o «voltar» volta ao mundo (pasta, ou ?scene= num fixture), no cimo e no fundo',
-        estado.voltar === (caso.pasta ? caso.mundo + '/' : './?scene=' + caso.mundo) &&
+      result.check(onde + ': o «voltar» volta ao mundo, ao sítio de onde se saiu, no cimo e no fundo',
+        estado.voltar === (caso.pasta ? caso.mundo + '/?volta=1' : './?scene=' + caso.mundo + '&volta=1') &&
           estado.botoesVoltar === 2,
         JSON.stringify({ href: estado.voltar, botoes: estado.botoesVoltar }));
       result.check(onde + ': sem ID no mundo, a página não carrega medição nenhuma',

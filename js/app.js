@@ -13,6 +13,7 @@ import {
   on
 } from './core/index.js';
 import { startSession, cameraAlreadyAllowed, cameraFirstFrame, showStartButton, showLoading } from './modules/camera.js';
+import { playerCamera } from './modules/camera.js';
 import { closeArtwork, toggleArtworkLabels } from './modules/artwork.js';
 import { startFrameDriver, traversalRecord, freezeMotion } from './modules/portal.js';
 import { shaderStatus, freezeShaders } from './modules/dimension.js';
@@ -24,6 +25,7 @@ import { validateScene } from './scene/validation.js';
 import { buildScene } from './scene/scene-builder.js';
 import { textIn } from './scene/schema.js';
 import { startAnalytics, pageLocation } from './scene/analytics.js';
+import { RETURN_PARAMETER, takePose } from './scene/return-pose.js';
 import { initI18n, languageFromUrl, currentLanguage } from './i18n.js';
 // Registers the `ar-config` component. It lives in js/scene/ because the scene's renderer settings
 // are the scene's: the editor's preview needs the same ones (Fase 4), and two copies would be two
@@ -62,7 +64,10 @@ window.portalDebug = {
     return stopped;
   },
   // O movimento das portas, sozinho (D59), para um instrumento que só olha para elas.
-  freezeMotion: (frozen) => freezeMotion(frozen)
+  freezeMotion: (frozen) => freezeMotion(frozen),
+  // Onde a câmara está e para onde olha (D63): é o que o regresso da ficha guarda e devolve, e é o
+  // que os instrumentos leem para provar que o visitante voltou ao mesmo sítio.
+  pose: () => playerCamera.pose()
 };
 
 // Development keyboard shortcuts: one listener for the whole scene, walking the portal
@@ -136,6 +141,18 @@ async function buildFromData() {
   // they came through a door (D14).
   const from = new URLSearchParams(window.location.search).get('from');
   await buildScene(data, { from });
+
+  // O regresso da ficha (D63): quem abriu uma obra e voltou é devolvido ao sítio onde estava — a
+  // posição, o olhar e a dimensão —, em vez de ao início do mundo. A ficha pede-o com `?volta=1`, e
+  // sem um ponto guardado (ou com um de outra visita, já velho) nada acontece.
+  if (new URLSearchParams(window.location.search).get(RETURN_PARAMETER) === '1') {
+    const ponto = takePose(data.world && data.world.slug);
+    if (ponto) {
+      setActiveDimension(ponto.dimension);
+      const aplicado = playerCamera.setPose(ponto);
+      window.portalDebug.returned = Object.assign({ aplicado: aplicado }, ponto);
+    }
+  }
 
   // A medição da sala (D62): uma propriedade por mundo, e o ID mora no dado. Sem ID não acontece
   // nada — nenhum script, nenhum pedido, nenhuma linha na consola.

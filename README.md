@@ -859,6 +859,20 @@ arranques). As capturas ficam em `.harness/imagenTeste/exemplo-ficha/`, fora do 
 **O guia de testes:** [docs/GUIA-DE-TESTES.md](docs/GUIA-DE-TESTES.md) — sete blocos com o que fazer, o
 que se espera e o que enviar se falhar, com todos os endereços para telemóvel e computador.
 
+**Voltar ao sítio onde se estava (D63).** Abrir uma obra e voltar punha a câmara no **início do mundo**:
+quem estava de frente para uma obra, a três metros, tinha de caminhar outra vez até lá. Agora o clique
+guarda o ponto de vista — **posição, olhar e dimensão** — e o «voltar» da ficha devolve-o (`?volta=1`).
+A memória é do separador, vale **um** regresso e tem prazo de 30 minutos: não é uma preferência, é a
+memória de um gesto. Medido: `volta.mjs` **7 de 7** — o ponto é guardado no clique, devolvido dentro de
+0,2 m e 1,5°, consumido no regresso, e sem ponto a sala começa onde o dado diz. Escrever a posição tinha
+uma armadilha: `object3D.position` **não pega** numa câmara acabada de criar (o componente `position`
+repõe o dado), por isso a escrita passou a ser pelo atributo.
+
+Do mesmo teste do autor saiu uma correção de desenho: num ecrã largo a imagem ficava pequena dentro do
+cartão (`--padding: 4vw` crescia com a janela, a coluna parava nos 800 px). Com
+`clamp(16px, 4vw, 40px)` a imagem passou a ocupar **89–91%** do cartão em todas as larguras medidas,
+contra **71%** a 2560 px antes.
+
 O que isto custa, dito: **sem JavaScript a ficha não mostra a obra**. Antes cada ficha era HTML
 pronto; agora é desenhada do dado, como a própria exposição (que também não existe sem JavaScript).
 Foi uma troca pedida pelo autor e está registada na decisão.

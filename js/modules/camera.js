@@ -70,6 +70,52 @@ export const playerCamera = {
     return true;
   },
 
+  // O ponto de vista inteiro (D63): onde se está e para onde se olha. O `look-controls` guarda o
+  // olhar em dois objectos seus (`yawObject`, `pitchObject`), e é lá que ele o vai buscar a cada
+  // movimento — escrever só na rotação da entidade fazia a câmara saltar para a pose antiga ao
+  // primeiro arrasto do dedo. `pose()` devolve graus, que é a unidade do atributo `rotation`.
+  pose: function () {
+    const element = playerElement();
+    if (!element) return null;
+    const rotation = element.object3D.rotation;
+    const look = element.components && element.components['look-controls'];
+    const yaw = look && look.yawObject ? look.yawObject.rotation.y : rotation.y;
+    const pitch = look && look.pitchObject ? look.pitchObject.rotation.x : rotation.x;
+    const degrees = 180 / Math.PI;
+    return {
+      position: [element.object3D.position.x, element.object3D.position.y, element.object3D.position.z],
+      yaw: yaw * degrees,
+      pitch: pitch * degrees
+    };
+  },
+
+  // O ponto de vista inteiro (D63): onde se está e para onde se olha. Escreve-se pelo **atributo** e
+  // não pelo `object3D`: a câmara acabou de ser criada quando o regresso acontece, o componente
+  // `position` ainda não inicializou, e a inicialização repõe o valor do dado — foi assim que a
+  // primeira versão parecia aplicar e voltava a (0, 1.6, 0). Se a entidade ainda não carregou, aplica-se
+  // outra vez no `loaded`. O olhar fica nos objectos do `look-controls` (é de lá que ele o lê a cada
+  // movimento), e a rotação da entidade acompanha.
+  setPose: function (pose) {
+    const element = playerElement();
+    if (!element || !pose) return false;
+    const position = Array.isArray(pose.position)
+      ? { x: pose.position[0], y: pose.position[1], z: pose.position[2] }
+      : null;
+    const radians = Math.PI / 180;
+    const yaw = (Number(pose.yaw) || 0) * radians;
+    const pitch = (Number(pose.pitch) || 0) * radians;
+    const apply = () => {
+      if (position) element.setAttribute('position', position);
+      const look = element.components && element.components['look-controls'];
+      if (look && look.yawObject) look.yawObject.rotation.y = yaw;
+      if (look && look.pitchObject) look.pitchObject.rotation.x = pitch;
+      element.object3D.rotation.set(pitch, yaw, 0);
+    };
+    apply();
+    if (!element.hasLoaded) element.addEventListener('loaded', apply, { once: true });
+    return true;
+  },
+
   // O instante da travessia (D54): a câmara encosta à janela que se está a atravessar e **mantém a
   // direcção do olhar**. A janela é uma máscara no plano da porta, por isso de lá ela enche o ecrã —
   // e o que fica no ecrã até a página seguinte pintar é o destino, não a sala que se deixa. Não há
