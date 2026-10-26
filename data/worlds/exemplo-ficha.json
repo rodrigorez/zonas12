@@ -1,0 +1,201 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "exemplo-ficha",
+    "name": {
+      "pt": "Exemplo da ficha",
+      "en": "Ficha example"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": false
+    }
+  },
+  "assets": {
+    "capa-cidade": {
+      "path": "assets/artworks/cidade-d0-bryan-goff.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Capa de exemplo (cidade)",
+        "en": "Example cover (city)"
+      }
+    },
+    "capa-torre": {
+      "path": "assets/artworks/eiffel.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Capa de exemplo (torre)",
+        "en": "Example cover (tower)"
+      }
+    },
+    "video-exemplo": {
+      "path": "assets/video/cidade-d0-compequicolor.mp4",
+      "type": "video",
+      "alt": {
+        "pt": "Vídeo de exemplo",
+        "en": "Example video"
+      }
+    },
+    "capa-site": {
+      "path": "assets/panoramas/praia-d0-praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Capa de exemplo (praia)",
+        "en": "Example cover (beach)"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "color",
+      "color": "#14141c",
+      "radius": 100,
+      "name": {
+        "pt": "Fundo liso de exemplo",
+        "en": "Example flat background"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-cidade",
+      "position": [
+        -2.7,
+        1.6,
+        -14
+      ],
+      "rotation": [
+        0,
+        -10.8,
+        0
+      ],
+      "size": [
+        1.7,
+        1.2,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Exemplo · cidade ao entardecer",
+        "en": "Example · city at dusk"
+      },
+      "author": {
+        "pt": "Autor de exemplo",
+        "en": "Autor de exemplo"
+      },
+      "synopsis": {
+        "pt": "Texto de exemplo. Aqui entra a sinopse da obra: uma ou duas frases que dizem o que ela é, com vírgulas e tudo.",
+        "en": "Example text. Here goes the synopsis of the work: one or two sentences saying what it is, commas and all."
+      }
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-torre",
+      "position": [
+        -0.9,
+        1.6,
+        -14
+      ],
+      "rotation": [
+        0,
+        -3.6,
+        0
+      ],
+      "size": [
+        1.7,
+        1.2,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Exemplo · torre",
+        "en": "Example · tower"
+      }
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "video",
+      "asset": "video-exemplo",
+      "position": [
+        0.9,
+        1.6,
+        -14
+      ],
+      "rotation": [
+        0,
+        3.6,
+        0
+      ],
+      "size": [
+        1.7,
+        1.2,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Exemplo · vídeo da cidade",
+        "en": "Example · city video"
+      },
+      "author": {
+        "pt": "Autor de exemplo",
+        "en": "Autor de exemplo"
+      },
+      "synopsis": {
+        "pt": "Uma obra em vídeo: a ficha mostra o leitor em vez da capa.",
+        "en": "A video work: the page shows the player instead of the cover."
+      }
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-site",
+      "site": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+      "position": [
+        2.7,
+        1.6,
+        -14
+      ],
+      "rotation": [
+        0,
+        10.8,
+        0
+      ],
+      "size": [
+        1.7,
+        1.2,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Exemplo · jogo da praia",
+        "en": "Example · beach game"
+      },
+      "author": {
+        "pt": "Autor de exemplo",
+        "en": "Autor de exemplo"
+      },
+      "synopsis": {
+        "pt": "Uma obra que é um site: a ficha tenta embuti-lo por cima da capa e deixa sempre o botão para o abrir numa aba nova.",
+        "en": "A work that is a site: the page tries to embed it over the cover and always leaves the button to open it in a new tab."
+      }
+    }
+  ],
+  "portals": []
+}

@@ -818,8 +818,12 @@ tradução inglesa — e corre-se com `--file`, sem tocar na folha a sério:
 node tools/artwork/from-csv.mjs --file data/obras.exemplo.csv
 ```
 
-Foi este exemplo que apanhou dois defeitos que as baterias não podiam ver, porque o site do fixture é
-nosso e perdoa tudo:
+O mesmo texto vive num **mundo de exemplo publicado**, `exemplo-ficha` (`data/worlds/exemplo-ficha.json`,
+um fixture como o `r9`), para se ver a ficha no telemóvel sem mexer no dado de produção:
+`obra.html?mundo=exemplo-ficha&id=0` — e `1` só com título, `2` vídeo, `3` com site.
+
+Foi este exemplo que apanhou **três** defeitos que as baterias não podiam ver, porque o site do fixture
+é nosso e perdoa tudo:
 
 - o `iframe` levava **`referrerpolicy="no-referrer"`**, e o YouTube recusa embutir sem referrer (erro
   **153**). A página de erro do YouTube **carrega como se tivesse corrido bem** — o `load` dispara, a
@@ -830,7 +834,27 @@ nosso e perdoa tudo:
   página morria a meio e ficava só com o nome da exposição e o «voltar». Agora o meio é a única parte
   que pode falhar, tem um limite de **8 s**, e uma falha cai na capa — o título, o autor e a sinopse
   aparecem sempre. A bateria passou a medir as duas coisas em separado: o meio que a obra **pede** e o
-  que foi **desenhado**.
+  que foi **desenhado**;
+- e o pior: uma obra **`kind: "site"` não era desenhada na sala**. O `createArtwork` só dava caixa a
+  `image` e `video`, por isso uma obra que é uma página existia no dado, aparecia na ficha e **não se
+  via nem se clicava** na exposição. Passou a desenhar a **capa** (o `asset` dela é, por lei, uma
+  imagem), e a bateria do `r9` — que só verificava que o elemento existia — passou a exigir a malha:
+  **7 de 7**.
+
+**Onde ver a ficha.** O endereço é sempre o mesmo, com o mundo e a obra na query. Há dois sítios para
+olhar, e o segundo é o que mostra a página **como ela vai ficar** depois de o dado estar preenchido:
+
+| O que se vê | Endereço |
+| --- | --- |
+| **produção** (o dado ainda não tem título nem sinopse, por isso o nome é o do asset) | `obra.html?mundo=scene1&id=0` — obras `scene1` 0–4, `scene2` 5–7, `scene3` 8–9 |
+| **exemplo em cheio** (o fixture `exemplo-ficha`, com texto de exemplo) | `obra.html?mundo=exemplo-ficha&id=0` — `1` só com título, `2` vídeo, `3` com site |
+| o mesmo, em inglês | junta `&lang=en` |
+
+Publicado ou local: `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=0`, ou com
+`node tools/server/serve.mjs` a servir em `http://127.0.0.1:8123/`. O mundo `exemplo-ficha` vive em
+`data/worlds/exemplo-ficha.json` e é um **fixture**, como o `r9`: não tem porta nem pasta, abre-se
+também com `?scene=exemplo-ficha`, e o validador sabe que não é uma sala (não entra no grafo nem nos
+arranques). As capturas ficam em `.harness/imagenTeste/exemplo-ficha/`, fora do repositório.
 
 O que isto custa, dito: **sem JavaScript a ficha não mostra a obra**. Antes cada ficha era HTML
 pronto; agora é desenhada do dado, como a própria exposição (que também não existe sem JavaScript).

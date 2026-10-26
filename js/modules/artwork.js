@@ -308,11 +308,15 @@ function textMesh(text, size) {
 // `model` é a malha do GLTF do catálogo, e o `size` escala-a por eixo; um `text` é um plano com o
 // texto desenhado. As três aceitam posição, rotação e tamanho como as outras.
 //
+// Uma obra `site` (D60/D62) é uma página, mas na sala ela é a **capa**: o `asset` dela é, por lei, uma
+// imagem, e sem a caixa a obra existia no dado e não existia na sala — não se via e não se clicava.
+//
 // A subtlety of the two names: `asset` is the id of the entry in `<a-assets>` — the catalogue id
 // the builder gives the <img>/<video> — and it becomes the `#id` selector the material loads.
 export function createArtwork(artwork, parent, derived = {}) {
   const kind = artwork.kind || 'image';
-  const el = document.createElement(kind === 'image' || kind === 'video' ? 'a-box' : 'a-entity');
+  const drawsItsImage = kind === 'image' || kind === 'video' || (kind === 'site' && Boolean(artwork.asset));
+  const el = document.createElement(drawsItsImage ? 'a-box' : 'a-entity');
   el.setAttribute('class', 'interactable');
   // The id in the DOM, like a portal's and a dimension's: it is what the editor uses to find the
   // element of the artwork it is changing without rebuilding the world (Fase 4, D33).
@@ -320,7 +324,7 @@ export function createArtwork(artwork, parent, derived = {}) {
   el.setAttribute('position', vector(artwork.position));
   if (artwork.rotation) el.setAttribute('rotation', vector(artwork.rotation));
 
-  if (kind === 'image' || kind === 'video') {
+  if (drawsItsImage) {
     el.setAttribute('src', '#' + artwork.asset);
     el.setAttribute('width', artwork.size[0]);
     el.setAttribute('height', artwork.size[1]);

@@ -9,7 +9,8 @@
 //   2. a obra `model` tem malha depois de o GLTF carregar, e está registada no núcleo;
 //   3. a obra `text` é um plano com textura desenhada e o texto da língua pedida;
 //   4. a obra com `interaction: "link"` navega para o endereço em vez de abrir o modal;
-//   5. a consola não tem erros nem avisos (T8) — a cena nova não pode trazer ruído.
+//   5. a obra `site` tem malha na sala — é a capa dela, e sem malha não se vê nem se clica;
+//   6. a consola não tem erros nem avisos (T8) — a cena nova não pode trazer ruído.
 //
 // Uso, da raiz do projeto:
 //
@@ -60,6 +61,7 @@ async function main() {
         texturaDoTexto: etiqueta(2),
         imagem: malha(0),
         ligacao: Boolean(document.querySelector('[data-artwork-id="3"]')),
+        site: malha(3),
         plano: plano === null ? null : true
       };
     })()`);
@@ -79,6 +81,11 @@ async function main() {
 
     result.check('a obra `image` continua a ser a caixa de sempre',
       cena.imagem !== null && cena.imagem.vertices > 0, JSON.stringify(cena.imagem));
+
+    // Uma obra `site` é uma página, mas na sala é a **capa**: sem malha ela existia no dado e não
+    // existia na sala — não se via e não se clicava (apanhado pelo mundo de exemplo da ficha, D62).
+    result.check('a obra `site` é a capa na sala (uma malha, não um elemento vazio)',
+      cena.site !== null && cena.site.vertices > 0, JSON.stringify(cena.site));
 
     await cliqueLigacao(result, browser);
 

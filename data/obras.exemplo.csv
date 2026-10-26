@@ -1,9 +1,13 @@
 # obras.exemplo.csv — EXEMPLO, só para ver o formato e como a ficha fica.
 #
 # Não é o ficheiro que se importa a sério: esse é o `data/obras.csv`. Este serve para ver, antes de
-# escrever o texto verdadeiro, o que cada coluna faz. Corre-se com
+# escrever o texto verdadeiro, o que cada coluna faz. O mesmo texto vive no mundo de exemplo
+# `exemplo-ficha`, que já está publicado: `obra.html?mundo=exemplo-ficha&id=0`.
+#
+# Para o experimentar nos mundos, sem tocar na folha a sério:
 #
 #   node tools/artwork/from-csv.mjs --file data/obras.exemplo.csv
+#   git checkout -- data/worlds/scene1.json data/worlds/scene2.json data/worlds/scene3.json
 #
 # e vê-se a ficha com `obra.html?mundo=scene1&id=0` (a obra 3 é a que tem site).
 #

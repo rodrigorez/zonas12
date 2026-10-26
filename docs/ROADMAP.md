@@ -3472,11 +3472,12 @@ e a leitura do endereço, o `page_view` com e sem ID, o script injetado, o meio 
 preencher sem escrever nada (é idempotente) e, com o exemplo preenchido, escreveu título, autor,
 sinopse e site, transformou uma obra num `site` e voltou atrás com o CSV em branco.
 
-**O exemplo antes do definitivo (`data/obras.exemplo.csv`, `--file`):** o autor pediu para ver o
-formato e a página antes de escrever o texto a sério. O exemplo tem as dez obras com texto de exemplo
-— uma completa, uma só com título, uma em vídeo, uma com site e uma sem tradução inglesa — e corre-se
-com `--file`, sem tocar na folha definitiva. Apanhou **dois** defeitos que nenhuma bateria podia ver,
-porque o site do fixture é nosso e perdoa tudo:
+**O exemplo antes do definitivo (`data/obras.exemplo.csv`, `--file`, e o mundo `exemplo-ficha`):** o
+autor pediu para ver o formato e a página antes de escrever o texto a sério. Há um CSV de exemplo e um
+**mundo de exemplo publicado** (`exemplo-ficha`, um fixture como o `r9`, com quatro obras: uma
+completa, uma só com título, uma em vídeo e uma com site) — as duas coisas com o mesmo texto, e
+nenhuma delas toca no dado de produção. Apanhou **três** defeitos que nenhuma bateria podia ver, porque
+o site do fixture é nosso e perdoa tudo:
 
 - **`referrerpolicy="no-referrer"`** no iframe: o YouTube recusa embutir sem referrer (**erro 153**) e
   a página de erro dele **carrega como se tivesse corrido bem** (o `load` dispara, a capa sai de trás,
@@ -3484,7 +3485,11 @@ porque o site do fixture é nosso e perdoa tudo:
   atributo, que é a causa — o efeito não é detetável por nenhuma página;
 - o **modelo** esperava pelo A-Frame do CDN antes de desenhar o resto: um CDN lento deixava a ficha
   só com o nome da exposição e o «voltar». Agora o meio é a única parte que pode falhar, com um
-  limite de **8 s** e a capa como reserva — título, autor e sinopse aparecem sempre.
+  limite de **8 s** e a capa como reserva — título, autor e sinopse aparecem sempre;
+- uma obra **`kind: "site"` não era desenhada na sala**: o `createArtwork` só dava caixa a `image` e
+  `video`, por isso a obra existia no dado, tinha ficha, e não se via nem se clicava na exposição.
+  Passou a desenhar a capa, e a bateria do `r9` — que só exigia o elemento — passou a exigir a malha
+  (**7 de 7**).
 
 **Riscos:** um site que recusa ser embutido não é detetável pela página (mitigação: a imagem por baixo
 e o botão sempre visível, e é isso que a bateria mede; e um embed que exija referrer, como o YouTube,
