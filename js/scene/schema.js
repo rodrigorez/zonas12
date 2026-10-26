@@ -121,6 +121,11 @@ export const SCENE = {
   },
 
   // The single place a file path appears (D20). A dimension and an artwork name an entry here.
+  //
+  // Um `path` pode ser **um endereço** (D64): `https://…` em vez de `assets/…`. É o que permite que a
+  // capa de uma obra seja a imagem que o site dela já serve (o thumbnail de um vídeo, por exemplo). O
+  // custo é dito no validador: a exposição passa a depender desse servidor, e as perguntas de disco
+  // (existe? que forma tem?) ficam por responder.
   assets: {
     type: 'map',
     entry: {

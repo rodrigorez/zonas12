@@ -69,6 +69,9 @@ export function summarise(scene) {
   };
 }
 
+// Um caminho que é um endereço (D64): o ficheiro vive fora do projeto e é o browser que o vai buscar.
+export const isRemotePath = (value) => typeof value === 'string' && /^https?:\/\//i.test(value);
+
 export function validateScene(scene, options = {}) {
   const errors = [];
   const warnings = [];
@@ -107,10 +110,20 @@ export function validateScene(scene, options = {}) {
 
   checkSceneFields(scene, err, warn, { assets, ids });
 
-  // ---- the catalogue (D20) ----
+// ---- the catalogue (D20) ----
   for (const [id, asset] of Object.entries(assets)) {
     if (!asset || typeof asset !== 'object') { err(`assets.${id}: not an object`); continue; }
     if (typeof asset.path === 'string') {
+      // Um asset pode viver **fora** do projeto (D64): a capa de uma obra cujo conteúdo está num site
+      // pode ser a imagem que esse site já serve (o thumbnail do YouTube, por exemplo). Nesse caso as
+      // perguntas de disco (existe? que forma tem? o nome segue a regra?) não têm resposta do lado de
+      // cá — diz-se que não foram verificadas, em vez de se inventar uma resposta.
+      if (isRemotePath(asset.path)) {
+        skipped.push(`assets.${id}: "${asset.path}" is remote — existence, shape and name not checked ` +
+          `(the exhibition depends on another server for it)`);
+        if (!asset.alt) warn(`assets.${id}: no alt — the <img> the builder creates will have no description`);
+        continue;
+      }
       if (/^([a-zA-Z]:[\\/]|[\\/])/.test(asset.path)) {
         err(`assets.${id}: path "${asset.path}" is absolute — law L12 (published in a folder, everything breaks)`);
       }
@@ -127,7 +140,7 @@ export function validateScene(scene, options = {}) {
     }
     if (!asset.alt) warn(`assets.${id}: no alt — the <img> the builder creates will have no description`);
     // ---- L10: the name of the file says what it is (a warning: it is hygiene, not a break) ----
-    if (typeof asset.path === 'string' && !ASSET_FILE.test(asset.path)) {
+    if (typeof asset.path === 'string' && !isRemotePath(asset.path) && !ASSET_FILE.test(asset.path)) {
       warn(`assets.${id}: "${asset.path}" is not assets/<type>/<name>.<ext> — law L10 (the folder stops being searchable)`);
     }
   }
@@ -340,6 +353,11 @@ export function validateScene(scene, options = {}) {
   for (const panorama of panoramas) {
     const entry = assets[panorama.asset];
     if (!entry || typeof entry.path !== 'string') continue;
+    // Um panorama remoto não se mede daqui (D64): a forma dele é do servidor que o serve.
+    if (isRemotePath(entry.path)) {
+      skipped.push(`${panorama.what}: the shape of "${entry.path}" was not measured (it is remote)`);
+      continue;
+    }
     // Reading an image is another question only the command line can answer (the same shape as
     // `exists`): in the browser it is reported as not verified.
     if (typeof options.imageSize !== 'function') {

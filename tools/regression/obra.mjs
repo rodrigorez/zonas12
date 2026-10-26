@@ -212,6 +212,8 @@ async function main() {
           botao: botao ? botao.getAttribute('href') : null,
           alvoDoBotao: botao ? botao.getAttribute('target') : null,
           imagemAtras: Boolean(imagem),
+          imagemCarregada: imagem ? (imagem.complete && imagem.naturalWidth > 0) : null,
+          imagemRemota: imagem ? String(imagem.getAttribute('src') || '').indexOf('http') === 0 : null,
           botoesVoltar: document.querySelectorAll('.botao-voltar').length,
           medicao: window.obraDebug ? window.obraDebug.analytics : null,
           pedido: window.obraDebug ? window.obraDebug.planned : null,
@@ -259,6 +261,11 @@ async function main() {
         result.check('e o endereço passou pela tabela das plataformas',
           typeof estado.plataforma === 'string' && estado.plataforma.length > 0,
           'plataforma=' + estado.plataforma);
+        // A capa por baixo do site tem de **carregar**: pode ser um ficheiro do projeto ou um endereço
+        // (D64 — o thumbnail do próprio vídeo, servido pelo YouTube, é o caso que existe hoje).
+        result.check('a capa do site carrega (ficheiro do projeto ou endereço remoto)',
+          estado.imagemCarregada === true,
+          JSON.stringify({ remota: estado.imagemRemota, carregada: estado.imagemCarregada }));
         // O YouTube recusa embutir sem referrer (erro 153) e a página de erro carrega como se tivesse
         // corrido bem — nada no browser a distingue. O que se pode medir é a causa: o atributo.
         result.check('o site embutido leva um referrer (o YouTube recusa embutir sem ele)',

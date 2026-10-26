@@ -26,8 +26,9 @@
 //     é (imagem, vídeo ou modelo) — é a única forma de desfazer, e é o que faz do CSV a fonte da
 //     verdade deste campo;
 //   - `capa` preenchida aponta a obra para um asset próprio (`capa-<id>`) com esse caminho, e o tipo
-//     vem da extensão do ficheiro. Vazio deixa a obra como está — é o que permite preencher só os
-//     textos e não tocar em nenhuma imagem.
+//     vem da extensão do ficheiro. Também aceita **um endereço** (D64): `https://…` — a capa de uma
+//     obra cujo conteúdo está num site pode ser a imagem que esse site já serve. Vazio deixa a obra
+//     como está — é o que permite preencher só os textos e não tocar em nenhuma imagem.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -174,7 +175,11 @@ export function applyRow(world, row, { exists }) {
     if (artwork.kind === 'site' && type !== 'image') {
       return { error: `obra ${row.id}: uma obra com site tem de ter uma imagem de capa (a que fica por baixo do iframe)` };
     }
-    if (exists(row.cover) === false) return { error: `obra ${row.id}: a capa "${row.cover}" não existe no projeto` };
+    // Uma capa remota (D64) não se pergunta ao disco: quem a serve é outro servidor.
+    const remota = /^https?:\/\//i.test(row.cover);
+    if (!remota && exists(row.cover) === false) {
+      return { error: `obra ${row.id}: a capa "${row.cover}" não existe no projeto` };
+    }
     // A capa que já é a da obra não é uma mudança: é o CSV a dizer o que o dado já diz, e reescrever
     // o catálogo por causa disso daria um asset novo em cada corrida.
     world.assets = world.assets || {};

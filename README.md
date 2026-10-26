@@ -863,9 +863,9 @@ que se espera e o que enviar se falhar, com todos os endereços para telemóvel 
 preenchido com texto **provisório**: as dez obras de produção passaram a ter título (pt/en), **autor
 (um ou vários, na mesma célula separados por vírgulas)** e sinopse. **Uma** delas — a do vídeo, `scene1`
 obra 2 — tem `site`: um vídeo do YouTube, para exercitar o caminho de uma obra cujo conteúdo é uma
-página (a plataforma resolve o `embed`, a ficha embute e o botão abre numa aba nova; a capa é um
-fotograma do vídeo local e é ela que fica no lugar do embed quando ele não carrega). O caminho, que é o
-que fica para o texto definitivo:
+página. A capa dela é o **thumbnail que o YouTube serve** (`i.ytimg.com/vi/<id>/maxresdefault.jpg`), e
+não um ficheiro copiado para o repositório: para isso o catálogo passou a aceitar **endereços** e não só
+caminhos locais (**D64**). O caminho, que é o que fica para o texto definitivo:
 
 ```sh
 # 1. editar data/obras.csv (título, autor, sinopse, site, capa)
@@ -879,20 +879,23 @@ modelo): é a única forma de desfazer, e é o que faz do CSV a fonte da verdade
 que os `testeX.nada` de uma primeira passagem saíram quando o autor passou a querer só uma obra com
 site.
 
-Do mesmo passo saíram três correções:
+Do mesmo passo saíram quatro correções:
 
 - **um site que não existe não dava erro**: o browser dispara o `load` do iframe com a **página de erro
   dele** em ~100 ms (medido: 97–136 ms, contra 623 ms de uma página real), e a ficha mostrava o «site
   não encontrado» do Chrome em vez da capa. Passou a haver um limite (`INSTANT_LOAD_MS`, 250 ms): abaixo
   dele o site conta como falhado e é a **capa** que fica, com o botão «Abrir o site» sempre presente;
-- **uma obra com site tem de ter capa de imagem** (a lei já o dizia): a obra do vídeo ganhou uma capa
-  extraída do seu próprio ficheiro (`assets/artworks/cidade-d0-video-quadro.jpg`, ffmpeg, 1 fotograma);
+- **um asset remoto** (D64): as leis de disco (L9, L14, L10) passaram a dizer «não verificado» em vez de
+  recusarem, e o importador aceita uma `capa` que é um endereço;
+- **uma obra com site tem de ter capa de imagem** (a lei já o dizia): a obra do vídeo tem o thumbnail;
 - a bateria **D40** tinha os nomes esperados escritos à mão e o `obra.mjs` tinha o **tipo** de cada obra
   escrito à mão (`tipo: 'image'`). Mudar o CSV era uma falha dos instrumentos em vez de uma mudança do
   dado: ambos passaram a ler o `data/worlds/<slug>.json`.
 
-Medido: `validate` **0**, `obra.mjs` **69 de 69**, `D40` **21 de 21**, `volta.mjs` **7 de 7**,
-`ficha-falhas` **3 de 3** e a suíte por omissão **5 de 5**.
+Medido: `validate` **0**, `obra.mjs` **71 de 71** (incluindo «a capa do site carrega» — um ficheiro do
+projeto ou um endereço remoto), `D40` **21 de 21**, `volta.mjs` **7 de 7**, `ficha-falhas` **3 de 3** e a
+suíte por omissão **5 de 5**. Na sala, a textura remota também carrega (mapa de **1280×720** na malha da
+obra, consola limpa).
 
 **Voltar ao sítio onde se estava (D63).** Abrir uma obra e voltar punha a câmara no **início do mundo**:
 quem estava de frente para uma obra, a três metros, tinha de caminhar outra vez até lá. Agora o clique

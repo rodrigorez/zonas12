@@ -9,8 +9,9 @@ para fazer num aparelho está marcado — não é preciso forçar.
 
 > **Estado do dado hoje:** o `data/obras.csv` está preenchido com texto **provisório**, para aprovação:
 > as dez obras de produção têm título, **autor (um ou vários)** e sinopse. **A do vídeo** (`scene1`
-> `id=2`, «Vídeo de teste») é a única com `site` — um vídeo do YouTube — e por isso a ficha dela mostra
-> o leitor embutido com o botão «Abrir o site». As outras nove são obras de imagem simples.
+> `id=2`, «Vídeo de teste») é a única com `site` — um vídeo do YouTube, **só para testes de laboratório**
+> — e a capa dela é o thumbnail do próprio vídeo (um asset **remoto**, D64). As outras nove são obras de
+> imagem simples.
 
 ---
 
@@ -50,7 +51,7 @@ Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos
 | --- | --- | --- |
 | 1.1 | Abrir `/obra.html?mundo=exemplo-ficha&id=0` | Fundo preto; cartão com **«Exemplo da ficha»**; botão laranja **«← Voltar para a exposição»**; a imagem da cidade num cartão; **«Exemplo · cidade ao entardecer»**; **«Autor de exemplo»**; a sinopse em texto justificado (2 linhas, com o recuo da 1.ª linha); outro botão laranja no fundo. O nome do separador é **«Exemplo · cidade ao entardecer — Exemplo da ficha»** |
 | 1.2 | Abrir `…&id=1` (só título) | Só três cartões: exposição, imagem, **título**. **Não** há cartão de autor nem de sinopse vazios |
-| 1.3 | Abrir a ficha **do vídeo** `https://rodrigorez.github.io/zonas12/obra.html?mundo=scene1&id=2` | Um leitor do YouTube embutido a tocar **sem som**, com o botão azul «Abrir o site da obra» por baixo |
+| 1.3 | Abrir a ficha **do vídeo** `https://rodrigorez.github.io/zonas12/obra.html?mundo=scene1&id=2` | Um leitor do YouTube embutido a tocar **sem som**, com o botão azul «Abrir o site da obra» por baixo. Se o embed falhar, vê-se o **thumbnail do vídeo** no lugar dele |
 | 1.4 | Abrir `…&id=3` (com site) | Um vídeo do YouTube a tocar **sem som**, no lugar do cartão; abaixo, o botão azul **«Abrir o site da obra»**. Se aparecer **«Erro de configuração do player de vídeo / Erro 153»**, é falha: envia o endereço e o print |
 | 1.5 | Clicar **«Abrir o site da obra»** | Abre o YouTube **numa aba nova**; a ficha fica onde estava |
 | 1.6 | Abrir `…&id=0&lang=en` | Interface **e** conteúdo em inglês: «Ficha example», «Back to the exhibition», «Example · city at dusk» |

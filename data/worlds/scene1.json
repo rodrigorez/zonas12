@@ -86,7 +86,7 @@
       }
     },
     "capa-2": {
-      "path": "assets/artworks/cidade-d0-video-quadro.jpg",
+      "path": "https://i.ytimg.com/vi/Gzegts8LXaI/maxresdefault.jpg",
       "type": "image",
       "alt": {
         "pt": "Capa da obra Vídeo de teste"
@@ -209,8 +209,8 @@
         "en": "Test video"
       },
       "synopsis": {
-        "pt": "Texto provisório: esta obra é um vídeo, e o vídeo está no YouTube — a ficha embute-o e deixa sempre o botão para o abrir numa aba nova. A capa é um fotograma do vídeo, e é ela que fica no lugar dele se o embed não carregar.",
-        "en": "Provisional text: this work is a video, and the video is on YouTube — the page embeds it and always leaves the button to open it in a new tab. The cover is a frame of the video, and it is what stays in place of the embed if it does not load."
+        "pt": "Texto provisório: esta obra é um vídeo, e o vídeo está no YouTube — a ficha embute-o e deixa sempre o botão para o abrir numa aba nova. A capa é o thumbnail do próprio vídeo, servido pelo YouTube, e é ela que fica no lugar dele se o embed não carregar.",
+        "en": "Provisional text: this work is a video, and the video is on YouTube — the page embeds it and always leaves the button to open it in a new tab. The cover is the video's own thumbnail, served by YouTube, and it is what stays in place of the embed if it does not load."
       },
       "author": {
         "pt": "autorB, autorC",
