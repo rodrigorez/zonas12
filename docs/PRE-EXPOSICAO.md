@@ -42,8 +42,10 @@ tipo `site`, o embed e a cadeia da capa. Não é uma obra da exposição.
 
 **Duas saídas, e a escolha é sua**
 
-- **Sem site:** apagar o `site` da linha no CSV (a célula **vazia** tira o site — a obra volta a ser o que
-  o ficheiro dela é) e escrever um título, autor e sinopse de verdade no mesmo passo que o ponto 1;
+- **Sem site:** apagar o `site` da linha no CSV **e dar-lhe uma imagem na `capa`** (a obra passa a ser
+  essa imagem), com um título, autor e sinopse de verdade no mesmo passo que o ponto 1. A célula
+  `site` vazia tira o site; o importador **recusa** se a linha não disser o que a obra passa a mostrar
+  — é de propósito, porque um «site» sem site deixaria a obra invisível;
 - **Sem obra:** retirar a obra da sala no editor, ou no dado. Nesse caso o `id` fica livre e as linhas
   seguintes do CSV mantêm o seu.
 

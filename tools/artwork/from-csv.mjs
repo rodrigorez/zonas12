@@ -31,7 +31,7 @@
 //     como está; **`-` tira a capa do dado** (D65: a ficha e a sala passam a usar a cadeia — o
 //     thumbnail do YouTube, depois a imagem padrão).
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LANGUAGES, ORIGIN_LANGUAGE } from '../../js/scene/schema.js';
 import { validateScene } from '../../js/scene/validation.js';
@@ -41,10 +41,12 @@ const root = join(here, '..', '..');
 const CHECK = process.argv.includes('--check');
 
 // A folha por omissão é a definitiva; `--file <caminho>` serve para correr um exemplo (o
-// `data/obras.exemplo.csv`) sem tocar no que o autor está a preencher.
+// `data/obras.exemplo.csv`) sem tocar no que o autor está a preencher. O caminho é resolvido da raiz
+// do projeto — e um caminho **absoluto** também serve, porque é o que uma pessoa cola de uma janela do
+// Explorador, e um `join` com um absoluto dá um caminho impossível (`d:\…\d:\…`).
 const fileArgument = process.argv.indexOf('--file');
 const CSV = fileArgument > 0 && process.argv[fileArgument + 1]
-  ? join(root, process.argv[fileArgument + 1])
+  ? resolve(root, process.argv[fileArgument + 1])
   : join(root, 'data', 'obras.csv');
 
 const COLUMNS = ['mundo', 'id', 'titulo_pt', 'titulo_en', 'autor', 'sinopse_pt', 'sinopse_en', 'site', 'capa'];
@@ -168,9 +170,7 @@ export function applyRow(world, row, { exists }) {
       artwork.kind = type;
       changes.push(`obra ${row.id}: volta a obra "${type}"`);
     }
-  }
-
-  if (row.cover === '-') {
+  }  if (row.cover === '-') {
     // `-` quer dizer «esta obra não tem capa no CSV»: a cadeia do D65 fica com o thumbnail do YouTube
     // (ou com a imagem padrão, se não houver site). É a forma de tirar uma capa que já estava no dado.
     const key = `capa-${row.id}`;
@@ -185,7 +185,11 @@ export function applyRow(world, row, { exists }) {
   } else if (row.cover) {
     const type = IMAGE_EXTENSIONS.test(row.cover) ? 'image' : (VIDEO_EXTENSIONS.test(row.cover) ? 'video' : null);
     if (!type) return { error: `obra ${row.id}: a capa "${row.cover}" não é uma imagem nem um vídeo conhecido` };
-    if (artwork.kind === 'site' && type !== 'image') {
+    // A capa manda no tipo de uma obra que **deixa** de ser um site nesta mesma linha: a célula `site`
+    // vazia já correu acima, e o `kind` só pode ser decidido depois de se saber que ficheiro a obra
+    // passa a mostrar. Era aqui que o exemplo do projeto era recusado com uma mensagem que falava de
+    // um site que a própria linha acabara de tirar.
+    if (artwork.site && artwork.kind === 'site' && type !== 'image') {
       return { error: `obra ${row.id}: uma obra com site tem de ter uma imagem de capa (a que fica por baixo do iframe)` };
     }
     // Uma capa remota (D64) não se pergunta ao disco: quem a serve é outro servidor.
@@ -216,10 +220,23 @@ export function applyRow(world, row, { exists }) {
         changes.push(`obra ${row.id}: passa a usar o asset "${key}"`);
       }
     }
-    if (artwork.kind !== 'site' && artwork.kind !== type) {
+    // Uma obra **com** site continua a ser um "site" (a capa é a imagem por baixo do iframe); uma obra
+    // sem site passa a ser o que a capa é. Era a segunda metade desta regra que faltava: o `kind` nunca
+    // saía de "site", e por isso tirar o site no CSV deixava um mundo inválido.
+    if (!artwork.site && artwork.kind !== type) {
       artwork.kind = type;
       changes.push(`obra ${row.id}: passa a obra "${type}"`);
     }
+  }
+
+  // Uma obra que era um site e que o CSV deixa sem site **e** sem ficheiro de capa não tem o que
+  // mostrar: o `kind` ficaria "site" sem `site` e o mundo inteiro seria recusado pelo validador, com
+  // uma mensagem que não diz qual é a linha do CSV. Aqui diz-se qual é, e o que falta.
+  if (artwork.kind === 'site' && !artwork.site) {
+    return {
+      error: `obra ${row.id}: esta obra era um "site" e a linha não dá site nem uma imagem/vídeo na capa — `
+        + 'diga o que ela passa a ser (uma imagem de capa) ou dê-lhe um site'
+    };
   }
 
   return { changes };

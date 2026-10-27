@@ -4,3 +4,8 @@ node_modules/
 # Artefactos de teste/sessao (capturas de ecra, logs do browser)
 .playwright-mcp/
 /*.png
+
+# Folhas CSV em teste (rascunhos): o dado a serio e data/obras.csv
+data/csv/*.csv
+
+!data/csv/MODELO.csv

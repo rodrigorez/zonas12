@@ -828,8 +828,12 @@ existe agora:
   ficha com o mesmo desenho das Zonas 11. Cada obra continua a ser **um endereço próprio**, que é o
   que a medição precisa para distinguir as obras no relatório;
 - **`node tools/artwork/from-csv.mjs`** — lê `data/obras.csv` e escreve nos mundos o que mudou, com
-  `--check` para ver sem escrever. Recusa escrever um mundo que não passe as leis; a capa passa a ser
-  um asset próprio da obra (`capa-<id>`), e um `site` preenchido faz dela uma obra `site`;
+  `--check` para ver sem escrever e `--file <caminho>` para correr uma folha de teste (aceita o caminho
+  da raiz do projeto ou absoluto). Recusa escrever um mundo que não passe as leis; a capa passa a ser
+  um asset próprio da obra (`capa-<id>`), e um `site` preenchido faz dela uma obra `site`; uma célula
+  `site` vazia tira o site e a obra volta a ser o que a capa der — e se a linha não disser o que ela
+  passa a ser, o importador **recusa** em vez de deixar a obra invisível. As folhas de teste vivem em
+  [`data/csv/`](data/csv/LEIA-ME.md), com um **MODELO.csv** que é a folha de produção copiada;
 - **a medição** (`js/scene/analytics.js`) — o autor vai ter **uma propriedade GA4 por mundo** e uma
   para o portão, e o ID mora no dado (`world.analytics.id`). Enquanto não houver IDs **não acontece
   nada**: nem script, nem pedido, nem linha na consola — é o que mantém o T8 e o funcionamento
@@ -1654,7 +1658,7 @@ de imagem, a chegada por uma porta, os rótulos, o botão, a transição, o fund
 política e as duas páginas com uma), os quatro valores do R9 na cena e nos painéis, o lote por
 dimensão, o catálogo de assets, os portais em movimento, a ficha das obras, o **ensaio A/B do fundo**
 (`ensaio.mjs`, D66) e a **queda para a imagem** (`queda.mjs`, R18) — cada uma abre um Chrome e juntas somam
-minutos, por isso não são o `default`. Com `--full` são **25** baterias.
+minutos, por isso não são o `default`. Com `--full` são **26** baterias.
 
 Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
 repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.csv` e escreve nos mundos o dado das
@@ -1854,14 +1858,14 @@ dia — o que falta para abrir ao público é **conteúdo**, e está listado em
 
 Fora da Fase 7, e sem data:
 
-- **As baterias arquivadas por omissão**: hoje `node tools/regression/all.mjs` corre as cinco que
+- **As baterias arquivadas por omissão**: hoje `node tools/regression/all.mjs` corre as seis que
   decidem uma alteração e deixa as vinte da Fase 4/5/7/8 atrás de `--full`, porque cada uma abre um
-  Chrome; juntá-las num só browser (uma sessão, vinte medições) poria as **25** em minutos
+  Chrome; juntá-las num só browser (uma sessão, vinte medições) poria as **26** em minutos
 
 **Fechado na Fase 7:** o catálogo em duas línguas (**B2**), o que o esquema prometia e a cena não
 construía — **D56** (fundo de cor), **D57** (`link` a navegar), **D58** (modelo GLTF e texto) —, o
 lote por dimensão e o catálogo de assets no editor (**B3**/**B4**), os portais animados (**D59**) e a
-verificação dos dois lados da exposição com **25** baterias (§ «Como Usar»).
+verificação dos dois lados da exposição com **26** baterias (§ «Como Usar»).
 
 **Fechado na Fase 4:** a **página de edição** (§ acima), o **retrato do portão** (decidido: não se
 faz — a ausência é honesta, **R10**) e a **orientação da chegada** no céu (resolvida por dado: as

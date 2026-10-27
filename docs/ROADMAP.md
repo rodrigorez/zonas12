@@ -3537,6 +3537,32 @@ estar **preenchido com texto provisório** — título, autor (um ou vários), s
 para laboratório) —, e é esse o estado do dado: **o conteúdo definitivo é do autor**, e substitui-se no CSV
 com um comando.
 
+**As folhas de teste e um defeito do importador (2026-10-27).** O autor ia trazer CSV novos para
+experimentar, e o sítio para os pôr passou a existir: `data/csv/` (com um `LEIA-ME` e um **MODELO.csv** que
+é a folha de produção copiada, para não se trocar um `id` sem querer), e os `.csv` dessa pasta ficam fora do
+repositório — o dado a sério continua a ser o `data/obras.csv`.
+
+Provar o caminho com a folha de exemplo do projeto revelou **dois defeitos** que ninguém tinha visto,
+porque o importador só era exercido à mão e sempre com a folha que já estava em dia:
+
+- **tirar o site de uma obra deixava o mundo inválido.** A célula `site` vazia apagava o `site` mas o
+  `kind` ficava `"site"` (a atribuição do tipo estava escrita para **nunca** sair de `"site"`, o que faz
+  sentido numa obra que continua a ser um site), e o validador recusava o mundo inteiro com uma mensagem
+  que não dizia qual era a linha do CSV. Agora o `kind` sai de `"site"` quando a obra deixa de o ser, e uma
+  linha que tira o site **sem** dizer o que a obra passa a mostrar é recusada com a linha e o que falta:
+  «esta obra era um "site" e a linha não dá site nem uma imagem/vídeo na capa — diga o que ela passa a ser».
+  Isto muda o que a lista de pré-exposição manda fazer no ponto 2: tirar o site do vídeo de laboratório
+  exige **dar-lhe uma imagem** na `capa`;
+- **`--file` com um caminho absoluto** (o que se cola de uma janela do Explorador) juntava a raiz ao
+  caminho e dizia «não encontrei `d:\…\d:\…`». Passou a `resolve`.
+
+Bateria nova `tools/regression/csv.mjs` — **9 de 9**, e é rápida (0,4 s, sem browser), por isso entrou no
+grupo por omissão do `all.mjs` (**6 de 6** em 124,0 s): a folha de produção em dia responde **0** e «o CSV
+não muda nada»; uma folha que muda texto responde **1** e lista; tirar o site com imagem de capa devolve a
+obra a `image` sem erro; tirar o site sem ficheiro é recusado com a linha; um site sem `http(s)`, uma capa
+inexistente e uma capa que não é imagem nem vídeo são recusados; um autor entre aspas com vírgula conta como
+**um** autor; e — a verificação que fecha o resto — **nenhum `--check` toca em `data/worlds/`**, comparando
+uma impressão digital da pasta antes e depois.
 **O roteiro de teste, percorrido (2026-10-27).** O guia por números mostrou-se difícil de seguir com o
 aparelho na mão, e o autor pediu um **roteiro passo a passo**: `docs/ROTEIRO-DE-TESTE.md` tem a preparação
 (aba anónima, ecrã sem apagar, servidor local, árvore limpa), **nove passos no telemóvel** e **dezassete no

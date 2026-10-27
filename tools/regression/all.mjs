@@ -26,7 +26,9 @@ import { ROOT } from './harness.mjs';
 
 const NUCLEO = [
   { nome: 'o dado: os 6 mundos, as leis, o grafo e os arranques', script: 'tools/scene/validate.mjs' },
-  { nome: 'as leis: 22 avarias injectadas e o controlo limpo', script: 'tools/scene/laws-selftest.mjs' }
+  { nome: 'as leis: 22 avarias injectadas e o controlo limpo', script: 'tools/scene/laws-selftest.mjs' },
+  // O importador do CSV (D62): rápido, sem browser, e é a única proteção entre uma folha e o dado.
+  { nome: 'o importador do CSV', script: 'tools/regression/csv.mjs' }
 ];
 
 const CENA = [
