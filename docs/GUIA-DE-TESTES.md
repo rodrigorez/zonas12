@@ -135,13 +135,14 @@ mede **sozinha** os dois lados do par — o shader e a imagem — e mostra um bl
 
 | # | O que fazer | O que se espera |
 | --- | --- | --- |
-| 7.1 | Abrir no **computador**: `https://rodrigorez.github.io/zonas12/scene1/?ensaio=1` | Um painel preto no canto: **«ensaio · fase 1/2 (shader) · a aquecer/medir · 55 s»** a descer de segundo a segundo. **Não tocar** na página | 
+| 7.1 | Abrir no **computador**: `https://rodrigorez.github.io/zonas12/scene1/?ensaio=1` | Um painel preto no canto: **«ensaio · fase 1/2 (shader) · a aquecer · 55 s»** a descer de segundo a segundo (e depois **«a medir»**). **Não tocar** na página e **não trocar de aba** | 
 | 7.2 | Esperar (~2 minutos, sem trocar de aba nem bloquear o ecrã) | A página **recarrega sozinha** (a fase 2, imagem) e o contador volta a descer. Depois aparece o bloco com **«--- fase 1 · shader ---»** e **«--- fase 2 · imagem ---»** |
-| 7.3 | Ler a última parte do bloco | **«--- comparação (imagem vs shader) ---»** com `quadros … /s → … /s` e `pior quadro … ms → … ms` |
+| 7.3 | Ler a última parte do bloco | **«--- comparação (imagem vs shader) ---»** com `quadros … /s → … /s`, `pior quadro … ms → … ms` e `janelas … s e … s` |
 | 7.4 | Tocar em **Copiar** | O botão diz **«copiado»** e o bloco fica no teclado. Colá-lo aqui é o resultado do teste |
 | 7.5 | Repetir **7.1–7.4** no **telemóvel fraco** e no **telemóvel do Adreno 630** | O bloco traz o modelo da **GPU** e o ecrã de cada um — é isso que distingue os três registos |
 | 7.6 | Em qualquer aparelho, abrir `…/scene1/?ensaio=1&segundos=10&aquecimento=3` | O mesmo, em ~26 s: serve para ver que o protocolo funciona quando não se quer esperar 2 minutos |
-| 7.7 | No painel, ler a linha **`janela`** antes de tudo | Tem de dizer **`45 s (aquecimento 10 s)`**. Se disser **`0 s`**, ou aparecer `null/s` / `NaN/s` nos quadros, o build está velho: recarregar com `Ctrl+Shift+R` (ou limpar a cache no telemóvel) |
+| 7.7 | No painel, ler a linha **`pedido`** antes de tudo | Tem de dizer **`45 s de medida · 10 s de aquecimento`**. Se disser `0 s`, ou aparecer `null/s` / `NaN/s` nos quadros, o build está velho: recarregar com `Ctrl+Shift+R` (ou limpar a cache no telemóvel) |
+| 7.8 | No fim, ler a linha **`janela`** de cada fase | **`45,0x s (desvio +0,0x s)`** — a janela que passou, não a que se pediu. As duas têm de dar o mesmo (a comparação mostra `janelas 45.00 s e 45.00 s`); se trouxer **`pausada … s`**, a aba esteve escondida nesse tempo e a medida foi pausada (é de propósito) |
 
 O que **conta** no resultado: os **quadros/s** de cada lado e o **pior quadro**. Num aparelho rápido os
 dois lados empatam (o browser desenha ao ritmo do ecrã) — isso **não** é falha, é o resultado. Num
@@ -149,7 +150,12 @@ aparelho fraco vê-se a diferença.
 
 Cuidados que mudam o número: o aparelho **frio** (não a carregar e sem outras apps abertas), a mesma
 **sala**, o ecrã **ligado** todo o tempo, e o mesmo estado de `prefers-reduced-motion` se o sistema o
-tiver.
+tiver. Trocar de aba **não estraga** o ensaio — a fase pausa e o tempo escondido vai declarado como
+`pausada` — mas demora mais, e um telemóvel que fica com o ecrã a apagar-se pausa da mesma maneira.
+
+Uma nota sobre os números: o que se compara são os **quadros por segundo de cada lado**, medidos na
+**mesma janela** (a linha `janelas` prova-o). Se as duas janelas não baterem, o par não é comparável e o
+relatório di-lo, em vez de apresentar uma diferença que é só do tempo.
 
 ---
 

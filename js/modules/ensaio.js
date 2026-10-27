@@ -18,6 +18,9 @@
 // ~2 minutos por aparelho). O texto é da ferramenta, não da interface (D12) — não sai do catálogo.
 const KEY = 'zonas12.ensaio';
 const SAMPLE_MS = 250;
+// De quanto em quanto o relógio da fase olha para o tempo: é o que atualiza o contador e o que fecha a
+// janela, portanto o desvio máximo entre a janela pedida e a medida é este intervalo.
+const TICK_MS = 100;
 // Uma janela curta não mede nada: em 0 ms não há um único quadro e a taxa é `0/0`. O relatório mostrou
 // `null/s` e `NaN/s` na primeira vez que o autor abriu o endereço sem durações explícitas, e a causa era
 // `Number(null) === 0` — o parâmetro ausente lia-se como zero. Duas defesas: ausente/vazio/inválido volta
@@ -71,76 +74,97 @@ function sceneReady(timeoutMs = 60000) {
   });
 }
 
-// Uma janela de medida: conta os quadros desenhados e amostra a política. Devolve só números — é o que
-// vai para o relatório e o que se compara.
-function measure(ms) {
+// ---- a fase: um relógio, três usos ----
+//
+// O contador no ecrã, a janela de medida e o divisor da taxa saem **todos** do mesmo `performance.now()`.
+// Antes eram três contas diferentes — a contagem decrescente num laço de `setTimeout(1000)` (que atrasa e
+// acumula), a medida num `setTimeout(ms)` (que pode disparar tarde) e a taxa a dividir pelo tempo que se
+// tinha *pedido* —, por isso o painel podia anunciar uma coisa e o resultado ser outra. Agora não: o que
+// se lê é o que se mediu, e o relatório diz quanto a janela real se afastou da pedida.
+//
+// Uma aba **escondida** pausa a fase. Um `requestAnimationFrame` que não corre contaria zero quadros, e o
+// A/B compararia 45 s de shader com 3 s de ecrã ligado na imagem — que é a forma mais fácil de obter um
+// número bonito e falso. O tempo escondido sai do relógio e vai declarado no relatório.
+function runPhase({ warmupMs, measureMs, onTick }) {
   return new Promise((resolve) => {
-    let frames = 0;
-    let active = true;
     const startedAt = performance.now();
-    // O intervalo entre quadros, e não só a contagem: numa máquina rápida o browser desenha ao ritmo do
-    // ecrã e os dois lados do A/B empatam (medido: 165 → 164,7 quadros/s num portátil com RTX 4060), o
-    // que não quer dizer que o shader seja grátis — quer dizer que ainda sobra. O que distingue é o
-    // **pior** quadro e quantos passaram do dobro da mediana: é aí que um telemóvel fraco se vê.
-    const gaps = [];
+    let hiddenAt = document.visibilityState === 'hidden' ? startedAt : null;
+    let pausedMs = 0;
+    let frames = 0;
     let lastFrameAt = 0;
-    const count = (now) => {
-      if (!active) return;
-      frames += 1;
-      if (lastFrameAt) gaps.push(now - lastFrameAt);
-      lastFrameAt = now;
-      requestAnimationFrame(count);
-    };
-    requestAnimationFrame(count);
-
+    // Quando o primeiro quadro da janela foi desenhado: é o princípio da janela de medida, e não o fim
+    // do aquecimento no papel — assim o divisor é o intervalo em que os quadros foram mesmo contados.
+    let measuringAt = null;
+    let lastSampleAt = -1;
+    let done = false;
+    const gaps = [];
     const samples = [];
+
+    const elapsedAt = (now) => now - startedAt - pausedMs - (hiddenAt === null ? 0 : now - hiddenAt);
+    const elapsed = () => elapsedAt(performance.now());
+    const visible = () => document.visibilityState !== 'hidden';
+
     const sample = () => {
       const now = state();
-      if (now && now.policy) {
-        samples.push({
-          updates: now.policy.updates || 0,
-          pixelRatio: now.policy.pixelRatio,
-          late: now.policy.late || 0,
-          cadence: now.policy.cadence,
-          mode: now.policy.mode,
-          events: (now.policy.events || []).length
-        });
-      } else {
-        samples.push(null);
-      }
+      samples.push(now && now.policy ? {
+        updates: now.policy.updates || 0,
+        pixelRatio: now.policy.pixelRatio,
+        late: now.policy.late || 0,
+        cadence: now.policy.cadence,
+        mode: now.policy.mode,
+        events: (now.policy.events || []).length
+      } : null);
     };
-    sample();
-    const timer = setInterval(sample, SAMPLE_MS);
 
-    setTimeout(() => {
-      active = false;
+    const onVisibility = () => {
+      const now = performance.now();
+      if (document.visibilityState === 'hidden') {
+        if (hiddenAt === null) hiddenAt = now;
+        return;
+      }
+      if (hiddenAt === null) return;
+      pausedMs += now - hiddenAt;
+      hiddenAt = null;
+      // O intervalo entre dois quadros não atravessa a pausa: senão o «pior quadro» era o tempo em que a
+      // aba esteve escondida, que não é um quadro lento — é um quadro que não foi pedido.
+      lastFrameAt = 0;
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    const finish = () => {
+      if (done) return;
+      done = true;
       clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisibility);
+      const total = elapsed();
+      const windowMs = Math.max(0, total - (measuringAt === null ? warmupMs : measuringAt));
+      const divisors = Math.max(0.001, windowMs / 1000);
       const valid = samples.filter(Boolean);
       const first = valid[0] || null;
       const last = valid[valid.length - 1] || null;
-      // O divisor vem da janela que passou, não da que se pediu: um `setTimeout` atrasado por um ecrã
-      // bloqueado não pode transformar a taxa num número inventado.
-      const elapsed = Math.max(1, performance.now() - startedAt);
-      const ratios = valid.map((item) => item.pixelRatio).filter((value) => typeof value === 'number');
+      const ratios = valid.map((item) => item.pixelRatio).filter((item) => typeof item === 'number');
       const backgrounds = state() ? state().backgrounds || [] : [];
       const background = backgrounds.find((item) => item.dimension === 0) || {};
       const sorted = gaps.slice().sort((a, b) => a - b);
       const median = sorted.length ? sorted[Math.floor(sorted.length / 2)] : null;
       const worst = sorted.length ? sorted[sorted.length - 1] : null;
-      const slow = median === null ? null : gaps.filter((gap) => gap > median * 2).length;
       resolve({
-        seconds: Math.round(elapsed / 1000),
-        fps: Math.round((frames / (elapsed / 1000)) * 10) / 10,
-        worstFrameMs: worst === null ? null : Math.round(worst * 10) / 10,
-        slowFrames: slow,
+        requestedMs: measureMs,
+        warmupMs: warmupMs,
+        // A janela que **passou**, com dois usos: o relatório mostra-a e a taxa divide-se por ela.
+        windowMs: windowMs,
+        pausedMs: pausedMs,
         frames: frames,
+        fps: Math.round((frames / divisors) * 10) / 10,
+        worstFrameMs: worst === null ? null : Math.round(worst * 10) / 10,
+        slowFrames: median === null ? null : gaps.filter((gap) => gap > median * 2).length,
         background: background.mode || '—',
         shader: background.shaderId || null,
         mode: last ? last.mode : null,
         cadence: last ? last.cadence : null,
         // Sem política (fundo de imagem) não há atualizações a contar: fica «—», não zero.
         updatesPerSecond: first && last && last.updates > first.updates
-          ? Math.round(((last.updates - first.updates) / (elapsed / 1000)) * 10) / 10
+          ? Math.round(((last.updates - first.updates) / divisors) * 10) / 10
           : null,
         updates: last ? last.updates : null,
         pixelRatio: last ? last.pixelRatio : null,
@@ -149,7 +173,46 @@ function measure(ms) {
         late: last ? last.late : null,
         events: last ? last.events : 0
       });
-    }, ms);
+    };
+
+    // Os quadros desenhados — o custo real —, contados só dentro da janela e só com a aba visível. O
+    // primeiro quadro depois do aquecimento **abre** a janela: é ele o instante zero.
+    const frame = (now) => {
+      if (done) return;
+      if (visible()) {
+        const ms = elapsedAt(now);
+        if (measuringAt === null && ms >= warmupMs) measuringAt = ms;
+        if (measuringAt !== null) {
+          frames += 1;
+          if (lastFrameAt) gaps.push(now - lastFrameAt);
+          lastFrameAt = now;
+        }
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+
+    const timer = setInterval(() => {
+      if (done) return;
+      const ms = elapsed();
+      if (measuringAt !== null && lastSampleAt < 0) {
+        sample();
+        lastSampleAt = ms;
+      } else if (measuringAt !== null && ms - lastSampleAt >= SAMPLE_MS) {
+        sample();
+        lastSampleAt = ms;
+      }
+      if (onTick) {
+        onTick({
+          measuring: measuringAt !== null,
+          // O que falta para o resultado: o contador conta o que o relógio diz que falta, não o que um
+          // laço de `setTimeout` ia somando.
+          left: Math.max(0, Math.ceil((warmupMs + measureMs - ms) / 1000)),
+          elapsed: ms
+        });
+      }
+      if (ms >= warmupMs + measureMs) finish();
+    }, TICK_MS);
   });
 }
 
@@ -161,12 +224,21 @@ const value = (number, casas = 1) => (typeof number === 'number' && Number.isFin
   ? String(Math.round(number * Math.pow(10, casas)) / Math.pow(10, casas))
   : '—');
 
+// A janela de uma fase, com o desvio e o tempo em que a aba esteve escondida: é o que prova que os dois
+// lados do A/B foram medidos pelo mesmo tempo, no mesmo aparelho.
+const windowLine = (result) => {
+  const drift = Math.round(((result.windowMs - result.requestedMs) / 1000) * 100) / 100;
+  return value(result.windowMs / 1000, 2) + ' s (desvio ' + (drift >= 0 ? '+' : '') + value(drift, 2) + ' s' +
+    (result.pausedMs >= 100 ? ' · pausada ' + value(result.pausedMs / 1000, 1) + ' s' : '') + ')';
+};
+
 function phaseReport(title, result) {
   if (!result) return [title, '  (sem medição)'];
   return [
     title,
     '  ' + line('fundo', (result.background || '—') + (result.shader ? ' · ' + result.shader : '')),
-    '  ' + line('quadros', value(result.fps) + '/s'),
+    '  ' + line('janela', windowLine(result)),
+    '  ' + line('quadros', value(result.fps) + '/s' + (result.frames ? ' · ' + result.frames + ' quadros' : '')),
     '  ' + line('pior quadro', (result.worstFrameMs === null ? '—' : value(result.worstFrameMs) + ' ms') +
       (result.slowFrames === null ? '' : ' · lentos ' + result.slowFrames)),
     '  ' + line('cadência', (result.cadence === null ? '—' : result.cadence + '/s') +
@@ -198,6 +270,10 @@ function summary(first, second) {
   if (Number.isFinite(first.slowFrames) && Number.isFinite(second.slowFrames)) {
     lines.push('  lentos       ' + first.slowFrames + ' → ' + second.slowFrames);
   }
+  // As duas janelas uma ao lado da outra: um A/B só vale se os dois lados foram medidos pelo mesmo tempo.
+  const equal = Math.abs(first.windowMs - second.windowMs) <= 1000;
+  lines.push('  janelas      ' + value(first.windowMs / 1000, 2) + ' s e ' + value(second.windowMs / 1000, 2) + ' s' +
+    (equal ? '' : '  (<- diferente: o par não é comparável, repetir)'));
   return lines;
 }
 
@@ -263,19 +339,12 @@ export function startEnsaio() {
       ui.text.textContent = 'zonas12 · ensaio\n  a cena não ficou pronta em 60 s: sem medição';
       return;
     }
-    // A contagem decrescente cobre a fase inteira (aquecimento + medida) e corre **em paralelo** com a
-    // medição: em série, cada fase levava o dobro do tempo (medido: 100 s em vez de 55 s).
-    const total = Math.round((warmupMs + measureMs) / 1000);
-    const countdown = (async () => {
-      for (let left = total; left > 0; left--) {
-        tick('ensaio · fase ' + (phase === 'shader' ? '1/2 (shader)' : '2/2 (imagem)') +
-          ' · a aquecer/medir · ' + left + ' s');
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
-    })();
-    await new Promise((resolve) => setTimeout(resolve, warmupMs));
-    const result = await measure(measureMs);
-    await countdown;
+    const result = await runPhase({
+      warmupMs: warmupMs,
+      measureMs: measureMs,
+      onTick: (progress) => tick('ensaio · fase ' + (phase === 'shader' ? '1/2 (shader)' : '2/2 (imagem)') +
+        (progress.measuring ? ' · a medir · ' : ' · a aquecer · ') + progress.left + ' s')
+    });
     result.phase = phase;
 
     if (phase === 'shader') {
@@ -305,8 +374,8 @@ export function startEnsaio() {
       line('aparelho', shortDevice()),
       line('gpu', gpuName()),
       line('ecrã', innerWidth + '×' + innerHeight + ' · dpr ' + (Math.round(devicePixelRatio * 100) / 100)),
-      line('janela', Math.round(measureMs / 1000) + ' s (aquecimento ' + Math.round(warmupMs / 1000) + ' s' +
-        (clamped ? '; pedido ' + String(requested) + ' s, mínimo ' + (MIN_MEASURE_MS / 1000) + ' s' : '') + ')'),
+      line('pedido', Math.round(measureMs / 1000) + ' s de medida · ' + Math.round(warmupMs / 1000) + ' s de aquecimento' +
+        (clamped ? ' (pedido ' + String(requested) + ' s, mínimo ' + (MIN_MEASURE_MS / 1000) + ' s)' : '')),
       line('reduzido', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'sim' : 'não'),
       '',
       ...phaseReport('--- fase 1 · shader ---', first),

@@ -1744,11 +1744,20 @@ sozinha** com `?fase=imagem&shader=0`, mede a imagem e junta os dois lados. O pa
 está e quanto falta; no fim tem **Copiar** (o bloco inteiro) e **Repetir**. Leva ~2 minutos por
 aparelho e não precisa de consola nem de tocar em nada.
 
-O bloco traz, por fase: fundo (modo e `shaderId`), **quadros/s**, **pior quadro** e quantos passaram do
+O bloco traz, por fase: fundo (modo e `shaderId`), **janela** (a que passou, com o desvio em relação à
+pedida e o tempo em que a aba esteve escondida), **quadros/s**, **pior quadro** e quantos passaram do
 dobro da mediana, cadência, atualizações, pixelRatio (com o mínimo e o máximo que a escada visitou),
-atrasos e eventos — mais a comparação dos dois lados, o aparelho e a **GPU**. As durações mudam-se no
-endereço: `?ensaio=1&segundos=30&aquecimento=5` (a medida tem um **mínimo de 2 s**, senão não há um
-único quadro a contar).
+atrasos e eventos — mais a comparação dos dois lados, com as **duas janelas** lado a lado, o aparelho e a
+**GPU**. As durações mudam-se no endereço: `?ensaio=1&segundos=30&aquecimento=5` (a medida tem um
+**mínimo de 2 s**, senão não há um único quadro a contar).
+
+O contador no ecrã, a janela de medida e o divisor dos quadros saem **todos do mesmo relógio**
+(`performance.now()`): o que o painel anuncia é o que se mede. O desvio entre a janela pedida e a medida
+fica escrito no relatório (medido: **+0,00 s** e **−0,01 s** em 3 s, com um relógio que fecha a fase de
+100 em 100 ms). E uma aba **escondida pausa a fase** — um `requestAnimationFrame` que não corre contaria
+zero quadros, e o A/B compararia 45 s de shader com 3 s de ecrã ligado na imagem; o tempo escondido sai
+da conta e aparece como `pausada`. Se as duas janelas saírem diferentes, a comparação diz que o par não é
+comparável e pede para repetir.
 
 Porque o **pior quadro** e não só os quadros: numa máquina rápida o browser desenha ao ritmo do ecrã e
 os dois lados empatam (medido num portátil com RTX 4060: **165,3 → 164,3** quadros/s), o que não quer

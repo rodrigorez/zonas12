@@ -43,6 +43,22 @@ async function main() {
     })()`);
     result.check('a fase 1 começa sozinha e anuncia-se (fase 1/2, shader)', arrancou);
 
+    // 1b. O contador **é** o relógio da fase: diz quanto falta (aquecimento + medida) e desce sozinho.
+    //     Antes era um laço de `setTimeout(1000)` a par da medida, e por isso podia anunciar uma coisa e
+    //     medir outra.
+    const relogio = async () => browser.evaluate(`(() => {
+      const texto = (document.getElementById('ensaio-resumo') || {}).textContent || '';
+      const achado = /· (\\d+) s$/.exec(texto.trim());
+      return { texto: texto, segundos: achado ? Number(achado[1]) : null };
+    })()`);
+    const antes = await relogio();
+    await sleep(1600);
+    const depois = await relogio();
+    result.check('o contador diz o que falta (4 s = 1 de aquecimento + 3 de medida) e desce com o relógio',
+      Number.isFinite(antes.segundos) && antes.segundos >= 3 && antes.segundos <= 4 &&
+        Number.isFinite(depois.segundos) && depois.segundos < antes.segundos,
+      antes.segundos + ' s → ' + depois.segundos + ' s · ' + depois.texto);
+
     // 2. A primeira fase mede o shader e guarda-o antes de recarregar.
     const primeira = await espera(browser, `(() => {
       try {
@@ -97,6 +113,20 @@ async function main() {
     result.check('há um botão que copia o bloco inteiro e outro que repete o ensaio',
       resumo.copiar && resumo.repetir);
 
+    // 4b. As duas janelas foram mesmo as pedidas, e o relatório di-lo com o desvio. É a garantia que o
+    //     autor pediu: o resultado vale o tempo que diz valer. A tolerância é a do relógio que fecha a
+    //     fase (o intervalo de 100 ms) mais uma folga para o `setInterval` atrasado numa máquina cheia.
+    const janelas = [...resumo.texto.matchAll(/janela\s+([0-9.]+) s \(desvio ([+-]?[0-9.]+) s/g)]
+      .map((achado) => ({ janela: Number(achado[1]), desvio: Number(achado[2]) }));
+    result.check('cada fase mede a janela pedida (3 s) e o relatório mostra o desvio',
+      janelas.length === 2 &&
+        janelas.every((item) => Math.abs(item.janela - SEGUNDOS) <= 0.35) &&
+        janelas.every((item) => Math.abs(item.desvio) <= 0.35),
+      JSON.stringify(janelas));
+    result.check('a comparação mostra as duas janelas lado a lado (um par só vale com o mesmo tempo)',
+      /janelas\s+[0-9.]+ s e [0-9.]+ s/.test(resumo.texto) && !/o par não é comparável/.test(resumo.texto),
+      (resumo.texto.split('\n').filter((item) => item.indexOf('janelas') >= 0) || [''])[0]);
+
     // 5. No fim, a sessão está limpa e o endereço volta ao princípio: uma recarga faz um ensaio novo.
     const limpo = await browser.evaluate(`(() => ({
       guardado: sessionStorage.getItem('zonas12.ensaio'),
@@ -140,6 +170,51 @@ async function main() {
     const segundosVazio = Number((/· (\d+) s/.exec(textoVazio) || [])[1]);
     result.check('com `&segundos=&aquecimento=` vazios volta à janela por omissão (não a 0 s)',
       vazio && Number.isFinite(segundosVazio) && segundosVazio >= 50, textoVazio);
+
+    // 9. Uma aba escondida **pausa** a fase, e o tempo escondido vai declarado. Sem isto, um visitante que
+    //    trocasse de aba a meio media 3 s de shader e 40 de imagem — com o `requestAnimationFrame` parado,
+    //    o segundo lado sairia com poucos quadros e o A/B diria uma mentira com números a favor.
+    await browser.goto(site.base + '/scene1/?ensaio=1&segundos=3&aquecimento=1&bust=' + Date.now(), 60000);
+    await espera(browser, `(() => {
+      const curto = document.getElementById('ensaio-resumo');
+      return Boolean(curto && /fase 1\\/2 \\(shader\\)/.test(curto.textContent));
+    })()`);
+    await sleep(800);
+    const esconder = await browser.evaluate(`(() => {
+      Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+      document.dispatchEvent(new Event('visibilitychange'));
+      const texto = (document.getElementById('ensaio-resumo') || {}).textContent || '';
+      return (/· (\\d+) s$/.exec(texto.trim()) || [])[1] || null;
+    })()`);
+    await sleep(2000);
+    const durante = await browser.evaluate(`(() => {
+      const texto = (document.getElementById('ensaio-resumo') || {}).textContent || '';
+      return { segundos: (/· (\\d+) s$/.exec(texto.trim()) || [])[1] || null, texto: texto };
+    })()`);
+    result.check('com a aba escondida o relógio pára (o contador não desce)',
+      esconder !== null && String(durante.segundos) === String(esconder),
+      esconder + ' s → ' + durante.segundos + ' s');
+    await browser.evaluate(`(() => {
+      delete document.visibilityState;
+      delete document.hidden;
+      document.dispatchEvent(new Event('visibilitychange'));
+      return true;
+    })()`);
+    const voltou = await espera(browser, `(() => {
+      const texto = document.getElementById('ensaio-texto');
+      return Boolean(texto && texto.textContent.indexOf('comparação') >= 0);
+    })()`, 600);
+    const comPausa = await browser.evaluate('(document.getElementById("ensaio-texto") || {}).textContent || ""');
+    const janelaComPausa = (/fase 1 · shader[\s\S]*?janela\s+([0-9.]+) s \(desvio ([+-]?[0-9.]+) s · pausada ([0-9.]+) s\)/
+      .exec(comPausa) || []);
+    result.check('a pausa é declarada e a janela continua a ser a pedida (3 s)',
+      voltou && janelaComPausa.length === 4 &&
+        Math.abs(Number(janelaComPausa[1]) - SEGUNDOS) <= 0.5 &&
+        Number(janelaComPausa[3]) >= 1.5,
+      janelaComPausa.length === 4
+        ? 'janela ' + janelaComPausa[1] + ' s · pausada ' + janelaComPausa[3] + ' s'
+        : (comPausa.split('\n').filter((item) => item.indexOf('janela') >= 0).join(' | ') || '(sem relatório)'));
   } finally {
     await browser.close();
     await site.close();
