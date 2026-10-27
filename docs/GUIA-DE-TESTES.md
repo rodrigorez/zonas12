@@ -7,6 +7,11 @@ Zonas 11.
 Cada teste diz **o que fazer**, **o que se espera** e **o que enviar** se falhar. Um teste que não dá
 para fazer num aparelho está marcado — não é preciso forçar.
 
+> **Para percorrer os blocos 2 a 6 pela ordem em que se fazem**, use o
+> [ROTEIRO-DE-TESTE.md](ROTEIRO-DE-TESTE.md): tem a preparação, os passos numerados com o sinal de
+> falha de cada um, a folha de registo e o que desfazer no fim. Este ficheiro continua a ser a
+> referência de cada teste.
+
 > **Estado do dado hoje:** o `data/obras.csv` está preenchido com texto **provisório**, para aprovação:
 > as dez obras de produção têm título, **autor (um ou vários)** e sinopse. **A do vídeo** (`scene1`
 > `id=2`, «Vídeo de teste») é a única com `site` — um vídeo do YouTube, **só para testes de laboratório**
@@ -75,7 +80,7 @@ Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos
 | 2.2 | Abrir `…&id=3` | O YouTube toca **sem som** (mudo forçado); o botão azul existe e abre o site numa aba nova |
 | 2.3 | Girar o telemóvel para horizontal | A ficha continua legível (a coluna alarga até 800 px, não estica a 100%) |
 | 2.4 | Abrir `…&id=0&lang=en` | Inglês em todo o lado, como no computador |
-| 2.5 | Abrir a ficha de produção `https://rodrigorez.github.io/zonas12/obra.html?mundo=scene2&id=5` | Nome **«Céu»**, autor provisório, sinopse provisória, e o **site falso** mostra a **capa** com o botão azul (não a página de erro do browser) |
+| 2.5 | Abrir a ficha de produção `https://rodrigorez.github.io/zonas12/obra.html?mundo=scene2&id=5` | Nome **«Céu»**, autor provisório (`autorB`), sinopse provisória, e a **capa** da obra — não uma página de erro do browser nem um espaço vazio |
 | 2.6 | Tocar em «Voltar» | Volta à sala certa, sem 404 |
 
 ## 3. A ficha ligada à exposição
