@@ -171,6 +171,32 @@ janela** (a linha `janelas` é o que prova que o par é comparável). Num aparel
 empatam (o browser desenha ao ritmo do ecrã) — isso **não** é falha, é o resultado desse aparelho; o
 número que discrimina passa a ser o pior quadro.
 
+### 7.11 O shader paga-se em nitidez ou em quadros? (o teste que decide)
+
+O autor foi claro sobre o que **não** se faz: «deixaria de ver o shader». O shader é o fundo da obra, e
+tirá-lo aos telemóveis antigos mudaria a exposição exactamente para quem mais precisa dela. O que se testa
+é a alternativa: **baixar a nitidez em vez de baixar os quadros**, mantendo o shader.
+
+O instrumento tem um parâmetro para isso: `?pr=<n>` **prende o pixelRatio** — o adaptador nasce com o mínimo
+igual ao máximo, a escada não tem para onde ir, e o resto do ensaio fica igual.
+
+| # | O que fazer | O que se espera |
+| --- | --- | --- |
+| 7.11.1 | No **telemóvel fraco**: `…/scene1/?ensaio=1&pr=1` | O bloco diz `pixelRatio 1 (min 1 · max 1)` na fase 1 e `eventos 0` — a escada não mexeu |
+| 7.11.2 | Logo a seguir: `…/scene1/?ensaio=1&pr=2.63` (o dpr nativo daquele ecrã) | O mesmo, com `pixelRatio 2.63` |
+| 7.11.3 | E outra vez: `…/scene1/?ensaio=1&pr=1` | Serve de controlo: se esta corrida der o mesmo que a 7.11.1, o aparelho não aqueceu entre as duas |
+| 7.11.4 | Comparar os **quadros/s da fase 1** entre as duas primeiras corridas | A **fase 2 (imagem) é o controlo térmico**: se ela variar muito entre corridas, o aparelho aqueceu e a comparação não vale — repetir noutro momento |
+
+Como ler o resultado:
+
+- se com `pr=1` os quadros da fase 1 **subirem para perto dos da imagem** → o shader paga-se em nitidez, e a
+  resposta é **manter o shader e deixar a escada descer mais depressa** (mais um degrau de política, não uma
+  troca de fundo);
+- se mesmo com `pr=1` o shader continuar **15% abaixo** → o custo é o fragment por pixel, a resolução não o
+  resolve, e a resposta passa a ser **uma variante mais leve do shader** (menos oitavas, menos passos) para
+  os aparelhos fracos — a mesma linguagem visual, mais barata;
+- em qualquer dos casos, **trocar para a imagem deixa de estar em cima da mesa**: fica só como a rede de
+  segurança do R18, que já existe e só dispara quando nem a cadência de recurso se sustenta.
 ### 7.9 O que se envia, por aparelho
 
 Ao fim de cada aparelho, tocar em **Copiar** e mandar o bloco para si mesmo (WhatsApp para «mensagens a

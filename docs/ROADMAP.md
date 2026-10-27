@@ -4902,6 +4902,27 @@ miséria); um aparelho bom a 60 Hz não desiste em 20 s (zero eventos); sem imag
 `?queda=0` e por omissão num aparelho bom, o shader fica. O `shader.mjs` continua em **13 de 13** (a escada
 sem `onGiveUp` congela como sempre) e o `ensaio.mjs` em **19 de 19**.
 
+**«Deixaria de ver o shader» (objeção do autor, e a direção que ela fixa).** A opção de **demover por taxa de
+quadros** — «menos de 40 quadros/s sustentados → imagem» — foi **posta de fora**: o shader é o fundo da obra,
+e tirá-lo aos telemóveis antigos mudaria a exposição exactamente para quem mais precisa dela. Fica só a rede de
+segurança do R18, que dispara quando nem a cadência de recurso se sustenta. O que se testa em vez disso é
+**pagar em nitidez e não em quadros**.
+
+**O instrumento dessa experiência: `?pr=<n>`** (`js/modules/dimension.js`). Prende o pixelRatio — o adaptador
+nasce com o mínimo igual ao máximo, a escada não tem para onde ir e a política não desiste (uma sessão com o
+ratio preso é uma medição, e uma troca de fundo a meio mediria outra coisa). Medido no `queda.mjs`, agora
+**14 de 14** (6 na política, 8 na cena): `?pr=1` dá `pixelRatio 1` e o renderer a 1, zero eventos de escada, o
+shader fica; `?pr=2` dá 2; sem o parâmetro, tudo como antes. O ensaio A/B com `?pr=` mede o **shader a uma
+nitidez fixa** contra a imagem, e a fase 2 serve de controlo térmico entre corridas.
+
+**A experiência que falta fazer (no telemóvel fraco, 6 minutos):** `?ensaio=1&pr=1`, depois `?ensaio=1&pr=2.63`,
+depois outra vez `?ensaio=1&pr=1` — ver o guia, bloco 7.11. Duas leituras possíveis, e cada uma tem resposta:
+
+- **os quadros sobem com `pr=1`** → o shader paga-se em nitidez: a resposta é a escada descer mais depressa
+  (mais um degrau de política), e **o fundo mantém-se o shader em todas as salas**;
+- **os quadros não sobem** → o custo é o *fragment* por pixel e a resolução não o resolve: a resposta é uma
+  **variante leve do mesmo shader** (menos oitavas, menos passos) para os aparelhos fracos — a mesma linguagem,
+  mais barata. O validador de `tools/shader/` já mede cada variante antes de ela poder ser nomeada.
 **O que esta rede é e o que não é — dito com franqueza:** é uma **rede de segurança**, não uma optimização do
 aparelho fraco. O PowerVR real **não** desiste, porque a política lhe cumpre a cadência e ele passa os
 critérios; o que ele perde é fluidez ao olhar em volta, e isso a escada não mede. Baixar a fasquia para «menos

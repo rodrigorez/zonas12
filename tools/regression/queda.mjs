@@ -170,6 +170,42 @@ async function sceneChecks() {
     const off = await read();
     check.check('`?queda=0` mantém o shader e não desiste (a rede antiga fica disponível)',
       off.fundo === 'shader' && off.desistiu === false, JSON.stringify(off));
+
+    // 8. `?pr=` prende o pixelRatio: é a experiência que decide se o shader se pode pagar em nitidez em
+    //    vez de em quadros. O adaptador nasce com o mínimo igual ao máximo, e a escada não tem para onde
+    //    ir — nem para baixo nem para cima.
+    await browser.goto(site.base + '/scene1/?pr=1&bust=' + Date.now(), 90000);
+    await ready();
+    await sleep(9000);
+    const pinado = await browser.evaluate(`(() => {
+      const shader = window.portalDebug.shader();
+      const scene = document.querySelector('a-scene');
+      const fundo = (shader.backgrounds || []).find((item) => item.dimension === 0) || {};
+      return {
+        pixelRatio: shader.policy ? shader.policy.pixelRatio : null,
+        renderer: scene.renderer.getPixelRatio(),
+        fundo: fundo.mode,
+        desistiu: Boolean(shader.policy && shader.policy.gaveUp),
+        eventosEscada: shader.policy ? shader.policy.events.filter((e) => /pr/.test(e.what)).length : -1
+      };
+    })()`);
+    check.check('`?pr=1` prende o pixelRatio em 1 e o renderer obedece',
+      pinado.pixelRatio === 1 && pinado.renderer === 1, JSON.stringify(pinado));
+    check.check('com o pixelRatio preso a escada não mexe (nenhum evento de pr) e não desiste',
+      pinado.eventosEscada === 0 && pinado.desistiu === false && pinado.fundo === 'shader',
+      JSON.stringify({ eventosEscada: pinado.eventosEscada, desistiu: pinado.desistiu, fundo: pinado.fundo }));
+
+    // 9. `?pr=2` idem, para provar que o valor é respeitado e não um caso especial do 1.
+    await browser.goto(site.base + '/scene1/?pr=2&bust=' + Date.now(), 90000);
+    await ready();
+    await sleep(2500);
+    const pinado2 = await browser.evaluate(`(() => {
+      const shader = window.portalDebug.shader();
+      return { pixelRatio: shader.policy ? shader.policy.pixelRatio : null,
+        renderer: document.querySelector('a-scene').renderer.getPixelRatio() };
+    })()`);
+    check.check('`?pr=2` prende o pixelRatio em 2', pinado2.pixelRatio === 2 && pinado2.renderer === 2,
+      JSON.stringify(pinado2));
   } finally {
     await browser.close();
     await site.close();

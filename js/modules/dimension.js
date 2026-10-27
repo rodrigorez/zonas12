@@ -78,9 +78,36 @@ function shaderMaterial(definition) {
   }, stencilWrite));
 }
 
+// `?pr=<n>` prende o pixelRatio (R18, a experiência que decide se o shader se pode pagar em nitidez em
+// vez de em quadros): o adaptador nasce com o mínimo igual ao máximo, e a escada não tem para onde ir.
+// É ferramenta de medição, como `?shader=0` e `?queda=`, e o relatório do ensaio denuncia-o sozinho —
+// `pixelRatio 1 (min 1 · max 1)`.
+const pinnedRatio = () => {
+  try {
+    const value = Number(new URLSearchParams(location.search).get('pr'));
+    if (!Number.isFinite(value) || value <= 0) return null;
+    // Um valor absurdo (100) mataria a página: o parâmetro é para medir, não para abusar.
+    return Math.min(4, Math.max(0.5, value));
+  } catch (error) {
+    return null;
+  }
+};
+
 function pixelRatioAdapter(sceneEl) {
   const renderer = sceneEl && sceneEl.renderer;
   if (!renderer) return null;
+  const pin = pinnedRatio();
+  if (pin) {
+    return {
+      min: pin,
+      max: pin,
+      get: () => renderer.getPixelRatio(),
+      set: (value) => {
+        renderer.setPixelRatio(value);
+        sceneEl.resize();
+      }
+    };
+  }
   return {
     min: 1,
     max: Math.max(1, window.devicePixelRatio || 1),
@@ -209,9 +236,10 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     if (giveUpMode() === 'sempre') this.useFallback('forced by ?queda=sempre');
   },
   // O que a política chama quando desiste (R18). Devolve `null` quando não há imagem de reserva para
-  // trocar ou quando `?queda=0` a desliga — nesse caso a política congela, como antes.
+  // trocar, quando `?queda=0` a desliga, ou quando o pixelRatio está **preso** (`?pr=`) — nesse caso a
+  // sessão é uma medição, e uma troca de fundo a meio mediria outra coisa.
   giveUp: function () {
-    if (giveUpMode() === 'nunca' || !this.data.fallback) return null;
+    if (giveUpMode() === 'nunca' || pinnedRatio() !== null || !this.data.fallback) return null;
     const component = this;
     return () => component.useFallback('the device did not hold the shader, even at the fallback cadence');
   },

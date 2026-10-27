@@ -1808,17 +1808,17 @@ feitos e cada um mediu o seu número. O **R14**/**R15** (o A/B do shader nos tr�
   o A/B medido nos três aparelhos (§ «Critério antes de produção»)
 - **Queda automática para a imagem** (**R18**): **fechada** — o último degrau da escada troca o fundo pela
   imagem em vez de congelar; `?queda=0` desliga, `?queda=sempre` força, e `queda.mjs` mede os dois lados
-- **O que o visitante de um telemóvel antigo vê** (aberta, sem número): o PowerVR **não** desiste, porque a
-  cadência se cumpre; baixar a fasquia para «menos de 40 quadros/s → imagem» é uma decisão de produto, com
-  os números do R14 na mão
-- **Um fundo 360º em vídeo**: a capacidade **já existe** (`kind: "video"` anima com
-  `THREE.VideoTexture`), mas nenhum mundo a usa — falta o asset, não o código
+- **O shader nos telemóveis antigos** (aberta): o autor pôs de fora **tirar o shader** a quem tem um
+  aparelho fraco — é o fundo da obra —, e a alternativa testa-se com `?pr=<n>`, que **prende o pixelRatio**
+  e mede o shader a uma nitidez fixa (`?ensaio=1&pr=1` contra `?ensaio=1&pr=2.63`, com a fase da imagem
+  como controlo térmico). Se os quadros subirem com `pr=1`, paga-se em nitidez e a escada desce mais
+  depressa; se não subirem, o caminho é uma variante **leve** do mesmo shader. Guia, bloco 7.11
 
 Fora da Fase 7, e sem data:
 
 - **As baterias arquivadas por omissão**: hoje `node tools/regression/all.mjs` corre as cinco que
-  decidem uma alteração e deixa as dezanove da Fase 4/5/7/8 atrás de `--full`, porque cada uma abre um
-  Chrome; juntá-las num só browser (uma sessão, dezanove medições) poria as **24** em minutos
+  decidem uma alteração e deixa as vinte da Fase 4/5/7/8 atrás de `--full`, porque cada uma abre um
+  Chrome; juntá-las num só browser (uma sessão, vinte medições) poria as **25** em minutos
 
 **Fechado na Fase 7:** o catálogo em duas línguas (**B2**), o que o esquema prometia e a cena não
 construía — **D56** (fundo de cor), **D57** (`link` a navegar), **D58** (modelo GLTF e texto) —, o
