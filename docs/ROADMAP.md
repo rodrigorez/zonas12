@@ -4444,7 +4444,7 @@ da chegada no céu) e um teste que ficou por re-medir por não haver mudança qu
 como instrumento. **R13 nasceu do plano da Fase 4** (§9), medido **antes** de mexer em código: os
 módulos **não** carregam numa página sem a UI da exposição.
 
-### R14 — Fundos esféricos procedurais e governor de resolução (ensaio, 2026-10-23)
+### R14 — Fundos esféricos procedurais e governor de resolução (**FECHADA em 2026-10-27**)
 
 **Plano:** entra na **Fase 7**, bloco **B9** (§9). O que a fecha é o A/B controlado nos três
 aparelhos; a produção foi adotada antes desse registo, por decisão do autor, com a escada do R15 e o
@@ -4571,14 +4571,46 @@ Este aparelho **não substitui** o Adreno 630: é uma GPU de topo, mais forte do
 Fica no registo como o extremo de cima — o ponto onde a pergunta deixa de ser «quanto custa» e passa a ser
 «quanto é que sobra» — e o médio continua em falta.
 
-**Onde o R14 está, depois destes dois** (2026-10-27):
+**Terceiro aparelho (2026-10-27): Qualcomm Adreno 630 — o médio, e o que faltava.** Com as durações por
+omissão e janelas de **45 s** e **44,99 s**:
 
-| aparelho | GPU | estado |
-| --- | --- | --- |
-| telemóvel fraco | PowerVR Rogue GE8320 | **medido** com as **45 s** por omissão: 40,7 → 46,9 quadros/s (+15,2%), pior quadro 231,4 → 66,2 ms, `janelas 44,98 s e 45 s` |
-| telemóvel forte | ARM Mali-G925-Immortalis MC11 | **medido** (duas corridas, 10 s) |
-| computador | NVIDIA RTX 4060 (portátil) | **medido** por mim no build publicado, com as **45 s** por omissão: 164,7 → 164,1 quadros/s (−0,4%), pior quadro 24,4 → 24,2 ms, `janelas 45 s e 45 s` |
-| telemóvel médio | Adreno 630 | **em falta** |
+| fundo | quadros/s | pior quadro | lentos (>2× a mediana) | pixelRatio | cadência | atrasos |
+| --- | --- | --- | --- | --- | --- | --- |
+| `grade-neon` | **52,1** (2343) | **66,7 ms** | 219 | **2,35** (min 2 · máx 2,4 · 4 eventos) | 20/s → 19,9/s | **112** de 1057 (10,6%) |
+| imagem | **54,1** (2433) | **66,7 ms** | 176 | 2,63 (nativo) | — | — |
+
+Aqui o shader custa **3,8%** e o **pior quadro é igual** nos dois lados (66,7 ms) — quer dizer que o
+engasgo que este aparelho tem não é do fundo. A cadência de 20/s cumpre-se com **10,6%** de atrasos, contra
+22,6% no fraco.
+
+### O R14 está fechado (2026-10-27)
+
+Os **três** aparelhos do R14 — e um quarto de bónus — medidos com o **mesmo instrumento**, o `?ensaio=1`
+do D66, com as janelas por omissão e o par dentro da mesma sessão:
+
+| aparelho | GPU | shader | imagem | diferença | pior quadro | atrasos |
+| --- | --- | --- | --- | --- | --- | --- |
+| telemóvel fraco (2020) | PowerVR Rogue GE8320 | **40,7**/s | **46,9**/s | **+15,2%** | 231,4 → 66,2 ms | **22,6%** |
+| telemóvel médio (2019) | Qualcomm Adreno 630 | **52,1**/s | **54,1**/s | **+3,8%** | 66,7 → 66,7 ms | **10,6%** |
+| telemóvel forte (2024) | ARM Mali-G925-Immortalis MC11 | **60,2**/s | **60,2**/s | 0% (vsync) | 16,8 → 16,7 ms | 1,5% |
+| computador | NVIDIA RTX 4060 | **164,7**/s | **164,1**/s | −0,4% | 24,4 → 24,2 ms | 0% |
+
+**O veredicto, e é o que a Fase 7 tinha prometido medir:** o custo do shader é um **gradiente com a GPU**, e
+só o aparelho mais fraco o paga. No médio (Adreno 630) e no forte, o `grade-neon` é indistinguível do
+panorama à resolução que a escada escolhe — no forte ela até **sobe** o pixelRatio para gastar a folga. No
+fraco custa 15,2% dos quadros, o pior quadro é 3,5× maior e um quinto das atualizações chega tarde, mas a
+cadência de 20/s ainda se cumpre **em média** (19,8/s).
+
+A política respondeu como foi desenhada em todos: procurou o teto com passos de 3 s, subiu 20% por três
+passos bons e bissectou depois de falhar (2 → 2,625 → 1,6 → 2,456 conforme o aparelho e o tempo de medida).
+Duas consequências aceites e registadas: a **procura não termina em 45 s** num aparelho fraco (4 eventos,
+estado ainda a mudar) e o `pausada`/`lentos` do relatório existem precisamente para isso não passar por
+estável sem se ver.
+
+**O que fica de pé, e porquê:** o shader continua o **fundo de produção** das três salas — foi a decisão do
+autor (D-decisão de 2026-10-24) e o A/B confirma-a em três dos quatro aparelhos; o `?shader=0` continua a
+ser o escape por sala, e no fraco passa a ser a escolha razoável. A rede que faltava (queda automática num
+aparelho fraco) fica como pendência **nova**, decidida com estes números na mão — ver **R18**.
 
 O que falta é o **Adreno 630** (o médio do ensaio de 2026-10-23), que o autor tem. Com o fraco e o forte
 medidos, o médio é o que decide a zona cinzenta: no fraco o shader custa **15,2%** dos quadros, um quinto
@@ -4713,7 +4745,7 @@ tempo do quadro total e o desenho CPU p5.js, não tempo GPU isolado. Só depois 
 resultados e os orçamentos de imagem/shader decidir se o modelo de produção aceitará dimensões
 `kind: "shader"` e como o editor as configurará.
 
-### R15 — Política adaptativa segura para fundos shader (proposta, 2026-10-23)
+### R15 — Política adaptativa segura para fundos shader (**FECHADA em 2026-10-27**)
 
 **Plano:** entra na **Fase 7**, bloco **B9** (§9), **depois** do **R14** — a escada 20 → 15 FPS →
 estático só vale com o A/B medido, e entra atrás de feature flag.
@@ -4839,6 +4871,28 @@ desvanecimento (D44): o que a espera muda é o instante, não a forma.
 fotogramas escuros **antes** e **depois** da mudança, com a mesma costura (0,31 / 0,32 / 0,30 / 0,41
 / 0,17 / 0,39) e as **12 de 12** verificações a passar. A correção fica em vigor — é a que a
 pendência pedia —, e o número continua a ser medido pelo `seam.mjs` em cada travessia.
+
+### R18 — Queda automática para a imagem num aparelho fraco (aberta, 2026-10-27)
+
+**A pergunta que o R14 deixou aberta.** O A/B fechado mede o gradiente: no telemóvel fraco o shader custa
+**15,2%** dos quadros, o pior quadro é **3,5×** maior (231,4 ms contra 66,2 ms) e **22,6%** das atualizações
+da cadência chegam tarde; no médio custa 3,8% com o pior quadro igual; no forte e no computador não custa
+nada. A produção ficou como estava — shader por omissão, `?shader=0` como escape manual —, o que deixa o
+visitante do aparelho fraco a pagar sem saber que há alternativa.
+
+**O que está em cima da mesa, e o que cada opção custa:**
+
+| opção | como | custa |
+| --- | --- | --- |
+| A. ficar como está | shader por omissão, `?shader=0` para quem souber | nada a fazer; o fraco fica pior servido |
+| B. queda automática | ao fim de N janelas más consecutivas, o fundo troca para o `fallbackAsset` (o panorama já está na memória) em vez de só descer resolução | um estado novo na política; a escada do R15 passaria a ter dois recursos em vez de um |
+| C. por sala, no dado | uma sala declara `kind: "image"` e as outras ficam com shader | não resolve o aparelho, só a sala — e o problema é do aparelho |
+
+**O que já se sabe para decidir:** a escada **não** chega a «estático» no fraco (a cadência de 20/s cumpre-se
+em média), portanto a rede que existe não dispara; e o que se perde nesse aparelho não é o fundo, é a
+fluidez com que se olha em volta (o pior quadro de 231 ms é um engasgo que se sente). A opção **B** é a única
+que responde à pergunta do visitante — mas muda o que a política faz, e por isso é decisão do autor, com
+estes números na mão.
 
 **R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
 apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o

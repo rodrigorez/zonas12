@@ -213,7 +213,8 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 
 > **Atualização (2026-10-24, Fase 7 — B9, o rename e a produção):** depois da v0.0.11, o **B9** pôs o
 > fundo shader na exposição e o autor **adotou-o como produção** (o ensaio passou no telemóvel fraco e
-> no desktop; o A/B nos três aparelhos está por medir — R14/R15 abertos), com `?shader=0` como
+> no desktop; o A/B nos três aparelhos fechou a **2026-10-27** — ver «Critério antes de produção»), com
+> `?shader=0` como
 > escape para a imagem de reserva. As salas passaram a chamar-se **`scene1`** (a cidade),
 > **`scene2`** (a praia) e **`scene3`** (o céu): o nome de conteúdo e as imagens não mudaram, o
 > endereço é que sim. Os números desta secção são os da **v0.0.11**; o que o B9 mediu está na §9 do
@@ -425,12 +426,14 @@ GPU durante a renderização. O instrumento [`teste/bench.js`](teste/bench.js) c
 com p5.js, mas não inclui um cenário shader equivalente; por isso, os números acima são evidência
 prática em aparelhos reais, não um A/B controlado imagem × shader na mesma sessão.
 
-**Decisão atual (2026-10-24):** o shader é a produção; a imagem é a reserva. A medição indica que
-shaders GLSL são muito mais adequados que p5.js para animação neste caso, mas não prova que todo
-shader será mais rápido que toda imagem: a complexidade do shader e a resolução continuam a
-importar — é por isso que o **validador** mede cada shader antes de ele poder ser nomeado, e que a
-**escada** do R15 (pixelRatio → 15 fps → quadro parado) fica como rede. Falta a comparação
-controlada imagem × shader no mesmo aparelho, cena, câmera, pixelRatio e duração (**R14**).
+**Decisão atual (2026-10-24, confirmada pelo A/B a 2026-10-27):** o shader é a produção; a imagem é a
+reserva. A medição indica que shaders GLSL são muito mais adequados que p5.js para animação neste caso,
+mas não prova que todo shader será mais rápido que toda imagem: a complexidade do shader e a resolução
+continuam a importar — é por isso que o **validador** mede cada shader antes de ele poder ser nomeado, e
+que a **escada** do R15 (pixelRatio → 15 fps → quadro parado) fica como rede. A comparação controlada
+imagem × shader no mesmo aparelho, cena, câmera, pixelRatio e duração (**R14**) foi feita e está na
+tabela de «Critério antes de produção»: o custo é um gradiente com a GPU, e só o aparelho mais fraco o
+paga.
 
 #### Política do fundo shader em produção
 
@@ -459,9 +462,10 @@ nomear só o `id`, nunca GLSL.
 
 O instrumento da política é `node tools/regression/shader.mjs` (entra em `all.mjs --full`): mede a
 escada sem GPU, a taxa entregue (≤ 20 atualizações/s), o `?shader=0`, o `prefers-reduced-motion`, as
-três salas de produção e o painel do editor. O **A/B controlado nos três aparelhos** continua por
-registar — é a medição que falta para o R14/R15, e a decisão de produção está tomada com o que foi
-observado (funciona no telemóvel fraco e no desktop), não com o A/B.
+três salas de produção e o painel do editor. O **A/B controlado nos três aparelhos** está registado
+desde **2026-10-27** (§ «Critério antes de produção», com a tabela dos quatro aparelhos): no médio e no
+forte o shader é indistinguível do panorama, e no fraco custa 15,2% dos quadros — a queda automática
+para a imagem nesse caso ficou como **R18**.
 
 A integração deve ser gradual e manter o panorama de imagem como fallback explícito de cada fundo.
 O shader começa num quadro estático (`uTime` fixo), mede a cena e só então tenta animar; “estático”
@@ -533,11 +537,21 @@ impedir o fallback ou a inicialização.
 
 **Critério antes de produção:** o shader está em produção desde 2026-10-24 (decisão do autor), com
 a escada do R15 como rede: `?shader=0` mostra a imagem de reserva, e o aparelho desce o pixelRatio,
-depois para 15 FPS e depois congela o quadro. O **A/B controlado** foi medido em **dois** dos três
-aparelhos, no build publicado e com a sonda — no telemóvel fraco o panorama desenha 35% mais pixels e
-ainda vai 11% mais depressa que o `grade-neon` (50,4 contra 45,5 quadros/s), e no desktop não há
-diferença que se meça. Falta o **terceiro aparelho** para o registo ficar completo; sem ele, o R14/R15
-continuam abertos na documentação, com os números que já existem.
+depois para 15 FPS e depois congela o quadro. O **A/B controlado** foi **fechado em 2026-10-27** nos
+três aparelhos, com o mesmo instrumento (`?ensaio=1`) e as duas fases na mesma sessão:
+
+| aparelho | GPU | shader | imagem | diferença | pior quadro |
+| --- | --- | --- | --- | --- | --- |
+| telemóvel fraco | PowerVR Rogue GE8320 | 40,7/s | 46,9/s | **+15,2%** | 231,4 → 66,2 ms |
+| telemóvel médio | Qualcomm Adreno 630 | 52,1/s | 54,1/s | **+3,8%** | 66,7 → 66,7 ms |
+| computador | NVIDIA RTX 4060 | 164,7/s | 164,1/s | −0,4% | 24,4 → 24,2 ms |
+
+O custo do shader é um **gradiente com a GPU** e só o aparelho mais fraco o paga: aí são 15,2% dos
+quadros e um pior quadro 3,5× maior, com 22,6% das atualizações da cadência atrasadas. No médio o pior
+quadro é **igual** ao do panorama; no desktop não há diferença que se meça. Um quarto aparelho
+(Mali-G925, de 2024) fica preso nos 60/s do ecrã dos dois lados, ou seja o shader é grátis onde há
+folga. A queda automática para a imagem num aparelho fraco ficou em aberto como **R18**, para ser
+decidida com estes números.
 
 #### Comparativo controlado: imagem, shader e p5.js
 
@@ -748,8 +762,9 @@ passou a ser congelado antes de se medir o corte, porque o quadro da ponte já e
 shaders parados — comparar com um destino a animar media o tempo que passou, não o corte. De
 **0,34–0,56** para **0,41** em duas corridas seguidas.
 
-**O que fica aberto:** o **R14**/**R15**, o A/B do shader nos **três** aparelhos — há dois medidos
-(o telemóvel fraco e o desktop) e falta o terceiro.
+**O que ficou aberto nesta fase:** o **R14**/**R15**, que fechou depois, a **2026-10-27**, com o A/B do
+shader medido nos **três** aparelhos (mais um quarto) e a queda automática num aparelho fraco em aberto
+como **R18**.
 
 **A Fase 8 — a ficha de cada obra (2026-10-25).** O autor descreveu a página de obra que queria e deu
 o exemplo das Zonas 11; ficou decidido em **D60**: **uma página estática por obra**, gerada pela
@@ -1784,13 +1799,14 @@ O que se lê no painel da sonda, na linha `giroscópio`: `ligado · tremor 0.04`
 ## Melhorias Planejadas
 
 A **Fase 7** (§9 de [docs/ROADMAP.md](docs/ROADMAP.md)) fechou em **2026-10-25**: os dez blocos estão
-feitos e cada um mediu o seu número. O que continua aberto é o **R14**/**R15** — o A/B do shader nos
-**três** aparelhos, do qual existem dois.
+feitos e cada um mediu o seu número. O **R14**/**R15** (o A/B do shader nos três aparelhos) fechou em
+**2026-10-27**, com os três medidos e um quarto de bónus.
 
-- **Fundos shader** (**R14**/**R15**, bloco **B9**): em produção desde 2026-10-24 — shader por
-  omissão, `?shader=0` para a imagem de reserva, validador em `tools/shader/` e a política
-  20 → 15 FPS → estático; falta o **A/B controlado nos três aparelhos** — com `?ensaio=1` (§8b) é
-  **um toque por aparelho**
+- **Fundos shader** (**R14**/**R15**, bloco **B9**): **fechado** — shader em produção desde 2026-10-24,
+  `?shader=0` para a imagem de reserva, validador em `tools/shader/`, política 20 → 15 FPS → estático, e
+  o A/B medido nos três aparelhos (§ «Critério antes de produção»)
+- **Queda automática para a imagem num aparelho fraco** (**R18**, aberta): o aparelho mais fraco paga 15,2%
+  dos quadros pelo shader; trocar de fundo em vez de só baixar resolução é a opção em cima da mesa
 - **Um fundo 360º em vídeo**: a capacidade **já existe** (`kind: "video"` anima com
   `THREE.VideoTexture`), mas nenhum mundo a usa — falta o asset, não o código
 
