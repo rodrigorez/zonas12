@@ -128,6 +128,51 @@ function policyChecks() {
   check.check('a escada não volta a subir sozinha', badStatus.events.every((event) => event.what !== 'subiu pr'),
     JSON.stringify(badStatus.events.map((event) => event.what)));
 
+  // O aparelho do R18, medido no PowerVR: 40 quadros/s a 2,63 e 60 a 1,0. A escada tem de descer a
+  // resolução até os quadros voltarem e **parar lá** — mantendo a cadência de 20/s, que é o que a
+  // produção promete. Antes do chão de quadros, este mesmo aparelho subia a resolução e ficava a 40/s
+  // com a cadência a falhar um quinto das vezes.
+  let fracoAtual = 2;
+  const fracoSets = [];
+  const fracoResolution = {
+    min: 1,
+    max: 2.625,
+    get: () => fracoAtual,
+    set: (value) => { fracoAtual = +value.toFixed(3); fracoSets.push(fracoAtual); }
+  };
+  const fracoClock = { now: 0 };
+  const fraco = createPolicy({ resolution: fracoResolution, clock: () => fracoClock.now });
+  let fracoNow = 0;
+  while (fracoNow <= 90000) {
+    fracoClock.now = fracoNow;
+    fraco.frame(fracoNow);
+    fracoNow += 1000 / (fracoAtual > 1.8 ? 40 : 60);
+  }
+  const fracoStatus = fraco.status();
+  check.check('num aparelho que só faz 40 quadros/s acima de 1,8, a escada desce até os quadros voltarem',
+    fracoAtual <= 1.8 && fracoStatus.fps >= SHADER_POLICY.minFps,
+    'pixelRatio ' + fracoAtual + ' · ' + JSON.stringify(fracoSets) + ' · fps ' + fracoStatus.fps);
+  check.check('e mantém a cadência de 20/s (não sacrifica a animação à nitidez)',
+    fracoStatus.cadence === SHADER_POLICY.targetFps && fracoStatus.gaveUp === false,
+    JSON.stringify({ cadence: fracoStatus.cadence, gaveUp: fracoStatus.gaveUp }));
+  check.check('não desce abaixo do necessário (pára onde os quadros voltam, não no piso)',
+    fracoAtual > 1, String(fracoAtual));
+  check.check('e a escada cala-se depois de encontrar o valor (sem rastejar mudando a nitidez)',
+    fracoStatus.events.filter((event) => /pr/.test(event.what)).length <= 7,
+    fracoStatus.events.map((event) => event.what + ' ' + event.pixelRatio).join(' · '));
+
+  // Um aparelho bom nunca é penalizado pelo chão de quadros: a 60 Hz não há um único evento.
+  const floorSafeClock = { now: 0 };
+  const floorSafe = createPolicy({ resolution: fakeResolution(2), clock: () => floorSafeClock.now });
+  let floorSafeNow = 0;
+  while (floorSafeNow <= 30000) {
+    floorSafeClock.now = floorSafeNow;
+    floorSafe.frame(floorSafeNow);
+    floorSafeNow += 1000 / 60;
+  }
+  check.check('o chão de quadros não toca num aparelho que já os faz',
+    floorSafe.status().events.every((event) => !/desceu pr/.test(event.what)),
+    JSON.stringify(floorSafe.status().events.map((event) => event.what)));
   // `prefers-reduced-motion`: estático desde o primeiro quadro.
   const reducedClock = { now: 0 };
   const reduced = createPolicy({ clock: () => reducedClock.now, reducedMotion: true });

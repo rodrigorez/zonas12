@@ -25,6 +25,11 @@ export const SHADER_POLICY = {
   warmupMs: 3000,          // still frame first: this is the baseline, before any animation
   stepMs: 3000,            // one decision per step, after a full window of samples
   severeMs: 90,            // a frame time this long is degradation on its own (one step, no waiting)
+  // O chão de quadros (2026-10-27, medido no PowerVR): abaixo disso a cena não se olha em volta com
+  // conforto. A 2,63 o mesmo shader desenhava 40,8 quadros/s com a cadência congelada e 134 atrasos; a
+  // 1,0 desenhava 60,2 com 4 atrasos em 1047. Como o custo cresce com o quadrado do pixelRatio, o
+  // degrau da resolução é o que devolve os quadros — e é preferível a perder nitidez do que a obra.
+  minFps: 45,
   deliveredFraction: 0.85, // below this share of the cadence, the scene did not sustain it
   lateToleranceMs: 20,     // an update later than its deadline by this much is a late update
   lateFraction: 0.25,      // more late updates than this in a step is degradation
@@ -64,8 +69,13 @@ export function createPolicy(options) {
   // whole window, `high` the lowest that failed. While `high` is infinite the ceiling is unknown.
   let low = ratio;
   let high = Infinity;
+  // A procura acabou: o valor ficou no último que aguentou uma janela inteira (ver `step`).
+  let settled = false;
   let hidden = false;
   let frozen = settings.reducedMotion === true;
+  // O último número que a política leu do próprio ecrã (quadros/s da mediana da janela): é o que a
+  // sonda mostra e o que decide o degrau da resolução.
+  let measuredFps = null;
   // A troca para a imagem só acontece uma vez por página: um fundo que vai e volta seria pior do que
   // qualquer um dos dois lados.
   let gaveUp = false;
@@ -103,7 +113,14 @@ export function createPolicy(options) {
   function percentiles() {
     if (frameTimes.length < 12) return null;
     const sorted = frameTimes.slice().sort((a, b) => a - b);
-    return { p95: sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))] };
+    const p95 = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))];
+    // A mediana, em quadros por segundo: é o que se sente ao olhar em volta, e é o sinal que faltava.
+    // Antes disto a escada só olhava para o p95 (> 90 ms) e para a cadência, e por isso um aparelho a
+    // desenhar 40 quadros/s com 22% de atualizações atrasadas — abaixo do limite de 25% — passava por
+    // bom e até **subia** a resolução. Medido no PowerVR: a 2,63 dava 40,8 quadros/s com a cadência
+    // congelada, e a 1,0 dava **60,2** com 4 atrasos em 1047.
+    const mediana = sorted[Math.floor(sorted.length / 2)];
+    return { p95: p95, fps: mediana > 0 ? 1000 / mediana : 0 };
   }
 
   function resetStep() {
@@ -120,12 +137,19 @@ export function createPolicy(options) {
     const share = expected === 0 ? 0 : delivered / (defaults.stepMs / 1000) / expected;
     const lateShare = delivered ? late / delivered : 0;
     const severe = stats.p95 > defaults.severeMs;
-    const bad = severe || share < defaults.deliveredFraction || lateShare > defaults.lateFraction;
+    // O chão de quadros (R18, medido no PowerVR): abaixo de `minFps` a cena não se olha em volta com
+    // conforto, mesmo que a cadência de 20/s se cumpra — e a cadência é a média, não a sensação. Só
+    // se aplica enquanto houver resolução para baixar: num aparelho já no piso, a resposta é a
+    // cadência e, por último, a imagem.
+    const slow = stats.fps > 0 && stats.fps < defaults.minFps && Boolean(resolution) &&
+      ratio > resolution.min + 0.001;
+    const bad = severe || slow || share < defaults.deliveredFraction || lateShare > defaults.lateFraction;
+    measuredFps = +stats.fps.toFixed(1);
 
     if (!bad) {
       badSteps = 0;
       goodSteps += 1;
-      if (resolution && goodSteps >= defaults.goodToStepUp) {
+      if (resolution && goodSteps >= defaults.goodToStepUp && !settled) {
         low = Math.max(low, ratio);
         let next = null;
         if (Number.isFinite(high)) {
@@ -139,7 +163,7 @@ export function createPolicy(options) {
           ratio = next;
           resolution.set(ratio);
           goodSteps = 0;
-          note('subiu pr', { pixelRatio: +ratio.toFixed(3), p95: +stats.p95.toFixed(1) });
+          note('subiu pr', { pixelRatio: +ratio.toFixed(3), p95: +stats.p95.toFixed(1), fps: +stats.fps.toFixed(1) });
         }
       }
       return;
@@ -156,12 +180,20 @@ export function createPolicy(options) {
         // The value we trusted failed: trust moves a step down, and the search restarts from there.
         low = Math.max(resolution.min, ratio * (1 - defaults.ratioStep));
         ratio = low;
+      } else if (high - low <= low * defaults.bisectionStop * 4) {
+        // O intervalo já é pequeno: em vez de continuar a bissectar — cada passo é uma mudança de
+        // nitidez visível e custa duas janelas —, fica no **valor que aguentou**. Medido no aparelho
+        // modelado do R18: sem isto a escada rastejava por 1,85 → 1,825 → 1,813 → … (12 mudanças) até
+        // cair num valor que nunca tinha sido provado; com isto assenta em 5 e no valor que já se viu
+        // bom.
+        ratio = low;
+        settled = true;
       } else {
         // A value that held is below and this one failed: the ceiling is in between.
         ratio = clamp((low + high) / 2, resolution.min, resolution.max);
       }
       resolution.set(ratio);
-      note('desceu pr', { pixelRatio: +ratio.toFixed(3), p95: +stats.p95.toFixed(1) });
+      note('desceu pr', { pixelRatio: +ratio.toFixed(3), p95: +stats.p95.toFixed(1), fps: +stats.fps.toFixed(1) });
       return;
     }
     if (cadence === defaults.targetFps) {
@@ -298,6 +330,9 @@ export function createPolicy(options) {
         // Se o fundo já trocou para a imagem (R18): a sonda e o ensaio leem isto em vez de adivinhar
         // pelo modo, que também fica 'static' quando congela.
         gaveUp: gaveUp,
+        // O que a política mediu do ecrã (quadros/s da mediana), e o chão que ela persegue.
+        fps: measuredFps,
+        minFps: defaults.minFps,
         // O `uTime` que o fundo está a desenhar: é o que a ponte leva para a página que chega (D53).
         time: +animationTime.toFixed(3),
         events: events.slice(-20)

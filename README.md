@@ -462,10 +462,12 @@ nomear só o `id`, nunca GLSL.
 
 O instrumento da política é `node tools/regression/shader.mjs` (entra em `all.mjs --full`): mede a
 escada sem GPU, a taxa entregue (≤ 20 atualizações/s), o `?shader=0`, o `prefers-reduced-motion`, as
-três salas de produção e o painel do editor. O **A/B controlado nos três aparelhos** está registado
-desde **2026-10-27** (§ «Critério antes de produção», com a tabela dos quatro aparelhos): no médio e no
-forte o shader é indistinguível do panorama, e no fraco custa 15,2% dos quadros — a queda automática
-para a imagem nesse caso está feita e medida (**R18**).
+três salas de produção e o painel do editor. A escada persegue dois alvos desde 2026-10-27: a cadência
+de **20/s** e um **chão de 45 quadros/s** (`minFps`) — abaixo dele, e enquanto houver resolução para
+baixar, a janela conta como má, porque é isso que se sente ao olhar em volta. O **A/B controlado nos três
+aparelhos** está registado desde **2026-10-27** (§ «Critério antes de produção», com a tabela dos quatro
+aparelhos): no médio e no forte o shader é indistinguível do panorama, e no fraco custa 15,2% dos quadros
+— resolvido em **nitidez** e não em quadros, o que manteve o shader em todas as salas (**R18**).
 
 A integração deve ser gradual e manter o panorama de imagem como fallback explícito de cada fundo.
 O shader começa num quadro estático (`uTime` fixo), mede a cena e só então tenta animar; “estático”
@@ -553,6 +555,15 @@ quadro é **igual** ao do panorama; no desktop não há diferença que se meça.
 folga. A queda automática para a imagem num aparelho que não sustente o shader está feita (**R18**): o
 último degrau da escada troca o fundo em vez de congelar, com `?queda=0` para desligar e `?queda=sempre`
 para ver o resultado.
+
+**E o shader paga-se em nitidez, não em quadros** (medido a 2026-10-27 no telemóvel fraco, com o
+pixelRatio preso por `?pr=`): o **mesmo shader**, no mesmo aparelho e na mesma sala, desenha **60,2**
+quadros/s a `pr=1` (cadência cumprida, **4** atrasos em 1047) e **40,8** a `pr=2,63` — onde nem a
+cadência se sustenta e a escada congela. E não é calor: na corrida do nativo a fase da **imagem** deu
+59,9 quadros/s, portanto o aparelho estava saudável. É por isso que o fundo continua a ser o **shader em
+todas as salas**: o que se gasta é resolução. A escada passou a perseguir um **chão de 45 quadros/s**
+(`SHADER_POLICY.minFps`), que é o que se sente ao olhar em volta, e assenta no último pixelRatio que
+provou aguentar — em vez de rastejar mudando a nitidez.
 
 #### Comparativo controlado: imagem, shader e p5.js
 
@@ -1808,11 +1819,11 @@ feitos e cada um mediu o seu número. O **R14**/**R15** (o A/B do shader nos tr�
   o A/B medido nos três aparelhos (§ «Critério antes de produção»)
 - **Queda automática para a imagem** (**R18**): **fechada** — o último degrau da escada troca o fundo pela
   imagem em vez de congelar; `?queda=0` desliga, `?queda=sempre` força, e `queda.mjs` mede os dois lados
-- **O shader nos telemóveis antigos** (aberta): o autor pôs de fora **tirar o shader** a quem tem um
-  aparelho fraco — é o fundo da obra —, e a alternativa testa-se com `?pr=<n>`, que **prende o pixelRatio**
-  e mede o shader a uma nitidez fixa (`?ensaio=1&pr=1` contra `?ensaio=1&pr=2.63`, com a fase da imagem
-  como controlo térmico). Se os quadros subirem com `pr=1`, paga-se em nitidez e a escada desce mais
-  depressa; se não subirem, o caminho é uma variante **leve** do mesmo shader. Guia, bloco 7.11
+- **O shader nos telemóveis antigos**: **resolvido** — o autor pôs de fora **tirar o shader** a quem tem
+  um aparelho fraco (é o fundo da obra), e a experiência com `?pr=<n>` mostrou que não é preciso: o mesmo
+  shader desenha **60,2** quadros/s a `pr=1` e **40,8** a `pr=2,63` no mesmo aparelho, com a fase da
+  imagem a 59,9 a provar que não era calor. O shader fica em todas as salas e a escada passou a perseguir
+  um **chão de 45 quadros/s**, gastando resolução (ver «Critério antes de produção»)
 
 Fora da Fase 7, e sem data:
 

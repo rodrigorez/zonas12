@@ -4915,20 +4915,34 @@ ratio preso é uma medição, e uma troca de fundo a meio mediria outra coisa). 
 shader fica; `?pr=2` dá 2; sem o parâmetro, tudo como antes. O ensaio A/B com `?pr=` mede o **shader a uma
 nitidez fixa** contra a imagem, e a fase 2 serve de controlo térmico entre corridas.
 
-**A experiência que falta fazer (no telemóvel fraco, 6 minutos):** `?ensaio=1&pr=1`, depois `?ensaio=1&pr=2.63`,
-depois outra vez `?ensaio=1&pr=1` — ver o guia, bloco 7.11. Duas leituras possíveis, e cada uma tem resposta:
+**A experiência, feita (2026-10-27, PowerVR, três corridas de 45 s):** as duas janelas bateram nas três
+(44,99/45, 45/45), e o resultado não deixa dúvida —
 
-- **os quadros sobem com `pr=1`** → o shader paga-se em nitidez: a resposta é a escada descer mais depressa
-  (mais um degrau de política), e **o fundo mantém-se o shader em todas as salas**;
-- **os quadros não sobem** → o custo é o *fragment* por pixel e a resolução não o resolve: a resposta é uma
-  **variante leve do mesmo shader** (menos oitavas, menos passos) para os aparelhos fracos — a mesma linguagem,
-  mais barata. O validador de `tools/shader/` já mede cada variante antes de ela poder ser nomeada.
-**O que esta rede é e o que não é — dito com franqueza:** é uma **rede de segurança**, não uma optimização do
-aparelho fraco. O PowerVR real **não** desiste, porque a política lhe cumpre a cadência e ele passa os
-critérios; o que ele perde é fluidez ao olhar em volta, e isso a escada não mede. Baixar a fasquia para «menos
-de 40 quadros/s sustentados → imagem» obrigaria a decidir **o que o visitante de um telefone antigo vê**, e
-essa é a pergunta seguinte (registada, com os números do R14 na mão). O `?shader=0` continua a ser a resposta
-manual, e a bateria `image-bridge`/`shader` garante que nada disto toca no caminho de um aparelho bom.
+| `?pr=` | quadros/s no shader | pior quadro | cadência | atrasos | eventos |
+| --- | --- | --- | --- | --- | --- |
+| **1** | **60,2** (2710) | 33,1 ms | 20/s → 19,9/s | **4** de 1047 | 0 |
+| 2,63 (nativo) | **40,8** (1837) | 49,7 ms | **0/s · congelou** | **134** de 496 | 2 |
+
+O mesmo shader, o mesmo aparelho, a mesma sala: a **1,0 desenha 60,2 quadros/s** — o teto do ecrã — com a
+cadência cumprida e **4** atrasos em 1047; a **2,63 desenha 40,8** e nem a cadência se sustenta (a escada
+congelou). E não é calor: na corrida de 2,63 a fase da **imagem** deu **59,9** quadros/s, ou seja o aparelho
+estava saudável e o que não cabia era o shader àquela resolução. **Resposta: o shader paga-se em nitidez, não
+em quadros** — e por isso o fundo continua a ser o shader em todas as salas, como o autor decidiu.
+
+**O que a experiência também revelou: a escada estava a olhar para o sinal errado.** Só via o p95 (> 90 ms) e
+a cadência, e por isso este aparelho — 40,8 quadros/s com **22,6%** de atualizações atrasadas, logo abaixo do
+limite de 25% — passava por bom e **subia** a resolução até 2,456. Duas correções, com o número que as pediu:
+
+1. **um chão de quadros** (`SHADER_POLICY.minFps = 45`): abaixo dele, e enquanto houver resolução para
+   baixar, a janela conta como má. É a medida do que se sente ao olhar em volta, que a cadência (uma média)
+   não via;
+2. **a escada assenta num valor provado** em vez de rastejar: quando o intervalo entre «aguentou» e «falhou»
+   já é pequeno, fica no que aguentou e cala-se. No aparelho modelado do R18 isso passou de **12** mudanças
+   de nitidez (`1,85 → 1,825 → 1,813 → …`) para **4** (`1,6 → 1,8 → 1,9 → 1,8`), acabando nos 60 quadros/s.
+
+Medido: `shader.mjs` **18 de 18** (eram 17, com três verificações novas para o chão de quadros e a de não
+rastejar) e a procura do teto ficou em **4 eventos**, contra os ≤ 6 que a bateria já exigia. Nos aparelhos
+bons nada muda: o chão de quadros só age com resolução para baixar, e a 60 Hz não há um único evento.
 
 **R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
 apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o
