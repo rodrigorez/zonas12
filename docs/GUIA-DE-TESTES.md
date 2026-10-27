@@ -133,9 +133,31 @@ Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos
 Este bloco não é sobre a ficha: é o número que falta para fechar o **R14** (o fundo shader). A página
 mede **sozinha** os dois lados do par — o shader e a imagem — e mostra um bloco só, para copiar.
 
+### 7.0 Antes de começar (a preparação é metade do resultado)
+
+O mesmo endereço tem de ser medido nos três aparelhos: **telemóvel fraco** (o PowerVR), **telemóvel do
+Adreno 630** e **computador**. Tudo o resto tem de ser igual, senão compara-se o aparelho e não o shader:
+
+| O quê | Porquê |
+| --- | --- |
+| A **mesma sala**: `scene1` (Cidade) | o custo do shader depende do que está na sala |
+| O aparelho **frio** — fora da carga, sem outras apps abertas | um telemóvel quente baixa a cadência do ecrã e estraga o segundo lado |
+| **Ecrã não pode apagar**: pôr o tempo de ecrã em 5 min ou mais | o ecrã a apagar pausa a fase (aparece `pausada`) |
+| **Modo de poupança de energia desligado** | baixa a cadência do ecrã |
+| **Não trocar de aba** e não mexer no telemóvel | a fase pausa e o ensaio demora mais |
+| Mesma **orientação** (vertical) nos dois telemóveis | a resolução medida é a do ecrã |
+| Mesmo estado de **`prefers-reduced-motion`** nos três | com «reduzir movimento» ligado o shader fica estático e o A/B compararia outra coisa |
+| Abrir numa **aba anónima** (privada) | garante que não está a correr um `ensaio.js` velho em cache |
+
+A aba anónima é o atalho que evita o problema mais chato: depois de uma publicação nova, o browser do
+telemóvel pode continuar a usar o JavaScript antigo. Em anónima não há cache, e a sessão do ensaio (a
+ligação entre as duas fases) continua a funcionar dentro da mesma aba.
+
+### O ensaio, passo a passo (2 minutos por aparelho)
+
 | # | O que fazer | O que se espera |
 | --- | --- | --- |
-| 7.1 | Abrir no **computador**: `https://rodrigorez.github.io/zonas12/scene1/?ensaio=1` | Um painel preto no canto: **«ensaio · fase 1/2 (shader) · a aquecer · 55 s»** a descer de segundo a segundo (e depois **«a medir»**). **Não tocar** na página e **não trocar de aba** | 
+| 7.1 | Abrir no **computador** — e antes do ensaio grande, fazer o curto de **7.6** para confirmar que o build é o novo: `https://rodrigorez.github.io/zonas12/scene1/?ensaio=1` | Um painel preto no canto: **«ensaio · fase 1/2 (shader) · a aquecer · 55 s»** a descer de segundo a segundo (e depois **«a medir»**). **Não tocar** na página e **não trocar de aba** | 
 | 7.2 | Esperar (~2 minutos, sem trocar de aba nem bloquear o ecrã) | A página **recarrega sozinha** (a fase 2, imagem) e o contador volta a descer. Depois aparece o bloco com **«--- fase 1 · shader ---»** e **«--- fase 2 · imagem ---»** |
 | 7.3 | Ler a última parte do bloco | **«--- comparação (imagem vs shader) ---»** com `quadros … /s → … /s`, `pior quadro … ms → … ms` e `janelas … s e … s` |
 | 7.4 | Tocar em **Copiar** | O botão diz **«copiado»** e o bloco fica no teclado. Colá-lo aqui é o resultado do teste |
@@ -144,18 +166,30 @@ mede **sozinha** os dois lados do par — o shader e a imagem — e mostra um bl
 | 7.7 | No painel, ler a linha **`pedido`** antes de tudo | Tem de dizer **`45 s de medida · 10 s de aquecimento`**. Se disser `0 s`, ou aparecer `null/s` / `NaN/s` nos quadros, o build está velho: recarregar com `Ctrl+Shift+R` (ou limpar a cache no telemóvel) |
 | 7.8 | No fim, ler a linha **`janela`** de cada fase | **`45,0x s (desvio +0,0x s)`** — a janela que passou, não a que se pediu. As duas têm de dar o mesmo (a comparação mostra `janelas 45.00 s e 45.00 s`); se trouxer **`pausada … s`**, a aba esteve escondida nesse tempo e a medida foi pausada (é de propósito) |
 
-O que **conta** no resultado: os **quadros/s** de cada lado e o **pior quadro**. Num aparelho rápido os
-dois lados empatam (o browser desenha ao ritmo do ecrã) — isso **não** é falha, é o resultado. Num
-aparelho fraco vê-se a diferença.
+O que **conta** no resultado: os **quadros/s** de cada lado e o **pior quadro**, medidos na **mesma
+janela** (a linha `janelas` é o que prova que o par é comparável). Num aparelho rápido os dois lados
+empatam (o browser desenha ao ritmo do ecrã) — isso **não** é falha, é o resultado desse aparelho; o
+número que discrimina passa a ser o pior quadro.
 
-Cuidados que mudam o número: o aparelho **frio** (não a carregar e sem outras apps abertas), a mesma
-**sala**, o ecrã **ligado** todo o tempo, e o mesmo estado de `prefers-reduced-motion` se o sistema o
-tiver. Trocar de aba **não estraga** o ensaio — a fase pausa e o tempo escondido vai declarado como
-`pausada` — mas demora mais, e um telemóvel que fica com o ecrã a apagar-se pausa da mesma maneira.
+### 7.9 O que se envia, por aparelho
 
-Uma nota sobre os números: o que se compara são os **quadros por segundo de cada lado**, medidos na
-**mesma janela** (a linha `janelas` prova-o). Se as duas janelas não baterem, o par não é comparável e o
-relatório di-lo, em vez de apresentar uma diferença que é só do tempo.
+Ao fim de cada aparelho, tocar em **Copiar** e mandar o bloco para si mesmo (WhatsApp para «mensagens a
+mim», nota, e-mail) — ou fotografar o ecrã, que serve. São precisos os **três** blocos; três blocos do
+mesmo aparelho não fecham o R14, porque o que a pendência pede é o par medido em três hardwares.
+
+Se o **Copiar** não funcionar, a primeira linha do painel (`A/B 45.0 → 48.2 quadros/s · Android 10 ·
+Chrome 144`) já identifica o aparelho e os dois números que interessam; o resto lê-se no ecrã.
+
+### 7.10 Se alguma coisa não bater
+
+| O que se vê | O que é | O que fazer |
+| --- | --- | --- |
+| `pedido 0 s`, ou `null/s` / `NaN/s` nos quadros | build velho em cache | abrir em **aba anónima** ou `Ctrl+Shift+R` no computador |
+| O painel demora a aparecer (10–30 s num telemóvel fraco) | está à espera de a cena ficar pronta (`sceneReady`) | esperar; o contador só começa quando há cena para medir |
+| `pausada 3.4 s` na linha `janela` | o ecrã apagou ou trocou de aba | o número **continua válido** (a janela foi reposta); se passar de ~5 s, repetir esse aparelho |
+| `janelas 45.00 s e 30.00 s` + «o par não é comparável» | uma fase foi interrompida a meio | repetir **Repetir** no mesmo aparelho |
+| Os dois lados empatados (~165 → ~165 no computador) | o ecrã manda, não o shader | **não é falha**: é o resultado do aparelho; o que conta passa a ser o **pior quadro** |
+| A página recarrega e volta à fase 1 sozinha | a sessão do separador foi perdida (aba fechada, anónima trocada) | repetir numa aba só, sem fechar |
 
 ---
 
