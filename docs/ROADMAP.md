@@ -4490,6 +4490,28 @@ pixels, 2,63 → 2,25) e fica ~10% abaixo da imagem parada, com a cadência de 2
 desktop não há diferença que se meça: DPR nativo, **0** atrasos, **nenhum** evento da escada.
 `prefers-reduced-motion` verificado no build publicado (estático, 0 atualizações) e na bateria.
 
+**O A/B pelo ensaio automático (2026-10-27), primeiro dos três aparelhos.** O autor correu o ensaio no
+telemóvel fraco, na variante curta (`?ensaio=1&segundos=10&aquecimento=3`), e as duas janelas saíram
+iguais (**9,99 s** e **9,99 s**, desvio **−0,01 s**): o par é comparável.
+
+| aparelho (DPR) | fundo | janela | quadros/s | pior quadro | lentos | pixelRatio | cadência | atrasos |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Android 10, PowerVR GE8320 (411×748, 2,63) | `grade-neon` | 9,99 s | **49,4** (493 quadros) | **132,2 ms** | 54 | **1,6** (de 2 a 1,6, **1** evento) | 20/s → 19,6/s | **71** de 217 |
+| idem | imagem (`?shader=0`) | 9,99 s | **55,4** (553 quadros) | **66,1 ms** | 28 | 2,63 (nativo) | — | — |
+
+O que isto diz, e é a mesma conclusão de 2026-10-24 por outro caminho: a imagem vai **12,1% mais
+depressa** (49,4 → 55,4) e o pior quadro é **metade** (132 ms contra 66 ms). O detalhe que fecha o
+argumento é o pixelRatio: o shader desenhou com **1,6**, ou seja `(1,6 / 2,63)²` ≈ **37%** dos pixels que a
+imagem desenhou, e mesmo assim foi mais lento — o custo do `grade-neon` não é resolução, é o fragment por
+pixel (≈ **3×** por pixel). A política respondeu como sabe (a escada desceu de 2 para 1,6, o único evento
+do ensaio) e ainda assim **71 dos 217** quadros do shader chegaram tarde — 33% da cadência de 20/s, contra
+0 na imagem, que não tem cadência. É o aparelho onde o `?shader=0` deixa de ser escape e passa a ser a
+escolha razoável.
+
+**Ressalva desta linha:** é a variante de 10 s, e nos primeiros segundos a escada ainda está a descer —
+portanto o lado do shader está penalizado por um transiente que o ensaio de 45 s já não apanha. Para o
+registo ficar uniforme com os outros dois aparelhos, o fraco repete-se com as durações por omissão.
+
 **O que continua em falta para fechar o R14:** o **terceiro aparelho** (o médio, Adreno 630 do ensaio
 de 2026-10-23). Com dois aparelhos medidos e o par shader × imagem pareado num deles, a pendência
 passa de «não foi registado» a «falta um dos três».
