@@ -334,7 +334,7 @@ function textMesh(text, size) {
 export function createArtwork(artwork, parent, derived = {}) {
   const kind = artwork.kind || 'image';
   // A imagem que a obra desenha: a capa resolvida (D65 — o `<img>` que o construtor pôs em
-  // `<a-assets>` e que já tentou o YouTube, a capa do CSV e a imagem padrão) ou, sem ela, o asset
+  // `<a-assets>` e que já tentou o YouTube, a capa da folha e a imagem padrão) ou, sem ela, o asset
   // que o dado nomeia (o caso de um vídeo, onde não há cadeia nenhuma a percorrer).
   const coverId = typeof derived.coverId === 'string' && derived.coverId ? derived.coverId : null;
   const drawsItsImage = kind === 'image' || kind === 'video' || (kind === 'site' && Boolean(coverId || artwork.asset));

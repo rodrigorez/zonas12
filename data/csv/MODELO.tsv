@@ -1,0 +1,45 @@
+# MODELO.tsv — o modelo da folha de obras: copie este ficheiro e preencha as suas linhas.
+#
+# (É igual à folha de produção, `data/obras.tsv`. Este vive em `data/csv/`, que está fora do git: aqui
+# pode guardar os seus rascunhos e as versões que estiver a testar.)
+#
+# Cada linha é uma obra. O padrão (2026-10-27) tem nove colunas, nesta ordem:
+#
+#   mundo ................. a sala da obra (scene1, scene2, scene3). **Não se muda**: é por ela que o
+#                           importador sabe de que mundo se fala — os `id` não são únicos no projeto.
+#   id .................... o número da obra dentro da sala. **Não se muda.**
+#   nome da obra .......... o nome que aparece na ficha e no rótulo da sala.
+#   nomeAutores ........... quem fez a obra. Vários nomes vão na **mesma célula**, separados por
+#                           vírgula: Fulano, Beltrana.
+#   nomeCoautores ......... co-autoria, com a mesma regra. Vazio = a ficha não mostra a linha.
+#   nomaColaboradores ..... colaborações, com a mesma regra. Vazio = a ficha não mostra a linha.
+#   Descritivo ............ o texto da ficha (a sinopse). Uma frase ou duas; o cartão cresce com ele.
+#   endereço da imagem .... a imagem que representa a obra: um caminho do projeto
+#                           (assets/artworks/eiffel.jpg) ou um endereço. Vazio = fica a que já está;
+#                           `-` = tira a capa (para a cadeia do YouTube começar do zero).
+#   endereço da obra ...... o site da obra, se ela for um jogo ou uma escultura interactiva. **Um** por
+#                           obra, a começar por http:// ou https://. Vazio tira o site — e então a linha
+#                           tem de dar uma **imagem** na coluna anterior, senão o importador recusa.
+#
+# Regras: as colunas são separadas por TABULAÇÃO e **sem aspas** — nem a vírgula nem o ponto e vírgula
+# são separadores, por isso qualquer texto pode tê-los. Uma linha que começa por # é ignorada. O
+# ficheiro tem de ser **UTF-8** (acentos); o «Texto separado por tabulações» do Excel em português
+# (UTF-16) também é lido. Numa folha de cálculo: Ficheiro → Guardar como → Texto (separado por
+# tabulações). O caminho inverso também serve: copiar as células e colar aqui — é o mesmo formato.
+#
+# Depois de preencher: node tools/artwork/from-csv.mjs --check  (e depois sem o --check)
+#
+# NOTA: o texto abaixo é PROVISÓRIO — é para aprovação do circuito e do desenho da ficha, não é
+# conteúdo. Os autores são falsos. **Uma só obra tem site** (a do vídeo, `scene1` id 2), que aponta
+# para um vídeo do YouTube: é o teste de uma obra cujo conteúdo é uma página.
+mundo	id	nome da obra	nomeAutores	nomeCoautores	nomaColaboradores	Descritivo	endereço da imagem	endereço da obra
+scene1	0	Cidade ao entardecer	autorA, autorB, AutorC			Texto provisório: a sinopse definitiva desta obra entra aqui, uma ou duas frases que dizem o que ela é.	assets/artworks/cidade-d0-bryan-goff.jpg	
+scene1	1	A torre	autorA			Texto provisório: uma obra com um autor preenchido mostra uma linha de autor na ficha.	assets/artworks/eiffel.jpg	
+scene1	2	Vídeo de teste	autorB	autorC		Texto provisório: esta obra é um vídeo, e o vídeo está no YouTube — a ficha embute-o e deixa sempre o botão para o abrir numa aba nova. A capa é buscada ao YouTube a partir do endereço do próprio vídeo (D65). Se falhar, aparece a imagem padrão que pede para avisar o administrador.	-	https://www.youtube.com/watch?v=Gzegts8LXaI
+scene1	3	Praia	autorC			Texto provisório: a sinopse definitiva desta obra entra aqui.	assets/panoramas/praia-d0-praia.jpg	
+scene1	4	Céu de nuvens	autorA	autorB		Texto provisório: a sinopse definitiva desta obra entra aqui.	assets/panoramas/ceu-d0-skycloud.jpg	
+scene2	5	Céu	autorB			Texto provisório: a mesma imagem é obra em duas salas, e cada uma tem a sua ficha.	assets/panoramas/ceu-d0-skycloud.jpg	
+scene2	6	A torre, na praia	autorA	autorC		Texto provisório: a sinopse definitiva desta obra entra aqui.	assets/artworks/eiffel.jpg	
+scene2	7	Cidade, na praia	autorC			Texto provisório: a sinopse definitiva desta obra entra aqui.	assets/artworks/cidade-d0-bryan-goff.jpg	
+scene3	8	Praia, no céu	autorA			Texto provisório: a sinopse definitiva desta obra entra aqui.	assets/panoramas/praia-d0-praia.jpg	
+scene3	9	Floresta	autorB	autorC		Texto provisório: a sinopse definitiva desta obra entra aqui.	assets/panoramas/cidade-d0-forest.jpg	

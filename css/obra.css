@@ -204,6 +204,12 @@ body {
   font-weight: 500;
 }
 
+/* Os créditos (D67): até três linhas — Autor, Coautor, Colaborador —, com a etiqueta em peso forte e os
+   nomes como foram escritos. As linhas ficam juntas no mesmo cartão, por isso o espaço entre elas é
+   pequeno: são o mesmo assunto. */
+.autor + .autor { margin-top: 0.15em; }
+.autor .credito { font-weight: 700; }
+
 .sinopse {
   font-size: clamp(0.9rem, 2.5vw, 1.1rem);
   text-align: justify;

@@ -5,7 +5,9 @@ node_modules/
 .playwright-mcp/
 /*.png
 
-# Folhas CSV em teste (rascunhos): o dado a serio e data/obras.csv
+# Folhas em teste (rascunhos): o dado a serio e data/obras.tsv
 data/csv/*.csv
+data/csv/*.tsv
+data/csv/*.txt
 
-!data/csv/MODELO.csv
+!data/csv/MODELO.tsv

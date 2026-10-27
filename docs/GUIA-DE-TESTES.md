@@ -12,7 +12,7 @@ para fazer num aparelho está marcado — não é preciso forçar.
 > falha de cada um, a folha de registo e o que desfazer no fim. Este ficheiro continua a ser a
 > referência de cada teste.
 
-> **Estado do dado hoje:** o `data/obras.csv` está preenchido com texto **provisório**, para aprovação:
+> **Estado do dado hoje:** o `data/obras.tsv` está preenchido com texto **provisório**, para aprovação:
 > as dez obras de produção têm título, **autor (um ou vários)** e sinopse. **A do vídeo** (`scene1`
 > `id=2`, «Vídeo de teste») é a única com `site` — um vídeo do YouTube, **só para testes de laboratório**
 > — e a capa dela é buscada ao YouTube a partir do endereço do vídeo (D65). As outras nove são obras de
@@ -110,16 +110,16 @@ Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos
 | 4.6 | Abrir `/scene2/?lang=en` | Interface em inglês (o nome da sala também) |
 | 4.7 | Telemóvel fraco: ficar 2 minutos numa sala com `?sonda=1` | `quadros` mantém-se acima de ~25; `pixelRatio` pode subir e descer uma vez e depois estabiliza (a política procura o tecto do aparelho). Quedas repetidas com `quadros < 20` são para reportar |
 
-## 5. O CSV (só no computador)
+## 5. A folha das obras (só no computador)
 
 | # | O que fazer | O que se espera |
 | --- | --- | --- |
-| 5.1 | Preencher **uma** linha de `data/obras.csv` (ex.: `scene1,0`, título, autor, sinopse) | — |
-| 5.2 | `node tools/artwork/from-csv.mjs --check` | Lista do que **mudaria** (`obra 0: título`, `autor`, `sinopse`) e **não escreve nada** |
+| 5.1 | Preencher **uma** linha de `data/obras.tsv` (ex.: a obra `0` de `scene1`: `nome da obra`, `nomeAutores`, `Descritivo`) | — |
+| 5.2 | `node tools/artwork/from-csv.mjs --check` | Lista do que **mudaria** (`obra 0: título`, `autor`, `descritivo`) e **não escreve nada** |
 | 5.3 | `node tools/artwork/from-csv.mjs` | Escreve `data/worlds/scene1.json`; a ficha `/obra.html?mundo=scene1&id=0` passa a mostrar o teu texto |
-| 5.4 | Pôr na `capa` um caminho que não existe | O importador **recusa** («a capa … não existe no projeto») e não escreve nenhum ficheiro |
-| 5.5 | Pôr em `site` um endereço sem `http` | Recusa («não é um endereço http(s)») |
-| 5.6 | Desfazer: `git checkout -- data/worlds/scene1.json` | O dado volta ao que estava |
+| 5.4 | Pôr no `endereço da imagem` um caminho que não existe | O importador **recusa** («a capa … não existe no projeto») e não escreve nenhum ficheiro |
+| 5.5 | Pôr no `endereço da obra` um endereço sem `http` | Recusa («não é um endereço http(s)») |
+| 5.6 | Desfazer: `git checkout -- data/worlds/scene1.json data/obras.tsv` | O dado e a folha voltam ao que estavam |
 
 ## 6. O editor (só no computador, com o servidor local)
 
@@ -238,14 +238,14 @@ Para cada falha, envia três coisas:
 - o **portão** tem **2 portais e nenhuma obra** — é a entrada, e as obras estão dentro das salas;
 - as obras de produção têm **título, autor e sinopse provisórios**; **uma** delas (`scene1` `id=2`) tem
   um vídeo do YouTube embutido — é o teste de uma obra cujo conteúdo é uma página. A **capa** dela é
-  buscada ao YouTube (D65); se não vier, aparece a capa do CSV e, em último caso, a imagem padrão de aviso;
+  buscada ao YouTube (D65); se não vier, aparece a capa da folha e, em último caso, a imagem padrão de aviso;
 - **não há medição a correr**: as propriedades GA4 ainda não existem, e sem ID a página não carrega
   script nenhum (é de propósito);
 - a ficha é **desenhada pelo browser**: sem JavaScript não mostra a obra (é o preço de ser um ficheiro
   só, a troca que foi pedida);
 - **um site que não existe** não dá erro ao browser (o iframe dispara `load` com a página de erro dele em
   ~100 ms). A ficha mede o tempo e trata-o como falha: fica a **capa** com o botão «Abrir o site». É o
-  que se vê com os `www.testeX.nada` do CSV provisório;
+  que se vê com os `www.testeX.nada` da folha provisória;
 - num telemóvel **com** giroscópio, o olhar volta governado pelo sensor — o **ponto** (posição) é
   restaurado sempre, mas a direcção do olhar pode ser corrigida pelo aparelho no instante seguinte;
 - no site publicado o **editor não grava** (gravar precisa do servidor local, que valida e escreve no

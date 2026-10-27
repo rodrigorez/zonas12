@@ -1,0 +1,33 @@
+# obras.exemplo.tsv — a folha de DEMONSTRAÇÃO (não é o dado da exposição).
+#
+# Serve para duas coisas: ver o formato do padrão novo (2026-10-27) e ver o que a ficha faz com cada
+# tipo de obra. Corre-se com `--file`, sem tocar na folha a sério:
+#
+#   node tools/artwork/from-csv.mjs --file data/obras.exemplo.tsv --check
+#
+# O que cada linha demonstra:
+#
+#   scene1 0 ... os três créditos preenchidos (autor, coautor, colaborador) numa obra de imagem;
+#   scene1 1 ... só autor, e sem coautor nem colaborador (a ficha mostra uma linha só);
+#   scene1 2 ... uma obra cujo conteúdo é um site (o YouTube), com a imagem tirada (`-`) para a cadeia
+#                 do D65 começar no thumbnail;
+#   scene1 3 ... sem créditos nenhuns (a ficha não mostra a linha do autor);
+#   scene1 4 ... vários autores na mesma célula, separados por vírgula (que aqui é só texto);
+#   scene2 e scene3 ... o mesmo em duas salas, porque a mesma imagem pode ser obra em duas.
+#
+# As colunas são separadas por TABULAÇÃO: nenhum texto precisa de aspas, nem os que têm vírgulas ou
+# pontos e vírgulas.
+#
+# Para ver isto no ecrã sem aplicar nada, o mundo `exemplo-ficha` já tem este texto lá dentro:
+#   obra.html?mundo=exemplo-ficha&id=0
+mundo	id	nome da obra	nomeAutores	nomeCoautores	nomaColaboradores	Descritivo	endereço da imagem	endereço da obra
+scene1	0	Exemplo · cidade ao entardecer	Autor de exemplo	Co-autor de exemplo	Colaborador de exemplo	Uma obra de imagem com os três créditos preenchidos: a ficha mostra três linhas, cada uma com a etiqueta do seu papel.	assets/artworks/cidade-d0-bryan-goff.jpg	
+scene1	1	Exemplo · torre	Autor de exemplo			Só com autor: a ficha mostra uma linha só, e não inventa coautor nem colaborador.	assets/artworks/eiffel.jpg	
+scene1	2	Exemplo · vídeo da cidade	Autor de exemplo			Uma obra cujo conteúdo é uma página: a ficha embute o site e deixa sempre o botão para o abrir numa aba nova. A imagem está tirada (`-`), por isso vem do thumbnail do YouTube (D65).	-	https://www.youtube.com/watch?v=aqz-KE-bpKQ
+scene1	3	Exemplo · praia				Sem créditos nenhuns: a ficha não mostra a linha do autor — é o que acontece enquanto o dado está por preencher.	assets/panoramas/praia-d0-praia.jpg	
+scene1	4	Exemplo · céu de nuvens	Um Autor, Outro Autor			Vários autores na mesma célula, separados por vírgula: a ficha mostra-os pela ordem escrita.	assets/panoramas/ceu-d0-skycloud.jpg	
+scene2	5	Exemplo · céu	Autor de exemplo			A mesma imagem é obra em duas salas, e cada uma tem a sua ficha.	assets/panoramas/ceu-d0-skycloud.jpg	
+scene2	6	Exemplo · torre (sala 2)	Autor de exemplo	Co-autor de exemplo		Uma obra com autor e coautor.	assets/artworks/eiffel.jpg	
+scene2	7	Exemplo · cidade (sala 2)	Autor de exemplo			Como esta.	assets/artworks/cidade-d0-bryan-goff.jpg	
+scene3	8	Exemplo · praia (céu)	Autor de exemplo			A ficha de uma obra de outra sala, com o mesmo desenho.	assets/panoramas/praia-d0-praia.jpg	
+scene3	9	Exemplo · floresta	Autor de exemplo	Co-autor de exemplo	Colaborador de exemplo	O nome manda no cimo da ficha e no nome do separador do browser.	assets/panoramas/cidade-d0-forest.jpg	

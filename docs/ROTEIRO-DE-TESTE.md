@@ -77,7 +77,7 @@ Abra `…/obra.html?mundo=exemplo-ficha&id=0&lang=en`.
 
 Abra `…/obra.html?mundo=scene2&id=5`.
 
-**Esperado:** o título **«Céu»**, autor e sinopse **provisórios** (é o que está no CSV hoje, não é
+**Esperado:** o título **«Céu»**, autor e sinopse **provisórios** (é o que está na folha hoje, não é
 falha), e a capa — não uma página de erro do browser.
 
 ### A6. Voltar sem 404 (guia 2.6)
@@ -170,18 +170,19 @@ Abra `/scene2/?lang=en`.
 
 **Esperado:** interface em inglês, incluindo o nome da sala.
 
-### B7 a B11. O CSV (guia 5.1 a 5.6) — escreve no repositório
+### B7 a B11. A folha (guia 5.1 a 5.6) — escreve no repositório
 
 Confirme primeiro que `git status` está vazio.
 
-1. **B7** — em `data/obras.csv`, mude **só** o título da linha `scene1,0` para `Teste do autor`.
+1. **B7** — em `data/obras.tsv`, mude **só** a coluna `nome da obra` da linha `scene1` `0` (a primeira obra) para `Teste do autor`.
 2. **B8** — `node tools/artwork/from-csv.mjs --check` → lista o que mudaria e **não escreve nada**
    (`git status` continua vazio).
 3. **B9** — `node tools/artwork/from-csv.mjs` → escreve; abra `http://127.0.0.1:8123/obra.html?mundo=scene1&id=0`
    e o título é **«Teste do autor»**.
-4. **B10** — ponha na coluna `capa` um caminho inventado (`assets/nao-existe.jpg`) e corra o importador
+4. **B10** — ponha na coluna `endereço da imagem` um caminho inventado (`assets/nao-existe.jpg`) e
+   corra o importador
    outra vez: tem de **recusar**, dizer que a capa não existe, e não escrever.
-5. **B11** — desfaça: `git checkout -- data/worlds/scene1.json data/obras.csv` e `git status` → vazio.
+5. **B11** — desfaça: `git checkout -- data/worlds/scene1.json data/obras.tsv` e `git status` → vazio.
 
 ### B12 a B16. O editor (guia 6.1 a 6.5) — escreve no repositório
 
@@ -198,7 +199,7 @@ Com o servidor local a correr:
 ### B17. Desfazer tudo (obrigatório)
 
 ```
-git checkout -- data/worlds/scene1.json data/obras.csv
+git checkout -- data/worlds/scene1.json data/obras.tsv
 git status
 ```
 

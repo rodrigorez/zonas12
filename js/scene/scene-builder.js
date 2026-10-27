@@ -183,7 +183,7 @@ export async function buildScene(scene, options = {}) {
   }
 
   // A capa de cada obra, resolvida por tentativas (D65) **antes** de a malha ser criada: o thumbnail do
-  // YouTube quando o site é um vídeo, depois a capa do CSV, depois a imagem padrão que pede para avisar
+  // YouTube quando o site é um vídeo, depois a capa da folha, depois a imagem padrão que pede para avisar
   // o administrador. Uma obra cuja imagem falha não pode ficar com uma parede preta na sala.
   const covers = await resolveCovers(scene, language, parent);
 

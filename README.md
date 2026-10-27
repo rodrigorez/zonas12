@@ -820,20 +820,26 @@ para uma obra durante 1,5 s abria-a sem tocar em nada. Com o modal isso era uma 
 seria uma mudança de página, portanto o `fuse` passou a `false` e a obra abre só a um toque.
 
 **A ficha é uma página só (D62).** Depois de a ficha estar no ar, o autor pediu duas coisas: o dado
-das obras entra por um **CSV** (título, autor, sinopse, o endereço da obra e a **capa**), e a ficha
+das obras entra por uma **folha** — TSV, com tabulações — (título, autores, sinopse, o endereço da obra e a **capa**), e a ficha
 passa a ser **um ficheiro** que muda o conteúdo ao carregar em vez de vinte e um HTML gerados. O que
 existe agora:
 
 - **`obra.html`** na raiz — lê `?mundo=<slug>&id=<n>&lang=pt|en`, vai buscar o mundo e desenha a
   ficha com o mesmo desenho das Zonas 11. Cada obra continua a ser **um endereço próprio**, que é o
   que a medição precisa para distinguir as obras no relatório;
-- **`node tools/artwork/from-csv.mjs`** — lê `data/obras.csv` e escreve nos mundos o que mudou, com
+- **`node tools/artwork/from-csv.mjs`** — lê `data/obras.tsv` e escreve nos mundos o que mudou, com
   `--check` para ver sem escrever e `--file <caminho>` para correr uma folha de teste (aceita o caminho
-  da raiz do projeto ou absoluto). Recusa escrever um mundo que não passe as leis; a capa passa a ser
-  um asset próprio da obra (`capa-<id>`), e um `site` preenchido faz dela uma obra `site`; uma célula
-  `site` vazia tira o site e a obra volta a ser o que a capa der — e se a linha não disser o que ela
-  passa a ser, o importador **recusa** em vez de deixar a obra invisível. As folhas de teste vivem em
-  [`data/csv/`](data/csv/LEIA-ME.md), com um **MODELO.csv** que é a folha de produção copiada;
+  da raiz do projeto ou absoluto). A folha é de **2026-10-27** (D67): nove colunas em **português**
+  separadas por **tabulação** e **sem aspas** — três créditos (`nomeAutores`, `nomeCoautores`,
+  `nomaColaboradores`) que a ficha mostra como `Autor:`/`Coautor:`/`Colaborador:` com as etiquetas da
+  interface. A tabulação é o que faz nenhum texto precisar de aspas (vírgulas e `;` são texto), e o
+  leitor continua a aceitar `;` e `,` para as folhas antigas; um ficheiro gravado pelo Excel em
+  «Texto separado por tabulações» (**UTF-16**) é descodificado pelo BOM. Recusa
+  escrever um mundo que não passe as leis; a imagem passa a ser um asset próprio da obra (`capa-<id>`),
+  e um `endereço da obra` preenchido faz dela uma obra `site`; uma célula `endereço da obra` vazia tira
+  o site e a obra volta a ser o que a imagem der — e se a linha não disser o que ela passa a ser, o
+  importador **recusa** em vez de deixar a obra invisível. As folhas de teste vivem em
+  [`data/csv/`](data/csv/LEIA-ME.md), com um **MODELO.tsv** que é a folha de produção copiada;
 - **a medição** (`js/scene/analytics.js`) — o autor vai ter **uma propriedade GA4 por mundo** e uma
   para o portão, e o ID mora no dado (`world.analytics.id`). Enquanto não houver IDs **não acontece
   nada**: nem script, nem pedido, nem linha na consola — é o que mantém o T8 e o funcionamento
@@ -847,17 +853,17 @@ existe, a consola), `validate` a **0** com a lei **L20** a olhar para a página 
 formato do ID, o T6 a apontar para `obra.html?mundo=…&id=…` e o `all.mjs --full` a **20 de 20** em
 **731,7 s**.
 
-**O exemplo que o autor pediu (antes do texto definitivo).** `data/obras.exemplo.csv` traz as dez obras
-com texto de exemplo — uma com tudo, uma só com título, uma em vídeo, uma com **site** e uma sem
-tradução inglesa — e corre-se com `--file`, sem tocar na folha a sério:
+**O exemplo que o autor pediu (antes do texto definitivo).** `data/obras.exemplo.tsv` traz as dez obras
+com texto de exemplo — uma com os **três créditos**, uma só com autor, uma sem créditos, uma em vídeo
+e uma com vários autores na mesma célula — e corre-se com `--file`, sem tocar na folha a sério:
 
 ```sh
-node tools/artwork/from-csv.mjs --file data/obras.exemplo.csv
+node tools/artwork/from-csv.mjs --file data/obras.exemplo.tsv
 ```
 
 O mesmo texto vive num **mundo de exemplo publicado**, `exemplo-ficha` (`data/worlds/exemplo-ficha.json`,
 um fixture como o `r9`), para se ver a ficha no telemóvel sem mexer no dado de produção:
-`obra.html?mundo=exemplo-ficha&id=0` — e `1` só com título, `2` vídeo, `3` com site.
+`obra.html?mundo=exemplo-ficha&id=0` — e `1` só com autor, `2` vídeo, `3` sem créditos.
 
 Foi este exemplo que apanhou **três** defeitos que as baterias não podiam ver, porque o site do fixture
 é nosso e perdoa tudo:
@@ -899,14 +905,14 @@ que se espera e o que enviar se falhar, com todos os endereços para telemóvel 
 **[lista de pré-exposição](docs/PRE-EXPOSICAO.md)** com o que falta antes de abrir ao público.
 
 **A capa por tentativas (D65).** O autor pediu o método: buscar a capa ao YouTube; se não der, a capa
-indicada no CSV (opcional, local ou num endereço); e se nada der, uma imagem padrão a pedir para avisar
+indicada na folha (opcional, local ou num endereço); e se nada der, uma imagem padrão a pedir para avisar
 o administrador. Ficou em `js/scene/cover.js`, com as três tentativas e a mesma cadeia na **ficha** e na
 **sala**:
 
 | Tentativa | De onde vem | Quando falha |
 | --- | --- | --- |
 | 1 | `i.ytimg.com/vi/<id>/hqdefault.jpg`, derivado do `site` quando é YouTube | não é YouTube, ou não carrega |
-| 2 | a `capa` do CSV (endereço ou ficheiro do projeto) | está vazia, ou não carrega |
+| 2 | o `endereço da imagem` da folha (endereço ou ficheiro do projeto) | está vazia, ou não carrega |
 | 3 | `assets/covers/sem-capa.svg` — «Capa indisponível · avisar o administrador da galeria» | — |
 
 A troca acontece no `onerror` do `<img>`: é o único sinal que responde às duas perguntas ao mesmo tempo
@@ -918,29 +924,29 @@ Duas correções que a medição impôs: a malha da sala tem de **esperar** que 
 `data-capa-de` em cada `<img>` diz qual tentativa ganhou, que é o que o instrumento lê.
 
 Medido: bateria nova `capa.mjs` **9 de 9** — o id sai de `watch?v=`, `youtu.be`, `embed/` e `shorts/`; a
-ordem das tentativas; e, no browser com pedidos bloqueados, **YouTube** com rede, **capa do CSV** com o
+ordem das tentativas; e, no browser com pedidos bloqueados, **YouTube** com rede, **capa da folha** com o
 YouTube bloqueado e **imagem padrão** com os dois bloqueados —, e o resto: `obra.mjs` **71 de 71**,
 `D40` **21 de 21**, `r9` **7 de 7**, `volta.mjs` **7 de 7**, `ficha-falhas` **3 de 3**, suíte por omissão
 **5 de 5**.
 
-**O CSV a funcionar de ponta a ponta.** O autor pediu para ver o circuito a trabalhar, e ele está
-preenchido com texto **provisório**: as dez obras de produção passaram a ter título (pt/en), **autor
-(um ou vários, na mesma célula separados por vírgulas)** e sinopse. **Uma** delas — a do vídeo, `scene1`
-obra 2 — tem `site`: um vídeo do YouTube, para exercitar o caminho de uma obra cujo conteúdo é uma
-página, e **nenhuma capa no dado** (`-`), para a cadeia do D65 começar no thumbnail do YouTube. O
-caminho, que é o que fica para o texto definitivo:
+**A folha a funcionar de ponta a ponta.** O autor pediu para ver o circuito a trabalhar, e ele está
+preenchido com texto **provisório**: as dez obras de produção passaram a ter nome e **três créditos**
+(autor, coautor, colaborador — vários nomes na mesma célula, separados por vírgulas) e descritivo.
+**Uma** delas — a do vídeo, `scene1` obra 2 — tem `endereço da obra`: um vídeo do YouTube, para
+exercitar o caminho de uma obra cujo conteúdo é uma página, e **nenhuma imagem no dado** (`-`), para a
+cadeia do D65 começar no thumbnail do YouTube. O caminho, que é o que fica para o texto definitivo:
 
 ```sh
-# 1. editar data/obras.csv (título, autor, sinopse, site, capa)
+# 1. editar data/obras.tsv (nome, créditos, descritivo, endereço da imagem, endereço da obra)
 node tools/artwork/from-csv.mjs --check   # 2. o que mudaria, sem escrever
 node tools/artwork/from-csv.mjs           # 3. escreve nos mundos
 node tools/scene/validate.mjs             # 4. as leis do dado, depois de escrever
 ```
 
-Uma **célula `site` vazia tira o site** e a obra volta ao que o ficheiro dela é (imagem, vídeo ou
-modelo): é a única forma de desfazer, e é o que faz do CSV a fonte da verdade desse campo. Foi assim
-que os `testeX.nada` de uma primeira passagem saíram quando o autor passou a querer só uma obra com
-site.
+Uma **célula `endereço da obra` vazia tira o site** e a obra volta ao que o ficheiro dela é (imagem,
+vídeo ou modelo): é a única forma de desfazer, e é o que faz da folha a fonte da verdade desse campo. Foi
+assim que os `testeX.nada` de uma primeira passagem saíram quando o autor passou a querer só uma obra
+com site.
 
 Do mesmo passo saíram quatro correções:
 
@@ -952,7 +958,7 @@ Do mesmo passo saíram quatro correções:
   recusarem, e o importador aceita uma `capa` que é um endereço;
 - **uma obra com site tem de ter capa de imagem** (a lei já o dizia): a obra do vídeo tem o thumbnail;
 - a bateria **D40** tinha os nomes esperados escritos à mão e o `obra.mjs` tinha o **tipo** de cada obra
-  escrito à mão (`tipo: 'image'`). Mudar o CSV era uma falha dos instrumentos em vez de uma mudança do
+  escrito à mão (`tipo: 'image'`). Mudar a folha era uma falha dos instrumentos em vez de uma mudança do
   dado: ambos passaram a ler o `data/worlds/<slug>.json`.
 
 Medido: `validate` **0**, `obra.mjs` **71 de 71** (incluindo «a capa do site carrega» — um ficheiro do
@@ -982,14 +988,14 @@ Foi uma troca pedida pelo autor e está registada na decisão.
 pediu um **roteiro passo a passo**: `docs/ROTEIRO-DE-TESTE.md` tem a preparação (aba anónima, ecrã sem
 apagar, servidor local, árvore limpa), **nove passos no telemóvel** e **dezassete no computador**, cada
 um com o **sinal de falha** concreto, uma folha de registo e o que **desfazer** no fim — os blocos do
-CSV e do editor escrevem no repositório, e um ID de Analytics de teste gravado iria para produção.
+A folha e o editor escrevem no repositório, e um ID de Analytics de teste gravado iria para produção.
 Percorrido pelo autor e **dado por bom, sem falhas reportadas**, incluindo o **ponto de regresso** (A8)
 e a linha **`travessia`** da sonda com `encosto` (A9). Escrever o roteiro corrigiu três coisas no
 próprio guia: o `v=8` que eu citava não existe em código nenhum, a ficha da praia já não tem «site
 falso», e `id=3` é a obra **com site** enquanto `id=2` é a de **vídeo**.
 
 **A fase fecha a 2026-10-27.** O que fica por fazer **não é a fase**: é o **conteúdo** que só o autor
-tem — o texto definitivo do CSV, a saída da obra de vídeo de laboratório e a conferência das capas — e
+tem — o texto definitivo da folha, a saída da obra de vídeo de laboratório e a conferência das capas — e
 um item técnico da Fase 7 (o teto de pixelRatio do panorama). Os quatro estão escritos, com o que cada
 um exige e como se sabe que ficou feito, em [docs/PRE-EXPOSICAO.md](PRE-EXPOSICAO.md). Separar as duas
 coisas é de propósito: uma fase que fica aberta à espera de texto deixa de poder dizer **com que
@@ -1661,10 +1667,10 @@ dimensão, o catálogo de assets, os portais em movimento, a ficha das obras, o 
 minutos, por isso não são o `default`. Com `--full` são **26** baterias.
 
 Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
-repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.csv` e escreve nos mundos o dado das
-obras (título, autor, sinopse, site e capa) — com `--file` corre outra folha, e é assim que se vê o
-exemplo (`data/obras.exemplo.csv`) sem tocar na definitiva —, e `node tools/scene/new-world.mjs <slug>`
-cria a pasta e o arranque de um mundo.
+repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.tsv` e escreve nos mundos o dado das
+obras (nome, créditos, descritivo, imagem e site) — com `--file` corre outra folha, e é assim que se vê
+o exemplo (`data/obras.exemplo.tsv`) sem tocar na definitiva —, e `node tools/scene/new-world.mjs
+<slug>` cria a pasta e o arranque de um mundo.
 
 Cada bateria continua a poder correr sozinha, com os argumentos que ela própria documenta — é o que
 se usa quando se está a investigar um número.

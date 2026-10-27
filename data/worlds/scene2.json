@@ -130,17 +130,12 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Céu",
-        "en": "Sky"
+        "pt": "Céu"
       },
       "synopsis": {
-        "pt": "Texto provisório: a mesma imagem é obra em duas salas, e cada uma tem a sua ficha.",
-        "en": "Provisional text: the same image is a work in two rooms, and each has its own page."
+        "pt": "Texto provisório: a mesma imagem é obra em duas salas, e cada uma tem a sua ficha."
       },
-      "author": {
-        "pt": "autorB",
-        "en": "autorB"
-      }
+      "authors": "autorB"
     },
     {
       "id": 6,
@@ -164,17 +159,13 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "A torre, na praia",
-        "en": "The tower, at the beach"
+        "pt": "A torre, na praia"
       },
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
-        "en": "Provisional text: the final synopsis of this work goes here."
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui."
       },
-      "author": {
-        "pt": "autorA, autorC",
-        "en": "autorA, autorC"
-      }
+      "authors": "autorA",
+      "coAuthors": "autorC"
     },
     {
       "id": 7,
@@ -198,17 +189,12 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Cidade, na praia",
-        "en": "City, at the beach"
+        "pt": "Cidade, na praia"
       },
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
-        "en": "Provisional text: the final synopsis of this work goes here."
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui."
       },
-      "author": {
-        "pt": "autorC",
-        "en": "autorC"
-      }
+      "authors": "autorC"
     }
   ],
   "portals": [

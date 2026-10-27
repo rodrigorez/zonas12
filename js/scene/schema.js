@@ -196,7 +196,14 @@ export const SCENE = {
       // por língua como o título; o `site` é o endereço que a ficha tenta embutir e que o botão
       // «abrir o site» leva numa aba nova. Sem `site`, a ficha mostra só o que o ficheiro dá — e é
       // por isso um campo opcional: a maioria das obras não tem site nenhum.
-      author: text,
+      //
+      // Os três créditos (D67, 2026-10-27) são **texto simples e não por língua**: nomes não se
+      // traduzem. A ficha mostra-os com a etiqueta da sua própria língua («Autor:», «Coautor:»,
+      // «Colaborador:»), e quem os preenche é a folha — colunas `nomeAutores`, `nomeCoautores` e
+      // `nomaColaboradores`.
+      authors: { type: 'string' },
+      coAuthors: { type: 'string' },
+      collaborators: { type: 'string' },
       synopsis: text,
       site: { type: 'string' },
       // O texto de uma obra `kind: "text"` (D58), por língua como todo o texto de conteúdo. É o

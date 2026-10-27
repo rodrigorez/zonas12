@@ -200,17 +200,19 @@ function card(artwork, context, data, dimensions) {
   };
   syncFields();
 
-  // A ficha da obra (D60): quem a fez e o que ela é, por língua, e o site que a ficha tenta embutir.
-  // Sem estes campos a ficha abria sem autor e sem uma linha sobre a obra.
-  const authorFields = LANGUAGES.map((language) => textField(box, {
-    name: 'artwork.' + artwork.id + '.author.' + language,
-    label: t('editor.artwork.authorIn', { language: language }),
-    value: artwork.author ? artwork.author[language] : '',
+  // Os créditos (D67, 2026-10-27): três campos de **texto simples**, porque nomes não se traduzem. A
+  // ficha mostra-os com a etiqueta da sua língua; aqui o campo diz de que crédito se trata.
+  const creditFields = [
+    { field: 'authors', label: 'editor.artwork.author' },
+    { field: 'coAuthors', label: 'editor.artwork.coAuthor' },
+    { field: 'collaborators', label: 'editor.artwork.collaborator' }
+  ].map((credit) => textField(box, {
+    name: 'artwork.' + artwork.id + '.' + credit.field,
+    label: t(credit.label),
+    value: artwork[credit.field] || '',
     onChange: (text) => {
-      if (!artwork.author) artwork.author = {};
-      if (text.trim() === '') delete artwork.author[language];
-      else artwork.author[language] = text;
-      if (Object.keys(artwork.author).length === 0) delete artwork.author;
+      if (text.trim() === '') delete artwork[credit.field];
+      else artwork[credit.field] = text;
       apply();
     }
   }));

@@ -2,7 +2,7 @@
 //
 // O autor: «podemos fazer um metodo que ele busca a capa do youtube se não conseguir ele faz um fallback
 // para imagem indicada, que pode estar hospedada em um site por exemplo, ou na pasta de assets do
-// projeto, mas isso é opcional no csv, se nada der certo, ele mostra uma imagem padrão avisando que a
+// projeto, mas isso é opcional na folha, se nada der certo, ele mostra uma imagem padrão avisando que a
 // capa da obra esta com problema e é necessario avisar o adminstrador da galeria».
 //
 // A cadeia é esta, por ordem:
@@ -10,7 +10,7 @@
 //   1. **o thumbnail do YouTube**, quando o site da obra é um vídeo do YouTube — derivado do próprio
 //      endereço, sem ninguém escrever nada no dado (`i.ytimg.com/vi/<id>/hqdefault.jpg`, que existe
 //      para todos os vídeos; `maxresdefault` não existe para todos);
-//   2. **a capa do CSV**, que é opcional e pode ser um ficheiro do projeto ou um endereço (D64);
+//   2. **a capa da folha**, que é opcional e pode ser um ficheiro do projeto ou um endereço (D64);
 //   3. a **imagem padrão** que diz que a capa tem um problema e que é preciso avisar o administrador.
 //
 // A resolução é feita a carregar: quem usa a cadeia tenta a primeira, e no erro passa à seguinte. É o
@@ -19,7 +19,7 @@
 export const DEFAULT_COVER = 'assets/covers/sem-capa.svg';
 
 // O id de um vídeo do YouTube, de qualquer das formas que as pessoas copiam: `watch?v=`, `youtu.be/`,
-// `embed/`, `shorts/`. Devolve `null` quando não é YouTube — e aí a cadeia começa na capa do CSV.
+// `embed/`, `shorts/`. Devolve `null` quando não é YouTube — e aí a cadeia começa na capa da folha.
 export function youtubeVideoId(url) {
   const value = String(url || '');
   const patterns = [
@@ -37,7 +37,7 @@ export function youtubeVideoId(url) {
 
 // `qdefault` (480×360) é o thumbnail mais pequeno que existe para todos os vídeos; `hqdefault` é
 // 480×360 também, mas com a barra preta quando o vídeo é 4:3. Fica o `hqdefault`, que é o que o YouTube
-// usa nas listas. Quem quiser melhor define a capa no CSV (a segunda tentativa).
+// usa nas listas. Quem quiser melhor define a capa na folha (a segunda tentativa).
 export function youtubeCoverUrl(videoId) {
   return 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
 }

@@ -130,17 +130,12 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Cidade ao entardecer",
-        "en": "City at dusk"
+        "pt": "Cidade ao entardecer"
       },
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui, uma ou duas frases que dizem o que ela é.",
-        "en": "Provisional text: the final synopsis of this work goes here, one or two sentences saying what it is."
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui, uma ou duas frases que dizem o que ela é."
       },
-      "author": {
-        "pt": "autorA, autorB, AutorC",
-        "en": "autorA, autorB, AutorC"
-      }
+      "authors": "autorA, autorB, AutorC"
     },
     {
       "id": 1,
@@ -164,17 +159,12 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "A torre",
-        "en": "The tower"
+        "pt": "A torre"
       },
       "synopsis": {
-        "pt": "Texto provisório: uma obra com um autor no CSV mostra um autor na ficha.",
-        "en": "Provisional text: a work with one author in the CSV shows one author on the page."
+        "pt": "Texto provisório: uma obra com um autor preenchido mostra uma linha de autor na ficha."
       },
-      "author": {
-        "pt": "autorA",
-        "en": "autorA"
-      }
+      "authors": "autorA"
     },
     {
       "id": 2,
@@ -197,18 +187,14 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Vídeo de teste",
-        "en": "Test video"
+        "pt": "Vídeo de teste"
       },
       "synopsis": {
-        "pt": "Texto provisório: esta obra é um vídeo, e o vídeo está no YouTube — a ficha embute-o e deixa sempre o botão para o abrir numa aba nova. A capa é buscada ao YouTube a partir do endereço do próprio vídeo (D65); se falhar, aparece a imagem padrão que pede para avisar o administrador.",
-        "en": "Provisional text: this work is a video, and the video is on YouTube — the page embeds it and always leaves the button to open it in a new tab. The cover is fetched from YouTube using the video's own address (D65); if that fails, the default image appears asking to notify the administrator."
+        "pt": "Texto provisório: esta obra é um vídeo, e o vídeo está no YouTube — a ficha embute-o e deixa sempre o botão para o abrir numa aba nova. A capa é buscada ao YouTube a partir do endereço do próprio vídeo (D65). Se falhar, aparece a imagem padrão que pede para avisar o administrador."
       },
-      "author": {
-        "pt": "autorB, autorC",
-        "en": "autorB, autorC"
-      },
-      "site": "https://www.youtube.com/watch?v=Gzegts8LXaI"
+      "authors": "autorB",
+      "site": "https://www.youtube.com/watch?v=Gzegts8LXaI",
+      "coAuthors": "autorC"
     },
     {
       "id": 3,
@@ -232,17 +218,12 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Praia",
-        "en": "Beach"
+        "pt": "Praia"
       },
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
-        "en": "Provisional text: the final synopsis of this work goes here."
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui."
       },
-      "author": {
-        "pt": "autorC",
-        "en": "autorC"
-      }
+      "authors": "autorC"
     },
     {
       "id": 4,
@@ -266,17 +247,13 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Céu de nuvens",
-        "en": "Cloudy sky"
+        "pt": "Céu de nuvens"
       },
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
-        "en": "Provisional text: the final synopsis of this work goes here."
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui."
       },
-      "author": {
-        "pt": "autorA, autorB",
-        "en": "autorA, autorB"
-      }
+      "authors": "autorA",
+      "coAuthors": "autorB"
     }
   ],
   "portals": [

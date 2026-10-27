@@ -63,7 +63,7 @@ async function main() {
 
   try {
     // Os nomes esperados vêm do **dado**, não escritos aqui: o rótulo é `#id · título (ou o asset, sem
-    // título) · nome da sala · interacção` (D40). Escritos à mão, mudar um título no `data/obras.csv`
+    // título) · nome da sala · interacção` (D40). Escritos à mão, mudar um título no `data/obras.tsv`
     // passava a ser uma falha da bateria em vez de uma mudança do dado.
     const esperado = {};
     for (const slug of ['scene1', 'scene2', 'scene3']) {

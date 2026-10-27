@@ -27,7 +27,7 @@ import { platformEmbed } from '../../js/scene/platform-embed.js';
 import { measurementIdWellFormed, gtagScriptUrl, pageLocation, startAnalytics } from '../../js/scene/analytics.js';
 import { artworkPageHref, artworkPageRequest, artworkBackHref } from '../../js/scene/artwork-page.js';
 
-// O tipo de cada obra vem do **dado** (o `data/obras.csv` muda-o: uma obra com `site` passa a ser uma
+// O tipo de cada obra vem do **dado** (o `data/obras.tsv` muda-o: uma obra com `site` passa a ser uma
 // obra `site`). Escrito à mão aqui, mudar o CSV era uma falha do instrumento em vez de uma mudança do
 // dado — a mesma lição da bateria D40.
 function kindOf(worldSlug, artworkId) {
@@ -43,6 +43,7 @@ const CASOS = [
   { mundo: 'r9', obra: 1, completo: true, pasta: false },
   { mundo: 'r9', obra: 2, completo: true, pasta: false },
   { mundo: 'r9', obra: 3, completo: true, pasta: false },
+  { mundo: 'exemplo-ficha', obra: 0, completo: true, creditos: 3, pasta: false },
   { mundo: 'exemplo-ficha', obra: 2, completo: true, pasta: false },
   { mundo: 'scene1', obra: 2, pasta: true },
   { mundo: 'scene1', obra: 0, pasta: true }
@@ -205,6 +206,7 @@ async function main() {
           exposicao: (document.querySelector('.exposicao') || {}).textContent || '',
           titulo: (document.querySelector('.titulo') || {}).textContent || '',
           autor: (document.querySelector('.autor') || {}).textContent || '',
+          creditos: Array.from(document.querySelectorAll('.autor')).map((linha) => linha.textContent.trim()),
           temSinopse: Boolean(document.querySelector('.sinopse')),
           voltar: voltar ? voltar.getAttribute('href') : null,
           iframe: iframe ? iframe.getAttribute('src') : null,
@@ -233,14 +235,21 @@ async function main() {
       result.check(onde + ': a ficha diz a exposição e o nome da obra',
         (estado.exposicao || '').trim().length > 0 && (estado.titulo || '').trim().length > 0,
         JSON.stringify({ exposicao: estado.exposicao.trim(), titulo: estado.titulo.trim() }));
-      // O autor e a sinopse são dado do mundo, e as obras de produção ainda não os têm: a ficha não
-      // inventa nenhum. O fixture prova que, quando existem, aparecem.
+      // Os créditos e a sinopse são dado do mundo: o fixture prova que, quando existem, aparecem com a
+      // etiqueta do seu papel (D67). As obras de produção têm hoje texto provisório, mas têm-no.
       if (caso.completo) {
-        result.check(onde + ': o autor e a sinopse vêm do dado',
-          (estado.autor || '').trim().length > 0 && estado.temSinopse === true,
-          'autor=' + (estado.autor || '').trim());
+        result.check(onde + ': os créditos e a sinopse vêm do dado, com a etiqueta do papel',
+          /^Autor:/.test((estado.autor || '').trim()) && estado.temSinopse === true,
+          'creditos=' + (estado.autor || '').trim());
       } else if (!(estado.autor || '').trim()) {
         faltam.push(onde);
+      }
+      // Os três créditos (D67): uma linha por papel, com a etiqueta de cada um, e nenhuma inventada.
+      if (caso.creditos) {
+        const linhas = estado.creditos || [];
+        result.check(onde + ': os três créditos dão três linhas — Autor, Coautor, Colaborador',
+          linhas.length === caso.creditos && /^Autor: /.test(linhas[0]) && /^Coautor: /.test(linhas[1]) &&
+            /^Colaborador: /.test(linhas[2]), JSON.stringify(linhas));
       }
       result.check(onde + ': o «voltar» volta ao mundo, ao sítio de onde se saiu, no cimo e no fundo',
         estado.voltar === (caso.pasta ? caso.mundo + '/?volta=1' : './?scene=' + caso.mundo + '&volta=1') &&
@@ -273,15 +282,16 @@ async function main() {
       }
     }
 
-    // 3. A língua: o mesmo endereço, `?lang=en`.
+    // 3. A língua: o mesmo endereço, `?lang=en`. O conteúdo é português (o CSV é a única fonte e é em
+    // português, D67); o que muda é a **interface** — e as etiquetas dos créditos são interface.
     await abrir(browser, site.base + '/' + artworkPageHref('r9', 0, 'en') + '&bust=' + Date.now());
     const ingles = await browser.evaluate(`(() => ({
       lingua: document.documentElement.lang,
       titulo: (document.querySelector('.titulo') || {}).textContent || '',
       autor: (document.querySelector('.autor') || {}).textContent || ''
     }))()`);
-    result.check('?lang=en mostra o inglês',
-      ingles.lingua === 'en' && /Tower at dusk/.test(ingles.titulo) && /Trial author/.test(ingles.autor),
+    result.check('?lang=en muda a interface — e a etiqueta do crédito é inglesa com o nome como está',
+      ingles.lingua === 'en' && /Tower at dusk/.test(ingles.titulo) && /^Author:/.test(ingles.autor.trim()),
       JSON.stringify(ingles));
 
     // 3b. O endereço resolve para a raiz a partir de dentro de uma sala (D28): as salas usam

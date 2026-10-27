@@ -98,17 +98,12 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Praia, no céu",
-        "en": "Beach, in the sky"
+        "pt": "Praia, no céu"
       },
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
-        "en": "Provisional text: the final synopsis of this work goes here."
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui."
       },
-      "author": {
-        "pt": "autorA",
-        "en": "autorA"
-      }
+      "authors": "autorA"
     },
     {
       "id": 9,
@@ -132,17 +127,13 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Floresta",
-        "en": "Forest"
+        "pt": "Floresta"
       },
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui.",
-        "en": "Provisional text: the final synopsis of this work goes here."
+        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui."
       },
-      "author": {
-        "pt": "autorB, autorC",
-        "en": "autorB, autorC"
-      }
+      "authors": "autorB",
+      "coAuthors": "autorC"
     }
   ],
   "portals": [

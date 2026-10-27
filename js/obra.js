@@ -75,7 +75,7 @@ function assetPath(world, artwork) {
 }
 
 // A capa da obra, pela cadeia do D65: o thumbnail do YouTube (quando o site é um vídeo), depois a
-// capa do CSV, depois a imagem padrão que pede para avisar o administrador. A troca é feita no `error`
+// capa da folha, depois a imagem padrão que pede para avisar o administrador. A troca é feita no `error`
 // do próprio `<img>` — é o único sinal que diz «não descodificou».
 function coverImage(world, artwork, language) {
   const candidates = coverCandidates(artwork, world.assets);
@@ -282,7 +282,6 @@ async function start() {
   }
 
   const title = textIn(titleOf(artwork), language);
-  const author = textIn(artwork.author, language);
   const synopsis = textIn(artwork.synopsis, language);
 
   const exhibition = row('linha exposicao');
@@ -307,12 +306,27 @@ async function start() {
   titleText.textContent = title;
   titleRow.appendChild(titleText);
 
-  if (author) {
-    const authorRow = row('linha');
-    const authorText = document.createElement('p');
-    authorText.className = 'autor';
-    authorText.textContent = author;
-    authorRow.appendChild(authorText);
+  // Os créditos (D67): até três linhas — autor, coautor, colaborador —, cada uma com a etiqueta na
+  // língua da interface e os nomes como foram escritos (nomes não se traduzem). Uma etiqueta só aparece
+  // se houver nomes: «Coautor:» sem ninguém não diz nada. O dado guarda os três campos como texto
+  // simples; quem os preenche é a folha.
+  const credits = [
+    { field: 'authors', label: 'artwork.page.author' },
+    { field: 'coAuthors', label: 'artwork.page.coAuthor' },
+    { field: 'collaborators', label: 'artwork.page.collaborator' }
+  ].filter((credit) => typeof artwork[credit.field] === 'string' && artwork[credit.field].trim() !== '');
+
+  if (credits.length) {
+    const creditRow = row('linha');
+    credits.forEach((credit) => {
+      const line = document.createElement('p');
+      line.className = 'autor';
+      const label = document.createElement('span');
+      label.className = 'credito';
+      label.textContent = t(credit.label) + ': ';
+      line.append(label, document.createTextNode(artwork[credit.field]));
+      creditRow.appendChild(line);
+    });
   }
 
   if (synopsis) {

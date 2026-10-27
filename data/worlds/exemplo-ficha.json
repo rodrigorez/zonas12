@@ -92,10 +92,9 @@
         "pt": "Exemplo · cidade ao entardecer",
         "en": "Example · city at dusk"
       },
-      "author": {
-        "pt": "Autor de exemplo",
-        "en": "Autor de exemplo"
-      },
+      "authors": "Autor de exemplo",
+      "coAuthors": "Coautora de exemplo",
+      "collaborators": "Colaborador de exemplo",
       "synopsis": {
         "pt": "Texto de exemplo. Aqui entra a sinopse da obra: uma ou duas frases que dizem o que ela é, com vírgulas e tudo.",
         "en": "Example text. Here goes the synopsis of the work: one or two sentences saying what it is, commas and all."
@@ -152,10 +151,7 @@
         "pt": "Exemplo · vídeo da cidade",
         "en": "Example · city video"
       },
-      "author": {
-        "pt": "Autor de exemplo",
-        "en": "Autor de exemplo"
-      },
+      "authors": "Autor de exemplo",
       "synopsis": {
         "pt": "Uma obra em vídeo: a ficha mostra o leitor em vez da capa.",
         "en": "A video work: the page shows the player instead of the cover."
@@ -187,10 +183,7 @@
         "pt": "Exemplo · jogo da praia",
         "en": "Example · beach game"
       },
-      "author": {
-        "pt": "Autor de exemplo",
-        "en": "Autor de exemplo"
-      },
+      "authors": "Autor de exemplo",
       "synopsis": {
         "pt": "Uma obra que é um site: a ficha tenta embuti-lo por cima da capa e deixa sempre o botão para o abrir numa aba nova.",
         "en": "A work that is a site: the page tries to embed it over the cover and always leaves the button to open it in a new tab."
