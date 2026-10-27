@@ -16,6 +16,8 @@ zonas12/
 │   └── index.html
 ├── scene3/             sala (o céu)
 │   └── index.html
+├── scene4/             sala (a noite)
+│   └── index.html
 ├── README.md           documentação principal (fica sempre na raiz)
 ├── css/
 │   ├── style.css       estilos da página, HUD, modal e D-pad
@@ -36,12 +38,13 @@ zonas12/
 │                       controlos partilhados, as respostas que a página pode dar sobre os
 │                       ficheiros e a ponte com o servidor da ferramenta (Fase 5)
 ├── data/
-│   └── worlds/         uma cena por mundo (D24): gate, scene1, scene2, scene3 e o fixture
-│                       `example` (o mundo sai do **endereço**: `/` é o portão, `/scene1/` é a
+│   └── worlds/         uma cena por mundo (D24): gate, scene1, scene2, scene3 e scene4, mais os
+│                       fixtures (`example`, `exemplo-ficha`, `r9` e `shader`; o mundo sai do
+│                       **endereço**: `/` é o portão, `/scene1/` é a
 │                       primeira sala; o `?scene=<mundo>` continua a forçar um deles, para os testes)
 ├── i18n/
-│   ├── pt.json         textos da interface: 209 chaves (192 delas do editor), lidas por js/i18n.js
-│   └── en.json         as mesmas 209 chaves em inglês (?lang=en); um teste compara as duas
+│   ├── pt.json         textos da interface: 219 chaves (196 delas do editor), lidas por js/i18n.js
+│   └── en.json         as mesmas 219 chaves em inglês (?lang=en); um teste compara as duas
 ├── docs/
 │   └── ROADMAP.md      plano de desenvolvimento (módulos, mundos e página de edição)
 ├── assets/
@@ -85,7 +88,7 @@ zonas12/
 
 - A raiz tem só o que é preciso para o projeto funcionar: `index.html`, `editor.html` (a página de
   edição, Fase 4), as pastas dos mundos
-  (`scene1/`, `scene2/` e `scene3/`, cada uma com o seu `index.html` — Fase 3B), `css/`, `js/`,
+  (`scene1/`, `scene2/`, `scene3/` e `scene4/`, cada uma com o seu `index.html` — Fase 3B), `css/`, `js/`,
   `data/`, `i18n/`, `assets/`, `README.md` e `.gitignore`.
 - Documentação de planeamento (roadmap, decisões) fica em `docs/`; ferramentas de
   construção (o validador da cena, o conversor e a varredura de regressão) em `tools/`.
@@ -209,8 +212,21 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.11)
+## Estado atual do código (v0.0.12)
 
+> **Atualização (2026-10-27, as quatro salas e o texto do autor):** o autor entregou as folhas das
+> salas 2, 3 e 4 e a exposição passou a ter **quatro salas** — `scene1` (a cidade), `scene2` (a praia),
+> `scene3` (o céu) e **`scene4`** (a noite, com o shader `noite-aurora`). As **23 obras** das quatro
+> salas estão na folha `data/obras.tsv` com o texto, os créditos e os endereços do autor (nenhuma sala
+> fica com texto provisório), e as capas das quatro vivem no **Google Drive**. A sala 4 é um mundo
+> novo (pasta, `data/worlds/scene4.json` e o arranque da D28), e o **portão** passou a ter **três
+> portas** (`-14 · 0 · +14`): cidade, praia e noite. O circuito fecha-se — portão → cidade → praia ↔
+> céu ↔ noite —, e a sala 3 deixou de ser um beco sem saída. O grafo dos mundos passa a **5 salas**
+> (mais os quatro fixtures) com **18 portas** e **9 retratos de porta** (D46), e a bateria dos doze
+> passa a medir **6 páginas** (**42** verificações), com as portas e as chegadas a **42** também.
+> Decisão **D69** (§11 do roadmap). Os números das secções seguintes são os da **v0.0.11**, onde foram
+> medidos.
+>
 > **Atualização (2026-10-24, Fase 7 — B9, o rename e a produção):** depois da v0.0.11, o **B9** pôs o
 > fundo shader na exposição e o autor **adotou-o como produção** (o ensaio passou no telemóvel fraco e
 > no desktop; o A/B nos três aparelhos fechou a **2026-10-27** — ver «Critério antes de produção»), com
@@ -221,7 +237,26 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > roadmap. As secções históricas deste README continuam a citar os nomes e endereços antigos, que é
 > onde foram medidos.
 
-Marcado pela branch `v0.0.11`. É o estado depois da **Fase 6** do roadmap — **testes e limpeza** —,
+Marcado pela branch `v0.0.12`. É o estado depois das **quatro salas**: as folhas das salas 2, 3 e 4
+entraram com o texto do autor (**23 obras**), a **sala 4** (a noite) passou a existir como mundo, o
+portão ficou com **três portas** e o circuito fechou-se (portão → cidade → praia ↔ céu ↔ noite). A
+decisão **D69** (§11 do roadmap) guarda o porquê de cada geometria e o que cada bateria mediu. Nada
+do que o visitante já conhecia mudou de comportamento: as salas 1 e 2 têm o mesmo número de obras e as
+mesmas portas, e as notas abaixo continuam a valer.
+
+Resumo do que existe na v0.0.12: `index.html` (**93 linhas**) e as **4** salas com o **mesmo** ficheiro
+(`scene1/`, `scene2/`, `scene3/` e `scene4/`, iguais fora da linha do `<base>` — D28), `editor.html`
+(**96**), `js/app.js` (**252**), `js/arrival-frame.js` (**204**, a ponte de imagem entre mundos — D43),
+`js/editor.js` (**15**, a entrada do editor — D36), `js/editor/` (**15** ficheiros, **3494** linhas com
+os painéis e a ponte com o servidor), `js/i18n.js` (**93**), `js/core/` (7 ficheiros, **226**),
+`js/modules/` (11 ficheiros, **3276**), `js/scene/` (10 ficheiros, **1773**), `js/shaders/`
+(5 ficheiros, **78**), `css/style.css` (**142**) e `css/editor.css` (**314**), **9** ficheiros em
+`data/worlds/` (o portão, as quatro salas e os quatro fixtures, **2809 linhas** no total e **18**
+portas), `i18n/pt.json` (**219** chaves), as **23 obras** na folha `data/obras.tsv`, os **21** ficheiros
+em `assets/previews/` (**9** retratos e **9** recortes, um par por porta — D46) e **48** ficheiros em
+`tools/` (**10419** linhas). O que a versão anterior entregou:
+
+A **v0.0.11** é o estado depois da **Fase 6** do roadmap — **testes e limpeza** —,
 medida em 2026-10-24 e **aceite no telemóvel** no mesmo dia: a automação dos **doze testes** num
 comando (`node tools/regression/all.mjs`), a **recusa** da varredura de poses quando a câmara se
 mexe, e as pendências **R16** e **R17** fechadas. O que a fase entregou e mediu está em
@@ -229,7 +264,7 @@ mexe, e as pendências **R16** e **R17** fechadas. O que a fase entregou e mediu
 comportamento da exposição mudou — o único ficheiro de produção tocado foi `js/arrival-frame.js`
 (a ponte espera pela descodificação da imagem).
 
-A versão anterior é a `v0.0.10` (o fecho da Fase 5 — a **gravação direta**): o servidor da
+E antes dela a `v0.0.10` (o fecho da Fase 5 — a **gravação direta**): o servidor da
 ferramenta (`tools/server/serve.mjs`) e o botão «Gravar» no editor, com as decisões **D48–D51**;
 tudo o que está nesta secção foi medido a **2026-10-23** na versão local (as baterias estão em §10)
 e a **2026-10-24** no **telemóvel**, na versão publicada, com os **oito** itens do aceite daquela
@@ -366,11 +401,12 @@ portais com stencil e ajuste automático do pixelRatio.
   retrato tinha de o carregar também, e a `2048 × 1024` a costura ficava em **0,54** (acima da meta
   de **0,50**): a exceção do **D47** subiu-o a `3072 × 1536`. Com o **fundo shader** (Fase 7) o céu, o
   mar e o chão passam a ser calculados — iguais dos dois lados do corte — e o retrato só carrega as
-  **obras e as portas**: a `2048 × 1024` a costura fica em **0,13 a 0,47** nas seis portas. São **6**
-  ficheiros, **772 kB** no total, **8 MiB** de textura cada, e a **L14** deixa de ter o que avisar
-  (`validate.mjs`: `Erros: 0 · Avisos: 0` nos seis mundos).
+  **obras e as portas**: a `2048 × 1024` a costura fica em **0,13 a 0,47** nas portas medidas. Com as
+  quatro salas são **9** ficheiros, **1192 kB** no total (**78 a 168 kB** cada), **8 MiB** de textura
+  cada, e a **L14** deixa de ter o que avisar
+  (`validate.mjs`: `Erros: 0 · Avisos: 0` nos nove ficheiros de mundo).
 - **Além do retrato, cada porta tem um recorte (D53).** O mesmo desenho, sem o fundo e com
-  transparência (`recorte-<porta>.png`, 2:1, **133 a 155 kB** cada): é o que a janela compõe sobre o
+  transparência (`recorte-<porta>.png`, 2:1, **125 a 144 kB** cada): é o que a janela compõe sobre o
   shader **ao vivo** do destino, para a janela animar sem perder as obras e as portas. O retrato
   inteiro fica como reserva — `?shader=0`, ou um driver que recusa o programa.
 - A produção configura `THREE.LinearFilter` e desativa mipmaps em
@@ -448,6 +484,7 @@ reserva, e é o que serve o A/B e o rollback. O mundo de ensaio é `?scene=shade
 | `scene1` (cidade) | `grade-neon` | `cidade-360` |
 | `scene2` (praia) | `por-do-sol` | `praia` |
 | `scene3` (céu) | `nuvens` | `skycloud` |
+| `scene4` (noite) | `noite-aurora` | `skycloud` |
 
 **Enviar um shader** é `node tools/shader/validate.mjs <ficheiro.glsl>` para medir e
 `node tools/shader/install.mjs <ficheiro.glsl> --id <id> --name "<nome>"` para instalar. O ficheiro
@@ -462,7 +499,7 @@ nomear só o `id`, nunca GLSL.
 
 O instrumento da política é `node tools/regression/shader.mjs` (entra em `all.mjs --full`): mede a
 escada sem GPU, a taxa entregue (≤ 20 atualizações/s), o `?shader=0`, o `prefers-reduced-motion`, as
-três salas de produção e o painel do editor. A escada persegue dois alvos desde 2026-10-27: a cadência
+quatro salas de produção e o painel do editor. A escada persegue dois alvos desde 2026-10-27: a cadência
 de **20/s** e um **chão de 45 quadros/s** (`minFps`) — abaixo dele, e enquanto houver resolução para
 baixar, a janela conta como má, porque é isso que se sente ao olhar em volta. O **A/B controlado nos três
 aparelhos** está registado desde **2026-10-27** (§ «Critério antes de produção», com a tabela dos quatro
@@ -855,7 +892,8 @@ formato do ID, o T6 a apontar para `obra.html?mundo=…&id=…` e o `all.mjs --f
 
 **O exemplo que o autor pediu (antes do texto definitivo).** `data/obras.exemplo.tsv` traz as dez obras
 com texto de exemplo — uma com os **três créditos**, uma só com autor, uma sem créditos, uma em vídeo
-e uma com vários autores na mesma célula — e corre-se com `--file`, sem tocar na folha a sério:
+e uma com vários autores na mesma célula —, nas quatro salas (com os `id` que elas têm hoje), e
+corre-se com `--file`, sem tocar na folha a sério:
 
 ```sh
 node tools/artwork/from-csv.mjs --file data/obras.exemplo.tsv
@@ -1073,7 +1111,7 @@ dois sítios.
 
 > A fase correu **bloco a bloco** — de B0 (o plano) a B10 (esta documentação) — e cada bloco está em
 > [docs/ROADMAP.md](docs/ROADMAP.md) §9 com o que entregou e **mediu**; as decisões que a fecharam
-> (D24–D29) estão em §11. O `?scene=<mundo>` continua a existir para os testes, e as três salas têm
+> (D24–D29) estão em §11. O `?scene=<mundo>` continua a existir para os testes, e as quatro salas têm
 > endereço próprio. O marco é a branch `v0.0.6`.
 
 Um **mundo** é um conjunto fechado de dimensões, com as suas portas e o seu conteúdo, e tem o seu
@@ -1082,7 +1120,7 @@ porta para cada sala. Dentro de uma sala só se navega pelas dimensões dessa sa
 
 | Antes (Fase 3) | Agora (Fase 3B) |
 | --- | --- |
-| Uma página, uma cena, quatro dimensões | **Uma cena por mundo**, com o seu ficheiro (`data/worlds/`) e o seu endereço: a raiz é o portão e `/scene1/`, `/scene2/` e `/scene3/` são as salas — o **mesmo `index.html`**, com o `<base>` a apontar um nível acima |
+| Uma página, uma cena, quatro dimensões | **Uma cena por mundo**, com o seu ficheiro (`data/worlds/`) e o seu endereço: a raiz é o portão e `/scene1/`, `/scene2/`, `/scene3/` e `/scene4/` são as salas — o **mesmo `index.html`**, com o `<base>` a apontar um nível acima |
 | O portal ligava duas dimensões (`dimensionA`/`dimensionB`) | O portal tem **dois eixos**: `window` (o que a janela mostra: o par, um retrato ou nada) e `action` (o que a travessia faz: ficar, navegar ou nada) |
 | A travessia mudava a dimensão ativa | A **porta de mundo** mostra um **retrato** do destino (uma dimensão derivada, com paralaxe porque a esfera não segue a câmara) e a travessia **navega** para a URL do outro mundo |
 | Técnica do stencil | **Igual dentro de cada sala** — as leis L1–L8 e os testes T1–T9 continuam a valer, e a porta de mundo entra na mesma máquina (máscara, moldura, valor de stencil) |
@@ -1097,8 +1135,8 @@ de câmara não desenha nada, e a janela fica transparente sobre o vídeo — a 
 lados da porta.
 `node tools/scene/validate.mjs` confere isso tudo do lado do dado: as leis dos mundos, o **grafo**
 (todas as salas alcançáveis a partir do portão e **L19** — toda a porta tem uma chegada no destino,
-que é o defeito que a praia teve até ao B7), e os quatro **arranques** (a pasta é o slug, o `<base>`
-aponta para a raiz e os quatro são o mesmo ficheiro fora dessa linha — D28). O formato dos dados, as
+que é o defeito que a praia teve até ao B7), e os cinco **arranques** (a pasta é o slug, o `<base>`
+aponta para a raiz e os cinco são o mesmo ficheiro fora dessa linha — D28). O formato dos dados, as
 leis (L9–L19), os testes (T10–T12) e o estado de cada bloco estão em
 [docs/ROADMAP.md](docs/ROADMAP.md).
 
@@ -1345,17 +1383,19 @@ portas que dele saem; o portão não tem conteúdo 3D — vê-se a câmara.
 
 | Mundo | Dimensão | Conteúdo | Portas (id: para onde) |
 | --- | --- | --- | --- |
-| `gate` (o portão, na raiz) | 0 — realidade | Vê-se a câmara | `0 → scene1`, `1 → scene2` — em `x = ∓6`, `z = -8` |
-| `scene1` (a cidade) | 0 — cidade 360º | `cidade-360` + 5 obras | `2 → gate`, `3 → scene2` — em `x = ∓25`, `z = -45` |
-| `scene2` (a praia) | 0 — praia | `praia` + 3 obras | `4 → scene1`, `5 → gate`, `6 → scene3` — em `x = -25`, `x = 25` e `x = 0`, `z = -80` |
-| `scene3` (o céu) | 0 — céu 360º | `skycloud` + 2 obras | `7 → scene2` — em `x = 0`, `z = -120` |
+| `gate` (o portão, na raiz) | 0 — realidade | Vê-se a câmara | `0 → scene1`, `1 → scene2`, `2 → scene4` — em `x = -14`, `0` e `14`, `z = -8` |
+| `scene1` (a cidade) | 0 — cidade 360º | `cidade-360` + 7 obras | `2 → gate`, `3 → scene2` — em `x = ∓25`, `z = -45` |
+| `scene2` (a praia) | 0 — praia | `praia` + 7 obras | `4 → scene1`, `5 → gate`, `6 → scene3` — em `x = -19`, `0` e `19`, `z = -80` |
+| `scene3` (o céu) | 0 — céu 360º | `skycloud` + 3 obras | `7 → scene2`, `10 → scene4` — em `x = 0` e `20`, `z = -120` |
+| `scene4` (a noite) | 0 — noite 360º | `skycloud` + 6 obras | `8 → gate`, `9 → scene3` — em `x = ∓19`, `z = -80` |
 
-O grafo das portas é o que era — as oito, nos mesmos sítios —, mas cada uma leva agora a um
-**mundo**, e não a uma dimensão do mesmo ficheiro (excepto a porta 5, trocada no B7 — ver abaixo):
+O grafo das portas leva cada uma a um **mundo**, e não a uma dimensão do mesmo ficheiro (excepto a
+porta 5, trocada no B7 — ver abaixo):
 
 ```
 gate   ⇄ cidade   (portas 0 e 2)      gate  ⇄ praia  (portas 1 e 5)
 cidade ⇄ praia    (portas 3 e 4)      praia ⇄ céu    (portas 6 e 7)
+gate   ⇄ noite    (portas 2 e 8)      céu   ⇄ noite  (portas 10 e 9)
 ```
 
 A porta **5** era a **segunda porta da praia para a cidade** — uma duplicação que vinha da cena
@@ -1369,10 +1409,11 @@ derivada (D26: 1 textura, 1 valor de stencil, 1 desenho) continua a valer no có
 estar **exercitada**; o **fixture** passou a exercitá-la no B8 (uma quarta porta, com o mesmo
 retrato da primeira).
 
-Todas as salas têm **regresso directo** ao portão — `cidade → gate` (porta 2) e `praia → gate`
-(porta 5) — e cada porta é **bidirecional**: atravessar no sentido contrário é a mesma porta. A que
-marca `arrivalFrom` é por onde se chega a esse mundo (uma por origem — lei L17), e a chegada é
-**atrás** dela, virada para dentro da sala — o que faz do regresso um passo. As posições foram
+A cidade, a praia e a noite têm **regresso directo** ao portão — `cidade → gate` (porta 2),
+`praia → gate` (porta 5) e `noite → gate` (porta 8); o céu regressa pela praia (porta 7), porque não
+tem porta própria para o portão. E cada porta é **bidirecional**: atravessar no sentido contrário é a
+mesma porta. A que marca `arrivalFrom` é por onde se chega a esse mundo (uma por origem — lei L17), e a
+chegada é **atrás** dela, virada para dentro da sala — o que faz do regresso um passo. As posições foram
 escolhidas para que o ponto de chegada nunca caia dentro da caixa de outra porta — sem isso haveria
 trocas em cadeia ao chegar.
 
@@ -1616,12 +1657,13 @@ e o **nome de cada porta e de cada obra** (tecla **D**):
 4. Explore o ambiente utilizando o mouse (desktop) ou o D-pad (mobile)
 
 O **endereço escolhe o mundo**: a raiz é o **portão** e cada sala tem a sua pasta —
-`http://127.0.0.1:8123/scene1/`, `/scene2/` e `/scene3/`. As três salas servem o **mesmo `index.html`**
-da raiz (o `<base>` é que muda), e atravessar uma porta de mundo navega para a pasta do destino.
+`http://127.0.0.1:8123/scene1/`, `/scene2/`, `/scene3/` e `/scene4/`. As quatro salas servem o **mesmo
+`index.html`** da raiz (o `<base>` é que muda), e atravessar uma porta de mundo navega para a pasta do
+destino.
 
 Quem quiser experimentar sem mexer na exposição pode forçar um mundo com `?scene=`
 (`http://127.0.0.1:8123/?scene=example`): carrega o `data/worlds/example.json`, o mundo de ensaio
-com duas dimensões e **duas portas de cada tipo** (o par de dimensões ao vivo, atravessável, e o retrato que navega) — `?scene=scene1`, `?scene=scene2` e `?scene=scene3` também
+com duas dimensões e **duas portas de cada tipo** (o par de dimensões ao vivo, atravessável, e o retrato que navega) — `?scene=scene1`, `?scene=scene2`, `?scene=scene3` e `?scene=scene4` também
 funcionam. E `&from=<mundo>` diz de que mundo se vem, o que faz o visitante aparecer atrás da porta
 de chegada: `/scene2/?from=scene1`. O mundo de ensaio do fundo shader (Fase 7, **R14**/**R15**) é
 `?scene=shader`, e `&shader=0` mostra a imagem de reserva em vez do shader — em qualquer mundo.
@@ -1653,10 +1695,10 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 
 | Bateria | O que responde |
 | --- | --- |
-| `tools/scene/validate.mjs` | os 6 mundos, as leis, o grafo das portas e os arranques |
+| `tools/scene/validate.mjs` | os 9 ficheiros de mundo (5 salas e 4 fixtures), as leis, o grafo das portas e os arranques |
 | `tools/scene/laws-selftest.mjs` | **22** avarias injectadas, todas detectadas, com o controlo limpo |
-| `tools/regression/twelve-tests.mjs` | **T2–T12** nas 5 páginas (**35** verificações) |
-| `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) |
+| `tools/regression/twelve-tests.mjs` | **T2–T12** nas 6 páginas (**42** verificações) |
+| `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) — 18 portas, 42 verificações |
 | `tools/regression/i18n.mjs` | as duas línguas: chaves, marcadores e `?lang=en` nas duas páginas |
 
 `--full` acrescenta as baterias arquivadas das Fases 4, 5, 7 e 8 — a costura das travessias, a ponte

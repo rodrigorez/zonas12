@@ -13,7 +13,12 @@
 #                 do D65 começar no thumbnail;
 #   scene1 3 ... sem créditos nenhuns (a ficha não mostra a linha do autor);
 #   scene1 4 ... vários autores na mesma célula, separados por vírgula (que aqui é só texto);
-#   scene2 e scene3 ... o mesmo em duas salas, porque a mesma imagem pode ser obra em duas.
+#   scene2 ... o mesmo em duas salas, porque a mesma imagem pode ser obra em duas;
+#   scene3 e scene4 ... as salas que entraram depois (o céu e a noite), para a folha não apontar para
+#                 um `id` que já não existe.
+#
+# Os `id` têm de existir no mundo: `scene1` e `scene2` vão de 0 a 6, `scene3` de 0 a 2 e `scene4` de
+# 0 a 5. Um `id` que não exista é recusado com a linha e o mundo.
 #
 # As colunas são separadas por TABULAÇÃO: nenhum texto precisa de aspas, nem os que têm vírgulas ou
 # pontos e vírgulas.
@@ -28,6 +33,6 @@ scene1	3	Exemplo · praia				Sem créditos nenhuns: a ficha não mostra a linha 
 scene1	4	Exemplo · céu de nuvens	Um Autor, Outro Autor			Vários autores na mesma célula, separados por vírgula: a ficha mostra-os pela ordem escrita.	assets/panoramas/ceu-d0-skycloud.jpg	
 scene2	5	Exemplo · céu	Autor de exemplo			A mesma imagem é obra em duas salas, e cada uma tem a sua ficha.	assets/panoramas/ceu-d0-skycloud.jpg	
 scene2	6	Exemplo · torre (sala 2)	Autor de exemplo	Co-autor de exemplo		Uma obra com autor e coautor.	assets/artworks/eiffel.jpg	
-scene2	7	Exemplo · cidade (sala 2)	Autor de exemplo			Como esta.	assets/artworks/cidade-d0-bryan-goff.jpg	
-scene3	8	Exemplo · praia (céu)	Autor de exemplo			A ficha de uma obra de outra sala, com o mesmo desenho.	assets/panoramas/praia-d0-praia.jpg	
-scene3	9	Exemplo · floresta	Autor de exemplo	Co-autor de exemplo	Colaborador de exemplo	O nome manda no cimo da ficha e no nome do separador do browser.	assets/panoramas/cidade-d0-forest.jpg	
+scene3	0	Exemplo · praia (céu)	Autor de exemplo			A ficha de uma obra de outra sala, com o mesmo desenho.	assets/panoramas/praia-d0-praia.jpg	
+scene3	1	Exemplo · floresta	Autor de exemplo	Co-autor de exemplo	Colaborador de exemplo	O nome manda no cimo da ficha e no nome do separador do browser.	assets/panoramas/cidade-d0-forest.jpg	
+scene4	0	Exemplo · noite	Autor de exemplo			A sala 4 é a mais nova: a ficha funciona do mesmo modo, com o texto desta célula.	assets/panoramas/ceu-d0-skycloud.jpg	

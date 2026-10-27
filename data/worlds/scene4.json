@@ -1,0 +1,380 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "scene4",
+    "name": {
+      "pt": "Noite 360º",
+      "en": "Night 360º"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "skycloud": {
+      "path": "assets/panoramas/ceu-d0-skycloud.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º do céu, usado como reserva do fundo da sala 4",
+        "en": "360º panorama of the sky, used as the fallback for room 4"
+      }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/1u0TVscbuT73uUOHmpBXdRl9YBLZF7KXT",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Harmonização Doméstica"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1r-lDhd6jf8FxjpGnkNMq-IEiX3xoefUe",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra More than Her"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1Sb4jZUmrLWLkPcOBW1ASESeS5nsc2xd6",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Fragmento 1"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1ImqWsAmtfYTn0xiAseWZaXv26xb2-0OG",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra 8 Freezing Forks"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/15Ea-Wn1q64vNuwPlxGm26luVRP61_Jov",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Ottetto"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1BNThxvaPD7WMxq-AkUplQMy-2odeuDsf",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra SENTINELAS"
+      }
+    },
+    "retrato-ceu": {
+      "path": "assets/previews/scene3-de-scene4.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Céu 360º, visto da porta",
+        "en": "Portrait of the Sky 360º world, seen from the door"
+      }
+    },
+    "recorte-scene3-de-scene4": {
+      "path": "assets/previews/recorte-scene3-de-scene4.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Céu 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Sky 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "noite-aurora",
+      "fallbackAsset": "skycloud",
+      "name": {
+        "pt": "Noite 360º",
+        "en": "Night 360º"
+      },
+      "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-0",
+      "position": [
+        -50,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Harmonização Doméstica"
+      },
+      "authors": "Juliana Garzillo",
+      "synopsis": {
+        "pt": "O vídeo é composto por imagens gravadas pela artista mescladas com imagens feitas por inteligência artificial. Utilizando um filtro que simula um rosto com harmonização facial exagerada, vemos uma mulher realizar a limpeza da casa. Apresentado por um gato, o trabalho flerta com o non sense ao trazer ações fantásticas criadas por IA."
+      },
+      "site": "https://vimeo.com/1231840976?share=copy&fl=sv&fe=ci"
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-1",
+      "position": [
+        -30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "More than Her"
+      },
+      "authors": "233",
+      "synopsis": {
+        "pt": "Em meio ao ruído visual contemporâneo, este projeto propõe um silêncio necessário; um compromisso óptico que nos convida à introspecção. É por isso que esta imagem é novamente descartada, justificando outra reviravolta, uma nova reviravolta que nos ajuda a ir além do anatômico."
+      }
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        -10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Fragmento 1"
+      },
+      "authors": "Felipe Faraco",
+      "synopsis": {
+        "pt": "Fragmento 1 é a reutilização/ degradação / fragmentação de processos artísticos originalmente independentes, mas que, aqui, originam algo novo."
+      },
+      "site": "https://youtu.be/sVFZ6J1iKWM"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "8 Freezing Forks"
+      },
+      "authors": "Martí Ruids",
+      "synopsis": {
+        "pt": "Os *Freezing Forks* foram criados por volta de 2012, utilizando o sistema Baschet de acústica aplicada para redefinir o comportamento dos diapasões. A simetria de sua forma em “U” permite uma ressonância sustentada; graças às suas proporções mais robustas, as oscilações acumulam tanta energia que o ar é impulsionado de forma direcional, como uma espécie de farol sonoro. Durante residências artísticas no Salzamt Linz e no TangibleMusicLab, fabricamos oito deles, capazes de ressoar por minutos."
+      },
+      "site": "https://youtu.be/xRaSZx1O-xA"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Ottetto"
+      },
+      "authors": "Josep Manuel Berenguer",
+      "synopsis": {
+        "pt": "Ottetto é uma improvisação eletroacústica para guitarra e oito agentes computacionais baseados em Dicy2. Do solo ao octeto, os agentes transformam gravações e sons ao vivo. O guitarrista responde às alterações do seu passado sonoro, num diálogo entre memória humana e digital que explora a repetição, a reinvenção e a narração."
+      },
+      "site": "https://www.youtube.com/watch?v=J8r8m7BABXc"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        50,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "SENTINELAS"
+      },
+      "authors": "Thiago Capella; Núcleo de pesquisa Sentinelas",
+      "collaborators": "Anna Mendes; Bruno Dan Borges; Carolina Holanda; Edstron Rosário; Felipe Zancanaro; Hércules Guará; Isabela Suckow; Juruá; Katrina Moura; Lucas Neves; Luiza Maria; Lunar; Mafer Cristino; Mariana Leme; Rafael Veras; Roberta Santos Lima",
+      "synopsis": {
+        "pt": "Sentinelas cria um organismo cênico híbrido em que sinais fisiológicos e movimentos dos performers transformam luz, som, laser, vídeo e motores em tempo real. A obra investiga relações entre corpo e máquina, presença e vigilância, controle e crença."
+      },
+      "site": "https://drive.google.com/file/d/1E0RnglrBOO9eMd1wwSHqnGAiidqfOQTA/preview"
+    }
+  ],
+  "portals": [
+    {
+      "id": 8,
+      "ownedBy": 0,
+      "position": [
+        -19,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "arrivalFrom": "gate"
+    },
+    {
+      "id": 9,
+      "ownedBy": 0,
+      "position": [
+        19,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-ceu",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene4"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "arrivalFrom": "scene3"
+    }
+  ]
+}

@@ -10,18 +10,19 @@ ponto diz o que fazer e **como se sabe que ficou feito**.
 
 ---
 
-## 1. O texto definitivo das obras
+## 1. O texto definitivo das obras — **feito** (2026-10-27)
 
-`scene1` **está feito** (2026-10-27): as sete obras da sala 1 entraram com o texto do autor, os créditos
-e os endereços, e a folha `data/obras.tsv` é a fonte da verdade. `scene2` (3 obras) e `scene3` (2
-obras) continuam com texto **provisório** — autores `autorA`/`autorB`/`AutorC` e sinopses «Texto
-provisório: …» — à espera das folhas dessas salas.
+As **quatro salas** entraram com o texto do autor (2026-10-27): `scene1` com **7** obras, `scene2` com
+**7**, `scene3` com **3** e `scene4` com **6** — **23** obras, com título, créditos, descritivo, capa e
+site onde a obra é uma página. A folha `data/obras.tsv` é a fonte da verdade e **nenhuma** obra fica com
+texto provisório: `node tools/artwork/from-csv.mjs --check` responde «a folha não muda nada: o dado já
+diz o mesmo».
 
 O formato é de **2026-10-27** (D67), todo em **português**, nove colunas separadas por **tabulação** e
 **sem aspas**: `mundo`, `id`, `nome da obra`, `nomeAutores`, `nomeCoautores`, `nomaColaboradores`,
 `Descritivo`, `endereço da imagem`, `endereço da obra`. O `mundo` e o `id` **não se mudam**.
 
-**O que fazer**
+**Se o autor entregar uma revisão de texto** (o caminho continua a ser este)
 
 1. Abrir `data/obras.tsv` e substituir, por obra: `nome da obra`, `nomeAutores`, `nomeCoautores`,
    `nomaColaboradores` e `Descritivo`. Uma célula de crédito vazia **tira** aquele crédito da ficha.
@@ -54,20 +55,18 @@ folha de produção não tem nenhum endereço que não seja de uma obra real.
 
 ## 3. As capas
 
-As sete obras da sala 1 têm a capa no **Google Drive**, servida pelo endereço directo
+As **23 obras** das quatro salas têm a capa no **Google Drive**, servida pelo endereço directo
 `https://lh3.googleusercontent.com/d/<ID>` — o `/file/d/<ID>/view` é uma **página** e não carrega como
-imagem (medido: 0 px), e o `uc?export=view&id=` falha do mesmo modo. `scene2` e `scene3` continuam a
-apontar para ficheiros do projeto.
+imagem (medido: 0 px), e o `uc?export=view&id=` falha do mesmo modo. O importador aceita um endereço
+remoto **sem extensão** como imagem (D68) e escreve a capa em `capa-<id>`.
 
 Custo medido: sete capas remotas são sete idas à rede; a sala 1 abria **1,7 s** depois do resto da
 exposição (as outras salas, 0,2–0,3 s) porque as capas eram resolvidas **uma a uma** — desde
 2026-10-27 são resolvidas em paralelo e a sala 1 abre em ~0,9 s. Se a exposição for para telemóveis
 fracos, a alternativa é servir as capas numa versão menor (`…/d/<ID>=w800`) ou alojá-las no projeto.
 
-**O que fazer:** abrir cada ficha e olhar para a imagem. Confirmar que é a obra certa — na sala 1 as
-sete são fotogramas das próprias obras; as capas de `scene2`/`scene3` continuam a apontar para o
-panorama (por exemplo `Floresta` a apontar para `cidade-d0-forest.jpg`) e serão substituídas com as
-folhas dessas salas.
+**O que fazer:** abrir cada ficha e olhar para a imagem. Confirmar que é a obra certa — são os
+fotogramas que o autor escolheu, uma por obra.
 
 **Ficou feito quando** nenhuma obra mostrar a imagem de aviso, e todas forem reconhecíveis.
 
@@ -94,7 +93,7 @@ aos dois lados (num aparelho bom a reserva fica intacta; num fraco o ratio desce
 ## 6. Antes de dizer «está no ar»
 
 ```
-node tools/regression/all.mjs --full      # 25 de 25
+node tools/regression/all.mjs --full      # 26 de 26
 git status                                 # vazio
 git log -1 --format='%h %s'                # o commit que o Pages está a servir
 ```
@@ -109,4 +108,4 @@ browser guarda o JavaScript da visita anterior e é isso que faz uma correção 
 | | |
 | --- | --- |
 | **Fase 8** | fechada em 2026-10-27, com os números no [roadmap](ROADMAP.md) (§ «Fase 8») |
-| **Pré-exposição** | sala 1 entregue: pontos **1** (sala 1) e **2** feitos; falta o texto de `scene2`/`scene3`; **3** a conferir; **4** só se houver propriedade; **5** opcional |
+| **Pré-exposição** | as quatro salas entregues: pontos **1**, **2** e **3** feitos; **4** só se houver propriedade; **5** opcional |

@@ -60,6 +60,43 @@
         "pt": "Retrato do mundo Praia, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Beach world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/11aOVugiI2OLbr-ostwyBsOh3L1pCjdv9",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra GALÁXIAS"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1m0TxSD3VrDjn87728J-mV1JDAhx3UW7v",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra PARANGOLÉS ELETRÔNICOS"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1bBvmWgfl5-rLBOesJ8fAo7bVqNXmEugM",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra UAKTI CORPOS SONOROS"
+      }
+    },
+    "retrato-noite": {
+      "path": "assets/previews/scene4-de-scene3.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Noite 360º, visto da porta",
+        "en": "Portrait of the Night 360º world, seen from the door"
+      }
+    },
+    "recorte-scene4-de-scene3": {
+      "path": "assets/previews/recorte-scene4-de-scene3.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Noite 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Night 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -77,12 +114,12 @@
   ],
   "artworks": [
     {
-      "id": 8,
+      "id": 0,
       "dimension": 0,
-      "kind": "image",
-      "asset": "praia",
+      "kind": "site",
+      "asset": "capa-0",
       "position": [
-        -6,
+        -24,
         1.5,
         -131
       ],
@@ -98,20 +135,22 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Praia, no céu"
+        "pt": "GALÁXIAS"
       },
+      "authors": "Sidney Tamai, Dennis Gomes, Fernanda Catelani, Matheus Novaes",
+      "coAuthors": "Dennis Gomes, Fernanda Catelani",
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui."
+        "pt": "O Galáxias é uma instalação site orientado trans sensorial no Campus Bauru (30m × 50m), decorrente do grupo Artes em Tecnologias Emergentes. Reúne três estruturas têxteis tenso-estruturadas, com sensores de umidade, motores de tração e túnel sonoro-luminoso, reagindo à presença no ambiente."
       },
-      "authors": "autorA"
+      "site": "https://drive.google.com/file/d/1V3XT-waoHouJHYTyxxjyLwi5x6U1QXy5/preview"
     },
     {
-      "id": 9,
+      "id": 1,
       "dimension": 0,
-      "kind": "image",
-      "asset": "cidade-360",
+      "kind": "site",
+      "asset": "capa-1",
       "position": [
-        6,
+        -12,
         1.5,
         -131
       ],
@@ -127,13 +166,45 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Floresta"
+        "pt": "PARANGOLÉS ELETRÔNICOS"
       },
+      "authors": "Sidney Tamai, Dennis Gomes, Fernanda Catelani, Matheus Sinto Novaes, Lia Soares de Figueiredo, Inaê Soares de Figueiredo.",
+      "coAuthors": "Matheus Sinto Novaes, Lia Soares de Figueiredo, Inaê Soares de Figueiredo",
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui."
+        "pt": "Os Parangolés Eletrônicos é um projeto de pesquisa em arte vestível interativa que reimagina os Parangolés de Hélio Oiticica em contexto tecnológico, desenvolvido desde 2022. Em três fases (2023-2026), reúne seis vestíveis com sensores, som, termossensibilidade e conexões IoT, promovendo relação simbiótica orgânico/digital."
       },
-      "authors": "autorB",
-      "coAuthors": "autorC"
+      "site": "https://drive.google.com/file/d/1zsSuRYkSq5_tSByOHkX3Y5j3-DOPbdZz/preview"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        12,
+        1.5,
+        -131
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "UAKTI CORPOS SONOROS"
+      },
+      "authors": "AILTON WENCESLAU; SIDNEY TAMAI",
+      "collaborators": "Participantes do Grupo de Pesquisa Artes em Tecnologias Emergentes - FAAC UNESP/CAPES-CNPQ. - http://dgp.cnpq.br/dgp/espelhogrupo/262243",
+      "synopsis": {
+        "pt": "UAKTI CORPOS SONOROS é uma Instalação sonora, um cubo em aço de arestas com 3mts, aberto com 12 sensores que captam o movimento das pessoas tranformando em som conforme seu deslocamento, ao sair do cubo o som permanece segundos, a presença de uma ausência."
+      },
+      "site": "https://drive.google.com/file/d/1Np8rXCT2jx5B2_RrDsQSY5eZ3POmgT0A/preview"
     }
   ],
   "portals": [
@@ -179,6 +250,49 @@
         "target": "scene2"
       },
       "arrivalFrom": "scene2"
+    },
+    {
+      "id": 10,
+      "ownedBy": 0,
+      "position": [
+        20,
+        0,
+        -120
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-noite",
+        "radius": 120,
+        "shaderId": "noite-aurora",
+        "cutout": "recorte-scene4-de-scene3"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene4"
+      },
+      "arrivalFrom": "scene4"
     }
   ]
 }

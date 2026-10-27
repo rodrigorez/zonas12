@@ -35,6 +35,7 @@ const MUNDOS = [
   { slug: 'scene1', rota: '/scene1/' },
   { slug: 'scene2', rota: '/scene2/' },
   { slug: 'scene3', rota: '/scene3/' },
+  { slug: 'scene4', rota: '/scene4/' },
   { slug: 'example', rota: '/', cena: 'example' }
 ];
 

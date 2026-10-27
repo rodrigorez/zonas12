@@ -33,6 +33,7 @@ const PAGINAS = [
   { slug: 'scene1', from: 'gate' },
   { slug: 'scene2', from: 'scene1' },
   { slug: 'scene3', from: 'scene2' },
+  { slug: 'scene4', from: 'gate' },
   { slug: 'example', from: null }
 ];
 

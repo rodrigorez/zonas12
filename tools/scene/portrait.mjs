@@ -38,15 +38,18 @@ import { serveProject, openBrowser, ROOT, sleep } from '../regression/harness.mj
 // resolução.
 const TAMANHO = { largura: 2048, altura: 1024, face: 1536, qualidade: 0.85 };
 
-// As seis portas com retrato, como (mundo de destino, mundo de origem): é o par que diz de onde a
-// câmara parte para desenhar a chegada. `--todos` desenha as seis.
+// As nove portas com retrato, como (mundo de destino, mundo de origem): é o par que diz de onde a
+// câmara parte para desenhar a chegada. `--todos` desenha as nove.
 const PORTAS = [
   ['scene1', 'gate'],
   ['scene2', 'gate'],
+  ['scene4', 'gate'],
   ['scene2', 'scene1'],
   ['scene1', 'scene2'],
   ['scene3', 'scene2'],
-  ['scene2', 'scene3']
+  ['scene2', 'scene3'],
+  ['scene3', 'scene4'],
+  ['scene4', 'scene3']
 ];
 
 const todos = process.argv[2] === '--todos';
@@ -189,9 +192,22 @@ async function gerar(mundo, origem, destino) {
     const url = site.base + '/' + mundo + '/?from=' + origem + '&bust=' + Date.now();
     const pronta = await browser.goto(url, 90000);
     if (!pronta) throw new Error('a cena de ' + mundo + ' não ficou pronta');
-    // A cena só está construída quando as portas existem: o `world` é escrito antes do build.
+    // A sala só está construída quando `built` o diz (D68): `state.portals` enche-se antes disso, e com
+    // as capas no Google Drive o fundo da dimensão ainda não existe nesse instante. Esperar só pelas
+    // portas apanhava a sala a meio e o retrato inteiro saía **preto** (medido, 2026-10-27: 13 kB em vez
+    // de 171 kB na sala 3) — o recorte vinha certo, porque as obras já lá estavam e é só delas que ele
+    // é feito. Por isso a espera é pelo `built`, e depois pelos fundos que o retrato vai desenhar.
     for (let i = 0; i < 240; i++) {
-      if (await browser.evaluate('Boolean(window.portalDebug.state.portals.length)').catch(() => false)) break;
+      const estado = await browser.evaluate(`(() => {
+        const depuracao = window.portalDebug;
+        if (!depuracao || depuracao.built !== true) return null;
+        const cena = document.querySelector('a-scene');
+        if (!cena) return null;
+        const fundos = Array.from(cena.querySelectorAll('[data-dimension]'))
+          .filter((elemento) => elemento.components && elemento.components['dimension-panorama']);
+        return { portas: depuracao.state.portals.length, fundos: fundos.length };
+      })()`).catch(() => null);
+      if (estado && estado.portas > 0 && estado.fundos > 0) break;
       await sleep(250);
     }
     await sleep(2500);
@@ -206,6 +222,16 @@ async function gerar(mundo, origem, destino) {
     })()`);
     console.log('mundo ' + mundo + ' a chegar de ' + origem + ': câmara em [' +
       chegada.posicao.map((valor) => Math.round(valor * 100) / 100).join(', ') + ']');
+
+    // O shader **congela** antes de desenhar (2026-10-27). O retrato fixa o instante em cada material,
+    // mas o ciclo da exposição volta a escrever `uTime` a cada fotograma — e as seis faces do cubo são
+    // desenhadas com esperas pelo meio, cada uma num instante diferente. Era isso que fazia o mesmo
+    // retrato sair com 438, 215 e 378 kB em passagens seguidas, e que punha os anéis do mar fora de
+    // fase em relação à chegada (a costura de uma porta media 1,4 a 2,0 em vez de 0,3). Congelado, o
+    // instante que `shaderTime()` devolve é o mesmo que o retrato guarda.
+    await browser.evaluate(
+      '(() => { if (window.portalDebug && window.portalDebug.freezeShaders) window.portalDebug.freezeShaders(); return true; })()'
+    ).catch(() => { /* um mundo sem política de shader não tem o que congelar */ });
 
     const desenho = await browser.evaluate(
       DESENHAR(tamanho.largura, tamanho.altura, tamanho.face, tamanho.qualidade), 180000);

@@ -12,11 +12,11 @@ para fazer num aparelho está marcado — não é preciso forçar.
 > falha de cada um, a folha de registo e o que desfazer no fim. Este ficheiro continua a ser a
 > referência de cada teste.
 
-> **Estado do dado hoje:** o `data/obras.tsv` está preenchido com texto **provisório**, para aprovação:
-> as dez obras de produção têm título, **autor (um ou vários)** e sinopse. **A do vídeo** (`scene1`
-> `id=2`, «Vídeo de teste») é a única com `site` — um vídeo do YouTube, **só para testes de laboratório**
-> — e a capa dela é buscada ao YouTube a partir do endereço do vídeo (D65). As outras nove são obras de
-> imagem simples.
+> **Estado do dado hoje (2026-10-27):** o `data/obras.tsv` tem as **23 obras** das quatro salas com o
+> texto, os créditos e os endereços do autor — **nenhuma** tem texto provisório, e a folha é a fonte da
+> verdade (D67). As capas vivem **todas** no Google Drive, servidas por
+> `https://lh3.googleusercontent.com/d/<ID>`; as obras cujo conteúdo é uma página (Drive, YouTube ou
+> Vimeo) têm essa página em `endereço da obra`, e as outras são obras de imagem.
 
 ---
 
@@ -27,20 +27,23 @@ endereço completo** — é só abrir:
 
 | O que | Endereço completo |
 | --- | --- |
-| Portão (entrada da exposição, **2 portais e nenhuma obra**) | `https://rodrigorez.github.io/zonas12/` |
-| Cidade 360º (5 obras) | `https://rodrigorez.github.io/zonas12/scene1/` |
-| Praia (3 obras) | `https://rodrigorez.github.io/zonas12/scene2/` |
-| Céu 360º (2 obras, sem câmara) | `https://rodrigorez.github.io/zonas12/scene3/` |
+| Portão (entrada da exposição, **3 portais e nenhuma obra**) | `https://rodrigorez.github.io/zonas12/` |
+| Cidade 360º (7 obras) | `https://rodrigorez.github.io/zonas12/scene1/` |
+| Praia (7 obras) | `https://rodrigorez.github.io/zonas12/scene2/` |
+| Céu 360º (3 obras, sem câmara) | `https://rodrigorez.github.io/zonas12/scene3/` |
+| Noite 360º (6 obras) | `https://rodrigorez.github.io/zonas12/scene4/` |
 | **Ficha de exemplo — completa** (título, autor, sinopse) | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=0` |
 | Ficha de exemplo — **só com título** | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=1` |
 | Ficha de exemplo — **vídeo** | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=2` |
 | Ficha de exemplo — **com site** (YouTube) | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=3` |
 | Ficha de exemplo — **em inglês** | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=0&lang=en` |
 | **Sala** de exemplo (para clicar nas obras) | `https://rodrigorez.github.io/zonas12/?scene=exemplo-ficha` |
-| Ficha **de produção** (ainda sem metadados) | `https://rodrigorez.github.io/zonas12/obra.html?mundo=scene1&id=0` |
+| Ficha **de produção** | `https://rodrigorez.github.io/zonas12/obra.html?mundo=scene1&id=0` |
 
-As obras de produção, por mundo: `scene1` → `id=0…4`, `scene2` → `id=5,6,7`, `scene3` → `id=8,9`. O
-endereço é sempre `obra.html?mundo=<mundo>&id=<id>`; mudar o `id` muda a obra, e `&lang=en` é a língua.
+As obras de produção, por mundo: `scene1` → `id=0…6`, `scene2` → `id=0…6`, `scene3` → `id=0…2`,
+`scene4` → `id=0…5`. O endereço é sempre `obra.html?mundo=<mundo>&id=<id>`; mudar o `id` muda a obra, e
+`&lang=en` é a língua. Todos os `id` das quatro salas têm o texto e os créditos do autor: nenhuma ficha
+mostra texto provisório.
 
 Sonda de campo (números no ecrã): junta `?sonda=1` a qualquer endereço de sala, por exemplo
 `https://rodrigorez.github.io/zonas12/scene1/?sonda=1`.
@@ -80,14 +83,14 @@ Local (só no computador), com `node tools/server/serve.mjs` a correr: os mesmos
 | 2.2 | Abrir `…&id=3` | O YouTube toca **sem som** (mudo forçado); o botão azul existe e abre o site numa aba nova |
 | 2.3 | Girar o telemóvel para horizontal | A ficha continua legível (a coluna alarga até 800 px, não estica a 100%) |
 | 2.4 | Abrir `…&id=0&lang=en` | Inglês em todo o lado, como no computador |
-| 2.5 | Abrir a ficha de produção `https://rodrigorez.github.io/zonas12/obra.html?mundo=scene2&id=5` | Nome **«Céu»**, autor provisório (`autorB`), sinopse provisória, e a **capa** da obra — não uma página de erro do browser nem um espaço vazio |
+| 2.5 | Abrir a ficha de produção `https://rodrigorez.github.io/zonas12/obra.html?mundo=scene4&id=0` | Nome **«Harmonização Doméstica»**, autora **Juliana Garzillo**, o descritivo do autor, e a **capa** da obra — não uma página de erro do browser nem um espaço vazio |
 | 2.6 | Tocar em «Voltar» | Volta à sala certa, sem 404 |
 
 ## 3. A ficha ligada à exposição
 
 | # | O que fazer | O que se espera |
 | --- | --- | --- |
-| 3.1 | Telemóvel: abrir `/`, aceitar a câmara, entrar numa sala (atravessar um portal) | A sala construída, com o D-pad de setas ao fundo. Entrar na **Cidade** e ver 5 obras |
+| 3.1 | Telemóvel: abrir `/`, aceitar a câmara, entrar numa sala (atravessar um portal) | A sala construída, com o D-pad de setas ao fundo. O portão tem **três** portas (cidade, praia e noite). Entrar na **Cidade** e ver 7 obras |
 | 3.2 | Apontar a cruz do centro a uma obra e **tocar no ecrã** | Abre a **ficha** dessa obra (muda de página). **Não** abre ao fim de 1,5 s só por olhar (isso era um defeito antigo, já corrigido) |
 | 3.3 | Computador: o mesmo, com o rato (pousar em cima da obra e clicar) | Igual: abre a ficha |
 | 3.4 | Na ficha, tocar em «Voltar» | Volta à sala onde estava |
@@ -235,17 +238,17 @@ Para cada falha, envia três coisas:
 
 ## O que já se sabe, e não é defeito
 
-- o **portão** tem **2 portais e nenhuma obra** — é a entrada, e as obras estão dentro das salas;
-- as obras de produção têm **título, autor e sinopse provisórios**; **uma** delas (`scene1` `id=2`) tem
-  um vídeo do YouTube embutido — é o teste de uma obra cujo conteúdo é uma página. A **capa** dela é
-  buscada ao YouTube (D65); se não vier, aparece a capa da folha e, em último caso, a imagem padrão de aviso;
+- o **portão** tem **3 portais e nenhuma obra** — é a entrada, e as obras estão dentro das salas;
+- as obras de produção têm **título, créditos e sinopse do autor** (nenhuma é provisória); as que têm
+  `site` embutem uma página (Drive, YouTube ou Vimeo) — é o teste de uma obra cujo conteúdo é uma
+  página. A **capa** é a que a folha dá, e se não vier aparece a imagem padrão de aviso;
 - **não há medição a correr**: as propriedades GA4 ainda não existem, e sem ID a página não carrega
   script nenhum (é de propósito);
 - a ficha é **desenhada pelo browser**: sem JavaScript não mostra a obra (é o preço de ser um ficheiro
   só, a troca que foi pedida);
 - **um site que não existe** não dá erro ao browser (o iframe dispara `load` com a página de erro dele em
   ~100 ms). A ficha mede o tempo e trata-o como falha: fica a **capa** com o botão «Abrir o site». É o
-  que se vê com os `www.testeX.nada` da folha provisória;
+  que se vê com um endereço que não exista;
 - num telemóvel **com** giroscópio, o olhar volta governado pelo sensor — o **ponto** (posição) é
   restaurado sempre, mas a direcção do olhar pode ser corrigida pelo aparelho no instante seguinte;
 - no site publicado o **editor não grava** (gravar precisa do servidor local, que valida e escreve no

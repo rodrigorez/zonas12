@@ -28,8 +28,10 @@ Endereços que vão ser usados (publicado = o que o telemóvel vê):
 | Ficha de exemplo, vídeo (ficheiro) | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=2` |
 | Ficha de exemplo, site (YouTube) | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=3` |
 | Sala de exemplo | `https://rodrigorez.github.io/zonas12/?scene=exemplo-ficha` |
-| Cidade (5 obras) | `https://rodrigorez.github.io/zonas12/scene1/` |
-| Praia | `https://rodrigorez.github.io/zonas12/scene2/` |
+| Cidade (7 obras) | `https://rodrigorez.github.io/zonas12/scene1/` |
+| Praia (7 obras) | `https://rodrigorez.github.io/zonas12/scene2/` |
+| Céu 360º (3 obras) | `https://rodrigorez.github.io/zonas12/scene3/` |
+| Noite 360º (6 obras) | `https://rodrigorez.github.io/zonas12/scene4/` |
 
 No computador, os mesmos caminhos em `http://127.0.0.1:8123` (sem `https`), quando o servidor estiver
 a correr.
@@ -75,10 +77,10 @@ Abra `…/obra.html?mundo=exemplo-ficha&id=0&lang=en`.
 
 ### A5. Uma ficha de produção (guia 2.5)
 
-Abra `…/obra.html?mundo=scene2&id=5`.
+Abra `…/obra.html?mundo=scene4&id=0`.
 
-**Esperado:** o título **«Céu»**, autor e sinopse **provisórios** (é o que está na folha hoje, não é
-falha), e a capa — não uma página de erro do browser.
+**Esperado:** o título **«Harmonização Doméstica»**, a autora **Juliana Garzillo**, o descritivo do autor
+e a capa — não uma página de erro do browser. Nenhuma ficha de produção mostra texto provisório.
 
 ### A6. Voltar sem 404 (guia 2.6)
 
@@ -91,7 +93,7 @@ Toque em **«Voltar»**.
 
 Abra `https://rodrigorez.github.io/zonas12/`, aceite a câmara, atravesse o portal para a **Cidade**.
 
-**Esperado:** a sala com as **5 obras** e o D-pad de setas ao fundo; aponte a cruz do centro a uma obra
+**Esperado:** a sala com as **7 obras** e o D-pad de setas ao fundo; aponte a cruz do centro a uma obra
 e **toque uma vez** → abre a ficha.
 **Sinal de falha:** abre só por olhar 1,5 s (era um defeito antigo), ou o toque não faz nada.
 
@@ -242,9 +244,10 @@ Preencha e mande esta tabela — é o suficiente para eu corrigir o que falhar.
 
 ## O que **não** é defeito
 
-- o **portão** tem **2 portais e nenhuma obra** — é a entrada;
-- o texto das obras é **provisório** (`autorA`, «Texto provisório…») — o conteúdo definitivo é o item
-  seguinte da lista, não um defeito do circuito;
+- o **portão** tem **3 portais e nenhuma obra** — é a entrada;
+- as obras têm o **texto e os créditos do autor** (nenhuma é provisória), e as capas vêm do Google
+  Drive: a primeira abertura de uma sala pode demorar ~0,9 s mais do que as outras, porque são sete
+  idas à rede em paralelo (D68), e isso não é defeito;
 - num telemóvel que já deu permissão à câmara, a sala arranca sozinha; noutro, mostra «Ativar
   exposição» — as duas coisas estão certas;
 - a ficha abre **no mesmo separador** (é a decisão D60), não numa aba nova;

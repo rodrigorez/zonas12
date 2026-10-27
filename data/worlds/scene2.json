@@ -84,6 +84,55 @@
         "pt": "Retrato do mundo Céu 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Sky 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/1pyT4GfLwIBkO6FF5g-cEGnZEtD7IEh-4",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Sem título 2 - da série Rupturas em Saturação"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/14STUksQZfdvl4yDN7bwoOZu2TpJz0J0S",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra A Semana de Freya #1- Segunda Azul"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1z6DF4sU_kc04bob_BqI_IgcuUeEsf7p4",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Topografia Sensível: Tigrado"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1pdExT66bob9jKUCJX-7F1f8QCCEViZQw",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Atravessamentos"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1de2aoUWVOSrY26XKnuBOom1pjkuICHQv",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra 6"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1NJTGNT9V5qYSC00rN12InTrMupFSV9NU",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Goteta.exe"
+      }
+    },
+    "capa-6": {
+      "path": "https://lh3.googleusercontent.com/d/1zNL5_PGXdMOkg7xgOtFb8KR6xqesPK2y",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Geometría viva: Trazado robótico de un paisaje fractal"
+      }
     }
   },
   "dimensions": [
@@ -109,12 +158,12 @@
   ],
   "artworks": [
     {
-      "id": 5,
+      "id": 0,
       "dimension": 0,
       "kind": "image",
-      "asset": "skycloud",
+      "asset": "capa-0",
       "position": [
-        -20,
+        -70,
         1.5,
         -90
       ],
@@ -130,20 +179,169 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Céu"
+        "pt": "Sem título 2 - da série Rupturas em Saturação"
       },
+      "authors": "Paula Aschidamini",
       "synopsis": {
-        "pt": "Texto provisório: a mesma imagem é obra em duas salas, e cada uma tem a sua ficha."
+        "pt": "A obra Sem título 2 faz parte da série intitulada Rupturas em Saturação, que consiste em uma sequência de trabalhos manuais trabalhados também no digital. As obras constituem um território, subjetivo e físico, onde o contato com o caos da obra instiga um fluxo de reestruturação pessoal, onde o objetivo principal é movimentar livremente os significados, constituindo meios de subjetivação capazes de lidar com a complexidade ao trabalhar a subjetividade em conjunto com a expressão."
+      }
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        -50,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "A Semana de Freya #1- Segunda Azul"
       },
-      "authors": "autorB"
+      "authors": "ArthurMeeM",
+      "synopsis": {
+        "pt": "“A história sobre uma pessoa feliz passando por um momento triste.” Essa é Freya, uma jovem adulta que se sente solitária, mas com o retorno de um conhecido, sua vida se torna uma confusão.  O quadrinho se diferencia por sua paleta de cores composta apenas por tons de azul, personagens com designs carismáticos e também retrata melâncolia com uma protagonista com o qual é fácil se identificar. O primeiro capítulo, em específico, mostra um pouco para o leitor da rotina monótona de Freya."
+      },
+      "site": "https://drive.google.com/file/d/1TiBjfBbvsoGZHy3yYClY28KUrYOIqkbj/preview"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-2",
+      "position": [
+        -30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Topografia Sensível: Tigrado"
+      },
+      "authors": "Caléo",
+      "synopsis": {
+        "pt": "Topografia Sensível: Tigrado (2025) utiliza as marcas do meu corpo gordo como matrizes para a criação visual. Por meio de manipulação digital para chegar até a inversão cromática em tons de azul, o corpo-paisagem conversa com as poéticas de Jenny Saville e John Coplans. Tal procedimento se fundamenta na reprogramação da imagem, ressignificando vestígios físicos em novas morfologias e transformando marcas socialmente estigmatizadas em narrativa política insurgente."
+      }
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        -10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Atravessamentos"
+      },
+      "authors": "AGDA CARVALHO; RODRIGO DOS SANTOS OLIVEIRA; ISABELLE CARVALHO",
+      "synopsis": {
+        "pt": "ATRAVESSAMENTOS Conecta experiências do habitar e do existir entre Guaçuí e São Paulo a partir de percepções pós-pandemia. Memórias, gestos, paisagens, sons e marcos dos dois territórios se sobrepõem, atravessando fronteiras entre natureza e metrópole, interior e exterior, proximidade e distância. Acessos e passagens tornam-se conexões entre espaços, tempos e subjetividades."
+      },
+      "site": "https://www.youtube.com/watch?v=rcpaLU4AWog"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "6"
+      },
+      "authors": "Adriano Vilela Mafra",
+      "synopsis": {
+        "pt": "O trabalho investiga a estrutura geométrica e matemática da linguagem escrita, incluindo o tempo como parte constitutiva do poema."
+      },
+      "site": "https://www.adrianovilela.com/6"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Goteta.exe"
+      },
+      "authors": "Sandra Balaguer",
+      "synopsis": {
+        "pt": "Goteta.exe é uma peça escultórica que explora o imaginário da umidade e da água a partir do encontro entre uma prática tradicional como a cerâmica e o contexto tecnológico contemporâneo. A obra consiste em um recipiente cerâmico que incorpora em seu interior um sistema de condensação construído a partir de componentes eletrônicos reciclados, capaz de extrair e armazenar a umidade presente no ar."
+      },
+      "site": "https://youtu.be/90KqKSwvZfU"
     },
     {
       "id": 6,
       "dimension": 0,
       "kind": "image",
-      "asset": "galeriaFoto2",
+      "asset": "capa-6",
       "position": [
-        0,
+        50,
         1.5,
         -90
       ],
@@ -159,42 +357,13 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "A torre, na praia"
+        "pt": "Geometría viva: Trazado robótico de un paisaje fractal"
       },
+      "authors": "Helena Hernández-Acuaviva ; Irene Quiñonero-Puey",
+      "coAuthors": "Helena Hernández-Acuaviva; Irene Quiñonero-Puey",
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui."
-      },
-      "authors": "autorA",
-      "coAuthors": "autorC"
-    },
-    {
-      "id": 7,
-      "dimension": 0,
-      "kind": "image",
-      "asset": "galeriaFoto1",
-      "position": [
-        20,
-        1.5,
-        -90
-      ],
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "size": [
-        4,
-        3,
-        0.1
-      ],
-      "interaction": "page",
-      "title": {
-        "pt": "Cidade, na praia"
-      },
-      "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui."
-      },
-      "authors": "autorC"
+        "pt": "Esta obra surge da observação da matemática natural que liga as diferentes escalas da realidade, transportando o gesto do macro para o micro. Através do traçado preciso de um braço robótico, explora os padrões fractais para materializar uma cartografia do impercetível. Sobre cartolina verde, acetatos e marcadores, propõe um «pensamento planetário»: o ser humano como parte de uma mesma rede orgânica, do nível celular ao territorial."
+      }
     }
   ],
   "portals": [
@@ -202,7 +371,7 @@
       "id": 4,
       "ownedBy": 0,
       "position": [
-        -25,
+        -19,
         0,
         -80
       ],
@@ -245,7 +414,7 @@
       "id": 5,
       "ownedBy": 0,
       "position": [
-        25,
+        0,
         0,
         -80
       ],
@@ -286,7 +455,7 @@
       "id": 6,
       "ownedBy": 0,
       "position": [
-        0,
+        19,
         0,
         -80
       ],
