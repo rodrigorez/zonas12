@@ -565,6 +565,12 @@ todas as salas**: o que se gasta é resolução. A escada passou a perseguir um 
 (`SHADER_POLICY.minFps`), que é o que se sente ao olhar em volta, e assenta no último pixelRatio que
 provou aguentar — em vez de rastejar mudando a nitidez.
 
+**Confirmado no aparelho, no build publicado:** o mesmo PowerVR saiu de **40,7** para **58,7** quadros/s
+(**+44%**), com os atrasos de **22,6%** para **5,7%** e o pixelRatio a assentar em **1,95** depois de
+quatro mudanças de nitidez. E, com a escada livre, o shader ficou **mais fluido do que o próprio
+panorama** nesse aparelho (58,7 contra 48,6 — a imagem desenha a 2,63 nativo): o fundo de **reserva** é
+ali o mais lento dos dois, o que fica registado como a próxima pergunta e não como uma mudança feita.
+
 #### Comparativo controlado: imagem, shader e p5.js
 
 As páginas da bateria comum são:

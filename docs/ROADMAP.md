@@ -4591,6 +4591,7 @@ do D66, com as janelas por omissão e o par dentro da mesma sessão:
 | aparelho | GPU | shader | imagem | diferença | pior quadro | atrasos |
 | --- | --- | --- | --- | --- | --- | --- |
 | telemóvel fraco (2020) | PowerVR Rogue GE8320 | **40,7**/s | **46,9**/s | **+15,2%** | 231,4 → 66,2 ms | **22,6%** |
+| telemóvel fraco, **depois do R18** (chão de 45 quadros/s) | PowerVR Rogue GE8320 | **58,7**/s a 1,95 | 48,6/s a 2,63 | **−17,2%** (o shader passa à frente) | 99,2 → 49,7 ms | **5,7%** |
 | telemóvel médio (2019) | Qualcomm Adreno 630 | **52,1**/s | **54,1**/s | **+3,8%** | 66,7 → 66,7 ms | **10,6%** |
 | telemóvel forte (2024) | ARM Mali-G925-Immortalis MC11 | **60,2**/s | **60,2**/s | 0% (vsync) | 16,8 → 16,7 ms | 1,5% |
 | computador | NVIDIA RTX 4060 | **164,7**/s | **164,1**/s | −0,4% | 24,4 → 24,2 ms | 0% |
@@ -4940,6 +4941,27 @@ limite de 25% — passava por bom e **subia** a resolução até 2,456. Duas cor
    já é pequeno, fica no que aguentou e cala-se. No aparelho modelado do R18 isso passou de **12** mudanças
    de nitidez (`1,85 → 1,825 → 1,813 → …`) para **4** (`1,6 → 1,8 → 1,9 → 1,8`), acabando nos 60 quadros/s.
 
+**A confirmação no aparelho (2026-10-27, depois da correção, no build publicado):** o autor repetiu o ensaio
+de 45 s no mesmo PowerVR e o resultado é o que a experiência previa —
+
+| | antes (política antiga) | depois (chão de 45 quadros/s) |
+| --- | --- | --- |
+| quadros/s no shader | 40,7 | **58,7** (2642) |
+| pixelRatio | 2,456 (máx 2,625) | **1,95** (de 1,6 a 1,95) |
+| atrasos | **238** de 1054 (22,6%) | **60** de 1049 (5,7%) |
+| eventos da escada | 4 (a subir) | 4 (desceu e assentou) |
+
+**+44% de quadros e um quinto dos atrasos**, com quatro mudanças de nitidez e a cadência de 20/s cumprida
+(19,9/s). A escada desceu até 1,6, viu que a 1,6 sobrava folga, subiu por bissecção e **assentou em 1,95** —
+um pouco acima do 1,6–1,8 que eu tinha previsto, e ainda assim a 58,7 quadros/s. É o mesmo aparelho, o mesmo
+shader, a mesma sala.
+
+**Uma consequência que a medição trouxe e que não estava no plano:** com a escada livre, o shader passou a
+ser **mais fluido do que o panorama** nesse aparelho — 58,7 contra **48,6** na fase da imagem, que desenha a
+2,63 (nativo). Ou seja, o fundo que hoje serve de **reserva** é o mais lento dos dois ali: a **imagem** é que
+está a pagar a resolução nativa, com **275** quadros acima do dobro da mediana contra **35** do shader. Não se
+mexeu nisso — mudar o fundo de reserva é outra decisão —, mas fica registado: o mesmo recurso (um teto de
+pixelRatio) serviria o panorama, e é a pergunta seguinte se o autor a quiser.
 Medido: `shader.mjs` **18 de 18** (eram 17, com três verificações novas para o chão de quadros e a de não
 rastejar) e a procura do teto ficou em **4 eventos**, contra os ≤ 6 que a bateria já exigia. Nos aparelhos
 bons nada muda: o chão de quadros só age com resolução para baixar, e a 60 Hz não há um único evento.
