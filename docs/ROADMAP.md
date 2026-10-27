@@ -4510,7 +4510,8 @@ escolha razoável.
 
 **Ressalva desta linha:** é a variante de 10 s, e nos primeiros segundos a escada ainda está a descer —
 portanto o lado do shader está penalizado por um transiente que o ensaio de 45 s já não apanha. Para o
-registo ficar uniforme com os outros dois aparelhos, o fraco repete-se com as durações por omissão.
+registo ficar uniforme com os outros dois aparelhos, **o autor repete o fraco com as durações por omissão
+(2026-10-27)**; a linha que sair dessa repetição substitui esta, e esta fica como a primeira leitura.
 
 **O que continua em falta para fechar o R14:** o **terceiro aparelho** (o médio, Adreno 630 do ensaio
 de 2026-10-23). Com dois aparelhos medidos e o par shader × imagem pareado num deles, a pendência
