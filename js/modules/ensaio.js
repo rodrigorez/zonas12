@@ -240,7 +240,7 @@ function phaseReport(title, result) {
     '  ' + line('janela', windowLine(result)),
     '  ' + line('quadros', value(result.fps) + '/s' + (result.frames ? ' · ' + result.frames + ' quadros' : '')),
     '  ' + line('pior quadro', (result.worstFrameMs === null ? '—' : value(result.worstFrameMs) + ' ms') +
-      (result.slowFrames === null ? '' : ' · lentos ' + result.slowFrames)),
+      (result.slowFrames === null ? '' : ' · lentos ' + result.slowFrames + ' (>2× a mediana)')),
     '  ' + line('cadência', (result.cadence === null ? '—' : result.cadence + '/s') +
       (result.mode ? ' · ' + result.mode : '')),
     '  ' + line('atualizações', (result.updatesPerSecond === null ? '—' : value(result.updatesPerSecond) + '/s') +
@@ -268,7 +268,10 @@ function summary(first, second) {
     lines.push('  pior quadro  ' + value(first.worstFrameMs) + ' ms → ' + value(second.worstFrameMs) + ' ms');
   }
   if (Number.isFinite(first.slowFrames) && Number.isFinite(second.slowFrames)) {
-    lines.push('  lentos       ' + first.slowFrames + ' → ' + second.slowFrames);
+    // Cada lado é contado contra a **sua** mediana, por isso esta linha não se compara entre fases: um
+    // fundo mais lento tem medianas maiores e conta menos «lentos» com o mesmo tremor. Foi medido:
+    // 24 no shader contra 319 na imagem num aparelho onde a imagem ia 15% mais depressa.
+    lines.push('  lentos       ' + first.slowFrames + ' → ' + second.slowFrames + ' (cada lado contra a sua mediana)');
   }
   // As duas janelas uma ao lado da outra: um A/B só vale se os dois lados foram medidos pelo mesmo tempo.
   const equal = Math.abs(first.windowMs - second.windowMs) <= 1000;

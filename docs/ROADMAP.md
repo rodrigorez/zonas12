@@ -4508,10 +4508,36 @@ do ensaio) e ainda assim **71 dos 217** quadros do shader chegaram tarde — 33%
 0 na imagem, que não tem cadência. É o aparelho onde o `?shader=0` deixa de ser escape e passa a ser a
 escolha razoável.
 
-**Ressalva desta linha:** é a variante de 10 s, e nos primeiros segundos a escada ainda está a descer —
-portanto o lado do shader está penalizado por um transiente que o ensaio de 45 s já não apanha. Para o
-registo ficar uniforme com os outros dois aparelhos, **o autor repete o fraco com as durações por omissão
-(2026-10-27)**; a linha que sair dessa repetição substitui esta, e esta fica como a primeira leitura.
+**A repetição com as 45 s (2026-10-27), e é esta a linha do registo:**
+
+| fundo | janela | quadros/s | pior quadro | lentos (>2× a mediana) | pixelRatio | cadência | atrasos |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `grade-neon` | 44,98 s (−0,02) | **40,7** (1829) | **231,4 ms** | 24 | **2,456** (min 2 · máx **2,625** · **4 eventos**) | 20/s → 19,8/s | **238** de 1054 (22,6%) |
+| imagem | 45 s (+0) | **46,9** (2111) | **66,2 ms** | 319 | 2,63 (nativo) | — | — |
+
+A comparação de fundo: **+15,2%** para a imagem (40,7 → 46,9) e o pior quadro do shader **3,5× pior**
+(231,4 ms contra 66,2 ms). O veredicto do fraco não mudou com a janela maior (era +12,1% em 10 s), o que
+diz que a conclusão é robusta ao tempo de medida.
+
+**As 45 s também mostram o que a corrida curta não podia:** o mesmo aparelho, na mesma sala, desceu de
+**49,4 para 40,7 quadros/s** no shader e de **55,4 para 46,9** na imagem — cerca de **18% nos dois lados**.
+É o **throttling térmico**: a corrida de 10 s foi um jato a frio, a de 45 s é o que um visitante tem depois
+de dois minutos a olhar em volta. É o argumento a favor do protocolo por omissão, e a razão pela qual os
+10 s não servem para o registo.
+
+**A escada não converge neste aparelho.** Com 45 s o pixelRatio foi de 2 até **2,625** (o dpr nativo) e
+voltou a **2,456**, com **4 eventos** — a procurar. Na corrida de 10 s tinha descido a 1,6 com um evento.
+Os **238 atrasos em 1054** (22,6%) dizem o mesmo por outro caminho: a cadência de 20/s cumpre-se **em
+média** (19,8/s) mas falha um quinto das vezes, e o estado não é estável — oscila. Numa exposição isto vê-se
+como trepidação periódica, não como um fundo liso.
+
+**Uma armadilha na nossa própria linha `lentos`, que estes números expuseram:** 24 no shader contra 319 na
+imagem parece dizer que a imagem é pior — e é o contrário, ela vai 15% mais depressa. A razão é que a
+contagem é **relativa à mediana de cada lado** (quadros acima do dobro dela): um fundo mais lento tem
+medianas maiores e conta menos «lentos» com o mesmo tremor. O rótulo passou a dizer `(>2× a mediana)` e a
+comparação avisa que não se compara entre fases; a correção de fundo é reportar **p95/p99** dos intervalos
+entre quadros, que são absolutos e comparáveis — fica para depois de o R14 fechar, para não mudar o
+instrumento com o registo a meio.
 
 **Segundo aparelho (2026-10-27): ARM Mali-G925-Immortalis MC11 — e é outro, não o Adreno 630.** O autor
 correu o ensaio duas vezes seguidas neste telemóvel, na mesma variante curta. As duas corridas dão o
@@ -4549,20 +4575,21 @@ Fica no registo como o extremo de cima — o ponto onde a pergunta deixa de ser 
 
 | aparelho | GPU | estado |
 | --- | --- | --- |
-| telemóvel fraco | PowerVR Rogue GE8320 | **medido** (variante de 10 s; repetição com 45 s em curso) |
+| telemóvel fraco | PowerVR Rogue GE8320 | **medido** com as **45 s** por omissão: 40,7 → 46,9 quadros/s (+15,2%), pior quadro 231,4 → 66,2 ms, `janelas 44,98 s e 45 s` |
 | telemóvel forte | ARM Mali-G925-Immortalis MC11 | **medido** (duas corridas, 10 s) |
 | computador | NVIDIA RTX 4060 (portátil) | **medido** por mim no build publicado, com as **45 s** por omissão: 164,7 → 164,1 quadros/s (−0,4%), pior quadro 24,4 → 24,2 ms, `janelas 45 s e 45 s` |
 | telemóvel médio | Adreno 630 | **em falta** |
 
 O que falta é o **Adreno 630** (o médio do ensaio de 2026-10-23), que o autor tem. Com o fraco e o forte
-medidos, o médio é o que decide a zona cinzenta: no fraco o shader custa **12%** dos quadros e um terço da
-cadência; no forte não custa **nada** e a escada sobe a resolução. Falta saber de que lado da linha cai um
+medidos, o médio é o que decide a zona cinzenta: no fraco o shader custa **15,2%** dos quadros, um quinto
+dos quadros da cadência atrasados e o pior quadro 3,5× maior; no forte não custa **nada** e a escada sobe
+a resolução. Falta saber de que lado da linha cai um
 aparelho de 2018–2019 — que é o que a maior parte do público traz.
 
 Com o ensaio automático (D66), o que falta passou a ser **um toque em cada aparelho**: abrir
 `https://rodrigorez.github.io/zonas12/scene1/?ensaio=1`, esperar ~2 minutos, **Copiar** e colar. O fraco
-está a repetir-se com as durações por omissão (a linha de 10 s fica como primeira leitura) e o médio
-(Adreno 630) é o único que nunca foi medido por este caminho.
+ficou medido com as durações por omissão; o **médio** (Adreno 630) é o único que nunca foi medido por
+este caminho.
 
 O ensaio em `teste/` continua a comparar a arquitetura de panoramas com fundos gerados por shader
 GLSL. É **protótipo de medição**, não a política de produção: `js/modules/dimension.js` usa
