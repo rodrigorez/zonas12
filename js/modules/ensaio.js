@@ -112,6 +112,9 @@ function runPhase({ warmupMs, measureMs, onTick }) {
         late: now.policy.late || 0,
         cadence: now.policy.cadence,
         mode: now.policy.mode,
+        // Uma desistência a meio da fase (R18) troca o fundo medido: o relatório tem de o dizer, senão
+        // a fase 1 aparecia como «imagem» sem explicação.
+        gaveUp: Boolean(now.policy.gaveUp),
         events: (now.policy.events || []).length
       } : null);
     };
@@ -170,6 +173,7 @@ function runPhase({ warmupMs, measureMs, onTick }) {
         pixelRatio: last ? last.pixelRatio : null,
         pixelRatioMin: ratios.length ? Math.min(...ratios) : null,
         pixelRatioMax: ratios.length ? Math.max(...ratios) : null,
+        gaveUp: samples.some((item) => item && item.gaveUp),
         late: last ? last.late : null,
         events: last ? last.events : 0
       });
@@ -236,7 +240,8 @@ function phaseReport(title, result) {
   if (!result) return [title, '  (sem medição)'];
   return [
     title,
-    '  ' + line('fundo', (result.background || '—') + (result.shader ? ' · ' + result.shader : '')),
+    '  ' + line('fundo', (result.background || '—') + (result.shader ? ' · ' + result.shader : '') +
+      (result.gaveUp ? ' (desistiu: o shader parou a meio da fase)' : '')),
     '  ' + line('janela', windowLine(result)),
     '  ' + line('quadros', value(result.fps) + '/s' + (result.frames ? ' · ' + result.frames + ' quadros' : '')),
     '  ' + line('pior quadro', (result.worstFrameMs === null ? '—' : value(result.worstFrameMs) + ' ms') +

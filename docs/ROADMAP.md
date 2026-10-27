@@ -4872,27 +4872,42 @@ fotogramas escuros **antes** e **depois** da mudança, com a mesma costura (0,31
 / 0,17 / 0,39) e as **12 de 12** verificações a passar. A correção fica em vigor — é a que a
 pendência pedia —, e o número continua a ser medido pelo `seam.mjs` em cada travessia.
 
-### R18 — Queda automática para a imagem num aparelho fraco (aberta, 2026-10-27)
+### R18 — Queda automática para a imagem num aparelho fraco (**FECHADA em 2026-10-27**)
 
-**A pergunta que o R14 deixou aberta.** O A/B fechado mede o gradiente: no telemóvel fraco o shader custa
+**A pergunta que o R14 deixou aberta.** O A/B fechado mediu o gradiente: no telemóvel fraco o shader custa
 **15,2%** dos quadros, o pior quadro é **3,5×** maior (231,4 ms contra 66,2 ms) e **22,6%** das atualizações
 da cadência chegam tarde; no médio custa 3,8% com o pior quadro igual; no forte e no computador não custa
-nada. A produção ficou como estava — shader por omissão, `?shader=0` como escape manual —, o que deixa o
-visitante do aparelho fraco a pagar sem saber que há alternativa.
+nada. E a rede que existia — a escada do R15 até «estático» — **nunca disparava no fraco**, porque lá a
+cadência de 20/s se cumpre em média (19,8/s): o degrau final só chegava a quem falhasse também a cadência.
 
-**O que está em cima da mesa, e o que cada opção custa:**
+**O que se fez (opção B, decidida pelo autor com estes números).** O último degrau da escada deixou de ser
+«congelar» e passou a ser **trocar o fundo pela imagem de reserva**, que já está descarregada e descodificada
+e traz as obras e as portas desenhadas nela. A ordem mantém-se a que estava medida — pixelRatio até ao piso
+**1**, cadência **20 → 15**, e só então a troca —, com duas janelas más consecutivas em cada degrau. A
+política só sabe que **desistiu** (`onGiveUp`, `status().gaveUp`): quem troca é o componente
+(`dimensionComponent.useFallback`, que já existia para o shader que não compila e para a perda de contexto).
+A troca é **uma vez por página** — um fundo que vai e volta seria pior do que qualquer dos dois lados — e sem
+imagem para onde ir o degrau antigo fica: **congelar ainda é melhor do que animar aos soluços**.
 
-| opção | como | custa |
-| --- | --- | --- |
-| A. ficar como está | shader por omissão, `?shader=0` para quem souber | nada a fazer; o fraco fica pior servido |
-| B. queda automática | ao fim de N janelas más consecutivas, o fundo troca para o `fallbackAsset` (o panorama já está na memória) em vez de só descer resolução | um estado novo na política; a escada do R15 passaria a ter dois recursos em vez de um |
-| C. por sala, no dado | uma sala declara `kind: "image"` e as outras ficam com shader | não resolve o aparelho, só a sala — e o problema é do aparelho |
+**Os dois parâmetros de ensaio**, como `?shader=0` (ferramenta, não interface): `?queda=0` desliga a troca
+(fica o congelar de antes) e `?queda=sempre` força-a de imediato, que é a única forma de ver o resultado num
+aparelho bom sem esperar que ele degrade.
 
-**O que já se sabe para decidir:** a escada **não** chega a «estático» no fraco (a cadência de 20/s cumpre-se
-em média), portanto a rede que existe não dispara; e o que se perde nesse aparelho não é o fundo, é a
-fluidez com que se olha em volta (o pior quadro de 231 ms é um engasgo que se sente). A opção **B** é a única
-que responde à pergunta do visitante — mas muda o que a política faz, e por isso é decisão do autor, com
-estes números na mão.
+**Medido** (`tools/regression/queda.mjs`, **11 de 11**, em `all.mjs --full`): um aparelho simulado de 8
+quadros/s percorre a escada e desiste com a ordem certa — `desceu pr` ×4 → `15 fps` → `fundo de imagem`;
+desiste **uma** vez e não volta a animar (142 atualizações, iguais antes e depois de mais dois minutos de
+miséria); um aparelho bom a 60 Hz não desiste em 20 s (zero eventos); sem imagem para trocar, congela
+(`estático`) como antes. Na cena de produção com `?queda=sempre`: o fundo passa a `image`, as **5** obras e as
+**2** portas continuam lá, a esfera continua no sítio e o shader deixa de animar (0 atualizações novas). Com
+`?queda=0` e por omissão num aparelho bom, o shader fica. O `shader.mjs` continua em **13 de 13** (a escada
+sem `onGiveUp` congela como sempre) e o `ensaio.mjs` em **19 de 19**.
+
+**O que esta rede é e o que não é — dito com franqueza:** é uma **rede de segurança**, não uma optimização do
+aparelho fraco. O PowerVR real **não** desiste, porque a política lhe cumpre a cadência e ele passa os
+critérios; o que ele perde é fluidez ao olhar em volta, e isso a escada não mede. Baixar a fasquia para «menos
+de 40 quadros/s sustentados → imagem» obrigaria a decidir **o que o visitante de um telefone antigo vê**, e
+essa é a pergunta seguinte (registada, com os números do R14 na mão). O `?shader=0` continua a ser a resposta
+manual, e a bateria `image-bridge`/`shader` garante que nada disto toca no caminho de um aparelho bom.
 
 **R1 — fechado em 2026-10-15.** Depois de A2/A3 serem fechados, três sítios continuavam a
 apontá-los como trabalho da Fase 2: a lei **L8** (§8), o «Ficou por fazer» da Fase 1 e o

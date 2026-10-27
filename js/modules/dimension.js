@@ -92,6 +92,20 @@ function pixelRatioAdapter(sceneEl) {
   };
 }
 
+// A queda para a imagem (R18) decide-se aqui e não na política: a política só sabe que desistiu; quem
+// tem a imagem descodificada e a esfera na mão é o componente. `?queda=0` desliga-a (fica o degrau
+// antigo, congelar) e `?queda=sempre` força-a de imediato, para se poder ver o resultado num aparelho
+// bom sem esperar que ele degrade — é ferramenta de ensaio, como `?shader=0`, e não muda nada para o
+// visitante que não escreva o parâmetro.
+const giveUpMode = () => {
+  try {
+    const value = new URLSearchParams(location.search).get('queda');
+    return value === '0' ? 'nunca' : (value === 'sempre' ? 'sempre' : 'automatica');
+  } catch (error) {
+    return 'automatica';
+  }
+};
+
 AFRAME.registerComponent(DIMENSION_COMPONENT, {
   schema: {
     dimension: { type: 'int', default: 0 },
@@ -129,7 +143,7 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
       try {
         this.material = shaderMaterial(definition);
         this.shaderActive = true;
-        pagePolicy = shaderPolicy(pixelRatioAdapter(this.el.sceneEl));
+        pagePolicy = shaderPolicy(pixelRatioAdapter(this.el.sceneEl), this.giveUp());
         this.policy = pagePolicy;
         this.listenForContextLoss();
         this.listenForShaderErrors();
@@ -190,6 +204,16 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
       shaderId: component.shaderActive ? component.data.shader : null
     });
     backgrounds.push(this.entry);
+
+    // `?queda=sempre`: a troca forçada, para se ver o que o visitante de um aparelho fraco veria.
+    if (giveUpMode() === 'sempre') this.useFallback('forced by ?queda=sempre');
+  },
+  // O que a política chama quando desiste (R18). Devolve `null` quando não há imagem de reserva para
+  // trocar ou quando `?queda=0` a desliga — nesse caso a política congela, como antes.
+  giveUp: function () {
+    if (giveUpMode() === 'nunca' || !this.data.fallback) return null;
+    const component = this;
+    return () => component.useFallback('the device did not hold the shader, even at the fallback cadence');
   },
   // The image the shader promised. The asset is already decoded (the builder waits for every asset
   // before it builds anything), so this is a material swap and not a download.

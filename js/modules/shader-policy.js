@@ -49,6 +49,7 @@ export function createPolicy(options) {
   const settings = options || {};
   const defaults = Object.assign({}, SHADER_POLICY, settings.policy || {});
   let resolution = settings.resolution || null;
+  let onGiveUp = typeof settings.onGiveUp === 'function' ? settings.onGiveUp : null;
   const clock = settings.clock || (() => performance.now());
   const startedAt = clock();
 
@@ -65,6 +66,9 @@ export function createPolicy(options) {
   let high = Infinity;
   let hidden = false;
   let frozen = settings.reducedMotion === true;
+  // A troca para a imagem só acontece uma vez por página: um fundo que vai e volta seria pior do que
+  // qualquer um dos dois lados.
+  let gaveUp = false;
   let started = false;
   let animateFrom = frozen ? Infinity : startedAt + defaults.warmupMs;
   let lastStepAt = animateFrom;
@@ -170,6 +174,17 @@ export function createPolicy(options) {
       cadence = 0;
       frozen = true;
       decision = false;
+      // R18: o último degrau deixa de ser «congelar». Num aparelho que não sustenta nem 15 atualizações
+      // por segundo, a imagem de reserva é **melhor** do que um fundo parado: já está descarregada e
+      // descodificada, traz as obras e as portas desenhadas nela, e não custa um fragment por pixel.
+      // Sem uma imagem para trocar, o degrau antigo mantém-se — congelar ainda é melhor do que animar
+      // aos soluços.
+      if (typeof onGiveUp === 'function' && !gaveUp) {
+        gaveUp = true;
+        note('fundo de imagem');
+        onGiveUp('the device did not hold the shader at ' + defaults.fallbackFps + ' fps');
+        return;
+      }
       note('estático');
     }
   }
@@ -267,6 +282,12 @@ export function createPolicy(options) {
       resolution = adapter;
       ratio = clamp(adapter.get(), adapter.min, adapter.max);
     },
+    // Quem troca o fundo pela imagem é a cena, não a política: a política só sabe que desistiu. O
+    // `null` desliga a troca (é o que `?queda=0` faz) e devolve o degrau antigo, o de congelar.
+    useGiveUp(callback) {
+      onGiveUp = typeof callback === 'function' ? callback : null;
+      gaveUp = false;
+    },
     status() {
       return {
         mode: frozen || !started ? 'static' : 'animating',
@@ -274,6 +295,9 @@ export function createPolicy(options) {
         pixelRatio: +ratio.toFixed(3),
         updates: totals.updates,
         late: totals.late,
+        // Se o fundo já trocou para a imagem (R18): a sonda e o ensaio leem isto em vez de adivinhar
+        // pelo modo, que também fica 'static' quando congela.
+        gaveUp: gaveUp,
         // O `uTime` que o fundo está a desenhar: é o que a ponte leva para a página que chega (D53).
         time: +animationTime.toFixed(3),
         events: events.slice(-20)
@@ -289,9 +313,10 @@ export function createPolicy(options) {
 // renderer as its resolution lever, and it reads the two preferences that belong to the page.
 let pagePolicy = null;
 
-export function shaderPolicy(resolution) {
+export function shaderPolicy(resolution, onGiveUp) {
   if (pagePolicy) {
     if (resolution) pagePolicy.useResolution(resolution);
+    if (onGiveUp !== undefined) pagePolicy.useGiveUp(onGiveUp);
     return pagePolicy;
   }
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia
@@ -301,7 +326,7 @@ export function shaderPolicy(resolution) {
   // destino num instante, e a chegada continua a partir dele em vez de recomeçar no estático.
   const bridge = typeof window !== 'undefined' ? window.arrivalFrame : null;
   const startTime = bridge && typeof bridge.shaderTime === 'function' ? bridge.shaderTime() : undefined;
-  pagePolicy = createPolicy({ resolution, reducedMotion, startTime });
+  pagePolicy = createPolicy({ resolution, reducedMotion, startTime, onGiveUp });
   if (typeof window !== 'undefined' && window.matchMedia) {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (query.addEventListener) {

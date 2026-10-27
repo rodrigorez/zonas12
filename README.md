@@ -465,7 +465,7 @@ escada sem GPU, a taxa entregue (≤ 20 atualizações/s), o `?shader=0`, o `pre
 três salas de produção e o painel do editor. O **A/B controlado nos três aparelhos** está registado
 desde **2026-10-27** (§ «Critério antes de produção», com a tabela dos quatro aparelhos): no médio e no
 forte o shader é indistinguível do panorama, e no fraco custa 15,2% dos quadros — a queda automática
-para a imagem nesse caso ficou como **R18**.
+para a imagem nesse caso está feita e medida (**R18**).
 
 A integração deve ser gradual e manter o panorama de imagem como fallback explícito de cada fundo.
 O shader começa num quadro estático (`uTime` fixo), mede a cena e só então tenta animar; “estático”
@@ -550,8 +550,9 @@ O custo do shader é um **gradiente com a GPU** e só o aparelho mais fraco o pa
 quadros e um pior quadro 3,5× maior, com 22,6% das atualizações da cadência atrasadas. No médio o pior
 quadro é **igual** ao do panorama; no desktop não há diferença que se meça. Um quarto aparelho
 (Mali-G925, de 2024) fica preso nos 60/s do ecrã dos dois lados, ou seja o shader é grátis onde há
-folga. A queda automática para a imagem num aparelho fraco ficou em aberto como **R18**, para ser
-decidida com estes números.
+folga. A queda automática para a imagem num aparelho que não sustente o shader está feita (**R18**): o
+último degrau da escada troca o fundo em vez de congelar, com `?queda=0` para desligar e `?queda=sempre`
+para ver o resultado.
 
 #### Comparativo controlado: imagem, shader e p5.js
 
@@ -763,7 +764,7 @@ shaders parados — comparar com um destino a animar media o tempo que passou, n
 **0,34–0,56** para **0,41** em duas corridas seguidas.
 
 **O que ficou aberto nesta fase:** o **R14**/**R15**, que fechou depois, a **2026-10-27**, com o A/B do
-shader medido nos **três** aparelhos (mais um quarto) e a queda automática num aparelho fraco em aberto
+shader medido nos **três** aparelhos (mais um quarto) e a queda automática num aparelho fraco fechada
 como **R18**.
 
 **A Fase 8 — a ficha de cada obra (2026-10-25).** O autor descreveu a página de obra que queria e deu
@@ -1615,9 +1616,9 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 `--full` acrescenta as baterias arquivadas das Fases 4, 5, 7 e 8 — a costura das travessias, a ponte
 de imagem, a chegada por uma porta, os rótulos, o botão, a transição, o fundo shader (que mede a
 política e as duas páginas com uma), os quatro valores do R9 na cena e nos painéis, o lote por
-dimensão, o catálogo de assets, os portais em movimento, a ficha das obras e o **ensaio A/B do fundo**
-(`ensaio.mjs`, D66) — cada uma abre um Chrome e juntas somam minutos, por isso não são o `default`.
-Com `--full` são **24** baterias.
+dimensão, o catálogo de assets, os portais em movimento, a ficha das obras, o **ensaio A/B do fundo**
+(`ensaio.mjs`, D66) e a **queda para a imagem** (`queda.mjs`, R18) — cada uma abre um Chrome e juntas somam
+minutos, por isso não são o `default`. Com `--full` são **25** baterias.
 
 Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
 repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.csv` e escreve nos mundos o dado das
@@ -1805,8 +1806,11 @@ feitos e cada um mediu o seu número. O **R14**/**R15** (o A/B do shader nos tr�
 - **Fundos shader** (**R14**/**R15**, bloco **B9**): **fechado** — shader em produção desde 2026-10-24,
   `?shader=0` para a imagem de reserva, validador em `tools/shader/`, política 20 → 15 FPS → estático, e
   o A/B medido nos três aparelhos (§ «Critério antes de produção»)
-- **Queda automática para a imagem num aparelho fraco** (**R18**, aberta): o aparelho mais fraco paga 15,2%
-  dos quadros pelo shader; trocar de fundo em vez de só baixar resolução é a opção em cima da mesa
+- **Queda automática para a imagem** (**R18**): **fechada** — o último degrau da escada troca o fundo pela
+  imagem em vez de congelar; `?queda=0` desliga, `?queda=sempre` força, e `queda.mjs` mede os dois lados
+- **O que o visitante de um telemóvel antigo vê** (aberta, sem número): o PowerVR **não** desiste, porque a
+  cadência se cumpre; baixar a fasquia para «menos de 40 quadros/s → imagem» é uma decisão de produto, com
+  os números do R14 na mão
 - **Um fundo 360º em vídeo**: a capacidade **já existe** (`kind: "video"` anima com
   `THREE.VideoTexture`), mas nenhum mundo a usa — falta o asset, não o código
 
@@ -1819,7 +1823,7 @@ Fora da Fase 7, e sem data:
 **Fechado na Fase 7:** o catálogo em duas línguas (**B2**), o que o esquema prometia e a cena não
 construía — **D56** (fundo de cor), **D57** (`link` a navegar), **D58** (modelo GLTF e texto) —, o
 lote por dimensão e o catálogo de assets no editor (**B3**/**B4**), os portais animados (**D59**) e a
-verificação dos dois lados da exposição com **24** baterias (§ «Como Usar»).
+verificação dos dois lados da exposição com **25** baterias (§ «Como Usar»).
 
 **Fechado na Fase 4:** a **página de edição** (§ acima), o **retrato do portão** (decidido: não se
 faz — a ausência é honesta, **R10**) e a **orientação da chegada** no céu (resolvida por dado: as
