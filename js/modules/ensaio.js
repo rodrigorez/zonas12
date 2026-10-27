@@ -18,10 +18,17 @@
 // ~2 minutos por aparelho). O texto é da ferramenta, não da interface (D12) — não sai do catálogo.
 const KEY = 'zonas12.ensaio';
 const SAMPLE_MS = 250;
+// Uma janela curta não mede nada: em 0 ms não há um único quadro e a taxa é `0/0`. O relatório mostrou
+// `null/s` e `NaN/s` na primeira vez que o autor abriu o endereço sem durações explícitas, e a causa era
+// `Number(null) === 0` — o parâmetro ausente lia-se como zero. Duas defesas: ausente/vazio/inválido volta
+// ao valor por omissão (o zero **pedido** continua a valer para o aquecimento), e a medida tem um mínimo.
+const MIN_MEASURE_MS = 2000;
 
-const seconds = (value, fallback) => {
+const seconds = (value, fallback, minimum = 0) => {
+  if (value === null || value === undefined || String(value).trim() === '') return fallback;
   const number = Number(value);
-  return Number.isFinite(number) && number >= 0 ? number * 1000 : fallback;
+  if (!Number.isFinite(number) || number < 0) return fallback;
+  return Math.max(minimum, number * 1000);
 };
 
 const shortDevice = () => {
@@ -70,6 +77,7 @@ function measure(ms) {
   return new Promise((resolve) => {
     let frames = 0;
     let active = true;
+    const startedAt = performance.now();
     // O intervalo entre quadros, e não só a contagem: numa máquina rápida o browser desenha ao ritmo do
     // ecrã e os dois lados do A/B empatam (medido: 165 → 164,7 quadros/s num portátil com RTX 4060), o
     // que não quer dizer que o shader seja grátis — quer dizer que ainda sobra. O que distingue é o
@@ -110,6 +118,9 @@ function measure(ms) {
       const valid = samples.filter(Boolean);
       const first = valid[0] || null;
       const last = valid[valid.length - 1] || null;
+      // O divisor vem da janela que passou, não da que se pediu: um `setTimeout` atrasado por um ecrã
+      // bloqueado não pode transformar a taxa num número inventado.
+      const elapsed = Math.max(1, performance.now() - startedAt);
       const ratios = valid.map((item) => item.pixelRatio).filter((value) => typeof value === 'number');
       const backgrounds = state() ? state().backgrounds || [] : [];
       const background = backgrounds.find((item) => item.dimension === 0) || {};
@@ -118,8 +129,8 @@ function measure(ms) {
       const worst = sorted.length ? sorted[sorted.length - 1] : null;
       const slow = median === null ? null : gaps.filter((gap) => gap > median * 2).length;
       resolve({
-        seconds: Math.round(ms / 1000),
-        fps: Math.round((frames / (ms / 1000)) * 10) / 10,
+        seconds: Math.round(elapsed / 1000),
+        fps: Math.round((frames / (elapsed / 1000)) * 10) / 10,
         worstFrameMs: worst === null ? null : Math.round(worst * 10) / 10,
         slowFrames: slow,
         frames: frames,
@@ -129,7 +140,7 @@ function measure(ms) {
         cadence: last ? last.cadence : null,
         // Sem política (fundo de imagem) não há atualizações a contar: fica «—», não zero.
         updatesPerSecond: first && last && last.updates > first.updates
-          ? Math.round(((last.updates - first.updates) / (ms / 1000)) * 10) / 10
+          ? Math.round(((last.updates - first.updates) / (elapsed / 1000)) * 10) / 10
           : null,
         updates: last ? last.updates : null,
         pixelRatio: last ? last.pixelRatio : null,
@@ -144,17 +155,23 @@ function measure(ms) {
 
 const line = (label, value) => label.padEnd(13) + value;
 
+// Um número do relatório: `null`, `NaN` e `Infinity` não são resultados, são a ausência dele — e um
+// relatório que os imprime (foi o que aconteceu com a janela de 0 s) faz perder a viagem.
+const value = (number, casas = 1) => (typeof number === 'number' && Number.isFinite(number)
+  ? String(Math.round(number * Math.pow(10, casas)) / Math.pow(10, casas))
+  : '—');
+
 function phaseReport(title, result) {
   if (!result) return [title, '  (sem medição)'];
   return [
     title,
-    '  ' + line('fundo', result.background + (result.shader ? ' · ' + result.shader : '')),
-    '  ' + line('quadros', result.fps + '/s'),
-    '  ' + line('pior quadro', (result.worstFrameMs === null ? '—' : result.worstFrameMs + ' ms') +
+    '  ' + line('fundo', (result.background || '—') + (result.shader ? ' · ' + result.shader : '')),
+    '  ' + line('quadros', value(result.fps) + '/s'),
+    '  ' + line('pior quadro', (result.worstFrameMs === null ? '—' : value(result.worstFrameMs) + ' ms') +
       (result.slowFrames === null ? '' : ' · lentos ' + result.slowFrames)),
     '  ' + line('cadência', (result.cadence === null ? '—' : result.cadence + '/s') +
       (result.mode ? ' · ' + result.mode : '')),
-    '  ' + line('atualizações', (result.updatesPerSecond === null ? '—' : result.updatesPerSecond + '/s') +
+    '  ' + line('atualizações', (result.updatesPerSecond === null ? '—' : value(result.updatesPerSecond) + '/s') +
       (result.updates === null ? '' : ' · total ' + result.updates)),
     '  ' + line('pixelRatio', (result.pixelRatio === null ? '—' : String(result.pixelRatio)) +
       (result.pixelRatioMin === null ? '' : ' (min ' + result.pixelRatioMin + ' · max ' + result.pixelRatioMax + ')')),
@@ -163,19 +180,23 @@ function phaseReport(title, result) {
   ];
 }
 
+// A comparação existe **sempre**: um ensaio a que falta um lado é um resultado (e diz-se porquê), não
+// uma secção que desaparece sem explicação.
 function summary(first, second) {
-  const lines = [];
-  if (first && second && first.fps && second.fps) {
-    const delta = Math.round(((second.fps - first.fps) / first.fps) * 1000) / 10;
-    lines.push('--- comparação (imagem vs shader) ---');
-    lines.push('  quadros      ' + first.fps + '/s → ' + second.fps + '/s  (' +
-      (delta >= 0 ? '+' : '') + delta + '%)');
-    if (first.worstFrameMs !== null && second.worstFrameMs !== null) {
-      lines.push('  pior quadro  ' + first.worstFrameMs + ' ms → ' + second.worstFrameMs + ' ms');
-    }
-    if (first.slowFrames !== null && second.slowFrames !== null) {
-      lines.push('  lentos       ' + first.slowFrames + ' → ' + second.slowFrames);
-    }
+  const lines = ['--- comparação (imagem vs shader) ---'];
+  const read = (result) => Boolean(result) && Number.isFinite(result.fps);
+  if (!read(first) || !read(second)) {
+    lines.push('  sem par: ' + (!read(first) ? 'a fase 1 (shader) não deixou números' : 'a fase 2 (imagem) não deixou números'));
+    return lines;
+  }
+  const delta = first.fps > 0 ? Math.round(((second.fps - first.fps) / first.fps) * 1000) / 10 : null;
+  lines.push('  quadros      ' + value(first.fps) + '/s → ' + value(second.fps) + '/s' +
+    (delta === null ? '' : '  (' + (delta >= 0 ? '+' : '') + delta + '%)'));
+  if (Number.isFinite(first.worstFrameMs) && Number.isFinite(second.worstFrameMs)) {
+    lines.push('  pior quadro  ' + value(first.worstFrameMs) + ' ms → ' + value(second.worstFrameMs) + ' ms');
+  }
+  if (Number.isFinite(first.slowFrames) && Number.isFinite(second.slowFrames)) {
+    lines.push('  lentos       ' + first.slowFrames + ' → ' + second.slowFrames);
   }
   return lines;
 }
@@ -226,8 +247,12 @@ export function startEnsaio() {
   const parameters = new URLSearchParams(location.search);
   if (parameters.get('ensaio') !== '1') return null;
 
+  // Aquecimento e medida: o primeiro aceita 0 (um ensaio curto quer medir já), o segundo tem mínimo —
+  // uma janela de 0 ms produz `0/0`, que é como o relatório do autor saiu com `null/s` e `NaN/s`.
   const warmupMs = seconds(parameters.get('aquecimento'), 10000);
-  const measureMs = seconds(parameters.get('segundos'), 45000);
+  const requested = parameters.get('segundos');
+  const measureMs = seconds(requested, 45000, MIN_MEASURE_MS);
+  const clamped = requested !== null && String(requested).trim() !== '' && measureMs !== Number(requested) * 1000;
   const phase = parameters.get('fase') === 'imagem' ? 'imagem' : 'shader';
   const ui = panel();
 
@@ -280,7 +305,8 @@ export function startEnsaio() {
       line('aparelho', shortDevice()),
       line('gpu', gpuName()),
       line('ecrã', innerWidth + '×' + innerHeight + ' · dpr ' + (Math.round(devicePixelRatio * 100) / 100)),
-      line('janela', Math.round(measureMs / 1000) + ' s (aquecimento ' + Math.round(warmupMs / 1000) + ' s)'),
+      line('janela', Math.round(measureMs / 1000) + ' s (aquecimento ' + Math.round(warmupMs / 1000) + ' s' +
+        (clamped ? '; pedido ' + String(requested) + ' s, mínimo ' + (MIN_MEASURE_MS / 1000) + ' s' : '') + ')'),
       line('reduzido', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'sim' : 'não'),
       '',
       ...phaseReport('--- fase 1 · shader ---', first),
@@ -292,8 +318,8 @@ export function startEnsaio() {
     if (!first) lines.push('  (a fase 1 não chegou a esta página: ensaio incompleto)');
 
     ui.text.textContent = lines.join('\n');
-    ui.short.textContent = first && result
-      ? 'A/B ' + first.fps + ' → ' + result.fps + ' quadros/s · ' + shortDevice()
+    ui.short.textContent = first && Number.isFinite(first.fps) && Number.isFinite(result.fps)
+      ? 'A/B ' + value(first.fps) + ' → ' + value(result.fps) + ' quadros/s · ' + shortDevice()
       : 'A/B incompleto';
     ui.copy.addEventListener('click', () => copyText(ui.text.textContent, ui.copy));
     ui.repeat.addEventListener('click', () => {

@@ -141,6 +141,7 @@ mede **sozinha** os dois lados do par — o shader e a imagem — e mostra um bl
 | 7.4 | Tocar em **Copiar** | O botão diz **«copiado»** e o bloco fica no teclado. Colá-lo aqui é o resultado do teste |
 | 7.5 | Repetir **7.1–7.4** no **telemóvel fraco** e no **telemóvel do Adreno 630** | O bloco traz o modelo da **GPU** e o ecrã de cada um — é isso que distingue os três registos |
 | 7.6 | Em qualquer aparelho, abrir `…/scene1/?ensaio=1&segundos=10&aquecimento=3` | O mesmo, em ~26 s: serve para ver que o protocolo funciona quando não se quer esperar 2 minutos |
+| 7.7 | No painel, ler a linha **`janela`** antes de tudo | Tem de dizer **`45 s (aquecimento 10 s)`**. Se disser **`0 s`**, ou aparecer `null/s` / `NaN/s` nos quadros, o build está velho: recarregar com `Ctrl+Shift+R` (ou limpar a cache no telemóvel) |
 
 O que **conta** no resultado: os **quadros/s** de cada lado e o **pior quadro**. Num aparelho rápido os
 dois lados empatam (o browser desenha ao ritmo do ecrã) — isso **não** é falha, é o resultado. Num

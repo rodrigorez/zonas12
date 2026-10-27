@@ -113,6 +113,33 @@ async function main() {
     await espera(browser, 'Boolean(window.portalDebug && document.querySelector("a-scene"))');
     const semParametro = await browser.evaluate(`Boolean(document.getElementById('ensaio'))`);
     result.check('sem `?ensaio=1` não existe painel', semParametro === false, String(semParametro));
+
+    // 7. O endereço **como está no guia** — `?ensaio=1` e mais nada — tem de anunciar as durações por
+    //    omissão (55 s = 10 de aquecimento + 45 de medida) e não zero. Foi este o defeito que o autor
+    //    encontrou: `Number(null)` é **0**, por isso um parâmetro ausente lia-se como «mede 0 s» e o
+    //    relatório saía com `null/s` e `NaN/s`. As verificações acima passavam porque traziam sempre as
+    //    durações escritas — a bateria tinha de exercitar o caminho que o guia manda seguir.
+    await browser.goto(site.base + '/scene1/?ensaio=1&bust=' + Date.now(), 60000);
+    const anunciado = await espera(browser, `(() => {
+      const curto = document.getElementById('ensaio-resumo');
+      return Boolean(curto && /fase 1\\/2 \\(shader\\)/.test(curto.textContent));
+    })()`);
+    const texto = await browser.evaluate('(document.getElementById("ensaio-resumo") || {}).textContent || ""');
+    const segundos = Number((/· (\d+) s/.exec(texto) || [])[1]);
+    result.check('`?ensaio=1` sozinho anuncia a janela por omissão (55 s), não zero',
+      anunciado && Number.isFinite(segundos) && segundos >= 50, texto);
+
+    // 8. E o mesmo com os parâmetros presentes mas vazios (`&segundos=&aquecimento=`), que é o que sai de
+    //    um endereço editado à mão.
+    await browser.goto(site.base + '/scene1/?ensaio=1&segundos=&aquecimento=&bust=' + Date.now(), 60000);
+    const vazio = await espera(browser, `(() => {
+      const curto = document.getElementById('ensaio-resumo');
+      return Boolean(curto && /· (\\d+) s/.test(curto.textContent || ''));
+    })()`);
+    const textoVazio = await browser.evaluate('(document.getElementById("ensaio-resumo") || {}).textContent || ""');
+    const segundosVazio = Number((/· (\d+) s/.exec(textoVazio) || [])[1]);
+    result.check('com `&segundos=&aquecimento=` vazios volta à janela por omissão (não a 0 s)',
+      vazio && Number.isFinite(segundosVazio) && segundosVazio >= 50, textoVazio);
   } finally {
     await browser.close();
     await site.close();

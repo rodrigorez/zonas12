@@ -4528,6 +4528,19 @@ lições da primeira medição: numa máquina rápida os quadros ficam presos ao
 quadro**; e o `?shader=0` da segunda fase não pode ser esquecido — está no relatório, em cada fase,
 para um ensaio que corra duas vezes o mesmo lado ser visto e não confundido com um empate.
 
+**A primeira noite de campo (2026-10-27):** o autor abriu o endereço do guia — `?ensaio=1` e
+mais nada — e recebeu um relatório com `quadros null/s`, `quadros NaN/s` e `janela 0 s`. A causa era
+`Number(null) === 0`: um parâmetro **ausente** lia-se como zero, e uma janela de 0 ms não tem um único
+quadro, logo a taxa é `0/0`. A bateria não o apanhou porque todas as suas verificações traziam as
+durações escritas — o caminho que o guia manda seguir nunca era exercido. Três defesas: ausente, vazio
+ou inválido volta à omissão (o **zero pedido** continua a valer para o aquecimento); a medida tem
+mínimo de **2 s** e diz no relatório quando o pedido foi elevado; e o divisor da taxa é o tempo que
+**passou**, não o que se pediu, para um `setTimeout` atrasado não inventar um número. O relatório
+passou a formatar tudo por uma função que imprime **—** em vez de `null`/`NaN`/`Infinity`, e a
+comparação existe sempre — quando falta um lado, diz qual. A bateria ganhou as duas verificações que
+faltavam (o endereço nu e os parâmetros vazios) e foi provada contra o defeito reintroduzido: falha
+com ele (**588** quadros/s onde deviam ser 55 s de janela) e passa sem ele (**14 de 14**).
+
 **Formato e orçamento de imagem**
 
 - O panorama equiretangular deve manter a proporção **2:1** (lei L14). Os arquivos atuais medidos

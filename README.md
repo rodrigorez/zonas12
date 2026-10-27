@@ -1747,7 +1747,8 @@ aparelho e não precisa de consola nem de tocar em nada.
 O bloco traz, por fase: fundo (modo e `shaderId`), **quadros/s**, **pior quadro** e quantos passaram do
 dobro da mediana, cadência, atualizações, pixelRatio (com o mínimo e o máximo que a escada visitou),
 atrasos e eventos — mais a comparação dos dois lados, o aparelho e a **GPU**. As durações mudam-se no
-endereço: `?ensaio=1&segundos=30&aquecimento=5`.
+endereço: `?ensaio=1&segundos=30&aquecimento=5` (a medida tem um **mínimo de 2 s**, senão não há um
+único quadro a contar).
 
 Porque o **pior quadro** e não só os quadros: numa máquina rápida o browser desenha ao ritmo do ecrã e
 os dois lados empatam (medido num portátil com RTX 4060: **165,3 → 164,3** quadros/s), o que não quer
