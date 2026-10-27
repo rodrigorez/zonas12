@@ -3524,9 +3524,39 @@ pequena dentro do cartão. Medido antes de mexer: `--padding: 4vw` cresce com a 
 para nos 800 px, por isso a imagem ocupava **71%** do cartão a 2560 px e **91%** a 780. Passou a
 `clamp(16px, 4vw, 40px)`: **89–91%** em todas as larguras medidas (420, 480, 780, 1280, 1600, 2560).
 
-Medido: bateria nova `volta.mjs` **7 de 7** (o clique guarda o ponto, o «voltar» pede `?volta=1`, a
-posição e o olhar voltam dentro de 0,2 m e 1,5°, o ponto é consumido, e sem ponto a sala começa no
-dado), `obra.mjs` **60 de 60**, `ficha-falhas` **3 de 3** e a suíte por omissão **5 de 5**.
+**As capas por tentativas e os assets remotos (D64/D65).** Uma obra cujo conteúdo é uma **página** (um vídeo
+do YouTube) precisou de duas coisas que o dado não dava: um asset que é um **endereço** (D64 — as leis de
+disco L9/L10/L14 passam a «não verificado» em vez de recusarem, e o `crossorigin` que o construtor já punha
+faz o resto) e uma **capa resolvida por tentativas** (D65): o thumbnail do YouTube derivado do próprio
+endereço → a `capa` do CSV → `assets/covers/sem-capa.svg`, que diz «avisar o administrador da galeria» nas
+duas línguas. A resolução é feita ao carregar (`Image` + `onerror`), porque é o único sinal que responde ao
+mesmo tempo a «existe?» e «descodifica?». Medido: `capa.mjs` **9 de 9** (as três camadas, com pedidos
+bloqueados um a um), `obra.mjs` **71 de 71** e a malha da sala a esperar a descodificação (sem isso a consola
+dizia «Texture marked for update but image is incomplete», apanhado pela D40). O `data/obras.csv` passou a
+estar **preenchido com texto provisório** — título, autor (um ou vários), sinopse, um site (o do vídeo, só
+para laboratório) —, e é esse o estado do dado: **o conteúdo definitivo é do autor**, e substitui-se no CSV
+com um comando.
+
+**O roteiro de teste, percorrido (2026-10-27).** O guia por números mostrou-se difícil de seguir com o
+aparelho na mão, e o autor pediu um **roteiro passo a passo**: `docs/ROTEIRO-DE-TESTE.md` tem a preparação
+(aba anónima, ecrã sem apagar, servidor local, árvore limpa), **nove passos no telemóvel** e **dezassete no
+computador**, cada um com o **sinal de falha** concreto, uma **folha de registo** e o que **desfazer** no fim
+(os blocos 5 e 6 escrevem no repositório: um `G-TESTE123` gravado iria para produção). Escrevê-lo corrigiu
+três coisas no próprio guia: o `v=8` que eu tinha citado não existe em código nenhum (era um *cache-buster*
+meu), a ficha da praia já não tem «site falso» (os `www.testeX.nada` saíram quando o site ficou a ser um só)
+e as duas fichas de média estavam confundidas — `id=3` é a obra **com site** e `id=2` é a de **vídeo**.
+**Percorrido pelo autor e dado por bom, sem falhas reportadas** — incluindo o **ponto de regresso** (A8) e a
+linha **`travessia`** da sonda com `encosto` (A9, o detalhe que faltava do D55).
+
+**Fecho da Fase 8 (2026-10-27):** o números finais, todos medidos e nenhum afirmado — `obra.mjs` **71 de 71**
+(os cinco tipos, as três camadas do `site`, a tabela das plataformas, o `page_view` com e sem ID, o meio
+pedido e o desenhado, a obra que não existe, a consola), `capa.mjs` **9 de 9**, `volta.mjs` **7 de 7**
+(o clique guarda o ponto, o «voltar» pede `?volta=1`, a posição e o olhar voltam dentro de 0,2 m e 1,5°, o
+ponto é consumido, e sem ponto a sala começa no dado), `ficha-falhas` **3 de 3** (sem `i18n`, sem mundo, e
+o caminho normal), `i18n` a **9 de 9** com **214** chaves por língua, o `validate` a **0**, a lei **L20** a
+recusar uma ficha velha e o `all.mjs --full` a **25 de 25** em **796,7 s**. O que a fase **deixa aberto** é
+só conteúdo: o texto definitivo do CSV, a decisão sobre a obra de vídeo (é de laboratório) e a conferência
+das capas — os três do autor, sem código pelo meio.
 
 ---
 

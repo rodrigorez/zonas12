@@ -972,6 +972,16 @@ O que isto custa, dito: **sem JavaScript a ficha não mostra a obra**. Antes cad
 pronto; agora é desenhada do dado, como a própria exposição (que também não existe sem JavaScript).
 Foi uma troca pedida pelo autor e está registada na decisão.
 
+**O roteiro de teste (2026-10-27).** O guia por números não se seguia com o aparelho na mão, e o autor
+pediu um **roteiro passo a passo**: `docs/ROTEIRO-DE-TESTE.md` tem a preparação (aba anónima, ecrã sem
+apagar, servidor local, árvore limpa), **nove passos no telemóvel** e **dezassete no computador**, cada
+um com o **sinal de falha** concreto, uma folha de registo e o que **desfazer** no fim — os blocos do
+CSV e do editor escrevem no repositório, e um ID de Analytics de teste gravado iria para produção.
+Percorrido pelo autor e **dado por bom, sem falhas reportadas**, incluindo o **ponto de regresso** (A8)
+e a linha **`travessia`** da sonda com `encosto` (A9). Escrever o roteiro corrigiu três coisas no
+próprio guia: o `v=8` que eu citava não existe em código nenhum, a ficha da praia já não tem «site
+falso», e `id=3` é a obra **com site** enquanto `id=2` é a de **vídeo**.
+
 **A porta do portão mostra a realidade (D38, o B12).** O autor reparou que, na cidade, a porta de onde
 veio aparecia só como pórtico. É verdade e era o dado (`window: none` desde a **D29**), mas a
 expectativa era outra: ver a **câmara**. Provado primeiro numa sonda — uma sala com uma dimensão
