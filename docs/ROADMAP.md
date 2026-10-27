@@ -3410,7 +3410,7 @@ dois), e o que falta é o terceiro número.
 | O `en.json` divergir do `pt.json` | Baixa | um teste compara as chaves; a tradução não acrescenta nem remove nenhuma |
 | O catálogo de assets abrir a porta a caminhos fora do sítio | Média | validar `path` contra a raiz do projeto e os tipos de `ASSET_KINDS`; a L9 continua a recusar o que falta |
 
-### Fase 8 — A ficha da obra (2026-10-25)
+### Fase 8 — A ficha da obra (fechada, 2026-10-27)
 
 - **Entregável:** cada obra passa a ter uma **página própria** — a ficha, no modelo do
   `galerias/obra7.html` das Zonas 11 (nome da exposição, «voltar», o meio da obra, título, autor,
@@ -3548,6 +3548,14 @@ e as duas fichas de média estavam confundidas — `id=3` é a obra **com site**
 **Percorrido pelo autor e dado por bom, sem falhas reportadas** — incluindo o **ponto de regresso** (A8) e a
 linha **`travessia`** da sonda com `encosto` (A9, o detalhe que faltava do D55).
 
+**A fase fecha em 2026-10-27, e é assim que se lê o «fechada»:** o que a fase prometeu está entregue e
+medido — a ficha como um ficheiro só, o dado por CSV, o regresso ao ponto (D63), os assets remotos (D64), a
+capa por tentativas (D65) e a verificação que os guarda. O que fica por fazer **não é a fase**: é o
+**conteúdo** que só o autor tem (o texto definitivo do CSV, a saída da obra de vídeo de laboratório e a
+conferência das capas) e um item técnico da Fase 7 (o teto de pixelRatio do panorama, medido no R18). Os
+quatro estão escritos, com o que cada um exige, em `docs/PRE-EXPOSICAO.md` — a lista que se percorre antes
+de abrir ao público. Separar as duas coisas é de propósito: uma fase que fica aberta à espera de texto deixa
+de poder dizer **com que números** fechou.
 **Fecho da Fase 8 (2026-10-27):** o números finais, todos medidos e nenhum afirmado — `obra.mjs` **71 de 71**
 (os cinco tipos, as três camadas do `site`, a tabela das plataformas, o `page_view` com e sem ID, o meio
 pedido e o desenhado, a obra que não existe, a consola), `capa.mjs` **9 de 9**, `volta.mjs` **7 de 7**

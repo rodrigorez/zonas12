@@ -890,7 +890,9 @@ também com `?scene=exemplo-ficha`, e o validador sabe que não é uma sala (nã
 arranques). As capturas ficam em `.harness/imagenTeste/exemplo-ficha/`, fora do repositório.
 
 **O guia de testes:** [docs/GUIA-DE-TESTES.md](docs/GUIA-DE-TESTES.md) — sete blocos com o que fazer, o
-que se espera e o que enviar se falhar, com todos os endereços para telemóvel e computador.
+que se espera e o que enviar se falhar, com todos os endereços para telemóvel e computador —, o
+**[roteiro passo a passo](docs/ROTEIRO-DE-TESTE.md)** para os percorrer pela ordem certa, e a
+**[lista de pré-exposição](docs/PRE-EXPOSICAO.md)** com o que falta antes de abrir ao público.
 
 **A capa por tentativas (D65).** O autor pediu o método: buscar a capa ao YouTube; se não der, a capa
 indicada no CSV (opcional, local ou num endereço); e se nada der, uma imagem padrão a pedir para avisar
@@ -981,6 +983,13 @@ Percorrido pelo autor e **dado por bom, sem falhas reportadas**, incluindo o **p
 e a linha **`travessia`** da sonda com `encosto` (A9). Escrever o roteiro corrigiu três coisas no
 próprio guia: o `v=8` que eu citava não existe em código nenhum, a ficha da praia já não tem «site
 falso», e `id=3` é a obra **com site** enquanto `id=2` é a de **vídeo**.
+
+**A fase fecha a 2026-10-27.** O que fica por fazer **não é a fase**: é o **conteúdo** que só o autor
+tem — o texto definitivo do CSV, a saída da obra de vídeo de laboratório e a conferência das capas — e
+um item técnico da Fase 7 (o teto de pixelRatio do panorama). Os quatro estão escritos, com o que cada
+um exige e como se sabe que ficou feito, em [docs/PRE-EXPOSICAO.md](PRE-EXPOSICAO.md). Separar as duas
+coisas é de propósito: uma fase que fica aberta à espera de texto deixa de poder dizer **com que
+números** fechou.
 
 **A porta do portão mostra a realidade (D38, o B12).** O autor reparou que, na cidade, a porta de onde
 veio aparecia só como pórtico. É verdade e era o dado (`window: none` desde a **D29**), mas a
@@ -1828,7 +1837,9 @@ O que se lê no painel da sonda, na linha `giroscópio`: `ligado · tremor 0.04`
 
 A **Fase 7** (§9 de [docs/ROADMAP.md](docs/ROADMAP.md)) fechou em **2026-10-25**: os dez blocos estão
 feitos e cada um mediu o seu número. O **R14**/**R15** (o A/B do shader nos três aparelhos) fechou em
-**2026-10-27**, com os três medidos e um quarto de bónus.
+**2026-10-27**, com os três medidos e um quarto de bónus. A **Fase 8** (a ficha da obra) fechou no mesmo
+dia — o que falta para abrir ao público é **conteúdo**, e está listado em
+[docs/PRE-EXPOSICAO.md](docs/PRE-EXPOSICAO.md).
 
 - **Fundos shader** (**R14**/**R15**, bloco **B9**): **fechado** — shader em produção desde 2026-10-24,
   `?shader=0` para a imagem de reserva, validador em `tools/shader/`, política 20 → 15 FPS → estático, e
