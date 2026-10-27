@@ -64,7 +64,7 @@ forma de não trocar um `id` sem querer.
 | `nomeCoautores` | co-autoria, com a mesma regra |
 | `nomaColaboradores` | colaborações, com a mesma regra (aceita-se também `nomeColaboradores`) |
 | `Descritivo` | o texto da ficha (a sinopse); o cartão cresce com ele |
-| `endereço da imagem` | um caminho do projeto (`assets/artworks/eiffel.jpg`) ou um endereço; **vazio** = fica a que já está; `-` = tira a capa |
+| `endereço da imagem` | um caminho do projeto (`assets/artworks/eiffel.jpg`) ou um endereço; **vazio** = fica a que já está; `-` = tira a capa. Um endereço **sem extensão** é aceite como imagem (é o caso das capas no Google Drive: `https://lh3.googleusercontent.com/d/<ID>`) |
 | `endereço da obra` | o site, se a obra for um jogo ou uma escultura interactiva: **um**, a começar por `http://` ou `https://`. Vazio tira o site — e então a linha tem de dar uma **imagem** na coluna anterior |
 
 O cabeçalho é comparado **sem acentos, sem maiúsculas e sem espaços a mais**: `Endereço da imagem`,

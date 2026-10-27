@@ -43,6 +43,10 @@ window.portalDebug = {
   // Which world the page is showing (D28), for the console and the regression scripts. `state`
   // holds what the scene is made of; this says which file it was read from.
   world: null,
+  // A sala está construída (D68): `world` é escrito no início da leitura do ficheiro, mas a construção
+  // só acaba quando as capas chegarem — e uma capa remota (Google Drive, YouTube) chega centenas de ms
+  // depois. Sem este sinal, um instrumento que espera por `world` mede uma sala a meio.
+  built: false,
   setActiveDimension: setActiveDimension,
   applyStencilState: applyStencilState,
   syncStencilValues: syncStencilValues,
@@ -143,6 +147,7 @@ async function buildFromData() {
   // they came through a door (D14).
   const from = new URLSearchParams(window.location.search).get('from');
   await buildScene(data, { from });
+  window.portalDebug.built = true;
 
   // O regresso da ficha (D63): quem abriu uma obra e voltou é devolvido ao sítio onde estava — a
   // posição, o olhar e a dimensão —, em vez de ao início do mundo. A ficha pede-o com `?volta=1`, e

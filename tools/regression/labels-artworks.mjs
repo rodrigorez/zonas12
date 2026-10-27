@@ -20,7 +20,7 @@ import { join } from 'node:path';
 const LARGURA = 1200;
 const ALTURA = 800;
 
-const PRONTA = `Boolean(window.portalDebug && window.portalDebug.world && document.querySelector('a-scene').renderer)`;
+const PRONTA = `Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.world && document.querySelector('a-scene').renderer)`;
 
 const NOMES = `(() => [...document.querySelectorAll('[data-artwork-id]')].map((element) => {
   const component = element.components['dimensional-material'];

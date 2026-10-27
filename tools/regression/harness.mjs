@@ -339,7 +339,7 @@ export async function openBrowser(options) {
       const until = Date.now() + (limit || 60000);
       while (Date.now() < until) {
         try {
-          if (await evaluate('Boolean(window.portalDebug && window.portalDebug.world)')) return true;
+          if (await evaluate('Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.world)')) return true;
         } catch (error) { /* still navigating */ }
         await sleep(200);
       }

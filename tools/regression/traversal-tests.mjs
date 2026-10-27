@@ -42,7 +42,7 @@ const MUNDOS = [
 const MARCA = 'zonas12-aceitacao';
 const MARCA_CHEGADA = 'zonas12-aceitacao-chegada';
 
-const PRONTO = `Boolean(window.portalDebug && window.portalDebug.world && window.portalDebug.state &&
+const PRONTO = `Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.world && window.portalDebug.state &&
   window.portalDebug.state.portals && document.querySelector('a-scene') &&
   document.querySelector('a-scene').renderer)`;
 

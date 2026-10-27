@@ -48,7 +48,7 @@ const ESTADO = `(() => {
   };
 })()`;
 
-const PRONTA = `Boolean(window.portalDebug && window.portalDebug.world && document.querySelector('a-scene').renderer)`;
+const PRONTA = `Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.world && document.querySelector('a-scene').renderer)`;
 
 // Abre uma página e devolve o estado depois de ela estar construída. A `timeOrigin` tem de mudar: sem
 // isso lê-se o documento anterior, que ainda está a responder.

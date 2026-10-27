@@ -40,7 +40,7 @@ const url = (site, pagina) =>
   site.base + '/?' + ['scene=' + pagina.slug, pagina.from ? 'from=' + pagina.from : null,
     'bust=' + Date.now() + '-' + Math.random()].filter(Boolean).join('&');
 
-const PRONTO = `Boolean(window.portalDebug && window.portalDebug.world && window.portalDebug.state &&
+const PRONTO = `Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.world && window.portalDebug.state &&
   window.portalDebug.state.portals && document.querySelector('a-scene') &&
   document.querySelector('a-scene').renderer)`;
 

@@ -84,6 +84,55 @@
         "pt": "Retrato do mundo Praia, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Beach world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/1dLxHwUJdFCyzI0DKNLij2E5eIn5YJKTx",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Entre Pétalas e Silhuetas"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1E1Eqo19hro_44FhmtE9aMwd0WTtG4EL9",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Golens Transgênicos"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1y3p9eogJPA6-q8UdT_5iBTgl4ke_GZs4",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Três Corações"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/13cEHb0AbO9-Stk4QDgJlSl6uu_nZK5NR",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Morfopoéticas: série Óptica-Fluorescente"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1FbAzyT8fQ6gjlagC7vHqO-LMLvQPlbjf",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Concerto Curto Para Os Últimos 74s De Topsy"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1W6sn-x3E9D2GTugXmuJIOyryslOnkh9p",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Arquivo Instável Ato #2: sobrecarga compulsiva"
+      }
+    },
+    "capa-6": {
+      "path": "https://lh3.googleusercontent.com/d/1WShcFPth-VaL2ZTAS_SMZiNIVnt3Rb4t",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Carnavais · II - Porta-Bandeira | Série Imaginarium Popular (2025–)"
+      }
     }
   },
   "dimensions": [
@@ -111,16 +160,16 @@
     {
       "id": 0,
       "dimension": 0,
-      "kind": "image",
-      "asset": "galeriaFoto1",
+      "kind": "site",
+      "asset": "capa-0",
       "position": [
-        -44,
+        -60,
         1.5,
         -55
       ],
       "rotation": [
         0,
-        15,
+        0,
         0
       ],
       "size": [
@@ -130,20 +179,21 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Cidade ao entardecer"
+        "pt": "Entre Pétalas e Silhuetas"
       },
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui, uma ou duas frases que dizem o que ela é."
+        "pt": "A obra Entre Pétalas e Silhuetas é apresentada pela artista como mais do que uma composição estética: trata-se de um testemunho pessoal e coletivo sobre a experiência feminina diante das expectativas sociais. O título reflete a dualidade entre o ideal de feminilidade imposto — simbolizado pelas pétalas, associadas à delicadeza, beleza e suavidade — e a silhueta, que representa o corpo real, marcado por dores, resistências e cicatrizes invisíveis.  A artista descreve como, desde cedo, as mulheres são moldadas a acreditar que devem ser frágeis como flores, mas fortes o suficiente para suportar sofrimentos raramente reconhecidos. As linhas triangulares que compõem a figura não são apenas elementos visuais, mas fissuras e cortes que simbolizam a forma como a feminilidade é esculpida por forças externas. A sociedade exige que as mulheres sejam belas, mas não intensas; dóceis, mas não rebeldes; femininas, mas dentro de um molde que não criaram. Nesse processo, suas dores se tornam invisíveis e desvalorizadas.  A obra busca romper com essa invisibilidade. As pequenas gotas vermelhas que descem do alto representam a dor feminina, geralmente tratada como detalhe ou exagero, mas que para quem a carrega é pesada e transformadora. A inclusão desses elementos é uma forma de dar visibilidade ao que costuma ser silenciado.  No canto inferior, a forma branca semelhante a uma flor simboliza a expectativa de que a mulher seja ornamento e beleza. Ao lado, o vermelho geométrico no chão evidencia o custo dessa idealização: a negação das dores e da complexidade feminina. Assim, entre pétalas e silhuetas, há sempre um corpo que sofre, resiste e insiste em existir além das limitações impostas. Ao falar em primeira pessoa, a artista reivindica sua voz como mulher e criadora. Ela não quer que a obra seja vista apenas como estética, mas como crítica e testemunho. Cada cor, forma e linha carrega uma mensagem sutil contra as expectativas que aprisionam. O tom é de um sussurro firme, que insiste em ser ouvido mesmo quando o mundo prefere ignorar. Entre Pétalas e Silhuetas é, portanto, um convite à reflexão. A obra lembra que por trás da imagem idealizada da feminilidade existe um corpo real, com dores reais, que não podem ser menosprezadas."
       },
-      "authors": "autorA, autorB, AutorC"
+      "authors": "Zarza",
+      "site": "https://canva.link/owpkwgtoa1hh1lb"
     },
     {
       "id": 1,
       "dimension": 0,
-      "kind": "image",
-      "asset": "galeriaFoto2",
+      "kind": "site",
+      "asset": "capa-1",
       "position": [
-        -24,
+        -40,
         1.5,
         -55
       ],
@@ -159,25 +209,26 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "A torre"
+        "pt": "Golens Transgênicos"
       },
       "synopsis": {
-        "pt": "Texto provisório: uma obra com um autor preenchido mostra uma linha de autor na ficha."
+        "pt": "“Golens Transgênicos” é um “animaforismo”, neologismo nascido da conexão entre“aforismo” e “animação”. As duas criaturas apresentadas na obra são seres transgênicos do futuro criados em laboratório para atuarem como serviçais de humanos. Ou seja, a vida de criaturas sencientes patenteada como um produto descartável. Os dois seres são animados para fazerem dancinhas que remetem à moda da rede social TikTok, denotando essa vulgarização e uso indiscriminado de seres vivos transgênicos como objetos."
       },
-      "authors": "autorA"
+      "authors": "Ciberpajé",
+      "site": "https://youtu.be/63faPpyHonk"
     },
     {
       "id": 2,
       "dimension": 0,
       "kind": "site",
       "position": [
-        4,
+        -20,
         1.5,
         -55
       ],
       "rotation": [
         0,
-        -15,
+        0,
         0
       ],
       "size": [
@@ -187,22 +238,22 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Vídeo de teste"
+        "pt": "Três Corações"
       },
       "synopsis": {
-        "pt": "Texto provisório: esta obra é um vídeo, e o vídeo está no YouTube — a ficha embute-o e deixa sempre o botão para o abrir numa aba nova. A capa é buscada ao YouTube a partir do endereço do próprio vídeo (D65). Se falhar, aparece a imagem padrão que pede para avisar o administrador."
+        "pt": "Três Corações é um conjunto de animações digitais que explora a visualidade do movimento e da transformação no plano bidimensional. Nele, diferentes realidades coexistem como fragmentos de uma realidade única, porém multifacetada, assim como o são as emoções humanas."
       },
-      "authors": "autorB",
-      "site": "https://www.youtube.com/watch?v=Gzegts8LXaI",
-      "coAuthors": "autorC"
+      "authors": "Yago Teruo",
+      "site": "https://www.youtube.com/watch?v=QjSH3-v1b4o",
+      "asset": "capa-2"
     },
     {
       "id": 3,
       "dimension": 0,
-      "kind": "image",
-      "asset": "praia",
+      "kind": "site",
+      "asset": "capa-3",
       "position": [
-        24,
+        0,
         1.5,
         -55
       ],
@@ -218,20 +269,21 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Praia"
+        "pt": "Morfopoéticas: série Óptica-Fluorescente"
       },
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui."
+        "pt": "Morphopoetics: Optical-Fluorescent Series (2026) é uma obra audiovisual feita com imagens de microscopia de fluorescência óptica. Trata a observação científica de células animais como arte, usando IA generativa para explorar zoom e interpolação. Ao expor a tradução via prompts da ciência em animação, a peça mostra como a observação molda a forma e o sentido. Dialogando com Lynn Margulis e Victor Pasmore, redefine a microscopia como um campo coletivo e autônomo de produção de imagens."
       },
-      "authors": "autorC"
+      "authors": "Clarissa Ribeiro; Roberta Naufal; Carla Lombardo; Hana Masuda; Renata Simões; Arnaldo Rodrigues dos Santos Junior; Andressa Borello; Marcela Rosa.",
+      "site": "https://drive.google.com/file/d/1sRrA05MYtk2Zkau1AbIYgdNAgaNaIFyM/preview"
     },
     {
       "id": 4,
       "dimension": 0,
-      "kind": "image",
-      "asset": "skycloud",
+      "kind": "site",
+      "asset": "capa-4",
       "position": [
-        44,
+        20,
         1.5,
         -55
       ],
@@ -247,13 +299,74 @@
       ],
       "interaction": "page",
       "title": {
-        "pt": "Céu de nuvens"
+        "pt": "Concerto Curto Para Os Últimos 74s De Topsy"
       },
       "synopsis": {
-        "pt": "Texto provisório: a sinopse definitiva desta obra entra aqui."
+        "pt": "Concerto Curto Para os Últimos 74s de Topsy é uma obra audiovisual generativa que parte do filme da execução de Topsy, elefanta eletrocutada em Coney Island em 1903 e filmada pela Edison Manufacturing Company, possivelmente o primeiro registro fílmico de uma morte no Ocidente. Um sistema programado em Max/MSP/Jitter faz uma escuta maquínica do arquivo e converte pixels em som. A obra é um regime de co-autoria entre Vitor Bossa, Topsy e o software Max/MSP/Jitter."
       },
-      "authors": "autorA",
-      "coAuthors": "autorB"
+      "authors": "Vitor Bossa",
+      "coAuthors": "Topsy; Max/MSP.",
+      "site": "https://www.youtube.com/watch?v=sHzk4p4Z55o"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        40,
+        1.5,
+        -55
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Arquivo Instável Ato #2: sobrecarga compulsiva"
+      },
+      "authors": "Karen Caetano",
+      "synopsis": {
+        "pt": "Autorretratos são percorridos por gravações de live coding, sobreposições e ruídos até que a imagem entre em repetição, pulsação e colapso. O corpo aparece como matéria em disputa: insiste, falha, retorna e se desfaz. Contra a superfície lisa em que o corpo se oferece como mercadoria otimizada, sem marca e sem tempo, a matéria recupera o direito ao defeito. Tornar-se ilegível e opaco é deixar que o corpo exista fora da pressão pela correção."
+      },
+      "site": "https://youtu.be/dW2yCrQFc7k"
+    },
+    {
+      "id": 6,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-6",
+      "position": [
+        60,
+        1.5,
+        -55
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Carnavais · II - Porta-Bandeira | Série Imaginarium Popular (2025–)"
+      },
+      "authors": "William Figueiredo",
+      "synopsis": {
+        "pt": "Carnavais #2 - Porta-Bandeira (2025) é uma escultura interativa (WebGPU) em LiDAR. Sem gravar imagens, usa a webcam (fluxo óptico) para reagir ao movimento do público, que altera suas partículas 3D coreografando um encontro imersivo com a memória do carnaval no ciberespaço."
+      },
+      "site": "https://allt3liee.github.io/imaginarium_popular/"
     }
   ],
   "portals": [

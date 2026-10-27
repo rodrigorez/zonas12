@@ -1,4 +1,4 @@
-// A queda para a imagem num aparelho que não sustenta o shader (R18), medida nos dois lados.
+﻿// A queda para a imagem num aparelho que não sustenta o shader (R18), medida nos dois lados.
 //
 // Porque existe: o A/B do R14 mostrou que o telemóvel mais fraco paga 15,2% dos quadros pelo shader, e
 // que a escada do R15 **nunca chega a «estático»** nesse aparelho (a cadência de 20/s cumpre-se em
@@ -114,7 +114,7 @@ async function sceneChecks() {
   const ready = async (tries) => {
     for (let i = 0; i < (tries || 400); i++) {
       const ok = await browser.evaluate(
-        'Boolean(window.portalDebug && window.portalDebug.state && document.querySelector("a-scene") && document.querySelector("a-scene").renderer)'
+        'Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.state && document.querySelector("a-scene") && document.querySelector("a-scene").renderer)'
       ).catch(() => false);
       if (ok) return true;
       await sleep(150);
@@ -144,7 +144,7 @@ async function sceneChecks() {
     const forced = await read();
     check.check('`?queda=sempre` troca o fundo do shader para a imagem',
       forced.fundo === 'image' && forced.shaderId === null, JSON.stringify(forced));
-    check.check('a cena continua inteira depois da troca (as 5 obras, as portas e a esfera no sítio)',
+    check.check('a cena continua inteira depois da troca (as obras, as portas e a esfera no sítio)',
       forced.obras > 0 && forced.portas > 0 && forced.esfera === true,
       JSON.stringify({ obras: forced.obras, portas: forced.portas, esfera: forced.esfera }));
 

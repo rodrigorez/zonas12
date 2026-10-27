@@ -280,8 +280,11 @@ async function resolveCovers(scene, language, parent) {
   if (wanted.length === 0) return covers;
 
   const container = parent.querySelector('a-assets') || parent.appendChild(document.createElement('a-assets'));
-  const loading = [];
-  for (const artwork of wanted) {
+  // Todas as capas **ao mesmo tempo**: em série, cada imagem remota somava a sua espera às seguintes —
+  // nesta sala (sete obras com a capa no Google Drive) isso era 1,7 s a abrir contra 0,3 s nas outras, e
+  // uma capa lenta fazia esperar por ela **e** por todas as que vinham depois. Em paralelo a sala espera
+  // pela mais lenta, não pela soma.
+  const loading = wanted.map(async (artwork) => {
     const candidates = coverCandidates(artwork, catalogue);
     const resolved = candidates.length === 0
       ? { src: DEFAULT_COVER, from: 'padrao' }
@@ -296,16 +299,16 @@ async function resolveCovers(scene, language, parent) {
     const description = (asset && textIn(asset.alt, language)) || textIn(artwork.title, language);
     if (description) el.setAttribute('alt', description);
     container.appendChild(el);
+    covers.set(artwork.id, id);
     // A malha só pode ser criada depois de a imagem estar descodificada: sem esta espera, a textura é
     // enviada para a GPU a meio e a consola diz «Texture marked for update but image is incomplete»
     // (apanhado pela bateria D40 — duas texturas boas e uma incompleta no mesmo quadro).
-    loading.push(new Promise((resolve) => {
+    await new Promise((resolve) => {
       if (el.complete && el.naturalWidth > 0) { resolve(); return; }
       el.addEventListener('load', () => resolve(), { once: true });
       el.addEventListener('error', () => resolve(), { once: true });
-    }));
-    covers.set(artwork.id, id);
-  }
+    });
+  });
   await Promise.all(loading);
   return covers;
 }

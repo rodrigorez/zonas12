@@ -222,7 +222,7 @@ function main() {
   const tirou = run(['--file', semSite, '--check']);
   check.check('tirar o site com uma imagem de capa: a obra volta a ser imagem, sem erro',
     tirou.code === 1 && /obra 2: deixa de ter site/.test(tirou.output) &&
-      /obra 2: passa a obra "image"/.test(tirou.output) && !/ficaria inválido/.test(tirou.output),
+      /obra 2: (passa|volta) a obra "image"/.test(tirou.output) && !/ficaria inválido/.test(tirou.output),
     tirou.output.trim().split('\n').filter((l) => /obra 2:/.test(l)).join(' | '));
 
   const semNada = sheet('sem-nada.tsv', [[
@@ -257,6 +257,25 @@ function main() {
   check.check('uma capa que não é imagem nem vídeo é recusada',
     tipoMau.code === 1 && /não é uma imagem nem um vídeo conhecido/.test(tipoMau.output),
     tipoMau.output.trim().split('\n').pop());
+
+  // ---- 8b. uma capa remota **sem extensão** é uma imagem (as do Google Drive) ----
+  const capaDrive = sheet('capa-drive.tsv', [[
+    'scene1', '1', 'T', 'A', '', '', 'Descrição.',
+    'https://lh3.googleusercontent.com/d/1dLxHwUJdFCyzI0DKNLij2E5eIn5YJKTx', ''
+  ]]);
+  const drive = run(['--file', capaDrive, '--check']);
+  check.check('uma capa remota sem extensão (Drive) é aceite e entra como imagem',
+    drive.code === 1 && /obra 1: capa \(https:\/\/lh3\.googleusercontent\.com\/d\//.test(drive.output) &&
+      !/não é uma imagem nem um vídeo/.test(drive.output),
+    drive.output.trim().split('\n').filter((l) => /obra 1:/.test(l)).join(' | '));
+
+  const caminhoSemExtensao = sheet('caminho-sem-extensao.tsv', [[
+    'scene1', '1', 'T', 'A', '', '', 'Descrição.', 'assets/artworks/eiffel', ''
+  ]]);
+  const semExtensao = run(['--file', caminhoSemExtensao, '--check']);
+  check.check('um caminho do projeto sem extensão continua a ser recusado (aí o ficheiro sabe-se)',
+    semExtensao.code === 1 && /não é uma imagem nem um vídeo conhecido/.test(semExtensao.output),
+    semExtensao.output.trim().split('\n').pop());
 
   // ---- 9. nada disto tocou no dado ----
   const depois = worldsFingerprint();

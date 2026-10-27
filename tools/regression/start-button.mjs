@@ -42,7 +42,7 @@ const ESTADO = `(() => {
   };
 })()`;
 
-const PRONTA = `Boolean(window.portalDebug && window.portalDebug.world && document.querySelector('a-scene').renderer)`;
+const PRONTA = `Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.world && document.querySelector('a-scene').renderer)`;
 
 async function open(browser, url) {
   const before = await browser.evaluate('performance.timeOrigin').catch(() => null);

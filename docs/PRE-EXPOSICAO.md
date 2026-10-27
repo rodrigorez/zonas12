@@ -10,10 +10,12 @@ ponto diz o que fazer e **como se sabe que ficou feito**.
 
 ---
 
-## 1. O texto definitivo das obras (obrigatório)
+## 1. O texto definitivo das obras
 
-Hoje o `data/obras.tsv` está preenchido com texto **provisório**, para aprovação do circuito: autores
-`autorA`/`autorB`/`AutorC` e sinopses «Texto provisório: …». Um visitante leria isso.
+`scene1` **está feito** (2026-10-27): as sete obras da sala 1 entraram com o texto do autor, os créditos
+e os endereços, e a folha `data/obras.tsv` é a fonte da verdade. `scene2` (3 obras) e `scene3` (2
+obras) continuam com texto **provisório** — autores `autorA`/`autorB`/`AutorC` e sinopses «Texto
+provisório: …» — à espera das folhas dessas salas.
 
 O formato é de **2026-10-27** (D67), todo em **português**, nove colunas separadas por **tabulação** e
 **sem aspas**: `mundo`, `id`, `nome da obra`, `nomeAutores`, `nomeCoautores`, `nomaColaboradores`,
@@ -42,37 +44,32 @@ resultado no ficheiro, que é o mesmo formato.
 
 - `node tools/artwork/from-csv.mjs --check` disser **«a folha não muda nada: o dado já diz o mesmo»**;
 - `node tools/scene/validate.mjs` terminar com **0** erros e **0** avisos;
-- as fichas das 10 obras mostrarem o texto novo (no computador e no telemóvel — roteiro A1 a A6).
+- as fichas das obras de cada sala mostrarem o texto novo (no computador e no telemóvel — roteiro A1 a A6).
 
-## 2. A obra de vídeo de laboratório (obrigatório)
+## 2. A obra de vídeo de laboratório — **feita** (2026-10-27)
 
-`scene1` **id 2** é «Vídeo de teste»: aponta para um vídeo do YouTube que serve **só** para exercitar o
-tipo `site`, o embed e a cadeia da capa. Não é uma obra da exposição.
+`scene1` **id 2** era «Vídeo de teste», um vídeo do YouTube que servia só para exercitar o tipo `site`,
+o embed e a cadeia da capa. A sala 1 passou a ter as sete obras do autor e essa linha desapareceu: a
+folha de produção não tem nenhum endereço que não seja de uma obra real.
 
-**Duas saídas, e a escolha é sua**
+## 3. As capas
 
-- **Sem site:** apagar o `endereço da obra` da linha na folha **e dar-lhe uma imagem** na coluna
-  `endereço da imagem` (a obra passa a ser essa imagem), com um nome, créditos e descritivo de verdade
-  no mesmo passo que o ponto 1. A célula `endereço da obra` vazia tira o site; o importador **recusa**
-  se a linha não disser o que a obra passa a mostrar — é de propósito, porque um «site» sem site
-  deixaria a obra invisível;
-- **Sem obra:** retirar a obra da sala no editor, ou no dado. Nesse caso o `id` fica livre e as linhas
-  seguintes da folha mantêm o seu.
+As sete obras da sala 1 têm a capa no **Google Drive**, servida pelo endereço directo
+`https://lh3.googleusercontent.com/d/<ID>` — o `/file/d/<ID>/view` é uma **página** e não carrega como
+imagem (medido: 0 px), e o `uc?export=view&id=` falha do mesmo modo. `scene2` e `scene3` continuam a
+apontar para ficheiros do projeto.
 
-**Ficou feito quando** a ficha `/obra.html?mundo=scene1&id=2` não tiver o leitor do YouTube, e nenhuma
-ficha de produção tiver um endereço que não seja de uma obra real.
+Custo medido: sete capas remotas são sete idas à rede; a sala 1 abria **1,7 s** depois do resto da
+exposição (as outras salas, 0,2–0,3 s) porque as capas eram resolvidas **uma a uma** — desde
+2026-10-27 são resolvidas em paralelo e a sala 1 abre em ~0,9 s. Se a exposição for para telemóveis
+fracos, a alternativa é servir as capas numa versão menor (`…/d/<ID>=w800`) ou alojá-las no projeto.
 
-## 3. As capas (obrigatório)
+**O que fazer:** abrir cada ficha e olhar para a imagem. Confirmar que é a obra certa — na sala 1 as
+sete são fotogramas das próprias obras; as capas de `scene2`/`scene3` continuam a apontar para o
+panorama (por exemplo `Floresta` a apontar para `cidade-d0-forest.jpg`) e serão substituídas com as
+folhas dessas salas.
 
-As dez obras apontam o `endereço da imagem` para ficheiros do projeto; a do vídeo vem do YouTube. A
-cadeia do D65 mostra a **imagem padrão** («Capa indisponível · avisar o administrador») quando nada
-carrega — e isso é a rede, não o resultado desejado.
-
-**O que fazer:** abrir cada ficha e olhar para a imagem. Confirmar que é a obra certa (e não o panorama
-de outra sala, por exemplo — `Cidade, na praia` a apontar para a cidade está certo; `Floresta` a apontar
-para `cidade-d0-forest.jpg` também).
-
-**Ficou feito quando** nenhuma das dez mostrar a imagem de aviso, e as dez forem reconhecíveis.
+**Ficou feito quando** nenhuma obra mostrar a imagem de aviso, e todas forem reconhecíveis.
 
 ## 4. O ID do Google Analytics (se houver propriedade)
 
@@ -112,4 +109,4 @@ browser guarda o JavaScript da visita anterior e é isso que faz uma correção 
 | | |
 | --- | --- |
 | **Fase 8** | fechada em 2026-10-27, com os números no [roadmap](ROADMAP.md) (§ «Fase 8») |
-| **Pré-exposição** | pontos **1, 2, 3** obrigatórios; **4** só se houver propriedade; **5** opcional |
+| **Pré-exposição** | sala 1 entregue: pontos **1** (sala 1) e **2** feitos; falta o texto de `scene2`/`scene3`; **3** a conferir; **4** só se houver propriedade; **5** opcional |

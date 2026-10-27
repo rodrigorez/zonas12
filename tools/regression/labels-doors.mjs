@@ -15,7 +15,7 @@ import { serveProject, openBrowser, checks, sleep } from './harness.mjs';
 const LARGURA = 1200;
 const ALTURA = 800;
 
-const PRONTA = `Boolean(window.portalDebug && window.portalDebug.world && document.querySelector('a-scene').renderer)`;
+const PRONTA = `Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.world && document.querySelector('a-scene').renderer)`;
 
 // O que cada porta diz: o texto que o componente recebeu, e se o sprite existe e está visível.
 const NOMES = `(() => [...document.querySelectorAll('[data-portal-id]')].map((element) => {

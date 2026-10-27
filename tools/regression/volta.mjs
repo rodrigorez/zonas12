@@ -83,7 +83,7 @@ async function main() {
     await browser.evaluate(`document.querySelector('.botao-voltar').click()`).catch(() => {});
     for (let i = 0; i < 300; i++) {
       const voltou = await browser.evaluate(
-        'Boolean(window.portalDebug && window.portalDebug.world === "scene1" && document.querySelector("a-scene") && document.querySelector("a-scene").renderer)'
+        'Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.world === "scene1" && document.querySelector("a-scene") && document.querySelector("a-scene").renderer)'
       ).catch(() => false);
       if (voltou) break;
       await sleep(150);
@@ -115,7 +115,7 @@ async function main() {
     await browser.goto(site.base + '/scene1/?volta=1&bust=' + Date.now(), 60000);
     for (let i = 0; i < 300; i++) {
       const pronta = await browser.evaluate(
-        'Boolean(window.portalDebug && window.portalDebug.world === "scene1" && document.querySelector("a-scene") && document.querySelector("a-scene").renderer)'
+        'Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.world === "scene1" && document.querySelector("a-scene") && document.querySelector("a-scene").renderer)'
       ).catch(() => false);
       if (pronta) break;
       await sleep(150);

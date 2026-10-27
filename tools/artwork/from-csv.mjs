@@ -30,8 +30,10 @@
 //     dela é (imagem, vídeo ou modelo) — é a única forma de desfazer, e é o que faz da folha a fonte da
 //     verdade deste campo;
 //   - `endereço da imagem` aponta a obra para um asset próprio (`capa-<id>`) com esse caminho, e o tipo
-//     vem da extensão do ficheiro. Também aceita **um endereço** (D64): `https://…` — a capa de uma
-//     obra cujo conteúdo está num site pode ser a imagem que esse site já serve. Vazio deixa a obra
+//     vem da extensão do ficheiro; **um endereço remoto sem extensão é uma imagem** (as capas do Google
+//     Drive servem-se de `https://lh3.googleusercontent.com/d/<ID>`, que não tem `.jpg` nenhum). Também
+//     aceita **um endereço** (D64): `https://…` — a capa de uma obra cujo conteúdo está num site pode ser
+//     a imagem que esse site já serve. Vazio deixa a obra
 //     como está; **`-` tira a capa do dado** (D65: a ficha e a sala passam a usar a cadeia — o
 //     thumbnail do YouTube, depois a imagem padrão).
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -275,7 +277,15 @@ export function applyRow(world, row, { exists }) {
       changes.push(`obra ${row.id}: catálogo sem "${key}"`);
     }
   } else if (row.cover) {
-    const type = IMAGE_EXTENSIONS.test(row.cover) ? 'image' : (VIDEO_EXTENSIONS.test(row.cover) ? 'video' : null);
+    const remota = /^https?:\/\//i.test(row.cover);
+    // A extensão decide o tipo; **um endereço remoto sem extensão é uma imagem** (2026-10-27). É o caso
+    // das capas no Google Drive, que se servem do endereço directo `https://lh3.googleusercontent.com/d/<ID>`
+    // — uma imagem sem `.jpg` nenhum no caminho. Recusá-la obrigava o autor a alojar as capas noutro
+    // sítio por causa de um nome; um caminho do projeto sem extensão continua a ser recusado, porque aí
+    // o ficheiro existe (ou não) e sabe-se o que é.
+    const type = IMAGE_EXTENSIONS.test(row.cover) ? 'image'
+      : VIDEO_EXTENSIONS.test(row.cover) ? 'video'
+        : (remota ? 'image' : null);
     if (!type) return { error: `obra ${row.id}: a capa "${row.cover}" não é uma imagem nem um vídeo conhecido` };
     // A capa manda no tipo de uma obra que **deixa** de ser um site nesta mesma linha: a célula `site`
     // vazia já correu acima, e o `kind` só pode ser decidido depois de se saber que ficheiro a obra
@@ -285,7 +295,6 @@ export function applyRow(world, row, { exists }) {
       return { error: `obra ${row.id}: uma obra com site tem de ter uma imagem de capa (a que fica por baixo do iframe)` };
     }
     // Uma capa remota (D64) não se pergunta ao disco: quem a serve é outro servidor.
-    const remota = /^https?:\/\//i.test(row.cover);
     if (!remota && exists(row.cover) === false) {
       return { error: `obra ${row.id}: a capa "${row.cover}" não existe no projeto` };
     }
@@ -321,10 +330,12 @@ export function applyRow(world, row, { exists }) {
     }
   }
 
-  // Uma obra que era um site e que o CSV deixa sem site **e** sem ficheiro de capa não tem o que
-  // mostrar: o `kind` ficaria "site" sem `site` e o mundo inteiro seria recusado pelo validador, com
-  // uma mensagem que não diz qual é a linha do CSV. Aqui diz-se qual é, e o que falta.
-  if (artwork.kind === 'site' && !artwork.site) {
+  // Uma obra que era um site e que a folha deixa sem site **e** sem ficheiro de capa não tem o que
+  // mostrar: o `kind` ficaria "site" (ou "image") sem `site` nem `asset` e o mundo inteiro seria
+  // recusado pelo validador, com uma mensagem que não diz qual é a linha da folha. Aqui diz-se qual é,
+  // e o que falta. O caso do `-` na capa chega aqui com o `kind` já mudado para o da capa que saiu —
+  // por isso a pergunta é «ficou com algo para mostrar?», e não «ainda diz site?».
+  if (!artwork.site && !artwork.asset) {
     return {
       error: `obra ${row.id}: esta obra era um "site" e a linha não dá site nem uma imagem/vídeo na capa — `
         + 'diga o que ela passa a ser (uma imagem de capa) ou dê-lhe um site'
@@ -344,6 +355,9 @@ function main() {
   const worlds = new Map();
   const problems = [];
   const touched = new Set();
+  // Mundos com uma linha em erro ficam marcados: uma linha que já mutou o objecto antes de desistir
+  // deixaria o validador a falar de uma consequência em vez da causa, e a causa já está dita.
+  const comErro = new Set();
 
   for (const row of rows) {
     if (!row.world || !row.id) { problems.push(`linha ${row.line}: falta o mundo ou o id`); continue; }
@@ -360,7 +374,7 @@ function main() {
     if (!existsSync(file)) { problems.push(`linha ${row.line}: o mundo "${row.world}" não existe`); continue; }
     if (!worlds.has(row.world)) worlds.set(row.world, JSON.parse(readFileSync(file, 'utf8')));
     const result = applyRow(worlds.get(row.world), row, { exists: (path) => existsSync(join(root, path)) });
-    if (result.error) problems.push(`linha ${row.line}: ${result.error}`);
+    if (result.error) { comErro.add(row.world); problems.push(`linha ${row.line}: ${result.error}`); }
     else if (result.changes.length) {
       touched.add(row.world);
       for (const change of result.changes) console.log('  ' + change);
@@ -370,6 +384,7 @@ function main() {
   // O dado que sai daqui tem de passar as mesmas leis que o resto: escrever primeiro e validar depois
   // seria gravar um mundo que a exposição recusa.
   for (const [slug, world] of worlds) {
+    if (comErro.has(slug)) continue;
     const report = validateScene(world, { exists: (path) => existsSync(join(root, path)) });
     if (!report.ok) {
       problems.push(`o mundo ${slug} ficaria inválido:`);

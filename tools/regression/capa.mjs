@@ -17,8 +17,17 @@
 //
 //   node tools/regression/capa.mjs
 //
-import { serveProject, openBrowser, checks, sleep } from './harness.mjs';
+import { serveProject, openBrowser, checks, sleep, ROOT } from './harness.mjs';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { youtubeVideoId, youtubeCoverUrl, coverCandidates, DEFAULT_COVER } from '../../js/scene/cover.js';
+
+// A obra de vídeo de produção muda com o dado (a sala 1 passou a ter as obras do autor), por isso o
+// caso 1 lê o endereço do ficheiro do mundo em vez de fixar um id de vídeo: o que se mede é a cadeia
+// («a capa vem do YouTube»), não um vídeo em particular.
+const SALA = JSON.parse(readFileSync(join(ROOT, 'data', 'worlds', 'scene1.json'), 'utf8'));
+const OBRA_DE_VIDEO = (SALA.artworks || []).find((artwork) => artwork.kind === 'site' && youtubeVideoId(artwork.site));
+const ID_DO_VIDEO = OBRA_DE_VIDEO ? youtubeVideoId(OBRA_DE_VIDEO.site) : null;
 
 // Abre uma ficha com pedidos bloqueados e devolve o que a capa resolveu.
 async function comBloqueio(site, caminho, bloqueados) {
@@ -93,9 +102,9 @@ async function main() {
   const site = await serveProject();
   try {
     // 1. Tudo a funcionar: a capa vem do YouTube.
-    const youtube = await comBloqueio(site, '/obra.html?mundo=scene1&id=2', []);
+    const youtube = await comBloqueio(site, '/obra.html?mundo=scene1&id=' + OBRA_DE_VIDEO.id, []);
     result.check('com rede, a capa da obra de vídeo vem do YouTube',
-      youtube.de === 'youtube' && /i\.ytimg\.com\/vi\/Gzegts8LXaI\/hqdefault\.jpg$/.test(youtube.src || '') &&
+      youtube.de === 'youtube' && new RegExp('i\\.ytimg\\.com/vi/' + ID_DO_VIDEO + '/hqdefault\\.jpg$').test(youtube.src || '') &&
         youtube.carregada === true,
       JSON.stringify(youtube));
 

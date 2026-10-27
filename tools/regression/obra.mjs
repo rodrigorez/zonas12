@@ -79,6 +79,18 @@ const abrir = async (browser, url) => {
     await sleep(100);
   }
   await sleep(350);
+  // A capa por baixo do site pode ser um endereço remoto (D64: o thumbnail do YouTube, ou uma imagem
+  // no Google Drive) e chega depois de a página estar desenhada: espera-se por ela, até 5 s. O que se
+  // mede a seguir é se ela **carregou** — uma capa que não carrega continua a falhar, só demora 5 s.
+  for (let i = 0; i < 50; i++) {
+    const capa = await browser.evaluate(`(() => {
+      const imagem = document.querySelector('.meio-imagem');
+      if (!imagem) return 'sem-capa';
+      return imagem.complete ? (imagem.naturalWidth > 0 ? 'carregada' : 'falhou') : 'a-carregar';
+    })()`).catch(() => 'sem-capa');
+    if (capa !== 'a-carregar') break;
+    await sleep(100);
+  }
 };
 
 // A medição, sem browser: `startAnalytics` só fala com `window` e `document`, e aqui eles são de
@@ -320,7 +332,7 @@ async function main() {
     await browser.evaluate(`document.querySelector('.botao-voltar').click()`).catch(() => {});
     for (let i = 0; i < 200; i++) {
       const pronta = await browser.evaluate(
-        'Boolean(window.portalDebug && window.portalDebug.world && document.querySelector("a-scene") && document.querySelector("a-scene").renderer)'
+        'Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.world && document.querySelector("a-scene") && document.querySelector("a-scene").renderer)'
       ).catch(() => false);
       if (pronta) break;
       await sleep(150);
@@ -340,7 +352,7 @@ async function main() {
     await browser.evaluate(`document.querySelector('.botao-voltar').click()`).catch(() => {});
     for (let i = 0; i < 200; i++) {
       const pronta = await browser.evaluate(
-        'Boolean(window.portalDebug && window.portalDebug.world === "r9" && document.querySelector("a-scene") && document.querySelector("a-scene").renderer)'
+        'Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.world === "r9" && document.querySelector("a-scene") && document.querySelector("a-scene").renderer)'
       ).catch(() => false);
       if (pronta) break;
       await sleep(150);
