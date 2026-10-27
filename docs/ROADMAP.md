@@ -4513,14 +4513,56 @@ portanto o lado do shader está penalizado por um transiente que o ensaio de 45 
 registo ficar uniforme com os outros dois aparelhos, **o autor repete o fraco com as durações por omissão
 (2026-10-27)**; a linha que sair dessa repetição substitui esta, e esta fica como a primeira leitura.
 
-**O que continua em falta para fechar o R14:** o **terceiro aparelho** (o médio, Adreno 630 do ensaio
-de 2026-10-23). Com dois aparelhos medidos e o par shader × imagem pareado num deles, a pendência
-passa de «não foi registado» a «falta um dos três».
+**Segundo aparelho (2026-10-27): ARM Mali-G925-Immortalis MC11 — e é outro, não o Adreno 630.** O autor
+correu o ensaio duas vezes seguidas neste telemóvel, na mesma variante curta. As duas corridas dão o
+**mesmo veredicto**, o que por si só é a prova de que o instrumento repete:
+
+| corrida | fundo | janela | quadros/s | pior quadro | lentos | pixelRatio | cadência | atrasos |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| A | `grade-neon` | 10 s | **60,2** (602) | 16,8 ms | 0 | **2,4** (de 2 a 2,4, 1 evento) | 20/s → 19,8/s | **0** de 205 |
+| A | imagem | 9,98 s | **60,0** (599) | 33,2 ms | 0 | 3,25 (nativo) | — | — |
+| B | `grade-neon` | 10 s | **60,2** (602) | 16,8 ms | 0 | **2,4** (de 2 a 2,4, 1 evento) | 20/s → 19,7/s | 3 de 201 |
+| B | imagem | 9,99 s | **60,2** (602) | 16,7 ms | 0 | 3,25 (nativo) | — | — |
+
+O que isto diz: **aqui o shader é grátis.** Os dois lados ficam presos nos **60/s do ecrã** (60,2 é o mesmo
+que 60: são os carimbos do `requestAnimationFrame` a dividir por 10 s), portanto a diferença de −0,3% e de
+0% está **abaixo da resolução da medida** — a esta resolução o `grade-neon` cabe no orçamento do quadro com
+folga. E a política mostrou-o do lado dela: subiu o pixelRatio de **2 para 2,4** (um evento) em vez de o
+descer, ou seja **gastou a folga em resolução**, que é exatamente o que a escada do R15 foi desenhada para
+fazer. Os atrasos — 0 numa corrida e 3 de 201 (1,5%) na outra — são ruído; a cadência de 20/s cumpre-se.
+
+Duas lições de método que valem mais do que o número:
+
+- o **pior quadro de 33,2 ms** que a corrida A mostrou do lado da imagem **não se repetiu** na B (16,7 ms):
+  era um quadro longo isolado (descodificação, GC), não uma propriedade do fundo. Sem a segunda corrida
+  teria ficado escrito no registo como se fosse do panorama;
+- num aparelho **saturado no vsync**, os `quadros/s` não distinguem nada — quem discrimina é o **pior
+  quadro** e os **atrasos**. E a linha `lentos` (quadros acima do dobro da mediana, ~33 ms a 60 Hz) é
+  cega a um único quadro de 33 ms. Fica como candidato a refinar **depois** de o R14 fechar, para não
+  mudar o instrumento a meio da campanha.
+
+Este aparelho **não substitui** o Adreno 630: é uma GPU de topo, mais forte do que a média que o R14 pede.
+Fica no registo como o extremo de cima — o ponto onde a pergunta deixa de ser «quanto custa» e passa a ser
+«quanto é que sobra» — e o médio continua em falta.
+
+**Onde o R14 está, depois destes dois** (2026-10-27):
+
+| aparelho | GPU | estado |
+| --- | --- | --- |
+| telemóvel fraco | PowerVR Rogue GE8320 | **medido** (variante de 10 s; repetição com 45 s em curso) |
+| telemóvel forte | ARM Mali-G925-Immortalis MC11 | **medido** (duas corridas, 10 s) |
+| computador | NVIDIA RTX 4060 (portátil) | **medido** por mim no build publicado, com as **45 s** por omissão: 164,7 → 164,1 quadros/s (−0,4%), pior quadro 24,4 → 24,2 ms, `janelas 45 s e 45 s` |
+| telemóvel médio | Adreno 630 | **em falta** |
+
+O que falta é o **Adreno 630** (o médio do ensaio de 2026-10-23), que o autor tem. Com o fraco e o forte
+medidos, o médio é o que decide a zona cinzenta: no fraco o shader custa **12%** dos quadros e um terço da
+cadência; no forte não custa **nada** e a escada sobe a resolução. Falta saber de que lado da linha cai um
+aparelho de 2018–2019 — que é o que a maior parte do público traz.
 
 Com o ensaio automático (D66), o que falta passou a ser **um toque em cada aparelho**: abrir
-`https://rodrigorez.github.io/zonas12/scene1/?ensaio=1`, esperar ~2 minutos, **Copiar** e colar. O
-terceiro aparelho do R14 (o Adreno 630) já está com o autor; o fraco e o desktop têm de ser medidos de
-novo por este caminho, porque as leituras de 2026-10-24 foram de dois painéis e não do par na mesma sessão.
+`https://rodrigorez.github.io/zonas12/scene1/?ensaio=1`, esperar ~2 minutos, **Copiar** e colar. O fraco
+está a repetir-se com as durações por omissão (a linha de 10 s fica como primeira leitura) e o médio
+(Adreno 630) é o único que nunca foi medido por este caminho.
 
 O ensaio em `teste/` continua a comparar a arquitetura de panoramas com fundos gerados por shader
 GLSL. É **protótipo de medição**, não a política de produção: `js/modules/dimension.js` usa
