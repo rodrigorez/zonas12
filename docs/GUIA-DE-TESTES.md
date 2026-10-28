@@ -12,7 +12,7 @@ para fazer num aparelho está marcado — não é preciso forçar.
 > falha de cada um, a folha de registo e o que desfazer no fim. Este ficheiro continua a ser a
 > referência de cada teste.
 
-> **Estado do dado hoje (2026-10-28):** o `data/obras.tsv` tem as **33 obras** das seis salas com o
+> **Estado do dado hoje (2026-10-28):** o `data/obras.tsv` tem as **39 obras** das sete salas com o
 > texto, os créditos e os endereços do autor — a folha é a fonte da verdade (D67), e a única obra sem
 > texto é a `scene5` **id 1** («A CASA»), que veio do autor com um ponto final. As capas vivem **todas**
 > no Google Drive, servidas por `https://lh3.googleusercontent.com/d/<ID>`; as obras cujo conteúdo é uma
@@ -28,13 +28,14 @@ endereço completo** — é só abrir:
 
 | O que | Endereço completo |
 | --- | --- |
-| Portão (entrada da exposição, **5 portais e nenhuma obra**) | `https://rodrigorez.github.io/zonas12/` |
+| Portão (entrada da exposição, **6 portais e nenhuma obra**) | `https://rodrigorez.github.io/zonas12/` |
 | Cidade 360º (7 obras) | `https://rodrigorez.github.io/zonas12/scene1/` |
 | Praia (7 obras) | `https://rodrigorez.github.io/zonas12/scene2/` |
 | Céu 360º (3 obras, sem câmara) | `https://rodrigorez.github.io/zonas12/scene3/` |
 | Noite 360º (6 obras) | `https://rodrigorez.github.io/zonas12/scene4/` |
 | Ondas 360º (5 obras) | `https://rodrigorez.github.io/zonas12/scene5/` |
 | Becos 360º (5 obras) | `https://rodrigorez.github.io/zonas12/scene6/` |
+| Presenças 360º (6 obras) | `https://rodrigorez.github.io/zonas12/scene7/` |
 | **Ficha de exemplo — completa** (título, autor, sinopse) | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=0` |
 | Ficha de exemplo — **só com título** | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=1` |
 | Ficha de exemplo — **vídeo** | `https://rodrigorez.github.io/zonas12/obra.html?mundo=exemplo-ficha&id=2` |
@@ -44,8 +45,8 @@ endereço completo** — é só abrir:
 | Ficha **de produção** | `https://rodrigorez.github.io/zonas12/obra.html?mundo=scene1&id=0` |
 
 As obras de produção, por mundo: `scene1` → `id=0…6`, `scene2` → `id=0…6`, `scene3` → `id=0…2`,
-`scene4` → `id=0…5`, `scene5` → `id=0…4`, `scene6` → `id=0…4`. O endereço é sempre `obra.html?mundo=<mundo>&id=<id>`; mudar o
-`id` muda a obra, e `&lang=en` é a língua. Todos os `id` das seis salas têm o texto e os créditos do
+`scene4` → `id=0…5`, `scene5` → `id=0…4`, `scene6` → `id=0…4`, `scene7` → `id=0…5`. O endereço é sempre `obra.html?mundo=<mundo>&id=<id>`; mudar o
+`id` muda a obra, e `&lang=en` é a língua. Todos os `id` das sete salas têm o texto e os créditos do
 autor: nenhuma ficha mostra texto provisório.
 
 Sonda de campo (números no ecrã): junta `?sonda=1` a qualquer endereço de sala, por exemplo

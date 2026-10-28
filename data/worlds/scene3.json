@@ -97,6 +97,22 @@
         "pt": "Retrato do mundo Noite 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Night 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-presencas": {
+      "path": "assets/previews/scene7-de-scene3.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Presenças 360º, visto da porta",
+        "en": "Portrait of the Presences 360º world, seen from the door"
+      }
+    },
+    "recorte-scene7-de-scene3": {
+      "path": "assets/previews/recorte-scene7-de-scene3.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Presenças 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Presences 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -293,6 +309,49 @@
         "target": "scene4"
       },
       "arrivalFrom": "scene4"
+    },
+    {
+      "id": 20,
+      "ownedBy": 0,
+      "position": [
+        -40,
+        0,
+        -120
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-presencas",
+        "radius": 120,
+        "shaderId": "aguas",
+        "cutout": "recorte-scene7-de-scene3"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene7"
+      },
+      "arrivalFrom": "scene7"
     }
   ]
 }

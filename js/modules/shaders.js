@@ -21,6 +21,7 @@ import { shader as nuvens } from '../shaders/nuvens.js';
 import { shader as gradeNeon } from '../shaders/grade-neon.js';
 import { shader as ondas } from '../shaders/ondas.js';
 import { shader as becos } from '../shaders/becos.js';
+import { shader as aguas } from '../shaders/aguas.js';
 // shaders:imports end
 
 export const VERTEX = `
@@ -61,7 +62,8 @@ const INSTALLED = [
   nuvens,
   gradeNeon,
   ondas,
-  becos
+  becos,
+  aguas
   // shaders:list end
 ];
 

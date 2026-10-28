@@ -1,0 +1,379 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "scene7",
+    "name": {
+      "pt": "Presenças 360º",
+      "en": "Presences 360º"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "praia": {
+      "path": "assets/panoramas/praia-d0-praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da praia, usado como reserva do fundo da sala 7",
+        "en": "360º panorama of the beach, used as the fallback for room 7"
+      }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/182itoZS_4xKG6Vr2rG9i6hi0qtJPR0a3",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Desgaste"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1MdthobPjvadgK28yaRsZHRVwnpMKsc9T",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Flerbert, O artista"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1fj38MQPp7TWmXg9akBL10DcDqEcnhQI4",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Efeito vermelho"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1lQn8wY9cL8_ZBVdUxZ3LTe884v5YySod",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra O falso comício."
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1Op0w702qFc3dyg4hPjsWCqI1rfwyyq-v",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra A ausência"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1Gk3BDZC6yawifHxgtKzj3FQtGUjv27FO",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra O Balanço"
+      }
+    },
+    "retrato-ceu": {
+      "path": "assets/previews/scene3-de-scene7.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Céu 360º, visto da porta",
+        "en": "Portrait of the Sky 360º world, seen from the door"
+      }
+    },
+    "recorte-scene3-de-scene7": {
+      "path": "assets/previews/recorte-scene3-de-scene7.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Céu 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Sky 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "aguas",
+      "fallbackAsset": "praia",
+      "name": {
+        "pt": "Presenças 360º",
+        "en": "Presences 360º"
+      },
+      "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-0",
+      "position": [
+        -50,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Desgaste"
+      },
+      "authors": "Juliana Simões Moreira",
+      "synopsis": {
+        "pt": "A imagem tem como objetivo gerar uma reflexão sobre o desgaste que o respeito sofre com o tempo. Assim como a placa de proibido fumar, gasta e descascada, o respeito também vai se apagando, seja nas regras do dia a dia ou em diversos aspectos da vida."
+      }
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        -30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Flerbert, O artista"
+      },
+      "authors": "Gustavo Kisielow Almeida",
+      "synopsis": {
+        "pt": "Carta decorativa do jogo Flerbert: Além da Mente. Inspirado por grandes artistas, Flerbert — um extraterrestre em busca de compreender as emoções humanas — tenta entender como e por que a arte é tão importante para a humanidade. Uma reflexão sobre a expressão humana em tempos de criações por IA."
+      },
+      "site": "https://drive.google.com/file/d/1wAUcsU-Ysq6-Ad3cGyoAq9el-LpZwRbO/preview"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-2",
+      "position": [
+        -10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Efeito vermelho"
+      },
+      "authors": "Aline Ayumi",
+      "coAuthors": "Gabriele Sayuri e Stark",
+      "synopsis": {
+        "pt": "Efeito vermelho é fruto da interação entre Stark, um cão, e Sayuri, sua tutora. Sayuri joga seu brinquedo vermelho para que possa correr, pegar e retornar. A cor vermelha é associada ao amor. Embora Stark vá até o brinquedo, ele sempre retorna a Sayuri. Este é o efeito vermelho."
+      }
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "O falso comício."
+      },
+      "authors": "João Gabriel de Oliveira Costa",
+      "synopsis": {
+        "pt": "Uma crítica visceral às aparências do poder. Sob a textura tátil de uma colagem digital, a obra expõe o simulacro de um líder político artificial: uma criatura de cérebro exposto cujo grito de fúria carece de voz, significado e som."
+      },
+      "site": "https://drive.google.com/file/d/1Y8QYazFJrx7nv56fuMg5lC0lynHV-lrl/preview"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "A ausência"
+      },
+      "authors": "Leticia Amorim Silva",
+      "synopsis": {
+        "pt": "Um banco solitário à noite ganha vida sob a luz de um poste. A imagem traduz silêncio, ausência e vazio, revelando a alma de uma cena que passaria despercebida de dia e eternizando um instante em que tranquilidade e solidão se abraçam."
+      },
+      "site": "https://drive.google.com/file/d/1nPB6t21AYuWEq0pdIVJH1erxHBMs1_f9/preview"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        50,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "O Balanço"
+      },
+      "authors": "Heitor Santana",
+      "synopsis": {
+        "pt": "O balanço vermelho se destaca entre cores vivas e sombras marcantes. Mesmo vazio, ele desperta lembranças da infância e transforma um parquinho comum em uma cena cheia de movimento e significado."
+      },
+      "site": "https://drive.google.com/file/d/11GXaIIM0qhur-6dxcQgGiXLZ1EKMTpgY/preview"
+    }
+  ],
+  "portals": [
+    {
+      "id": 21,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "arrivalFrom": "gate"
+    },
+    {
+      "id": 19,
+      "ownedBy": 0,
+      "position": [
+        19,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-ceu",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene7"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "arrivalFrom": "scene3"
+    }
+  ]
+}

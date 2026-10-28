@@ -34,6 +34,7 @@ Endereços que vão ser usados (publicado = o que o telemóvel vê):
 | Noite 360º (6 obras) | `https://rodrigorez.github.io/zonas12/scene4/` |
 | Ondas 360º (5 obras) | `https://rodrigorez.github.io/zonas12/scene5/` |
 | Becos 360º (5 obras) | `https://rodrigorez.github.io/zonas12/scene6/` |
+| Presenças 360º (6 obras) | `https://rodrigorez.github.io/zonas12/scene7/` |
 
 No computador, os mesmos caminhos em `http://127.0.0.1:8123` (sem `https`), quando o servidor estiver
 a correr.
