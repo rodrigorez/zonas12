@@ -8,7 +8,7 @@
 //
 // O que corre por omissão são as três camadas que decidem uma fase:
 //   · o dado — o validador dos mundos e as leis com as avarias injectadas (node, segundos);
-//   · a cena — os doze testes (T2–T12) nas 5 páginas;
+//   · a cena — os doze testes (T2–T12) nas 7 páginas;
 //   · as portas — o T1 e o T7/T11, que precisam de navegações de página.
 //
 // As baterias arquivadas (a costura, a ponte, os rótulos, o botão, a transição — Fases 4 e 5 — e o
@@ -25,14 +25,14 @@ import { join } from 'node:path';
 import { ROOT } from './harness.mjs';
 
 const NUCLEO = [
-  { nome: 'o dado: os 9 ficheiros de mundo (5 salas + 4 fixtures), as leis, o grafo e os arranques', script: 'tools/scene/validate.mjs' },
+  { nome: 'o dado: os 10 ficheiros de mundo (6 salas + 4 fixtures), as leis, o grafo e os arranques', script: 'tools/scene/validate.mjs' },
   { nome: 'as leis: 22 avarias injectadas e o controlo limpo', script: 'tools/scene/laws-selftest.mjs' },
   // O importador da folha (D62/D67): rápido, sem browser, e é a única proteção entre uma folha e o dado.
   { nome: 'o importador da folha (D67)', script: 'tools/regression/csv.mjs' }
 ];
 
 const CENA = [
-  { nome: 'a cena: os doze testes (T2–T12) nas 6 páginas', script: 'tools/regression/twelve-tests.mjs' },
+  { nome: 'a cena: os doze testes (T2–T12) nas 7 páginas', script: 'tools/regression/twelve-tests.mjs' },
   { nome: 'as portas: o T1 e a chegada (T7/T11)', script: 'tools/regression/traversal-tests.mjs' },
   // Fase 7 (B2): as duas línguas dizem o mesmo. Corre por omissão porque uma chave nova que entre só
   // no `pt.json` é uma frase portuguesa a aparecer a quem abrir em inglês.

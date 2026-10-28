@@ -1,0 +1,340 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "scene5",
+    "name": {
+      "pt": "Ondas 360º",
+      "en": "Waves 360º"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "praia": {
+      "path": "assets/panoramas/praia-d0-praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da praia, usado como reserva do fundo da sala 5",
+        "en": "360º panorama of the beach, used as the fallback for room 5"
+      }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/12vO5s7RqwT7cUxZfbrZEGFZm7PFFQp7O",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Quem Sou Eu?"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1Wiwi2jVhrQgMaTCyPEIt4k9Kb_TiGMuD",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra A CASA"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/113aBwoOLWd8q3Dj8L5G-qqGiapMMZqtM",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Ninhada"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1VjyQBWt0SYB1pac02gGxtf1Tbq9VuIl4",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra PURIFICAÇÃO"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1izjBQETlmhDstuRuTDtIHqtempOH-Eiu",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra (Refle) and Refr(a)ction via Digital Art in 3D / Reflexão e Refração via Arte Digital em 3D"
+      }
+    },
+    "retrato-noite": {
+      "path": "assets/previews/scene4-de-scene5.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Noite 360º, visto da porta",
+        "en": "Portrait of the Night 360º world, seen from the door"
+      }
+    },
+    "recorte-scene4-de-scene5": {
+      "path": "assets/previews/recorte-scene4-de-scene5.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Noite 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Night 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "ondas",
+      "fallbackAsset": "praia",
+      "name": {
+        "pt": "Ondas 360º",
+        "en": "Waves 360º"
+      },
+      "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-0",
+      "position": [
+        -50,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Quem Sou Eu?"
+      },
+      "site": "https://heyzine.com/flip-book/4049a8b14f.html",
+      "authors": "Helen Wan; Helen Curi; Gabriela Kim; Ingrid Pereira; Julia Cavalcante; Miguel Aramaki; Nicole Helen; Diego Teodoro",
+      "synopsis": {
+        "pt": "“Quem Sou Eu?” é um jogo de cartas que convida a redescobrir os espaços culturais e a fauna nativa de São Paulo. Inspirado na Bauhaus e na Pop Art, une ilustrações, cores e interação para despertar a curiosidade e incentivar o cuidado com o patrimônio cultural e natural da cidade."
+      }
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-1",
+      "position": [
+        -30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "A CASA"
+      },
+      "authors": "Nathali Trova da Silva",
+      "synopsis": {
+        "pt": "."
+      }
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-2",
+      "position": [
+        -10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Ninhada"
+      },
+      "authors": "Natan Monteiro",
+      "synopsis": {
+        "pt": "Ninhada reúne serpentes em uma composição caótica que representa a confusão mental e pensamentos agressivos. Entrelaçadas, contrastam o desejo de isolamento com a sensação de estar cercado. As costuras evocam o monstro de Frankenstein, símbolo de uma figura solitária mesmo entre outras pessoas."
+      }
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-3",
+      "position": [
+        10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "PURIFICAÇÃO"
+      },
+      "authors": "Pedro Costa",
+      "synopsis": {
+        "pt": "A obra Purificação explora o conflito entre tentação, consciência e mudança. O contraste entre vermelho e azul representa forças opostas, enquanto as chamas e a luz simbolizam a redenção. Por meio de ilustração manual, fotografia autoral e edição digital, a obra retrata a transformação interior e a busca pela cura."
+      }
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "(Refle) and Refr(a)ction via Digital Art in 3D / Reflexão e Refração via Arte Digital em 3D"
+      },
+      "site": "https://refracaoreflexaoviadigitalartem3d.blogspot.com/2026/02/reflection-and-refraction-ii-in-2026.html",
+      "authors": "Jorge Franco",
+      "synopsis": {
+        "pt": "Este trabalho artístico apresenta uma composição de elementos referentes à geometria sacra e sua relação com saberes científicos, artísticos e culturais, ancestrais e contemporâneos, de artes, geometria e matemática, e com o Encantado Exu e Suas características transcendentes."
+      }
+    }
+  ],
+  "portals": [
+    {
+      "id": 11,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "arrivalFrom": "gate"
+    },
+    {
+      "id": 12,
+      "ownedBy": 0,
+      "position": [
+        19,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-noite",
+        "radius": 120,
+        "shaderId": "noite-aurora",
+        "cutout": "recorte-scene4-de-scene5"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene4"
+      },
+      "arrivalFrom": "scene4"
+    }
+  ]
+}

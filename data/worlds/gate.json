@@ -68,6 +68,22 @@
         "pt": "Retrato do mundo Noite 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Night 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-ondas": {
+      "path": "assets/previews/scene5-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Ondas 360º, visto da porta",
+        "en": "Portrait of the Waves 360º world, seen from the door"
+      }
+    },
+    "recorte-scene5-de-gate": {
+      "path": "assets/previews/recorte-scene5-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Ondas 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Waves 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -86,9 +102,9 @@
       "id": 0,
       "ownedBy": 0,
       "position": [
-        -14,
+        -18,
         0,
-        -8
+        -14
       ],
       "width": 8,
       "height": 10,
@@ -129,9 +145,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
+        -6,
         0,
-        0,
-        -8
+        -14
       ],
       "width": 8,
       "height": 10,
@@ -172,9 +188,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
-        14,
+        6,
         0,
-        -8
+        -14
       ],
       "width": 8,
       "height": 10,
@@ -210,6 +226,49 @@
         "target": "scene4"
       },
       "arrivalFrom": "scene4"
+    },
+    {
+      "id": 3,
+      "ownedBy": 0,
+      "position": [
+        18,
+        0,
+        -14
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-ondas",
+        "radius": 120,
+        "shaderId": "ondas",
+        "cutout": "recorte-scene5-de-gate"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene5"
+      },
+      "arrivalFrom": "scene5"
     }
   ]
 }

@@ -1,4 +1,4 @@
-// A bateria dos doze testes (§10 do roadmap) nas cinco páginas, como bateria de linha de comando.
+// A bateria dos doze testes (§10 do roadmap) nas sete páginas, como bateria de linha de comando.
 //
 // Porque existe: `tools/regression/acceptance.mjs` é a **sonda** — vive dentro da página e exporta
 // `runAcceptance()`, `walkDoor(id)` e `checkWindow(id)`. Sem um runner, os doze testes só se mediam
@@ -25,7 +25,7 @@
 // Se o número voltar, é para investigar — o instrumento diz onde mudou (`caixaForaDaMoldura`).
 //
 // Uso, da raiz do projeto: node tools/regression/twelve-tests.mjs [slug[:from] ...]
-// Sem argumentos mede as cinco páginas: o portão, as três salas e o fixture.
+// Sem argumentos mede as sete páginas: o portão, as cinco salas e o fixture.
 import { serveProject, openBrowser, checks, sleep } from './harness.mjs';
 
 const PAGINAS = [
@@ -34,6 +34,7 @@ const PAGINAS = [
   { slug: 'scene2', from: 'scene1' },
   { slug: 'scene3', from: 'scene2' },
   { slug: 'scene4', from: 'gate' },
+  { slug: 'scene5', from: 'gate' },
   { slug: 'example', from: null }
 ];
 

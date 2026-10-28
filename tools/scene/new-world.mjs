@@ -50,9 +50,9 @@ writeFileSync(
 );
 
 // Os mundos que já têm ficheiro, mais o que acabou de ganhar arranque (ainda sem JSON, e é o editor que
-// o vai exportar). O fixture não é uma sala — não tem pasta, e o validador da linha de comando também o
-// deixa de fora.
-const FIXTURES = ['example'];
+// o vai exportar). Os fixtures não são salas — não têm pasta, e o validador da linha de comando também
+// os deixa de fora (a mesma lista de `tools/scene/validate.mjs`).
+const FIXTURES = ['example', 'shader', 'r9', 'exemplo-ficha'];
 const directory = join(root, 'data', 'worlds');
 const slugs = new Set([slug]);
 if (existsSync(directory)) {

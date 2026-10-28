@@ -86,6 +86,22 @@
         "pt": "Retrato do mundo Céu 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Sky 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-ondas": {
+      "path": "assets/previews/scene5-de-scene4.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Ondas 360º, visto da porta",
+        "en": "Portrait of the Waves 360º world, seen from the door"
+      }
+    },
+    "recorte-scene5-de-scene4": {
+      "path": "assets/previews/recorte-scene5-de-scene4.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Ondas 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Waves 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -375,6 +391,49 @@
         "target": "scene3"
       },
       "arrivalFrom": "scene3"
+    },
+    {
+      "id": 13,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-ondas",
+        "radius": 120,
+        "shaderId": "ondas",
+        "cutout": "recorte-scene5-de-scene4"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene5"
+      },
+      "arrivalFrom": "scene5"
     }
   ]
 }

@@ -52,13 +52,13 @@ As aspas são sempre **delimitadores**: nunca chegam ao dado nem ao ecrã (e uma
 `""` é uma aspa no texto). Num `.tsv` só seriam precisas para um **texto com uma tabulação lá dentro**
 — que é o caso em que a linha fica com células a mais; aí o importador **recusa** e diz qual é a linha.
 
-O **[MODELO.tsv](MODELO.tsv)** desta pasta é a folha de produção copiada tal e qual: as **23 obras**
-das quatro salas com o `mundo` e o `id` certos e o texto do autor. Copie-o, mude as células, corra com
+O **[MODELO.tsv](MODELO.tsv)** desta pasta é a folha de produção copiada tal e qual: as **28 obras**
+das cinco salas com o `mundo` e o `id` certos e o texto do autor. Copie-o, mude as células, corra com
 `--file`. É a forma de não trocar um `id` sem querer.
 
 | Coluna | Regras |
 | --- | --- |
-| `mundo` / `id` | **não se mudam**. O `mundo` é a sala (`scene1`, `scene2`, `scene3`, `scene4`) e é ele que diz ao importador onde está a obra — os `id` **não são únicos** no projeto (o `id 0` existe em cinco mundos) |
+| `mundo` / `id` | **não se mudam**. O `mundo` é a sala (`scene1`, `scene2`, `scene3`, `scene4`, `scene5`) e é ele que diz ao importador onde está a obra — os `id` **não são únicos** no projeto (o `id 0` existe em seis mundos) |
 | `nome da obra` | o nome na ficha e no rótulo da sala |
 | `nomeAutores` | quem fez a obra. Vários nomes no **mesmo campo**, separados por vírgula: `Fulano, Beltrana` |
 | `nomeCoautores` | co-autoria, com a mesma regra |
@@ -98,8 +98,8 @@ assim que uma folha de teste nunca estraga o dado.
 
 ## Um exemplo pronto a copiar
 
-O **[MODELO.tsv](MODELO.tsv)** desta pasta é a folha de produção tal e qual (as **23 obras** das
-quatro salas, com o `mundo` e o `id` certos): copie-o, mude as células, corra com `--file`.
+O **[MODELO.tsv](MODELO.tsv)** desta pasta é a folha de produção tal e qual (as **28 obras** das
+cinco salas, com o `mundo` e o `id` certos): copie-o, mude as células, corra com `--file`.
 
 O [`data/obras.exemplo.tsv`](../obras.exemplo.tsv) é outra coisa: é a folha de **demonstração** do
 projeto, escrita para os mundos de produção mas com texto de exemplo — serve para ver o formato e o

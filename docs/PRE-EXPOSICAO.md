@@ -12,11 +12,12 @@ ponto diz o que fazer e **como se sabe que ficou feito**.
 
 ## 1. O texto definitivo das obras — **feito** (2026-10-27)
 
-As **quatro salas** entraram com o texto do autor (2026-10-27): `scene1` com **7** obras, `scene2` com
-**7**, `scene3` com **3** e `scene4` com **6** — **23** obras, com título, créditos, descritivo, capa e
-site onde a obra é uma página. A folha `data/obras.tsv` é a fonte da verdade e **nenhuma** obra fica com
-texto provisório: `node tools/artwork/from-csv.mjs --check` responde «a folha não muda nada: o dado já
-diz o mesmo».
+As **cinco salas** entraram com o texto do autor (2026-10-27): `scene1` com **7** obras, `scene2` com
+**7**, `scene3` com **3**, `scene4` com **6** e `scene5` com **5** — **28** obras, com título, créditos,
+descritivo, capa e site onde a obra é uma página. A folha `data/obras.tsv` é a fonte da verdade e
+**nenhuma** obra fica com texto provisório: `node tools/artwork/from-csv.mjs --check` responde «a folha
+não muda nada: o dado já diz o mesmo». **Uma excepção, à espera do autor:** a obra `scene5` **id 1**
+(«A CASA») veio com um **ponto final** como descritivo — é o que a ficha mostra, e é o que a folha diz.
 
 O formato é de **2026-10-27** (D67), todo em **português**, nove colunas separadas por **tabulação** e
 **sem aspas**: `mundo`, `id`, `nome da obra`, `nomeAutores`, `nomeCoautores`, `nomaColaboradores`,
@@ -55,7 +56,7 @@ folha de produção não tem nenhum endereço que não seja de uma obra real.
 
 ## 3. As capas
 
-As **23 obras** das quatro salas têm a capa no **Google Drive**, servida pelo endereço directo
+As **28 obras** das cinco salas têm a capa no **Google Drive**, servida pelo endereço directo
 `https://lh3.googleusercontent.com/d/<ID>` — o `/file/d/<ID>/view` é uma **página** e não carrega como
 imagem (medido: 0 px), e o `uc?export=view&id=` falha do mesmo modo. O importador aceita um endereço
 remoto **sem extensão** como imagem (D68) e escreve a capa em `capa-<id>`.
@@ -108,4 +109,4 @@ browser guarda o JavaScript da visita anterior e é isso que faz uma correção 
 | | |
 | --- | --- |
 | **Fase 8** | fechada em 2026-10-27, com os números no [roadmap](ROADMAP.md) (§ «Fase 8») |
-| **Pré-exposição** | as quatro salas entregues: pontos **1**, **2** e **3** feitos; **4** só se houver propriedade; **5** opcional |
+| **Pré-exposição** | as cinco salas entregues: pontos **1**, **2** e **3** feitos; **4** só se houver propriedade; **5** opcional |

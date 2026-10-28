@@ -24,10 +24,13 @@ const ESCALA = 0.5;
 const PORTAS = [
   { mundo: 'gate', porta: 0, destino: 'scene1' },
   { mundo: 'gate', porta: 1, destino: 'scene2' },
+  { mundo: 'gate', porta: 3, destino: 'scene5' },
   { mundo: 'scene1', porta: 3, destino: 'scene2' },
   { mundo: 'scene2', porta: 4, destino: 'scene1' },
   { mundo: 'scene2', porta: 6, destino: 'scene3' },
-  { mundo: 'scene3', porta: 7, destino: 'scene2' }
+  { mundo: 'scene3', porta: 7, destino: 'scene2' },
+  { mundo: 'scene4', porta: 13, destino: 'scene5' },
+  { mundo: 'scene5', porta: 12, destino: 'scene4' }
 ];
 
 // As que levam ao portão, onde a imagem é a câmara: medidas, mas não verificadas contra 0,5.
