@@ -84,6 +84,22 @@
         "pt": "Retrato do mundo Ondas 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Waves 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-becos": {
+      "path": "assets/previews/scene6-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Becos 360º, visto da porta",
+        "en": "Portrait of the Alleys 360º world, seen from the door"
+      }
+    },
+    "recorte-scene6-de-gate": {
+      "path": "assets/previews/recorte-scene6-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Becos 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Alleys 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -102,9 +118,9 @@
       "id": 0,
       "ownedBy": 0,
       "position": [
-        -18,
+        -24,
         0,
-        -14
+        -20
       ],
       "width": 8,
       "height": 10,
@@ -145,9 +161,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        -6,
+        -12,
         0,
-        -14
+        -20
       ],
       "width": 8,
       "height": 10,
@@ -188,9 +204,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
-        6,
         0,
-        -14
+        0,
+        -20
       ],
       "width": 8,
       "height": 10,
@@ -231,9 +247,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        18,
+        12,
         0,
-        -14
+        -20
       ],
       "width": 8,
       "height": 10,
@@ -269,6 +285,49 @@
         "target": "scene5"
       },
       "arrivalFrom": "scene5"
+    },
+    {
+      "id": 14,
+      "ownedBy": 0,
+      "position": [
+        24,
+        0,
+        -20
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-becos",
+        "radius": 120,
+        "shaderId": "becos",
+        "cutout": "recorte-scene6-de-gate"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene6"
+      },
+      "arrivalFrom": "scene6"
     }
   ]
 }

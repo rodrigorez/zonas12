@@ -133,6 +133,22 @@
       "alt": {
         "pt": "Capa da obra Carnavais · II - Porta-Bandeira | Série Imaginarium Popular (2025–)"
       }
+    },
+    "retrato-becos": {
+      "path": "assets/previews/scene6-de-scene1.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Becos 360º, visto da porta",
+        "en": "Portrait of the Alleys 360º world, seen from the door"
+      }
+    },
+    "recorte-scene6-de-scene1": {
+      "path": "assets/previews/recorte-scene6-de-scene1.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Becos 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Alleys 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -453,6 +469,49 @@
         "target": "scene2"
       },
       "arrivalFrom": "scene2"
+    },
+    {
+      "id": 17,
+      "ownedBy": 0,
+      "position": [
+        50,
+        0,
+        -45
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-becos",
+        "radius": 120,
+        "shaderId": "becos",
+        "cutout": "recorte-scene6-de-scene1"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene6"
+      },
+      "arrivalFrom": "scene6"
     }
   ]
 }

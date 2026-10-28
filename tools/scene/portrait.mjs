@@ -52,7 +52,10 @@ const PORTAS = [
   ['scene3', 'scene4'],
   ['scene4', 'scene3'],
   ['scene4', 'scene5'],
-  ['scene5', 'scene4']
+  ['scene5', 'scene4'],
+  ['scene6', 'gate'],
+  ['scene6', 'scene1'],
+  ['scene1', 'scene6']
 ];
 
 const todos = process.argv[2] === '--todos';

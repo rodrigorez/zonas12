@@ -20,6 +20,7 @@ import { shader as noiteAurora } from '../shaders/noite-aurora.js';
 import { shader as nuvens } from '../shaders/nuvens.js';
 import { shader as gradeNeon } from '../shaders/grade-neon.js';
 import { shader as ondas } from '../shaders/ondas.js';
+import { shader as becos } from '../shaders/becos.js';
 // shaders:imports end
 
 export const VERTEX = `
@@ -59,7 +60,8 @@ const INSTALLED = [
   noiteAurora,
   nuvens,
   gradeNeon,
-  ondas
+  ondas,
+  becos
   // shaders:list end
 ];
 

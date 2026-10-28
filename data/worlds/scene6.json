@@ -1,0 +1,341 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "scene6",
+    "name": {
+      "pt": "Becos 360º",
+      "en": "Alleys 360º"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "cidade-360": {
+      "path": "assets/panoramas/cidade-d0-forest.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da cidade, usado como reserva do fundo da sala 6",
+        "en": "360º panorama of the city, used as the fallback for room 6"
+      }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/1lzvwpG7lhi-4ZuoW4tEx77su77uQ59B8",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Tempo Perdido"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1ieuFxqYwtvaSBd7tttXfRYsWqO13L0Jl",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra O Submundo"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/16JQDij75jLDx3jCvsYl4koXOU65ONCKt",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Tanto a falar, mas continuo sem voz."
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1a9tG6EryfA0yOj4i5u679R7UU9rHyBuL",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Que tal renascer?"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/19SXeva9c6lgNCVjjO0kAiqL-OEjzG3KR",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Becos singulares 2023"
+      }
+    },
+    "retrato-cidade": {
+      "path": "assets/previews/scene1-de-scene6.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta",
+        "en": "Portrait of the City 360º world, seen from the door"
+      }
+    },
+    "recorte-scene1-de-scene6": {
+      "path": "assets/previews/recorte-scene1-de-scene6.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the City 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "becos",
+      "fallbackAsset": "cidade-360",
+      "name": {
+        "pt": "Becos 360º",
+        "en": "Alleys 360º"
+      },
+      "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-0",
+      "position": [
+        -50,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Tempo Perdido"
+      },
+      "authors": "GABZz",
+      "synopsis": {
+        "pt": "A obra expressa a sensação de estar preso a uma realidade indesejada e o desejo de encontrar liberdade e tranquilidade na natureza. Inspirada também na música Tempo Perdido, a colagem reflete o medo de ficar para trás e desperdiçar o tempo, traduzindo as inquietações de um momento de incerteza e a busca por um lugar de paz."
+      }
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-1",
+      "position": [
+        -30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "O Submundo"
+      },
+      "authors": "mNickz",
+      "synopsis": {
+        "pt": "A obra: O Submundo, retrata um gato azul perdido em um mundo sombrio, onde seu brilho incomum desperta a curiosidade dos monstros que habitam esse lugar, principalmente do monstro das sombras, que o observa."
+      }
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        -10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Tanto a falar, mas continuo sem voz."
+      },
+      "authors": "Oliver Brandelik",
+      "synopsis": {
+        "pt": "Inspirada pelo projeto autoral FAUNA, FLORA  &KOBIETA. explora os três elementos fundamentais da natureza, e como a harmonia entre eles se completa, e como a criação de ambos se condiz, com tudo a nossa, volta."
+      },
+      "site": "https://drive.google.com/file/d/127R1LVMCe7SAkWIWs1YB0pFwDWYRhwC7/preview"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-3",
+      "position": [
+        10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "\"Que tal renascer?\""
+      },
+      "authors": "Gustavo Reis, Nubia Cristina",
+      "coAuthors": "Gustavo Reis, Nubia Cristina",
+      "synopsis": {
+        "pt": "A obra apresenta uma camiseta branca estampada com uma fênix em vermelho e laranja, simbolizando renascimento, transformação e superação. Inspirada no conceito de Ready-made, de Marcel Duchamp, a peça cotidiana ganha significado artístico, valorizando a criatividade, a serigrafia e as artes gráficas como formas de expressão visual."
+      }
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Becos singulares 2023"
+      },
+      "authors": "JC DA VP",
+      "synopsis": {
+        "pt": "Becos singulares, Coroado (2023). Nesta série de duas artes digitais, deixo o olhar distante da mídia e mostro os becos onde nasci e cresci. Cada um tem suas cores, cheiros, pessoas e histórias. Em cenas do cotidiano, revelo necessidades ignoradas e o que me conecta a outras quebradas: histórias de luta, ódio e alegria, para além dos estigmas."
+      },
+      "site": "https://drive.google.com/file/d/10AeVTcD9JL-2kYmowlQuUezaMZL_upTD/preview"
+    }
+  ],
+  "portals": [
+    {
+      "id": 15,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "arrivalFrom": "gate"
+    },
+    {
+      "id": 16,
+      "ownedBy": 0,
+      "position": [
+        19,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-cidade",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene1-de-scene6"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene1"
+      },
+      "arrivalFrom": "scene1"
+    }
+  ]
+}

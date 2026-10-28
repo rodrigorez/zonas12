@@ -1,4 +1,4 @@
-// A bateria dos doze testes (§10 do roadmap) nas sete páginas, como bateria de linha de comando.
+// A bateria dos doze testes (§10 do roadmap) nas oito páginas, como bateria de linha de comando.
 //
 // Porque existe: `tools/regression/acceptance.mjs` é a **sonda** — vive dentro da página e exporta
 // `runAcceptance()`, `walkDoor(id)` e `checkWindow(id)`. Sem um runner, os doze testes só se mediam
@@ -25,7 +25,7 @@
 // Se o número voltar, é para investigar — o instrumento diz onde mudou (`caixaForaDaMoldura`).
 //
 // Uso, da raiz do projeto: node tools/regression/twelve-tests.mjs [slug[:from] ...]
-// Sem argumentos mede as sete páginas: o portão, as cinco salas e o fixture.
+// Sem argumentos mede as oito páginas: o portão, as seis salas e o fixture.
 import { serveProject, openBrowser, checks, sleep } from './harness.mjs';
 
 const PAGINAS = [
@@ -35,6 +35,7 @@ const PAGINAS = [
   { slug: 'scene3', from: 'scene2' },
   { slug: 'scene4', from: 'gate' },
   { slug: 'scene5', from: 'gate' },
+  { slug: 'scene6', from: 'gate' },
   { slug: 'example', from: null }
 ];
 
@@ -98,10 +99,17 @@ function verificar(result, pagina, report, ruido) {
   const t10 = testes.T10_T12 || {};
   const entradas = Object.values(t10);
   const foraDaMoldura = entradas.filter((entrada) => entrada.mudadosForaDaMoldura > 0);
-  const dentro = entradas.every((entrada) => entrada.mudadosDentroDaJanela > 0);
+  // Uma janela que não muda nada por dentro também é uma falha: a dimensão derivada existe e o
+  // visitante não vê diferença nenhuma — o nome da porta que falhou entra no relatório, senão um
+  // «10 medições» verde ao lado de um FAIL não diz onde olhar.
+  const paradas = entradas.filter((entrada) => !(entrada.mudadosDentroDaJanela > 0));
+  const dentro = paradas.length === 0;
   result.check(nome + ' · T10/T12: a dimensão derivada muda pixels dentro da janela e nenhum fora',
     entradas.length > 0 && dentro && foraDaMoldura.length === 0,
-    entradas.length + ' medição(ões), ' + (foraDaMoldura.length
+    entradas.length + ' medição(ões), ' + (paradas.length
+      ? 'sem mudança dentro da janela: ' + paradas.map((entrada) =>
+        'porta ' + entrada.porta + ' a ' + entrada.distancia + ' m').join('; ') + '; '
+      : '') + (foraDaMoldura.length
       ? 'fora da moldura: ' + foraDaMoldura.map((entrada) =>
         'porta ' + entrada.porta + ' a ' + entrada.distancia + ' m → ' +
         entrada.mudadosForaDaMoldura + ' px em ' + JSON.stringify(entrada.caixaForaDaMoldura)).join('; ')
