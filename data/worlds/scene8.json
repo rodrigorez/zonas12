@@ -1,0 +1,343 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "scene8",
+    "name": {
+      "pt": "Imersões 360º",
+      "en": "Immersions 360º"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "praia": {
+      "path": "assets/panoramas/praia-d0-praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da praia, usado como reserva do fundo da sala 8",
+        "en": "360º panorama of the beach, used as the fallback for room 8"
+      }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/1sQZteTqcdaLKmkhryoVe44WCcb9SgEdE",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra GAIA Virtual"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1GbUcuK5VlmXCKn7F8sGO5Fo9oXpJQPJ2",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Leão de Memória"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1tVDDogc5j-zqtg6XuimXL_fq-gHmtWji",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra LUIS VILELA - Direito & Educação"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1Ul4u5vXxCtJgh17yX2wdkXZARKRDciJh",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra CONEXÕES...Entre livros!"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1AVY3_GxBSSYHfdfxJhM5LLc-4N8580jO",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Docência em Camadas"
+      }
+    },
+    "retrato-cidade": {
+      "path": "assets/previews/scene1-de-scene8.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta",
+        "en": "Portrait of the City 360º world, seen from the door"
+      }
+    },
+    "recorte-scene1-de-scene8": {
+      "path": "assets/previews/recorte-scene1-de-scene8.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the City 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "holograma",
+      "fallbackAsset": "praia",
+      "name": {
+        "pt": "Imersões 360º",
+        "en": "Immersions 360º"
+      },
+      "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-0",
+      "position": [
+        -50,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://youtu.be/N3bTSdGMl8s?si=gs8gTUUKxq8HWZLE",
+      "title": {
+        "pt": "GAIA Virtual"
+      },
+      "authors": "Rogério Bordini; Maiara Araújo",
+      "synopsis": {
+        "pt": "GAIA Virtual é a versão digital da Galeria de Arte da UNICAMP, desenvolvida em 3DS Max e Unity e que permitiu acesso a exposições online durante a pandemia. Foi objeto de pesquisa acerca de percepções entre VR e WebGL,  aspectos expográficos, curatoriais, interação, estética, presença e usabilidade com participantes. Para acessar a eperiência em RA: \"Instruções de como baixar e acessar o arquivo da obra original: https://www.dropbox.com/sh/m8ss0ase8obabru/AAA5r6g29164WHu8v0fSz2zDa?dl=0 1 - Após baixar o arquivo e abrir a pasta zipada, abra o arquivo \"Re[X]istência.exe\"; 2 - Se caso a pasta vier sem esse arquivo ou se surgir algum erro ao tentar abrir o executável, por favor, tente baixar a mesma pasta novamente; 3 - Ao abrir o executável, você irá se deparar com uma tela em que poderá selecionar a qualidade gráfica da experiência. Opte pela opção \"Qualidade Baixa\" caso seu computador possua performance limitada; 4 - Caso não consiga acessar a exposição de modo algum, favor entrar em contato pelo e-mail rgbd@unicamp.br (Rogério Bordini). Obrigado e boa experiência! :)"
+      }
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        -30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://robsongalloppi.com.br/leaodememoria/",
+      "title": {
+        "pt": "Leão de Memória"
+      },
+      "authors": "Robson Galloppi",
+      "synopsis": {
+        "pt": "Uma experiência de realidade aumentada sobre a história do Clube Atlético Taquaritinga, o Leão. Fotos com QR Code espalhadas pela cidade abrem registros do clube — do mutirão que ergueu o estádio à vitória sobre o Corinthians — e sorteavam uma figurinha comemorativa."
+      }
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        -10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://esquinas-negras-theweeknd.netlify.app/",
+      "title": {
+        "pt": "LUIS VILELA - Direito & Educação"
+      },
+      "authors": "LUIS VILELA",
+      "synopsis": {
+        "pt": "Em um bar brasileiro de estética inspirada em Roblox, seis estações aproximam The Weeknd do Brasil e exploram como traços urbanos, negros e musicais brasileiros reorganizam a leitura de sua obra. O QR Code conduz a um percurso web entre escuta, imagem, dados e memória."
+      }
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://canva.link/conexoes-entre-livros",
+      "title": {
+        "pt": "CONEXÕES...Entre livros!"
+      },
+      "authors": "Anna K.Dias Moreira",
+      "synopsis": {
+        "pt": "CONEXÕES ... Entre livros, da autora Anna Karolina Dias Moreira, desenvolve uma narrativa que traz como referência o uso da Realidade Aumentada na Biblioteca. É a representação da intervenção interativa na promoção dos serviços da Biblioteca e conexão com os usuários e obras literárias ao ato de informar."
+      }
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://www.youtube.com/watch?v=QB8SKLy7a3A",
+      "title": {
+        "pt": "Docência em Camadas"
+      },
+      "authors": "Bruno Prux Medeiros",
+      "synopsis": {
+        "pt": "Três cartões de papel com QR Code. Ao apontar o celular, um avatar em realidade aumentada se levanta da folha e narra um caso de ensino para o grupo discutir. Feitos para uma oficina com docentes de engenharia, usam a XR para provocar a discussão, e não como vitrine."
+      }
+    }
+  ],
+  "portals": [
+    {
+      "id": 23,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "arrivalFrom": "gate"
+    },
+    {
+      "id": 24,
+      "ownedBy": 0,
+      "position": [
+        19,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-cidade",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene1-de-scene8"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene1"
+      },
+      "arrivalFrom": "scene1"
+    }
+  ]
+}

@@ -20,7 +20,7 @@
 //
 // Uso, da raiz do projeto:
 //
-//   node tools/regression/traversal-tests.mjs                    as 9 páginas, todas as portas
+//   node tools/regression/traversal-tests.mjs                    as 10 páginas, todas as portas
 //   node tools/regression/traversal-tests.mjs scene1             só as portas de um mundo
 //
 import { readFileSync } from 'node:fs';
@@ -39,6 +39,7 @@ const MUNDOS = [
   { slug: 'scene5', rota: '/scene5/' },
   { slug: 'scene6', rota: '/scene6/' },
   { slug: 'scene7', rota: '/scene7/' },
+  { slug: 'scene8', rota: '/scene8/' },
   { slug: 'example', rota: '/', cena: 'example' }
 ];
 

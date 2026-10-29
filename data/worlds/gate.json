@@ -116,6 +116,22 @@
         "pt": "Retrato do mundo Presenças 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Presences 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-imersoes": {
+      "path": "assets/previews/scene8-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Imersões 360º, visto da porta",
+        "en": "Portrait of the Immersions 360º world, seen from the door"
+      }
+    },
+    "recorte-scene8-de-gate": {
+      "path": "assets/previews/recorte-scene8-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Imersões 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Immersions 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -134,9 +150,9 @@
       "id": 0,
       "ownedBy": 0,
       "position": [
-        -30,
+        -36,
         0,
-        -24
+        -28
       ],
       "width": 8,
       "height": 10,
@@ -177,9 +193,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        -18,
+        -24,
         0,
-        -24
+        -28
       ],
       "width": 8,
       "height": 10,
@@ -220,9 +236,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
-        -6,
+        -12,
         0,
-        -24
+        -28
       ],
       "width": 8,
       "height": 10,
@@ -263,9 +279,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        6,
         0,
-        -24
+        0,
+        -28
       ],
       "width": 8,
       "height": 10,
@@ -306,9 +322,9 @@
       "id": 14,
       "ownedBy": 0,
       "position": [
-        18,
+        12,
         0,
-        -24
+        -28
       ],
       "width": 8,
       "height": 10,
@@ -349,9 +365,9 @@
       "id": 18,
       "ownedBy": 0,
       "position": [
-        30,
+        24,
         0,
-        -24
+        -28
       ],
       "width": 8,
       "height": 10,
@@ -387,6 +403,49 @@
         "target": "scene7"
       },
       "arrivalFrom": "scene7"
+    },
+    {
+      "id": 22,
+      "ownedBy": 0,
+      "position": [
+        36,
+        0,
+        -28
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-imersoes",
+        "radius": 120,
+        "shaderId": "holograma",
+        "cutout": "recorte-scene8-de-gate"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene8"
+      },
+      "arrivalFrom": "scene8"
     }
   ]
 }

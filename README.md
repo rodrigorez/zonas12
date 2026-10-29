@@ -24,6 +24,8 @@ zonas12/
 │   └── index.html
 ├── scene7/             sala (as presenças)
 │   └── index.html
+├── scene8/             sala (as imersões)
+│   └── index.html
 ├── README.md           documentação principal (fica sempre na raiz)
 ├── css/
 │   ├── style.css       estilos da página, HUD, modal e D-pad
@@ -45,7 +47,7 @@ zonas12/
 │                       ficheiros e a ponte com o servidor da ferramenta (Fase 5)
 ├── data/
 │   └── worlds/         uma cena por mundo (D24): gate, scene1, scene2, scene3, scene4, scene5,
-│                       scene6 e scene7, mais os fixtures (`example`, `exemplo-ficha`, `r9` e `shader`; o mundo sai do
+│                       scene6, scene7 e scene8, mais os fixtures (`example`, `exemplo-ficha`, `r9` e `shader`; o mundo sai do
 │                       **endereço**: `/` é o portão, `/scene1/` é a
 │                       primeira sala; o `?scene=<mundo>` continua a forçar um deles, para os testes)
 ├── i18n/
@@ -94,7 +96,7 @@ zonas12/
 
 - A raiz tem só o que é preciso para o projeto funcionar: `index.html`, `editor.html` (a página de
   edição, Fase 4), as pastas dos mundos
-  (`scene1/`, `scene2/`, `scene3/`, `scene4/`, `scene5/`, `scene6/` e `scene7/`, cada uma com o seu `index.html` — Fase 3B), `css/`, `js/`,
+  (`scene1/`, `scene2/`, `scene3/`, `scene4/`, `scene5/`, `scene6/`, `scene7/` e `scene8/`, cada uma com o seu `index.html` — Fase 3B), `css/`, `js/`,
   `data/`, `i18n/`, `assets/`, `README.md` e `.gitignore`.
 - Documentação de planeamento (roadmap, decisões) fica em `docs/`; ferramentas de
   construção (o validador da cena, o conversor e a varredura de regressão) em `tools/`.
@@ -218,8 +220,21 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.12)
+## Estado atual do código (v0.0.13)
 
+> **Atualização (2026-10-28, a oitava sala):** o autor entregou as cinco obras da sala 8 e a exposição
+> passou a ter **oito salas** — `scene8` (**Imersões 360º**, com o shader **novo** `holograma` — a grelha
+> de meridianos e paralelos em volta do visitante, o chão em perspectiva e uma faixa de varrimento a
+> subir; a reserva é o panorama da praia). As **44 obras** das oito salas estão na folha
+> `data/obras.tsv`, e o portão passou a **sete portas** (`-36 · -24 · -12 · 0 · +12 · +24 · +36`,
+> recuadas de `z = -24` para `z = -28`: sete caixas de 12 m medem 84 m, e a razão é a de 3 m por metro
+> da D70). A sala nova liga-se de volta à **cidade** (portão → imersões, cidade ↔ imersões), e a porta
+> da cidade fica a `x = -50`, no vão entre as obras de `-60` e `-40`. O grafo passa a **9 salas** (mais
+> os quatro fixtures) com **34 portas** e **21 retratos de porta** (D46), e a bateria dos doze passa a
+> medir **10 páginas**. Decisão **D73** (§11 do roadmap). O que foi medido: `validate` **0**, as leis
+> **22 de 22**, o importador **21 de 21**, os doze **70 de 70** nas **10 páginas**, as portas **90 de
+> 90**, o shader **51 de 51** e o i18n **9 de 9** — **6 de 6 baterias**.
+>
 > **Atualização (2026-10-28, a sétima sala):** o autor entregou as seis obras da sala 7 e a exposição
 > passou a ter **sete salas** — `scene7` (**Presenças 360º**, com o shader **novo** `aguas` — água
 > corrente: faixas paralelas ao horizonte, duas camadas de ruído a dobrar o traçado e o sol partido na
@@ -281,26 +296,27 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > roadmap. As secções históricas deste README continuam a citar os nomes e endereços antigos, que é
 > onde foram medidos.
 
-Marcado pela branch `v0.0.12`. É o estado depois das **sete salas**: as folhas das salas 2, 3, 4, 5, 6
-e 7 entraram com o texto do autor (**39 obras**), as **salas 4** (a noite), **5** (as ondas), **6** (os
-becos) e **7** (as presenças) passaram a existir como mundos, o portão ficou com **seis portas** e o
-circuito fechou-se (portão → cidade → praia ↔ céu ↔ noite ↔ ondas, com cidade ↔ becos e céu ↔
-presenças). As decisões **D69**, **D70**, **D71** e **D72** (§11 do roadmap) guardam o porquê de cada
+Marcado pela branch `v0.0.13`. É o estado depois das **oito salas**: as folhas das salas 2, 3, 4, 5, 6,
+7 e 8 entraram com o texto do autor (**44 obras**), as **salas 4** (a noite), **5** (as ondas), **6** (os
+becos), **7** (as presenças) e **8** (as imersões) passaram a existir como mundos, o portão ficou com
+**sete portas** e o circuito fechou-se (portão → cidade → praia ↔ céu ↔ noite ↔ ondas, com cidade ↔
+becos, céu ↔ presenças e cidade ↔ imersões). As decisões **D69**, **D70**, **D71**, **D72** e **D73**
+(§11 do roadmap) guardam o porquê de cada
 geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou de comportamento: as
 salas 1 e 2 têm o mesmo número de obras, a sala 2 as mesmas portas, e as notas abaixo continuam a
 valer.
 
-Resumo do que existe na v0.0.12: `index.html` (**93 linhas**) e as **7** salas com o **mesmo** ficheiro
-(`scene1/`, `scene2/`, `scene3/`, `scene4/`, `scene5/`, `scene6/` e `scene7/`, iguais fora da linha do `<base>` — D28),
+Resumo do que existe na v0.0.13: `index.html` (**93 linhas**) e as **8** salas com o **mesmo** ficheiro
+(`scene1/`, `scene2/`, `scene3/`, `scene4/`, `scene5/`, `scene6/`, `scene7/` e `scene8/`, iguais fora da linha do `<base>` — D28),
 `editor.html` (**95**), `js/app.js` (**251**), `js/arrival-frame.js` (**204**, a ponte de imagem entre
 mundos — D43), `js/editor.js` (**15**, a entrada do editor — D36), `js/editor/` (**15** ficheiros,
 **3494** linhas com os painéis e a ponte com o servidor), `js/i18n.js` (**93**), `js/core/` (7 ficheiros,
 **226**), `js/modules/` (11 ficheiros, **3276**), `js/scene/` (10 ficheiros, **1773**), `js/shaders/`
-(7 ficheiros, **173**), `css/style.css` (**142**) e `css/editor.css` (**314**), **12** ficheiros em
-`data/worlds/` (o portão, as sete salas e os quatro fixtures, **4214 linhas** no total e **30**
-portas), `i18n/pt.json` (**219** chaves), as **39 obras** na folha `data/obras.tsv`, os **39** ficheiros
-em `assets/previews/` (**18** retratos e **18** recortes, um par por porta, mais os três panoramas — D46)
-e **48** ficheiros em `tools/` (**10404** linhas). O que a versão anterior entregou:
+(8 ficheiros, **244**), `css/style.css` (**142**) e `css/editor.css` (**314**), **13** ficheiros em
+`data/worlds/` (o portão, as oito salas e os quatro fixtures, **4675 linhas** no total e **34**
+portas), `i18n/pt.json` (**219** chaves), as **44 obras** na folha `data/obras.tsv`, os **45** ficheiros
+em `assets/previews/` (**21** retratos e **21** recortes, um par por porta, mais os três panoramas — D46)
+e **48** ficheiros em `tools/` (**10413** linhas). O que a versão anterior entregou:
 
 A **v0.0.11** é o estado depois da **Fase 6** do roadmap — **testes e limpeza** —,
 medida em 2026-10-24 e **aceite no telemóvel** no mesmo dia: a automação dos **doze testes** num
@@ -448,11 +464,11 @@ portais com stencil e ajuste automático do pixelRatio.
   de **0,50**): a exceção do **D47** subiu-o a `3072 × 1536`. Com o **fundo shader** (Fase 7) o céu, o
   mar e o chão passam a ser calculados — iguais dos dois lados do corte — e o retrato só carrega as
   **obras e as portas**: a `2048 × 1024` a costura fica em **0,13 a 0,47** nas portas medidas. Com as
-  sete salas são **18** ficheiros, **2286 kB** no total (**82 a 188 kB** cada), **8 MiB** de textura
+  oito salas são **21** ficheiros, **2837 kB** no total (**82 a 190 kB** cada), **8 MiB** de textura
   cada, e a **L14** deixa de ter o que avisar
   (`validate.mjs`: `Erros: 0 · Avisos: 0` nos dez ficheiros de mundo).
 - **Além do retrato, cada porta tem um recorte (D53).** O mesmo desenho, sem o fundo e com
-  transparência (`recorte-<porta>.png`, 2:1, **118 a 144 kB** cada): é o que a janela compõe sobre o
+  transparência (`recorte-<porta>.png`, 2:1, **114 a 144 kB** cada): é o que a janela compõe sobre o
   shader **ao vivo** do destino, para a janela animar sem perder as obras e as portas. O retrato
   inteiro fica como reserva — `?shader=0`, ou um driver que recusa o programa.
 - A produção configura `THREE.LinearFilter` e desativa mipmaps em
@@ -534,6 +550,7 @@ reserva, e é o que serve o A/B e o rollback. O mundo de ensaio é `?scene=shade
 | `scene5` (ondas) | `ondas` | `praia` |
 | `scene6` (becos) | `becos` | `cidade-360` |
 | `scene7` (presenças) | `aguas` | `praia` |
+| `scene8` (imersões) | `holograma` | `praia` |
 
 **Enviar um shader** é `node tools/shader/validate.mjs <ficheiro.glsl>` para medir e
 `node tools/shader/install.mjs <ficheiro.glsl> --id <id> --name "<nome>"` para instalar. O ficheiro
@@ -1169,7 +1186,7 @@ porta para cada sala. Dentro de uma sala só se navega pelas dimensões dessa sa
 
 | Antes (Fase 3) | Agora (Fase 3B) |
 | --- | --- |
-| Uma página, uma cena, quatro dimensões | **Uma cena por mundo**, com o seu ficheiro (`data/worlds/`) e o seu endereço: a raiz é o portão e `/scene1/`, `/scene2/`, `/scene3/`, `/scene4/`, `/scene5/`, `/scene6/` e `/scene7/` são as salas — o **mesmo `index.html`**, com o `<base>` a apontar um nível acima |
+| Uma página, uma cena, quatro dimensões | **Uma cena por mundo**, com o seu ficheiro (`data/worlds/`) e o seu endereço: a raiz é o portão e `/scene1/`, `/scene2/`, `/scene3/`, `/scene4/`, `/scene5/`, `/scene6/`, `/scene7/` e `/scene8/` são as salas — o **mesmo `index.html`**, com o `<base>` a apontar um nível acima |
 | O portal ligava duas dimensões (`dimensionA`/`dimensionB`) | O portal tem **dois eixos**: `window` (o que a janela mostra: o par, um retrato ou nada) e `action` (o que a travessia faz: ficar, navegar ou nada) |
 | A travessia mudava a dimensão ativa | A **porta de mundo** mostra um **retrato** do destino (uma dimensão derivada, com paralaxe porque a esfera não segue a câmara) e a travessia **navega** para a URL do outro mundo |
 | Técnica do stencil | **Igual dentro de cada sala** — as leis L1–L8 e os testes T1–T9 continuam a valer, e a porta de mundo entra na mesma máquina (máscara, moldura, valor de stencil) |
@@ -1432,14 +1449,15 @@ portas que dele saem; o portão não tem conteúdo 3D — vê-se a câmara.
 
 | Mundo | Dimensão | Conteúdo | Portas (id: para onde) |
 | --- | --- | --- | --- |
-| `gate` (o portão, na raiz) | 0 — realidade | Vê-se a câmara | `0 → scene1`, `1 → scene2`, `2 → scene4`, `3 → scene5`, `14 → scene6`, `18 → scene7` — em `x = -30`, `-18`, `-6`, `6`, `18` e `30`, `z = -24` |
-| `scene1` (a cidade) | 0 — cidade 360º | `cidade-360` + 7 obras | `2 → gate`, `3 → scene2`, `17 → scene6` — em `x = -25`, `25` e `50`, `z = -45` |
+| `gate` (o portão, na raiz) | 0 — realidade | Vê-se a câmara | `0 → scene1`, `1 → scene2`, `2 → scene4`, `3 → scene5`, `14 → scene6`, `18 → scene7`, `22 → scene8` — em `x = -36`, `-24`, `-12`, `0`, `12`, `24` e `36`, `z = -28` |
+| `scene1` (a cidade) | 0 — cidade 360º | `cidade-360` + 7 obras | `2 → gate`, `3 → scene2`, `17 → scene6`, `25 → scene8` — em `x = -25`, `25`, `50` e `-50`, `z = -45` |
 | `scene2` (a praia) | 0 — praia | `praia` + 7 obras | `4 → scene1`, `5 → gate`, `6 → scene3` — em `x = -19`, `0` e `19`, `z = -80` |
 | `scene3` (o céu) | 0 — céu 360º | `skycloud` + 3 obras | `7 → scene2`, `10 → scene4`, `20 → scene7` — em `x = -40`, `0` e `20`, `z = -120` |
 | `scene4` (a noite) | 0 — noite 360º | `skycloud` + 6 obras | `8 → gate`, `9 → scene3`, `13 → scene5` — em `x = -19`, `19` e `0`, `z = -80` |
 | `scene5` (as ondas) | 0 — ondas 360º | `praia` (reserva) + 5 obras | `11 → gate`, `12 → scene4` — em `x = 0` e `19`, `z = -80` |
 | `scene6` (os becos) | 0 — becos 360º | `cidade-360` (reserva) + 5 obras | `15 → gate`, `16 → scene1` — em `x = 0` e `19`, `z = -80` |
 | `scene7` (as presenças) | 0 — presenças 360º | `praia` (reserva) + 6 obras | `21 → gate`, `19 → scene3` — em `x = 0` e `19`, `z = -80` |
+| `scene8` (as imersões) | 0 — imersões 360º | `praia` (reserva) + 5 obras | `23 → gate`, `24 → scene1` — em `x = 0` e `19`, `z = -80` |
 
 O grafo das portas leva cada uma a um **mundo**, e não a uma dimensão do mesmo ficheiro (excepto a
 porta 5, trocada no B7 — ver abaixo):
@@ -1451,6 +1469,7 @@ gate   ⇄ noite    (portas 2 e 8)      céu   ⇄ noite  (portas 10 e 9)
 gate   ⇄ ondas    (portas 3 e 11)     noite ⇄ ondas  (portas 13 e 12)
 gate   ⇄ becos    (portas 14 e 15)    cidade ⇄ becos (portas 17 e 16)
 gate   ⇄ presenças (portas 18 e 21)   céu   ⇄ presenças (portas 20 e 19)
+gate   ⇄ imersões (portas 22 e 23)    cidade ⇄ imersões (portas 25 e 24)
 ```
 
 A porta **5** era a **segunda porta da praia para a cidade** — uma duplicação que vinha da cena
@@ -1712,13 +1731,14 @@ e o **nome de cada porta e de cada obra** (tecla **D**):
 4. Explore o ambiente utilizando o mouse (desktop) ou o D-pad (mobile)
 
 O **endereço escolhe o mundo**: a raiz é o **portão** e cada sala tem a sua pasta —
-`http://127.0.0.1:8123/scene1/`, `/scene2/`, `/scene3/`, `/scene4/`, `/scene5/`, `/scene6/` e `/scene7/`. As sete salas servem o **mesmo
+`http://127.0.0.1:8123/scene1/`, `/scene2/`, `/scene3/`, `/scene4/`, `/scene5/`, `/scene6/`,
+`/scene7/` e `/scene8/`. As oito salas servem o **mesmo
 `index.html`** da raiz (o `<base>` é que muda), e atravessar uma porta de mundo navega para a pasta do
 destino.
 
 Quem quiser experimentar sem mexer na exposição pode forçar um mundo com `?scene=`
 (`http://127.0.0.1:8123/?scene=example`): carrega o `data/worlds/example.json`, o mundo de ensaio
-com duas dimensões e **duas portas de cada tipo** (o par de dimensões ao vivo, atravessável, e o retrato que navega) — `?scene=scene1`, `?scene=scene2`, `?scene=scene3`, `?scene=scene4`, `?scene=scene5`, `?scene=scene6` e `?scene=scene7` também
+com duas dimensões e **duas portas de cada tipo** (o par de dimensões ao vivo, atravessável, e o retrato que navega) — `?scene=scene1`, `?scene=scene2`, `?scene=scene3`, `?scene=scene4`, `?scene=scene5`, `?scene=scene6`, `?scene=scene7` e `?scene=scene8` também
 funcionam. E `&from=<mundo>` diz de que mundo se vem, o que faz o visitante aparecer atrás da porta
 de chegada: `/scene2/?from=scene1`. O mundo de ensaio do fundo shader (Fase 7, **R14**/**R15**) é
 `?scene=shader`, e `&shader=0` mostra a imagem de reserva em vez do shader — em qualquer mundo.
