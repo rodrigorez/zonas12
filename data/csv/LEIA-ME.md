@@ -58,7 +58,7 @@ das cinco salas com o `mundo` e o `id` certos e o texto do autor. Copie-o, mude 
 
 | Coluna | Regras |
 | --- | --- |
-| `mundo` / `id` | **não se mudam**. O `mundo` é a sala (`scene1`, `scene2`, `scene3`, `scene4`, `scene5`, `scene6`, `scene7`, `scene8`, `scene9`) e é ele que diz ao importador onde está a obra — os `id` **não são únicos** no projeto (o `id 0` existe em nove mundos) |
+| `mundo` / `id` | **não se mudam**. O `mundo` é a sala (`scene1`, `scene2`, `scene3`, `scene4`, `scene5`, `scene6`, `scene7`, `scene8`, `scene9`, `scene10`) e é ele que diz ao importador onde está a obra — os `id` **não são únicos** no projeto (o `id 0` existe em dez mundos) |
 | `nome da obra` | o nome na ficha e no rótulo da sala |
 | `nomeAutores` | quem fez a obra. Vários nomes no **mesmo campo**, separados por vírgula: `Fulano, Beltrana` |
 | `nomeCoautores` | co-autoria, com a mesma regra |

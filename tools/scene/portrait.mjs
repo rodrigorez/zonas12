@@ -38,8 +38,8 @@ import { serveProject, openBrowser, ROOT, sleep } from '../regression/harness.mj
 // resolução.
 const TAMANHO = { largura: 2048, altura: 1024, face: 1536, qualidade: 0.85 };
 
-// As vinte e quatro portas com retrato, como (mundo de destino, mundo de origem): é o par que diz de
-// onde a câmara parte para desenhar a chegada. `--todos` desenha as vinte e quatro.
+// As vinte e sete portas com retrato, como (mundo de destino, mundo de origem): é o par que diz de
+// onde a câmara parte para desenhar a chegada. `--todos` desenha as vinte e sete.
 const PORTAS = [
   ['scene1', 'gate'],
   ['scene2', 'gate'],
@@ -64,7 +64,10 @@ const PORTAS = [
   ['scene1', 'scene8'],
   ['scene9', 'gate'],
   ['scene9', 'scene1'],
-  ['scene1', 'scene9']
+  ['scene1', 'scene9'],
+  ['scene10', 'gate'],
+  ['scene10', 'scene1'],
+  ['scene1', 'scene10']
 ];
 
 const todos = process.argv[2] === '--todos';

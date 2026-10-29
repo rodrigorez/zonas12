@@ -12,9 +12,9 @@ ponto diz o que fazer e **como se sabe que ficou feito**.
 
 ## 1. O texto definitivo das obras — **feito** (2026-10-27)
 
-As **nove salas** entraram com o texto do autor (2026-10-28 e 2026-10-29): `scene1` com **7** obras,
+As **dez salas** entraram com o texto do autor (2026-10-28 a 2026-10-29): `scene1` com **7** obras,
 `scene2` com **7**, `scene3` com **3**, `scene4` com **6**, `scene5` com **5**, `scene6` com **5**,
-`scene7` com **6**, `scene8` com **5** e `scene9` com **4** — **48** obras, com título, créditos,
+`scene7` com **6**, `scene8` com **5**, `scene9` com **4** e `scene10` com **4** — **52** obras, com título, créditos,
 descritivo, capa e site onde a obra é uma página. A folha `data/obras.tsv` é a fonte da verdade e
 **nenhuma** obra fica com texto provisório: `node tools/artwork/from-csv.mjs --check` responde «a folha
 não muda nada: o dado já diz o mesmo». **Uma excepção, à espera do autor:** a obra `scene5` **id 1**
@@ -57,7 +57,7 @@ folha de produção não tem nenhum endereço que não seja de uma obra real.
 
 ## 3. As capas
 
-As **48 obras** das nove salas têm a capa no **Google Drive**, servida pelo endereço directo
+As **52 obras** das dez salas têm a capa no **Google Drive**, servida pelo endereço directo
 `https://lh3.googleusercontent.com/d/<ID>` — o `/file/d/<ID>/view` é uma **página** e não carrega como
 imagem (medido: 0 px), e o `uc?export=view&id=` falha do mesmo modo. O importador aceita um endereço
 remoto **sem extensão** como imagem (D68) e escreve a capa em `capa-<id>`.
@@ -110,4 +110,4 @@ browser guarda o JavaScript da visita anterior e é isso que faz uma correção 
 | | |
 | --- | --- |
 | **Fase 8** | fechada em 2026-10-27, com os números no [roadmap](ROADMAP.md) (§ «Fase 8») |
-| **Pré-exposição** | as nove salas entregues: pontos **1**, **2** e **3** feitos; **4** só se houver propriedade; **5** opcional |
+| **Pré-exposição** | as dez salas entregues: pontos **1**, **2** e **3** feitos; **4** só se houver propriedade; **5** opcional |

@@ -37,6 +37,7 @@ Endereços que vão ser usados (publicado = o que o telemóvel vê):
 | Presenças 360º (6 obras) | `https://rodrigorez.github.io/zonas12/scene7/` |
 | Imersões 360º (5 obras) | `https://rodrigorez.github.io/zonas12/scene8/` |
 | Mangue 360º (4 obras) | `https://rodrigorez.github.io/zonas12/scene9/` |
+| Distopia 360º (4 obras) | `https://rodrigorez.github.io/zonas12/scene10/` |
 
 No computador, os mesmos caminhos em `http://127.0.0.1:8123` (sem `https`), quando o servidor estiver
 a correr.

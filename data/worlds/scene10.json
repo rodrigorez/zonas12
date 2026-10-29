@@ -1,0 +1,306 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "scene10",
+    "name": {
+      "pt": "Distopia 360º",
+      "en": "Dystopia 360º"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "praia": {
+      "path": "assets/panoramas/praia-d0-praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da praia, usado como reserva do fundo da sala 10",
+        "en": "360º panorama of the beach, used as the fallback for room 10"
+      }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/1VVG1pvLyGMqR61-wZJw_m7hj3Moiv6qe",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Tenho sede, preciso pensar"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1h0JutPRDcLaaWdiq0YV-TaXFR2koq_nI",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Dentro"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1no5EvbsnY1SqbxV7UvYyNHirbmdDnJRd",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Mete Gala"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1YJ17pfcGaJRzt84ptlnMiQpDieAYmBam",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Ministério da Solidão"
+      }
+    },
+    "retrato-cidade": {
+      "path": "assets/previews/scene1-de-scene10.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta",
+        "en": "Portrait of the City 360º world, seen from the door"
+      }
+    },
+    "recorte-scene1-de-scene10": {
+      "path": "assets/previews/recorte-scene1-de-scene10.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the City 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "nucleo",
+      "fallbackAsset": "praia",
+      "name": {
+        "pt": "Distopia 360º",
+        "en": "Dystopia 360º"
+      },
+      "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-0",
+      "position": [
+        -30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://www.youtube.com/watch?v=Zm6MVxPgytA&list=PLb1uBuNGhBFg&index=11",
+      "title": {
+        "pt": "Tenho sede, preciso pensar"
+      },
+      "authors": "NÚCLEO DE CRIAÇÃO: Bruno Vieira (Direção), Dodô Costa (Técnicas de Palco), Gabi Flores (Humor), Heloísa Lobo (Cenografia e Figurino), Isabel Violante (Iluminação), Laura Rodrigo (Humor), Lucas Angelo (Humor), Lucas Sagawa (Humor), Maria Fonseca (Cenografia e Figurino), Mel Luz (Cenografia e Figurino), Rafaela Grandi (Sonoplastia), Raul Madeira (Humor), Samara Souza (Sonoplastia), Sophia Gobbi (Dramaturgia), Yasmin Florentino (Iluminação).",
+      "synopsis": {
+        "pt": "O mundo já não é mais um lugar habitável. Por isso, cinco pessoas dedicam suas vidas em prol de uma máquina de inteligência artificial chamada Cérebro, que mantém e controla uma estação habitável para as pessoas que sobreviveram."
+      }
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        -10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://youtu.be/-wnhM_S6PLE",
+      "title": {
+        "pt": "Dentro"
+      },
+      "authors": "NÚCLEO DE CRIAÇÃO: Alana Reis (Humor), Amanda Leite (Cenografia e Figurino), Ana Laura Araujo (Humor), Ana Mi (Técnicas de Palco), Caroline de Moraes (Técnicas de Palco), Débora Pereira (Iluminação), Diana Leocata (Sonoplastia), Emilien Wachs (Cenografia e Figurino), Giulia Müller (Iluminação), Hércules Guará (Direção), Isabela Gsil (Direção), Isabela Nascimento Franco Rossetto (Humor), Maria Ó (Sonoplastia), Milena Martins (Direção), Pedro Pacifici (Atuação), Priscilla Tavares (Humor), Raphael Estevam (Técnicas de Palco), Renan Rochac (Humor) e Thais Vaz (Dramaturgia)",
+      "synopsis": {
+        "pt": "A distopia teatral DENTRO segue AndreIA, androide com implantes que entra em crise de identidade após uma falha em seu “tetaphone”. Ao navegar seu “Cyber Cérebro”, ela revisita memórias de consumo e solidão, enfrentando o mercado de upgrades corporais. A peça questiona a mercantilização da vida e a força de escolhas definitivas."
+      }
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://youtu.be/6Sr3TrRTWrY",
+      "title": {
+        "pt": "Mete Gala"
+      },
+      "authors": "NÚCLEO DE CRIAÇÃO: Adriana F Albano (Direção), Alice (Cenografia e Figurino), Anís Reis (Técnicas de Palco), Bueno Sátiro (Dramaturgia), Cássio Iribarrem (Humor), Cesar Couto (Cenografia e Figurino), Delaris Antunes (Iluminação), Iessa de Pinho (Cenografia e Figurino), Joaquim Francisco (Humor), Leticia Ray (Sonoplastia), Lívia Farias (Técnicas de Palco), Lucas Sodré (Direção), Marcos Pê (Humor), Mucca Leon (Humor), Nathiele (Humor), Pablo Macena (Dramaturgia), Rayane Trindade (Humor), Sabrina Andrade (Iluminação), Sarça Poka Ideia (Humor), Thays Portela (Humor) e Triz Saguílar (Direção).",
+      "synopsis": {
+        "pt": "Em um divertido bordel, garotas de programa disputam entre si para levar o cliente pra cama. Porém, mortes misteriosas e macabras começam a acontecer. Quem vai sair viva?"
+      }
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://youtu.be/JULXTXZfdlc",
+      "title": {
+        "pt": "Ministério da Solidão"
+      },
+      "authors": "NÚCLEO DE CRIAÇÃO: Blendon Cassio (Dramaturgismo), Bruno Adnet (Humor), Camila Johann (Humor), Cristiano Roncari (Dramaturgia), Débora Silvério (Direção), João Alves (Direção), Karina Scott (Técnicas de Palco), Lea Arafah Simon Wasem (Sonoplastia), Letícia Neumitz (Técnicas de Palco), Letycia Sidonio (Cenografia e Figurino), Manu Nahas (Iluminação), Mariê olops (Sonoplastia), Matheus Leone (Iluminação), Rafaela Maciel (Iluminação), Raphael Mota (Cenografia e Figurino), Taline Bonazzi (Cenografia e Figurino), Thais Lume (Humor), Vini Soares (Humor), Viviane Kimie Okawati (Técnicas de Palco) e wyl de paula marangoni (Humor)",
+      "synopsis": {
+        "pt": "A visita inesperada do Ministro transforma uma sexta-feira comum na subsede do Ministério da Solidão. Para organizar a recepção, os servidores precisam ir ao esquecido almoxarifado, uma jornada que demora mais que o previsto e revela verdades há muito ignoradas sobre suas próprias vidas, abalando a rotina da repartição pública."
+      }
+    }
+  ],
+  "portals": [
+    {
+      "id": 31,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "arrivalFrom": "gate"
+    },
+    {
+      "id": 32,
+      "ownedBy": 0,
+      "position": [
+        19,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-cidade",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene1-de-scene10"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene1"
+      },
+      "arrivalFrom": "scene1"
+    }
+  ]
+}
