@@ -1,0 +1,306 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "scene9",
+    "name": {
+      "pt": "Mangue 360º",
+      "en": "Mangrove 360º"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "praia": {
+      "path": "assets/panoramas/praia-d0-praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da praia, usado como reserva do fundo da sala 9",
+        "en": "360º panorama of the beach, used as the fallback for room 9"
+      }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/1-FeNP98qpiBdIsvEUx7fg_57aky0ufzs",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Rios de refrigerante"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1Bc4QoZDRiSkyXgcN0JWBvWLNwW516d1t",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Guaiamundo"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1pd68X_6oZpyrbyfGxhxcln1UZGB6lL4u",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Mosreteverre"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1nLXX5ujXLZems3RkdvYZtM37-331QSdN",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Munhâm"
+      }
+    },
+    "retrato-cidade": {
+      "path": "assets/previews/scene1-de-scene9.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta",
+        "en": "Portrait of the City 360º world, seen from the door"
+      }
+    },
+    "recorte-scene1-de-scene9": {
+      "path": "assets/previews/recorte-scene1-de-scene9.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the City 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "mangue",
+      "fallbackAsset": "praia",
+      "name": {
+        "pt": "Mangue 360º",
+        "en": "Mangrove 360º"
+      },
+      "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-0",
+      "position": [
+        -30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://www.youtube.com/watch?v=NHe2k0lSf4Q&list=PLb1uBuNGhBFg&index=3",
+      "title": {
+        "pt": "Rios de refrigerante"
+      },
+      "authors": "NÚCLEO DE CRIAÇÃO: Alissa Vianna Andrade (Humor), Bruno Adnet Santos (Humor), Carlos Eduardo Souza Santos (Dramaturgia), Carolina Ribeiro Moraes (Sonoplastia), Cecília Fico Vieira Rocha (Iluminação), Danyella Tin Carlini Kohn (Cenografia e Figurino), Debora Santana de Miranda (Humor), João Carlos Alves Júnior (Direção), Kleberton Moura dos Anjos (Direção), Larissa Luisa Campos Reis (Iluminação), Lucas Fidalgo Knoeller (Humor), Lui Carrer (Técnicas de Palco), Manoel Gonçalves de Sousa Filho (Dramaturgista), Maria Fernanda P. do Rio e Souza (Sonoplastia), Marina Bezerra Ribeiro Rosa (Cenografia e Figurino), Matheus de Paula Ramos (Iluminação), Matheus Wey Fernandes (Humor), Milena Santos Chaves Martins (Direção), Mirela Cristielly Ap. da Silveira (Técnicas de Palco), Nathiele Balbino de França (Humor), Paulo Henrique P. Honório (Cenografia e Figurino), Rafaela Correia do Nascimento B. dos Santos (Técnicas de Palco), Sabrina Florentino Queiroz (Humor).",
+      "synopsis": {
+        "pt": "No Reino de Límpida, a Noite da Primavera é cancelada após latas poluírem os rios e matarem um habitante. A princesa Uara é enviada para investigar a crise. Enquanto isso, em Fétida, Tina Ronald, presidente da Sabispa, lança o refrigerante Cola Cola-Je Suis, enquanto o funcionário Márcio esconde o segredo sobre a origem do líquido usado na bebida."
+      }
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        -10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://www.youtube.com/watch?v=8sFBz8BhRfU&list=PLb1uBuNGhBFg&index=5",
+      "title": {
+        "pt": "Guaiamundo"
+      },
+      "authors": "NÚCLEO DE CRIAÇÃO: Ana Beatriz Rodrigues Trucharte (Cenografia e Figurino), Ana Caroline Barboza da Silva (Técnicas de Palco), Dani Costa Russo (Dramaturgismo), Débora Silvério (Direção), Diego Henrique S. da Cunha (Atuação), Emilien Wachs (Cenografia e Figurino), Felipe Roscoe (Atuação), Gabriel Zenteno (Direção), Gabrielly Livás (Técnicas de Palco), Gisele Turkie Rinaldi (Atuação), Humberto Bersani (Atuação), Iuri Silva Rodrigues (Iluminação), Joseane Alves do Santos (Cenografia e Figurino), Júlia Anastácia (Iluminação), Laura Felix (Atuação), Lea Arafah Simon Wasem (Sonoplastia), Màrianá Porto (Direção), Raphael Santana de Jesus (Sonoplastia), Sophia Navarro (Iluminação), Thaís Gazzola (Atuação), Valéria Antunes (Dramaturgia), Zaque (Atuação).",
+      "synopsis": {
+        "pt": "Em um mundo tornado mangue, o Festival do Caranguejo expõe disputas de poder e a revelação de que a população era manipulada por água com substâncias que apagavam memórias e emoções. A busca pelo Cofre do Apocalipse renova a esperança e acirra os conflitos, culminando em um embate final em que verdade, profecia e sobrevivência se cruzam."
+      }
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://www.youtube.com/watch?v=3ntjLmBOmu4&list=PLb1uBuNGhBFg&index=13",
+      "title": {
+        "pt": "Mosreteverre"
+      },
+      "authors": "NÚCLEO DE CRIAÇÃO: Augusto Milaré (Sonoplastia), Brenda França (Atuação), Duane Mota (Cenografia e Figurino), Édipo Queiroz (Atuação), Emanoelle Bonadio (Técnicas de Palco), Ester Fello (Atuação), Fabricio Pinheiro (Direção), Gabriela Gomes Bazilio (Cenografia e Figurino), Isadora Escher (Iluminação), Isaque Oliveira (Sonoplastia), Kauan Ribeiro (Dramaturgia), Laura Dias (Iluminação), Luan Bueno (Sonoplastia), Matheus Guilherme (Atuação), Pedro Henrique (Direção)",
+      "synopsis": {
+        "pt": "Em um mundo afogado pela escassez de água e pelo descaso governamental, uma comunidade recupera um dialeto ancestral criado para driblar o sistema e reverter a realidade por meio de uma revolução."
+      }
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "site": "https://www.youtube.com/watch?v=T0eO0Z4FmYE&list=PLb1uBuNGhBFg&index=16",
+      "title": {
+        "pt": "Munhâm"
+      },
+      "authors": "NÚCLEO DE CRIAÇÃO: Allan Lobato Nabeiro (Direção), Ana Laura Araújo (Humor), Brendo Batalha Maia (Humor), Bruna Geordanna (Dramaturgia), Dani Costa Russo (Dramaturgismo), Daniel Prata (Direção), Ellen Vitalino (Humor), Elvis Henrique Mendes Pereira (Sonoplastia), Filipe Batista (Iluminação), Guilherme Santos Silva (Direção), Letycia Sidonio (Cenografia e Figurino), Lívia Farias Alves (Técnicas de Palco), Lúcia Rosa da Silva (Técnicas de Palco), Maria Irmany Ribeiro (Dramaturgia), Mariana S Pinheiro (Cenografia e Figurino), Mateus Dornelles (Humor), Nelson Batista (Iluminação), Rafaela Pimenta (Sonoplastia), Symy Ren (Humor), Thais Lume (Humor), Vinícius de Carvalho Róveri (Cenografia e Figurino).",
+      "synopsis": {
+        "pt": "Após uma tempestade solar colapsar as tecnologias, a água potável se torna o bem mais precioso de Baixa da Égua. Assistindo à exploração e sobrevivência, Munhâm, entidade do rio local, surge para confrontar os habitantes. Com humor, crítica e fantasia, a peça mostra os limites da ambição humana quando a sede por poder assume o controle."
+      }
+    }
+  ],
+  "portals": [
+    {
+      "id": 27,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "arrivalFrom": "gate"
+    },
+    {
+      "id": 28,
+      "ownedBy": 0,
+      "position": [
+        19,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-cidade",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene1-de-scene9"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene1"
+      },
+      "arrivalFrom": "scene1"
+    }
+  ]
+}

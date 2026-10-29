@@ -23,6 +23,7 @@ import { shader as ondas } from '../shaders/ondas.js';
 import { shader as becos } from '../shaders/becos.js';
 import { shader as aguas } from '../shaders/aguas.js';
 import { shader as holograma } from '../shaders/holograma.js';
+import { shader as mangue } from '../shaders/mangue.js';
 // shaders:imports end
 
 export const VERTEX = `
@@ -65,7 +66,8 @@ const INSTALLED = [
   ondas,
   becos,
   aguas,
-  holograma
+  holograma,
+  mangue
   // shaders:list end
 ];
 

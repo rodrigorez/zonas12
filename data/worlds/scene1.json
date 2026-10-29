@@ -165,6 +165,22 @@
         "pt": "Retrato do mundo Imersões 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Immersions 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-mangue": {
+      "path": "assets/previews/scene9-de-scene1.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Mangue 360º, visto da porta",
+        "en": "Portrait of the Mangrove 360º world, seen from the door"
+      }
+    },
+    "recorte-scene9-de-scene1": {
+      "path": "assets/previews/recorte-scene9-de-scene1.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Mangue 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Mangrove 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -571,6 +587,49 @@
         "target": "scene8"
       },
       "arrivalFrom": "scene8"
+    },
+    {
+      "id": 29,
+      "ownedBy": 0,
+      "position": [
+        75,
+        0,
+        -45
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-mangue",
+        "radius": 120,
+        "shaderId": "mangue",
+        "cutout": "recorte-scene9-de-scene1"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene9"
+      },
+      "arrivalFrom": "scene9"
     }
   ]
 }

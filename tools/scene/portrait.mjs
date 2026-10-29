@@ -38,8 +38,8 @@ import { serveProject, openBrowser, ROOT, sleep } from '../regression/harness.mj
 // resolução.
 const TAMANHO = { largura: 2048, altura: 1024, face: 1536, qualidade: 0.85 };
 
-// As vinte e uma portas com retrato, como (mundo de destino, mundo de origem): é o par que diz de onde
-// a câmara parte para desenhar a chegada. `--todos` desenha as vinte e uma.
+// As vinte e quatro portas com retrato, como (mundo de destino, mundo de origem): é o par que diz de
+// onde a câmara parte para desenhar a chegada. `--todos` desenha as vinte e quatro.
 const PORTAS = [
   ['scene1', 'gate'],
   ['scene2', 'gate'],
@@ -61,7 +61,10 @@ const PORTAS = [
   ['scene3', 'scene7'],
   ['scene8', 'gate'],
   ['scene8', 'scene1'],
-  ['scene1', 'scene8']
+  ['scene1', 'scene8'],
+  ['scene9', 'gate'],
+  ['scene9', 'scene1'],
+  ['scene1', 'scene9']
 ];
 
 const todos = process.argv[2] === '--todos';
@@ -209,6 +212,12 @@ async function gerar(mundo, origem, destino) {
     // portas apanhava a sala a meio e o retrato inteiro saía **preto** (medido, 2026-10-27: 13 kB em vez
     // de 171 kB na sala 3) — o recorte vinha certo, porque as obras já lá estavam e é só delas que ele
     // é feito. Por isso a espera é pelo `built`, e depois pelos fundos que o retrato vai desenhar.
+    //
+    // As **capas** também contam (2026-10-29): a da sala 9 é remota como as outras, e a primeira
+    // passagem desenhou as quatro obras como retângulos pretos — o `built` já era `true` e as texturas
+    // ainda vinham pela rede. A espera passou a incluir as imagens do catálogo (`<a-assets>`), que é
+    // onde as capas entram; as que já falharam não seguram a passagem, senão uma capa em baixo
+    // pendurava o retrato para sempre.
     for (let i = 0; i < 240; i++) {
       const estado = await browser.evaluate(`(() => {
         const depuracao = window.portalDebug;
@@ -217,9 +226,16 @@ async function gerar(mundo, origem, destino) {
         if (!cena) return null;
         const fundos = Array.from(cena.querySelectorAll('[data-dimension]'))
           .filter((elemento) => elemento.components && elemento.components['dimension-panorama']);
-        return { portas: depuracao.state.portals.length, fundos: fundos.length };
+        const capas = Array.from(document.querySelectorAll('a-assets img'))
+          .filter((imagem) => !(imagem.complete && imagem.naturalWidth === 0));
+        const assentes = capas.filter((imagem) => imagem.complete && imagem.naturalWidth > 0).length;
+        return { portas: depuracao.state.portals.length, fundos: fundos.length,
+                 capas: capas.length, assentes };
       })()`).catch(() => null);
-      if (estado && estado.portas > 0 && estado.fundos > 0) break;
+      // `capas > 0` também conta: o `a-assets` enche-se aos poucos, e um instante com zero imagens
+      // dava `0 === 0` e a passagem seguia sem esperar por nenhuma.
+      if (estado && estado.portas > 0 && estado.fundos > 0 && estado.capas > 0 &&
+          estado.assentes === estado.capas) break;
       await sleep(250);
     }
     await sleep(2500);
