@@ -39,6 +39,7 @@ import {
 import { validateDoor, ENTRY_WORLD } from '../modules/portal-kinds.js';
 import { arrivalPoint } from './arrival.js';
 import { RING, angularGap, requiredClearance, ringCoordinates } from './ring.js';
+import { isFixture } from './fixtures.js';
 
 const EYE_HEIGHT = 1.6;
 
@@ -211,8 +212,12 @@ export function validateScene(scene, options = {}) {
   // here is that the data is still what it wrote: a work dragged in the editor, or a `position`
   // edited by hand, breaks the law and the report says which one and by how much.
   //
-  // A fixture (D9) is not a room and has no rings: `options.fixture` turns both off.
-  if (options.fixture !== true) {
+  // A fixture (D9) is not a room and has no rings. Who says so is the scene's **own** slug, and not
+  // only the caller: the instruments that check a fixture (`tools/regression/shader.mjs` with the
+  // `shader` world) do not know they are holding one, and the law read their world as a room with
+  // no doors.
+  const fixture = options.fixture === true || isFixture(scene.world && scene.world.slug);
+  if (!fixture) {
     ringErrors(scene.artworks || [], RING.artworks.radius, 'artworks', err);
     ringErrors(scene.portals || [], RING.portals.radius, 'portals', err);
     clearanceErrors(scene.artworks || [], scene.portals || [], err);
@@ -417,7 +422,7 @@ export function validateScene(scene, options = {}) {
   // ring: at 60 m, six doors would still be 60 m apart — what six doors lose is the room being a
   // room (D77).
   const worldSlug = scene.world && scene.world.slug;
-  if (options.fixture !== true && worldSlug !== ENTRY_WORLD) {
+  if (!fixture && worldSlug !== ENTRY_WORLD) {
     const roomDoors = scene.portals || [];
     if (roomDoors.length < MIN_DOORS || roomDoors.length > MAX_DOORS) {
       err(`the world has ${roomDoors.length} door(s) — law L24 (a room has three to five, or it is ` +

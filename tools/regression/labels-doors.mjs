@@ -10,12 +10,34 @@
 //   · a consola fica limpa.
 //
 // Uso, da raiz do projeto: node tools/regression/labels-doors.mjs
-import { serveProject, openBrowser, checks, sleep } from './harness.mjs';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { ROOT, serveProject, openBrowser, checks, sleep } from './harness.mjs';
 
 const LARGURA = 1200;
 const ALTURA = 800;
 
 const PRONTA = `Boolean(window.portalDebug && window.portalDebug.built && window.portalDebug.world && document.querySelector('a-scene').renderer)`;
+
+// O que cada porta deve dizer, tirado do **dado** e da regra que o constrói (`portalLabel`, a mesma
+// que o construtor e o editor usam) — e não de uma lista escrita à mão. A lista antiga tinha as
+// portas de quando uma sala tinha duas: o anel (D77) deu onze ao portão e cinco à sala 1, e a bateria
+// passou a falhar por estar velha, não por o nome estar errado.
+const ESPERADO = (portais, dimensoes) => `(async () => {
+  const { portalLabel } = await import('/js/scene/scene-builder.js');
+  return ${JSON.stringify(portais)}.map((portal) => portalLabel(portal, ${JSON.stringify(dimensoes)}, 'pt'));
+})()`;
+
+// O nome e o destino bastam para a regra: o resto da porta não entra na conta.
+function nomeEsperado(slug) {
+  const cena = JSON.parse(readFileSync(join(ROOT, 'data', 'worlds', slug + '.json'), 'utf8'));
+  const portais = (cena.portals || []).map((portal) => ({
+    id: portal.id,
+    window: portal.window || {},
+    action: portal.action || {}
+  }));
+  return { portais: portais, dimensoes: cena.dimensions || [] };
+}
 
 // O que cada porta diz: o texto que o componente recebeu, e se o sprite existe e está visível.
 const NOMES = `(() => [...document.querySelectorAll('[data-portal-id]')].map((element) => {
@@ -54,16 +76,11 @@ async function main() {
 
   try {
     // ---- 1. a exposição, sem e com a tecla D ----
-    const esperado = {
-      gate: ['#0 · retrato-cidade → scene1', '#1 · retrato-praia → scene2'],
-      scene1: ['#2 · Cidade 360º ↔ Realidade → Portão', '#3 · retrato-praia → scene2'],
-      scene2: ['#4 · retrato-cidade → scene1', '#5 · Praia ↔ Realidade → Portão', '#6 · retrato-ceu → scene3'],
-      scene3: ['#7 · retrato-praia → scene2']
-    };
-
     for (const slug of ['gate', 'scene1', 'scene2', 'scene3']) {
+      const dado = nomeEsperado(slug);
       const url = slug === 'gate' ? '/?bust=' : '/?scene=' + slug + '&bust=';
       await open(site.base + url + bust + Math.random());
+      const esperado = await evaluate(ESPERADO(dado.portais, dado.dimensoes));
       const antes = await evaluate(NOMES);
       check(slug + ': sem a tecla D não há nome nenhum',
         antes.every((entry) => entry.sprite === false), JSON.stringify(antes.map((entry) => entry.sprite)));
@@ -74,7 +91,7 @@ async function main() {
       check(slug + ': com a tecla D há um nome por porta, visível',
         depois.every((entry) => entry.sprite && entry.visible === true), JSON.stringify(textos));
       check(slug + ': os nomes são os do dado',
-        JSON.stringify(textos) === JSON.stringify(esperado[slug]), JSON.stringify(textos));
+        JSON.stringify(textos) === JSON.stringify(esperado), JSON.stringify(textos));
       await evaluate(TECLA_D);
       await sleep(400);
       const apagados = await evaluate(NOMES);
@@ -83,12 +100,15 @@ async function main() {
     }
 
     // ---- 2. o editor: os nomes sem tecla nenhuma ----
+    const sala1 = nomeEsperado('scene1');
     await open(site.base + '/editor.html?world=scene1&bust=' + bust);
     const editor = await evaluate(NOMES);
+    const noEditor = await evaluate(ESPERADO(sala1.portais, sala1.dimensoes));
     check('editor: os nomes estão à vista desde o início',
-      editor.length === 2 && editor.every((entry) => entry.sprite && entry.visible === true), JSON.stringify(editor));
+      editor.length === noEditor.length && editor.every((entry) => entry.sprite && entry.visible === true),
+      JSON.stringify(editor));
     check('editor: os nomes são os mesmos da exposição',
-      JSON.stringify(editor.map((entry) => entry.label)) === JSON.stringify(esperado.scene1),
+      JSON.stringify(editor.map((entry) => entry.label)) === JSON.stringify(noEditor),
       JSON.stringify(editor.map((entry) => entry.label)));
 
     // ---- 3. uma porta com nome não deixa textura nem nó atrás ----

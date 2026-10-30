@@ -45,7 +45,10 @@ const SONDA = `(() => {
     if (!ultimo || ultimo.botao !== estado.botao || ultimo.overlay !== estado.overlay || ultimo.cena !== estado.cena) {
       window.__linha.push(estado);
     }
-    if (performance.now() < 40000) setTimeout(ler, 40);
+    // A janela da amostragem cobre o pior caso do timeline (90 s à espera da cena): com 40 s, uma
+    // carga a 800 kB/s que passasse disso deixava a linha a acabar num passo velho e a bateria dizia
+    // que o ecrã não ficou pronto numa página que ficou.
+    if (performance.now() < 120000) setTimeout(ler, 40);
   };
   setTimeout(ler, 0);
 })()`;
@@ -61,6 +64,21 @@ const PERMISSAO_MUDA = `(() => {
 const PRONTA = `Boolean(window.portalDebug && window.portalDebug.state && window.portalDebug.state.portals && ` +
   `document.querySelector('a-scene') && document.querySelector('a-scene').renderer)`;
 
+// O estado do ecrã agora: o mesmo que a sonda regista a cada mudança, mas lido no fim. A linha só
+// guarda as **mudanças**, por isso um último passo velho (a carga acaba depois de a amostragem
+// parar, ou a página fica parada num estado intermédio enquanto o Playwright espera) dizia «o ecrã
+// não ficou pronto» de uma página que ficou.
+const AGORA = `(() => {
+  const botao = document.getElementById('btn-iniciar');
+  const overlay = document.getElementById('loading-overlay');
+  return {
+    botao: botao ? getComputedStyle(botao).display !== 'none' : null,
+    overlay: overlay ? getComputedStyle(overlay).display !== 'none' : null,
+    cena: Boolean(document.querySelector('[data-portal-id]')),
+    href: location.pathname + location.search
+  };
+})()`;
+
 async function timeline(browser, url, what) {
   const before = await browser.evaluate('performance.timeOrigin').catch(() => null);
   await browser.page.send('Page.navigate', { url });
@@ -71,7 +89,16 @@ async function timeline(browser, url, what) {
     } catch (error) { /* ainda a navegar */ }
     await sleep(250);
   }
-  await sleep(12000);
+  // Espera-se a **cena construída**, e não um tempo: a 800 kB/s esta sala já chegou aos 11,2 s
+  // (medido), e um `sleep` fixo de 12 s decidia a bateria por acaso. Depois de a cena estar pronta
+  // fica um instante para o «Carregando…» sair.
+  const fim = Date.now() + 90000;
+  while (Date.now() < fim) {
+    const agora = await browser.evaluate(AGORA).catch(() => null);
+    if (agora && agora.cena === true) break;
+    await sleep(200);
+  }
+  await sleep(1500);
   const linha = await browser.evaluate('window.__linha');
   console.log('');
   console.log('== ' + what + ' ==');
@@ -101,7 +128,7 @@ async function main() {
     result.check('e o ecrã não fica vazio enquanto carrega: a linha «Carregando…» está lá',
       linha.some((passo) => passo.overlay === true && passo.cena === false),
       JSON.stringify(linha.slice(0, 4)));
-    const fim = linha[linha.length - 1];
+    const fim = await browser.evaluate(AGORA);
     result.check('no fim: cena pronta, botão fora e nada por cima',
       fim.cena === true && fim.botao === false && fim.overlay === false, JSON.stringify(fim));
   } finally {

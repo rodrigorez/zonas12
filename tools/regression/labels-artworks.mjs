@@ -103,20 +103,23 @@ async function main() {
         JSON.stringify({ nomes: apagados.map((entry) => entry.visible), caixas: caixasDepois }));
     }
 
-    // O portão não tem obras: a tecla não pode rebentar (e mostra as caixas das duas portas).
+    // O portão não tem obras: a tecla não pode rebentar (e mostra as caixas de todas as portas dele,
+    // quantas o dado disser — o anel deu-lhe onze, D77).
+    const portao = JSON.parse(readFileSync(join(ROOT, 'data', 'worlds', 'gate.json'), 'utf8'));
+    const portasDoPortao = (portao.portals || []).length;
     await open(site.base + '/?bust=' + bust);
     await evaluate(TECLA_D);
     await sleep(400);
     const caixasNoPortao = await evaluate(CAIXAS);
     check('no portão, que não tem obras, a tecla D não faz nada de mal',
-      (await evaluate(NOMES)).length === 0 && caixasNoPortao === 2,
-      JSON.stringify({ caixas: caixasNoPortao }));
+      (await evaluate(NOMES)).length === 0 && caixasNoPortao === portasDoPortao,
+      JSON.stringify({ caixas: caixasNoPortao, portas: portasDoPortao }));
 
     // O editor: os nomes sem tecla nenhuma.
     await open(site.base + '/editor.html?world=scene2&bust=' + bust);
     const editor = await evaluate(NOMES);
     check('editor: as obras têm nome desde o arranque',
-      editor.length === 3 && editor.every((entry) => entry.sprite && entry.visible === true),
+      editor.length === esperado.scene2.length && editor.every((entry) => entry.sprite && entry.visible === true),
       JSON.stringify(editor.map((entry) => entry.label)));
     check('editor: os nomes são os mesmos da exposição',
       JSON.stringify(editor.map((entry) => entry.label)) === JSON.stringify(esperado.scene2),
