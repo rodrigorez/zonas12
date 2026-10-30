@@ -25,7 +25,7 @@
 // Se o número voltar, é para investigar — o instrumento diz onde mudou (`caixaForaDaMoldura`).
 //
 // Uso, da raiz do projeto: node tools/regression/twelve-tests.mjs [slug[:from] ...]
-// Sem argumentos mede as doze páginas: o portão, as dez salas e o fixture.
+// Sem argumentos mede as treze páginas: o portão, as onze salas e o fixture.
 import { serveProject, openBrowser, checks, sleep } from './harness.mjs';
 
 const PAGINAS = [
@@ -40,6 +40,7 @@ const PAGINAS = [
   { slug: 'scene8', from: 'gate' },
   { slug: 'scene9', from: 'gate' },
   { slug: 'scene10', from: 'gate' },
+  { slug: 'scene11', from: 'gate' },
   { slug: 'example', from: null }
 ];
 

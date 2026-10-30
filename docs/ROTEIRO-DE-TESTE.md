@@ -38,6 +38,7 @@ Endereços que vão ser usados (publicado = o que o telemóvel vê):
 | Imersões 360º (5 obras) | `https://rodrigorez.github.io/zonas12/scene8/` |
 | Mangue 360º (4 obras) | `https://rodrigorez.github.io/zonas12/scene9/` |
 | Distopia 360º (4 obras) | `https://rodrigorez.github.io/zonas12/scene10/` |
+| Memória 360º (5 obras) | `https://rodrigorez.github.io/zonas12/scene11/` |
 
 No computador, os mesmos caminhos em `http://127.0.0.1:8123` (sem `https`), quando o servidor estiver
 a correr.
@@ -250,7 +251,7 @@ Preencha e mande esta tabela — é o suficiente para eu corrigir o que falhar.
 
 ## O que **não** é defeito
 
-- o **portão** tem **3 portais e nenhuma obra** — é a entrada;
+- o **portão** tem **10 portais e nenhuma obra** — é a entrada;
 - as obras têm o **texto e os créditos do autor** (nenhuma é provisória), e as capas vêm do Google
   Drive: a primeira abertura de uma sala pode demorar ~0,9 s mais do que as outras, porque são sete
   idas à rede em paralelo (D68), e isso não é defeito;

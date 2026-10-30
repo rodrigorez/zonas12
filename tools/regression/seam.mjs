@@ -45,7 +45,10 @@ const PORTAS = [
   { mundo: 'scene9', porta: 28, destino: 'scene1' },
   { mundo: 'gate', porta: 30, destino: 'scene10' },
   { mundo: 'scene1', porta: 33, destino: 'scene10' },
-  { mundo: 'scene10', porta: 32, destino: 'scene1' }
+  { mundo: 'scene10', porta: 32, destino: 'scene1' },
+  { mundo: 'gate', porta: 34, destino: 'scene11' },
+  { mundo: 'scene4', porta: 37, destino: 'scene11' },
+  { mundo: 'scene11', porta: 36, destino: 'scene4' }
 ];
 
 // As que levam ao portão, onde a imagem é a câmara: medidas, mas não verificadas contra 0,5.
@@ -56,7 +59,8 @@ const CAMARA = [
   { mundo: 'scene7', porta: 21, destino: 'gate' },
   { mundo: 'scene8', porta: 23, destino: 'gate' },
   { mundo: 'scene9', porta: 27, destino: 'gate' },
-  { mundo: 'scene10', porta: 31, destino: 'gate' }
+  { mundo: 'scene10', porta: 31, destino: 'gate' },
+  { mundo: 'scene11', porta: 35, destino: 'gate' }
 ];
 
 const SONDA = `

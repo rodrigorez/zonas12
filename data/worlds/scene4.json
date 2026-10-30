@@ -102,6 +102,22 @@
         "pt": "Retrato do mundo Ondas 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Waves 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-memoria": {
+      "path": "assets/previews/scene11-de-scene4.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Memória 360º, visto da porta",
+        "en": "Portrait of the Memory 360º world, seen from the door"
+      }
+    },
+    "recorte-scene11-de-scene4": {
+      "path": "assets/previews/recorte-scene11-de-scene4.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Memória 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Memory 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -434,6 +450,49 @@
         "target": "scene5"
       },
       "arrivalFrom": "scene5"
+    },
+    {
+      "id": 37,
+      "ownedBy": 0,
+      "position": [
+        38,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-memoria",
+        "radius": 120,
+        "shaderId": "fichario",
+        "cutout": "recorte-scene11-de-scene4"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene11"
+      },
+      "arrivalFrom": "scene11"
     }
   ]
 }

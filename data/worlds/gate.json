@@ -164,6 +164,22 @@
         "pt": "Retrato do mundo Distopia 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Dystopia 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-memoria": {
+      "path": "assets/previews/scene11-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Memória 360º, visto da porta",
+        "en": "Portrait of the Memory 360º world, seen from the door"
+      }
+    },
+    "recorte-scene11-de-gate": {
+      "path": "assets/previews/recorte-scene11-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Memória 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Memory 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -182,9 +198,9 @@
       "id": 0,
       "ownedBy": 0,
       "position": [
-        -48,
+        -54,
         0,
-        -36
+        -40
       ],
       "width": 8,
       "height": 10,
@@ -225,9 +241,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        -36,
+        -42,
         0,
-        -36
+        -40
       ],
       "width": 8,
       "height": 10,
@@ -268,9 +284,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
-        -24,
+        -30,
         0,
-        -36
+        -40
       ],
       "width": 8,
       "height": 10,
@@ -311,9 +327,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        -12,
+        -18,
         0,
-        -36
+        -40
       ],
       "width": 8,
       "height": 10,
@@ -354,9 +370,9 @@
       "id": 14,
       "ownedBy": 0,
       "position": [
+        -6,
         0,
-        0,
-        -36
+        -40
       ],
       "width": 8,
       "height": 10,
@@ -397,9 +413,9 @@
       "id": 18,
       "ownedBy": 0,
       "position": [
-        12,
+        6,
         0,
-        -36
+        -40
       ],
       "width": 8,
       "height": 10,
@@ -440,9 +456,9 @@
       "id": 22,
       "ownedBy": 0,
       "position": [
-        24,
+        18,
         0,
-        -36
+        -40
       ],
       "width": 8,
       "height": 10,
@@ -483,9 +499,9 @@
       "id": 26,
       "ownedBy": 0,
       "position": [
-        36,
+        30,
         0,
-        -36
+        -40
       ],
       "width": 8,
       "height": 10,
@@ -526,9 +542,9 @@
       "id": 30,
       "ownedBy": 0,
       "position": [
-        48,
+        42,
         0,
-        -36
+        -40
       ],
       "width": 8,
       "height": 10,
@@ -564,6 +580,49 @@
         "target": "scene10"
       },
       "arrivalFrom": "scene10"
+    },
+    {
+      "id": 34,
+      "ownedBy": 0,
+      "position": [
+        54,
+        0,
+        -40
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-memoria",
+        "radius": 120,
+        "shaderId": "fichario",
+        "cutout": "recorte-scene11-de-gate"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene11"
+      },
+      "arrivalFrom": "scene11"
     }
   ]
 }

@@ -1,0 +1,343 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "scene11",
+    "name": {
+      "pt": "Memória 360º",
+      "en": "Memory 360º"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "praia": {
+      "path": "assets/panoramas/praia-d0-praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da praia, usado como reserva do fundo da sala 11",
+        "en": "360º panorama of the beach, used as the fallback for room 11"
+      }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/1lTTBAA1AZ_vLBhgCOXmHw5mhEomXic2H",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Colección Ricardo Salazar Ahumada"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1YA3F6gRNJmmjQwXyXJU65DS_uKsfjy-4",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Los presidentes y la Universidad"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1Y3mNSFGmpIKVLiSZ8QrvHnbU-cKYMFme",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Fondo Heriberto Jara Corona"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1oHC1SFMMYe3IGhYRgupZDWLT53bnGjvX",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Fondo Ignacio García Téllez"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1tNG4vGZdmT1v4iL-radQBvFc98cJoY-_",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Fondo Ezequiel A. Chávez"
+      }
+    },
+    "retrato-noite": {
+      "path": "assets/previews/scene4-de-scene11.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Noite 360º, visto da porta",
+        "en": "Portrait of the Night 360º world, seen from the door"
+      }
+    },
+    "recorte-scene4-de-scene11": {
+      "path": "assets/previews/recorte-scene4-de-scene11.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Noite 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Night 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "fichario",
+      "fallbackAsset": "praia",
+      "name": {
+        "pt": "Memória 360º",
+        "en": "Memory 360º"
+      },
+      "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-0",
+      "position": [
+        -50,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Colección Ricardo Salazar Ahumada"
+      },
+      "authors": "Cuikis · AHUNAM",
+      "synopsis": {
+        "pt": "Com esta pílula de conteúdo, inauguramos a série #TesorosdelArchivo. Nela, você conhecerá a coleção Ricardo Salazar por meio de Leticia Medina e Paulina Michel, técnicas acadêmicas do #AHUNAM."
+      },
+      "site": "https://youtu.be/xmyx_QQVEj8?si=k7SqmnCpZ_Nfax4_"
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        -30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Los presidentes y la Universidad"
+      },
+      "authors": "Cuikis · AHUNAM",
+      "synopsis": {
+        "pt": "No domingo, 2 de junho de 2024, tivemos eleições no México; por isso, nesta pílula de #TesorosdelArchivo, compartilhamos um pouco do que temos sobre a relação dos presidentes com a #UNAM."
+      },
+      "site": "https://youtu.be/stNg3KSsYSc?si=GAzJsLXZYvAyEFco"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        -10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Fondo Heriberto Jara Corona"
+      },
+      "authors": "Cuikis · AHUNAM",
+      "synopsis": {
+        "pt": "Conheça mais um dos Tesouros do Arquivo, o Fundo Heriberto Jara Corona, na voz de Luz María Jiménez Molotla, técnica acadêmica do AHUNAM."
+      },
+      "site": "https://youtu.be/LPSA6I1YB84?si=VpuFu6g4X5l8DgRU"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        10,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Fondo Ignacio García Téllez"
+      },
+      "authors": "Cuikis · AHUNAM",
+      "synopsis": {
+        "pt": "Em “Tesouros do Arquivo”, Mariano Mercado, técnico acadêmico do AHUNAM, fala sobre o Fundo Ignacio García Téllez. *In memoriam* ao nosso acadêmico."
+      },
+      "site": "https://youtu.be/NCW4ZSMUXG4?si=HMCmk_c77FyZCXN3"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        30,
+        1.5,
+        -90
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Fondo Ezequiel A. Chávez"
+      },
+      "authors": "Cuikis · AHUNAM",
+      "synopsis": {
+        "pt": "Descubra, em “Tesoros del Archivo”, o fundo Ezequiel A. Chávez e o da Universidade Nacional do México — fundamentais para compreender a fundação da nossa Universidade — por meio das vozes de Lourdes Chehaibar e Sandra Peña, pesquisadoras do IISUE-UNAM e do AHUNAM."
+      },
+      "site": "https://youtu.be/Btw6LkGlees?si=p2lOBHdbwFJmjtxR"
+    }
+  ],
+  "portals": [
+    {
+      "id": 35,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "arrivalFrom": "gate"
+    },
+    {
+      "id": 36,
+      "ownedBy": 0,
+      "position": [
+        19,
+        0,
+        -80
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-noite",
+        "radius": 120,
+        "shaderId": "noite-aurora",
+        "cutout": "recorte-scene4-de-scene11"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene4"
+      },
+      "arrivalFrom": "scene4"
+    }
+  ]
+}

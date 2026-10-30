@@ -30,6 +30,8 @@ zonas12/
 │   └── index.html
 ├── scene10/            sala (as distopias)
 │   └── index.html
+├── scene11/            sala (a memória)
+│   └── index.html
 ├── README.md           documentação principal (fica sempre na raiz)
 ├── css/
 │   ├── style.css       estilos da página, HUD, modal e D-pad
@@ -51,7 +53,7 @@ zonas12/
 │                       ficheiros e a ponte com o servidor da ferramenta (Fase 5)
 ├── data/
 │   └── worlds/         uma cena por mundo (D24): gate, scene1, scene2, scene3, scene4, scene5,
-│                       scene6, scene7, scene8, scene9 e scene10, mais os fixtures (`example`, `exemplo-ficha`, `r9` e `shader`; o mundo sai do
+│                       scene6, scene7, scene8, scene9, scene10 e scene11, mais os fixtures (`example`, `exemplo-ficha`, `r9` e `shader`; o mundo sai do
 │                       **endereço**: `/` é o portão, `/scene1/` é a
 │                       primeira sala; o `?scene=<mundo>` continua a forçar um deles, para os testes)
 ├── i18n/
@@ -100,7 +102,7 @@ zonas12/
 
 - A raiz tem só o que é preciso para o projeto funcionar: `index.html`, `editor.html` (a página de
   edição, Fase 4), as pastas dos mundos
-  (`scene1/`, `scene2/`, `scene3/`, `scene4/`, `scene5/`, `scene6/`, `scene7/`, `scene8/` e `scene9/`, cada uma com o seu `index.html` — Fase 3B), `css/`, `js/`,
+  (`scene1/`, `scene2/`, `scene3/`, `scene4/`, `scene5/`, `scene6/`, `scene7/`, `scene8/`, `scene9/`, `scene10/` e `scene11/`, cada uma com o seu `index.html` — Fase 3B), `css/`, `js/`,
   `data/`, `i18n/`, `assets/`, `README.md` e `.gitignore`.
 - Documentação de planeamento (roadmap, decisões) fica em `docs/`; ferramentas de
   construção (o validador da cena, o conversor e a varredura de regressão) em `tools/`.
@@ -224,8 +226,23 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.15)
+## Estado atual do código (v0.0.16)
 
+> **Atualização (2026-10-29, a décima primeira sala):** o autor entregou as **cinco pílulas de conteúdo**
+> do AHUNAM — a série «#TesorosdelArchivo»: a Colección Ricardo Salazar Ahumada, «Los presidentes y la
+> Universidad» e os fundos Heriberto Jara Corona, Ignacio García Téllez e Ezequiel A. Chávez — e a
+> exposição passou a ter **onze salas** — `scene11` (**Memória 360º**, com o shader **novo** `fichario` —
+> a sala dos catálogos: o chão em grelha, a parede inteira de gavetas com a etiqueta e o puxador, a
+> lâmpada fria de mesa no tecto e o pó a passar dentro dela; a reserva é o panorama da praia). As **57
+> obras** das onze salas estão na folha `data/obras.tsv`, e o portão passou a **dez portas** (`-54 · -42 ·
+> -30 · -18 · -6 · +6 · +18 · +30 · +42 · +54`, recuadas de `z = -36` para `z = -40`: dez caixas de 12 m
+> medem 120 m, e a razão é a de 3 m por metro da D70). A sala nova liga-se de volta à **noite** (portão →
+> memória, noite ↔ memória), e a porta da noite fica a `x = +38`, no vão entre as obras de `+30` e `+50`.
+> O grafo passa a **12 salas** (mais os quatro fixtures) com **46 portas** e **30 retratos de porta**
+> (D46), e a bateria dos doze passa a medir **13 páginas**. Decisão **D76** (§11 do roadmap). O que foi
+> medido: `validate` **0**, as leis **22 de 22**, o importador **21 de 21**, os doze **91 de 91** nas **13
+> páginas**, as portas **126 de 126**, o shader **51 de 51** e o i18n **9 de 9** — **6 de 6 baterias**.
+>
 > **Atualização (2026-10-29, a décima sala):** o autor entregou as quatro peças da sala 10 e a exposição
 > passou a ter **dez salas** — `scene10` (**Distopia 360º**, com o shader **novo** `nucleo` — a sala de
 > máquinas do «Cérebro»: o chão e o tecto em grelha, as filas de bastidores com as luzes dos
@@ -328,30 +345,30 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > roadmap. As secções históricas deste README continuam a citar os nomes e endereços antigos, que é
 > onde foram medidos.
 
-Marcado pela branch `v0.0.15`. É o estado depois das **dez salas**: as folhas das salas 2 a 10
-entraram com o texto do autor (**52 obras**), as **salas 4** (a noite), **5** (as ondas), **6**
-(os becos), **7** (as presenças), **8** (as imersões), **9** (o mangue) e **10** (as distopias)
-passaram a existir como mundos,
+Marcado pela branch `v0.0.16`. É o estado depois das **onze salas**: as folhas das salas 2 a 11
+entraram com o texto do autor (**57 obras**), as **salas 4** (a noite), **5** (as ondas), **6**
+(os becos), **7** (as presenças), **8** (as imersões), **9** (o mangue), **10** (as distopias) e **11**
+(a memória) passaram a existir como mundos,
 o portão ficou com
-**nove portas** e o circuito fechou-se (portão → cidade → praia ↔ céu ↔ noite ↔ ondas, com cidade ↔
-becos, céu ↔ presenças, cidade ↔ imersões, cidade ↔ mangue e cidade ↔ distopia). As decisões **D69**
-a **D75**
+**dez portas** e o circuito fechou-se (portão → cidade → praia ↔ céu ↔ noite ↔ ondas, com cidade ↔
+becos, céu ↔ presenças, cidade ↔ imersões, cidade ↔ mangue, cidade ↔ distopia e noite ↔ memória). As
+decisões **D69** a **D76**
 (§11 do roadmap) guardam o porquê de cada
 geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou de comportamento: as
-salas 1 e 2 têm o mesmo número de obras, a sala 2 as mesmas portas, e as notas abaixo continuam a
-valer.
+obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
+nova da noite, e as notas abaixo continuam a valer.
 
-Resumo do que existe na v0.0.15: `index.html` (**93 linhas**) e as **10** salas com o **mesmo** ficheiro
-(`scene1/`, `scene2/`, `scene3/`, `scene4/`, `scene5/`, `scene6/`, `scene7/`, `scene8/`, `scene9/` e `scene10/`, iguais fora da linha do `<base>` — D28),
-`editor.html` (**95**), `js/app.js` (**251**), `js/arrival-frame.js` (**204**, a ponte de imagem entre
+Resumo do que existe na v0.0.16: `index.html` (**93 linhas**) e as **11** salas com o **mesmo** ficheiro
+(`scene1/`, `scene2/`, `scene3/`, `scene4/`, `scene5/`, `scene6/`, `scene7/`, `scene8/`, `scene9/`, `scene10/` e `scene11/`, iguais fora da linha do `<base>` — D28),
+`editor.html` (**96**), `js/app.js` (**252**), `js/arrival-frame.js` (**204**, a ponte de imagem entre
 mundos — D43), `js/editor.js` (**15**, a entrada do editor — D36), `js/editor/` (**15** ficheiros,
 **3494** linhas com os painéis e a ponte com o servidor), `js/i18n.js` (**93**), `js/core/` (7 ficheiros,
-**226**), `js/modules/` (11 ficheiros, **3276**), `js/scene/` (10 ficheiros, **1773**), `js/shaders/`
-(10 ficheiros, **425**), `css/style.css` (**142**) e `css/editor.css` (**314**), **15** ficheiros em
-`data/worlds/` (o portão, as dez salas e os quatro fixtures, **5523 linhas** no total e **42**
-portas), `i18n/pt.json` (**219** chaves), as **52 obras** na folha `data/obras.tsv`, os **57** ficheiros
-em `assets/previews/` (**27** retratos e **27** recortes, um par por porta, mais os três panoramas — D46)
-e **48** ficheiros em `tools/` (**10444** linhas). O que a versão anterior entregou:
+**226**), `js/modules/` (11 ficheiros, **3288**), `js/scene/` (10 ficheiros, **1773**), `js/shaders/`
+(11 ficheiros, **539**), `css/style.css` (**142**) e `css/editor.css` (**314**), **16** ficheiros em
+`data/worlds/` (o portão, as onze salas e os quatro fixtures, **6000 linhas** no total e **46**
+portas), `i18n/pt.json` (**219** chaves), as **57 obras** na folha `data/obras.tsv`, os **63** ficheiros
+em `assets/previews/` (**30** retratos e **30** recortes, um par por porta, mais os três panoramas — D46)
+e **48** ficheiros em `tools/` (**10501** linhas). O que a versão anterior entregou:
 
 A **v0.0.11** é o estado depois da **Fase 6** do roadmap — **testes e limpeza** —,
 medida em 2026-10-24 e **aceite no telemóvel** no mesmo dia: a automação dos **doze testes** num
@@ -499,9 +516,9 @@ portais com stencil e ajuste automático do pixelRatio.
   de **0,50**): a exceção do **D47** subiu-o a `3072 × 1536`. Com o **fundo shader** (Fase 7) o céu, o
   mar e o chão passam a ser calculados — iguais dos dois lados do corte — e o retrato só carrega as
   **obras e as portas**: a `2048 × 1024` a costura fica em **0,13 a 0,47** nas portas medidas. Com as
-  dez salas são **27** ficheiros, **3512 kB** no total (**83 a 187 kB** cada), **8 MiB** de textura
+  **onze salas** são **30** ficheiros, **3868 kB** no total (**83 a 188 kB** cada), **8 MiB** de textura
   cada, e a **L14** deixa de ter o que avisar
-  (`validate.mjs`: `Erros: 0 · Avisos: 0` nos quinze ficheiros de mundo).
+  (`validate.mjs`: `Erros: 0 · Avisos: 0` nos dezasseis ficheiros de mundo).
 - **Além do retrato, cada porta tem um recorte (D53).** O mesmo desenho, sem o fundo e com
   transparência (`recorte-<porta>.png`, 2:1, **114 a 145 kB** cada): é o que a janela compõe sobre o
   shader **ao vivo** do destino, para a janela animar sem perder as obras e as portas. O retrato
@@ -1770,13 +1787,13 @@ e o **nome de cada porta e de cada obra** (tecla **D**):
 
 O **endereço escolhe o mundo**: a raiz é o **portão** e cada sala tem a sua pasta —
 `http://127.0.0.1:8123/scene1/`, `/scene2/`, `/scene3/`, `/scene4/`, `/scene5/`, `/scene6/`,
-`/scene7/`, `/scene8/`, `/scene9/` e `/scene10/`. As dez salas servem o **mesmo
+`/scene7/`, `/scene8/`, `/scene9/`, `/scene10/` e `/scene11/`. As onze salas servem o **mesmo
 `index.html`** da raiz (o `<base>` é que muda), e atravessar uma porta de mundo navega para a pasta do
 destino.
 
 Quem quiser experimentar sem mexer na exposição pode forçar um mundo com `?scene=`
 (`http://127.0.0.1:8123/?scene=example`): carrega o `data/worlds/example.json`, o mundo de ensaio
-com duas dimensões e **duas portas de cada tipo** (o par de dimensões ao vivo, atravessável, e o retrato que navega) — `?scene=scene1`, `?scene=scene2`, `?scene=scene3`, `?scene=scene4`, `?scene=scene5`, `?scene=scene6`, `?scene=scene7`, `?scene=scene8`, `?scene=scene9` e `?scene=scene10` também
+com duas dimensões e **duas portas de cada tipo** (o par de dimensões ao vivo, atravessável, e o retrato que navega) — `?scene=scene1`, `?scene=scene2`, `?scene=scene3`, `?scene=scene4`, `?scene=scene5`, `?scene=scene6`, `?scene=scene7`, `?scene=scene8`, `?scene=scene9`, `?scene=scene10` e `?scene=scene11` também
 funcionam. E `&from=<mundo>` diz de que mundo se vem, o que faz o visitante aparecer atrás da porta
 de chegada: `/scene2/?from=scene1`. O mundo de ensaio do fundo shader (Fase 7, **R14**/**R15**) é
 `?scene=shader`, e `&shader=0` mostra a imagem de reserva em vez do shader — em qualquer mundo.
