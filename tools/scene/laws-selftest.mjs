@@ -16,7 +16,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateScene, unreachableWorlds, missingArrivals } from '../../js/scene/validation.js';
+import { validateScene, unreachableWorlds, missingArrivals, repeatedDestinations } from '../../js/scene/validation.js';
 import { checkArranques } from './arranques.mjs';
 import {
   WINDOW_KINDS,
@@ -65,6 +65,16 @@ function withTooManyWindows(copy) {
   }
   return copy;
 }
+
+// A posição de um objeto do anel noutro ângulo, com o mesmo raio: é o que um arrasto faz, e é a
+// avaria das leis L22 (o passo) e L23 (a obra no eixo da porta).
+const anguloDe = (posicao) => (Math.atan2(posicao[0], -posicao[2]) * 180) / Math.PI;
+const comAngulo = (posicao, angulo) => {
+  const raio = Math.hypot(posicao[0], posicao[2]);
+  const radianos = (angulo * Math.PI) / 180;
+  const arredondar = (valor) => Math.round(valor * 100) / 100;
+  return [arredondar(raio * Math.sin(radianos)), posicao[1], arredondar(-raio * Math.cos(radianos))];
+};
 
 const cases = [
   {
@@ -248,6 +258,59 @@ const cases = [
       porta.action = { kind: 'navigate', target: 'scene2' };
       delete porta.arrivalFrom;
     }
+  },
+  // ---- os dois anéis (D77) ----
+  {
+    law: 'L22',
+    what: 'uma obra ainda no lugar de uma fila',
+    expect: 'law L22',
+    inject: (copy) => { copy.artworks[0].position = [0, 1.5, -55]; }
+  },
+  {
+    law: 'L22',
+    what: 'uma obra virada ao contrário (a frente não olha o centro)',
+    expect: 'law L22',
+    inject: (copy) => { copy.artworks[1].rotation = [0, 0, 0]; }
+  },
+  {
+    law: 'L22',
+    what: 'duas obras vizinhas com outro passo',
+    expect: 'equal steps inside a ring',
+    inject: (copy) => {
+      // O mesmo arrasto da L22, mas com a frente corrigida: a única coisa errada que resta é o passo.
+      const angulo = anguloDe(copy.artworks[2].position) + 5;
+      copy.artworks[2].position = comAngulo(copy.artworks[2].position, angulo);
+      copy.artworks[2].rotation = [0, Math.round(-angulo * 100) / 100, 0];
+    }
+  },
+  {
+    law: 'L23',
+    what: 'uma obra exactamente no eixo de uma porta',
+    expect: 'law L23',
+    inject: (copy) => {
+      copy.artworks[0].position = comAngulo(copy.artworks[0].position, anguloDe(copy.portals[0].position));
+    }
+  },
+  {
+    law: 'L24',
+    what: 'uma sala com duas portas',
+    expect: 'law L24',
+    inject: (copy) => { copy.portals = copy.portals.slice(0, 2); }
+  },
+  {
+    law: 'L24',
+    what: 'uma sala com seis portas',
+    expect: 'law L24',
+    inject: (copy) => { copy.portals.push(navigatingDoor({ id: 90 })); }
+  },
+  {
+    law: 'L24',
+    what: 'uma sala sem porta para o portão',
+    expect: 'law L24',
+    inject: (copy) => {
+      const porta = copy.portals.find((portal) => portal.action && portal.action.target === 'gate');
+      if (porta) porta.action.target = 'scene3';
+    }
   }
 ];
 
@@ -344,6 +407,22 @@ check('a portrait that the visitor would walk into is refused (L18)',
 
 const tablesPassed = tableChecks.filter((entry) => entry.ok).length;
 
+// L25 (D77): duas salas não podem ter o mesmo conjunto de destinos. A exposição tem um conjunto
+// diferente em cada sala; a avaria dá à sala 3 os destinos da sala 2 — o mesmo corredor em duas
+// salas, que é o que a regra proíbe.
+const sameSet = exhibition.map((copy) => JSON.parse(JSON.stringify(copy)));
+const destinationsOfTwo = sameSet.find((copy) => copy.world.slug === 'scene2').portals
+  .map((portal) => portal.action && portal.action.target)
+  .filter((target) => target && target !== 'gate');
+sameSet.find((copy) => copy.world.slug === 'scene3').portals
+  .filter((portal) => portal.action && portal.action.target !== 'gate')
+  .forEach((portal, index) => { portal.action.target = destinationsOfTwo[index % destinationsOfTwo.length]; });
+const repeatedClean = repeatedDestinations(exhibition, 'gate');
+const repeatedFault = repeatedDestinations(sameSet, 'gate');
+const repeatedAsExpected = repeatedClean.length === 0 && repeatedFault.length === 1 &&
+  repeatedFault[0].worlds.length === 2 &&
+  repeatedFault[0].worlds.indexOf('scene2') !== -1 && repeatedFault[0].worlds.indexOf('scene3') !== -1;
+
 console.table(rows.map((row) => ({ law: row.law, 'injected fault': row.what, detected: row.ok ? 'yes' : 'NO', message: row.message.slice(0, 96) })));
 console.log(`laws and shape: ${detected} of ${cases.length} faults detected`);
 console.log(`control (nothing injected): ${control.ok ? 'clean' : 'FAILED'} — ` +
@@ -354,6 +433,9 @@ const arrivalsAsExpected = arrivals.answered === 0 && arrivals.gaps.length === 1
 console.log(`arrivals (L19): the exhibition answers every door (${arrivals.answered} gaps), and a door ` +
   `with no arrival at the destination is ${arrivalsAsExpected ? 'detected' : 'NOT detected'}` +
   (arrivals.gaps.length ? ` (${arrivals.gaps.join(', ')}, doors ${arrivals.doors.join(', ')})` : ''));
+console.log(`destinations (L25): the exhibition has a set of its own in every room ` +
+  `(${repeatedClean.length} repeated), and two rooms pointing at the same ones is ` +
+  `${repeatedAsExpected ? 'detected' : 'NOT detected'}`);
 
 // The arranques (D28): one file per world, and the four the same outside the `<base>` line. Here the
 // disk is a map in memory, so a case can lie about it on purpose — which is the only way to know
@@ -392,7 +474,8 @@ console.log(`tables of the two axes: ${tablesPassed} of ${tableChecks.length} ch
 for (const entry of tableChecks.filter((entry) => !entry.ok)) console.error(`  failed: ${entry.what}`);
 
 const failed = detected !== cases.length || !control.ok || reachable.length !== 1 ||
-  !arrivalsAsExpected || arranquesPassed !== arranqueChecks.length || tablesPassed !== tableChecks.length;
+  !arrivalsAsExpected || !repeatedAsExpected || arranquesPassed !== arranqueChecks.length ||
+  tablesPassed !== tableChecks.length;
 if (failed) {
   console.error('the validator did not fail where it should');
   process.exit(1);

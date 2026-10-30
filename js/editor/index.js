@@ -4,6 +4,7 @@
 // world, the preview builds it, and the validator says what is wrong with it. The three pieces it
 // talks to live next to this file, so the entry point (js/editor.js) stays the few lines of a start.
 import { validateScene } from '../scene/validation.js';
+import { isFixture } from '../scene/fixtures.js';
 import { state, setActiveDimension } from '../core/index.js';
 import { t } from '../i18n.js';
 import {
@@ -81,7 +82,9 @@ function validate() {
   const report = validateScene(world.data, {
     worldExists: (slug) => worlds.exists(slug),
     exists: assets.exists,
-    imageSize: assets.imageSize
+    imageSize: assets.imageSize,
+    // Um fixture (D9) não é uma sala: sem anéis e sem a regra das três a cinco portas.
+    fixture: isFixture(world.data.world && world.data.world.slug)
   });
   problems.show(report);
   return report;

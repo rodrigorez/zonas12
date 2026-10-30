@@ -34,6 +34,7 @@
 // The modal is the artwork module's (D19), so the instrument closes it through the module and not
 // through a global: the `window.fecharObra` bridge left with the inline attributes in Fase 4.
 import { closeArtwork } from '../../js/modules/artwork.js';
+import { playerCamera } from '../../js/modules/camera.js';
 
 const MARCA = 'zonas12-aceitacao';
 const RUÍDO = 12;
@@ -204,23 +205,45 @@ function barrasDe(porta) {
   porta.portalGroup.traverse((node) => { if (node.isMesh && /-frame-\d+$/.test(node.name)) barras.push(node); });
   return barras;
 }
-// O ponto do ecrã onde a porta está, com a câmara posta em frente dela. A câmara é movida **só na
-// posição**: o look-controls é dono da rotação e desfaz o que lhe for escrito à mão (medido).
-function porAspecto(sceneEl, camera, posicao, raio, altura, desvios) {
+// A câmara à frente de um objeto, na frente dele e a olhá-lo.
+//
+// A disposição em anel (D77) rodou as portas e as obras: somar `distancia` ao z do mundo só ficava em
+// frente de quem olhava a +Z, que é o que as filas faziam — com o anel, os testes da janela passaram a
+// medi-la de esguelha. A frente sai da matriz do objeto (a mesma conta do `eixoDaPorta`), e o olhar
+// vai pelo `setPose` da câmara (D63): é ele que escreve no `look-controls`, que de outro modo desfaz
+// no fotograma seguinte o que se lhe escrevesse à mão.
+async function emFrenteDe(objeto, alturaSobre, distancia) {
+  const mundo = new THREE.Vector3();
+  const quaterniao = new THREE.Quaternion();
+  objeto.getWorldPosition(mundo);
+  objeto.getWorldQuaternion(quaterniao);
+  const frente = new THREE.Vector3(0, 0, 1).applyQuaternion(quaterniao).normalize();
+  const yaw = (Math.atan2(frente.x, frente.z) * 180) / Math.PI;
+  playerCamera.setPose({
+    position: [mundo.x + frente.x * distancia, mundo.y + alturaSobre, mundo.z + frente.z * distancia],
+    yaw: yaw,
+    pitch: 0
+  });
+  return mundo;
+}
+
+// O ponto do ecrã onde uma obra está, com a câmara posta em frente dela e a olhá-la.
+function porAspecto(sceneEl, camera, objeto) {
   const cameraEl = sceneEl.querySelector('a-camera');
   const canvas = sceneEl.querySelector('canvas');
   const rect = canvas.getBoundingClientRect();
-  for (const desvio of desvios) {
-    cameraEl.object3D.position.set(posicao[0] + desvio, altura, posicao[2] + raio);
-    cameraEl.object3D.updateMatrixWorld(true);
-    camera.updateMatrixWorld(true);
-    const v = new THREE.Vector3(posicao[0], altura, posicao[2]).project(camera);
-    if (Math.abs(v.x) > 0.75 || Math.abs(v.y) > 0.75) continue;
-    const css = { x: Math.round(rect.left + (v.x * 0.5 + 0.5) * rect.width), y: Math.round(rect.top + (-v.y * 0.5 + 0.5) * rect.height) };
-    const porCima = document.elementFromPoint(css.x, css.y);
-    if (porCima && porCima.tagName === 'CANVAS') return { desvio, css, ndc: [v.x, v.y] };
-  }
-  return null;
+  cameraEl.object3D.updateMatrixWorld(true);
+  camera.updateMatrixWorld(true);
+  const mundo = new THREE.Vector3();
+  objeto.getWorldPosition(mundo);
+  const v = mundo.project(camera);
+  if (Math.abs(v.x) > 0.75 || Math.abs(v.y) > 0.75) return null;
+  const css = {
+    x: Math.round(rect.left + (v.x * 0.5 + 0.5) * rect.width),
+    y: Math.round(rect.top + (-v.y * 0.5 + 0.5) * rect.height)
+  };
+  const porCima = document.elementFromPoint(css.x, css.y);
+  return porCima && porCima.tagName === 'CANVAS' ? { css: css, ndc: [v.x, v.y] } : null;
 }
 
 const estadoDoModal = () => {
@@ -303,13 +326,11 @@ export async function checkWindow(portalId) {
   const cameraEl = sceneEl.querySelector('a-camera');
   const gl = sceneEl.renderer.getContext();
   const camera = cameraEl.components.camera.camera;
-  const guardado = cameraEl.object3D.position.clone();
+  const guardada = playerCamera.pose();
   const porta = window.portalDebug.state.portals.find((p) => p.data.id === portalId);
   if (!porta) return { porta: portalId, erro: 'nao esta nesta pagina' };
 
-  const mundo = new THREE.Vector3();
-  porta.el.object3D.getWorldPosition(mundo);
-  cameraEl.object3D.position.set(mundo.x, mundo.y + 1.6, mundo.z + 14);
+  await emFrenteDe(porta.el.object3D, 1.6, 14);
   await proximoFrame();
   const rect = rectDaJanela(porta, camera, gl);
   desenhar(sceneEl, camera);
@@ -318,7 +339,7 @@ export async function checkWindow(portalId) {
   const cy = Math.round((rect.y0 + rect.y1) / 2);
   const centro = cor(leitura, cx, cy);
   const fora = cor(leitura, Math.round(leitura.w * 0.05), cy);
-  cameraEl.object3D.position.copy(guardado);
+  playerCamera.setPose(guardada);
   await proximoFrame();
   return {
     porta: portalId,
@@ -418,9 +439,8 @@ export async function checkArtworkClick(options = {}) {
   const mesh = alvos[obra];
   if (!mesh) return { aplicavel: false, porque: 'este mundo nao tem obras nesta dimensao' };
 
-  const posicao = new THREE.Vector3();
-  mesh.getWorldPosition(posicao);
-  const sitio = porAspecto(sceneEl, sceneEl.querySelector('a-camera').components.camera.camera, [posicao.x, 0, posicao.z], 8, 1.6, [4, 5, 3, 6, -4, -5, -3, -6, 7, -7]);
+  await emFrenteDe(mesh, 1.6, 8);
+  const sitio = porAspecto(sceneEl, sceneEl.querySelector('a-camera').components.camera.camera, mesh);
   if (!sitio) return { erro: 'sem zona do ecra livre para apontar' };
 
   const enviar = (tipo, extra) => canvas.dispatchEvent(new MouseEvent(tipo, Object.assign({ bubbles: true, clientX: sitio.css.x, clientY: sitio.css.y, button: 0 }, extra || {})));
@@ -627,7 +647,7 @@ export async function checkPortrait(options = {}) {
   const cameraEl = sceneEl.querySelector('a-camera');
   const gl = sceneEl.renderer.getContext();
   const camera = cameraEl.components.camera.camera;
-  const guardado = cameraEl.object3D.position.clone();
+  const guardada = playerCamera.pose();
   const state = window.portalDebug.state;
   const distancias = options.distancias || [12, 30];
   const portas = state.portals.filter((p) => p.data.previewDimension > 0);
@@ -661,10 +681,8 @@ export async function checkPortrait(options = {}) {
         if (ehShader) material.uniforms.uTime.value = ligado ? tempoOriginal + 3.7 : tempoOriginal;
         else material.color.setHex(ligado ? 0xff00ff : corOriginal);
       };
-      const mundo = new THREE.Vector3();
-      porta.el.object3D.getWorldPosition(mundo);
       for (const distancia of distancias) {
-        cameraEl.object3D.position.set(mundo.x, mundo.y + porta.data.height / 2, mundo.z + distancia);
+        await emFrenteDe(porta.el.object3D, porta.data.height / 2, distancia);
         await proximoFrame();
         await esperarTexturas(sceneEl);
         const janela = rectDaJanela(porta, camera, gl);
@@ -697,7 +715,7 @@ export async function checkPortrait(options = {}) {
     }
   } finally {
     videos.forEach((video) => { const promessa = video.play(); if (promessa) promessa.catch(() => {}); });
-    cameraEl.object3D.position.copy(guardado);
+    playerCamera.setPose(guardada);
     await proximoFrame();
   }
   return resultados;

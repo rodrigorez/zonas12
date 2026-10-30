@@ -24,6 +24,7 @@ import { startSonda } from './modules/sonda.js';
 import { startEnsaio } from './modules/ensaio.js';
 import { orientationStatus } from './modules/orientation.js';
 import { validateScene } from './scene/validation.js';
+import { isFixture } from './scene/fixtures.js';
 import { buildScene } from './scene/scene-builder.js';
 import { textIn } from './scene/schema.js';
 import { startAnalytics, pageLocation } from './scene/analytics.js';
@@ -131,7 +132,7 @@ async function loadScene() {
 async function buildFromData() {
   const data = await loadScene();
   window.portalDebug.world = data.world.slug;
-  const report = validateScene(data);
+  const report = validateScene(data, { fixture: isFixture(data.world.slug) });
 
   // The console is a test (T8): a scene that is fine says nothing at all. What cannot be checked
   // here — whether the file of an asset exists on disk, or the shape of an image — is the command

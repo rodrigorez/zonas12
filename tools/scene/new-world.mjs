@@ -16,6 +16,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkArranques } from './arranques.mjs';
 import { ENTRY_WORLD } from '../../js/modules/portal-kinds.js';
+import { FIXTURES } from '../../js/scene/fixtures.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
@@ -51,8 +52,7 @@ writeFileSync(
 
 // Os mundos que já têm ficheiro, mais o que acabou de ganhar arranque (ainda sem JSON, e é o editor que
 // o vai exportar). Os fixtures não são salas — não têm pasta, e o validador da linha de comando também
-// os deixa de fora (a mesma lista de `tools/scene/validate.mjs`).
-const FIXTURES = ['example', 'shader', 'r9', 'exemplo-ficha'];
+// os deixa de fora (`js/scene/fixtures.js`, uma casa só desde a lei L22).
 const directory = join(root, 'data', 'worlds');
 const slugs = new Set([slug]);
 if (existsSync(directory)) {

@@ -32,6 +32,8 @@
 //                                is not a frame fault: it is the D-pad left pressed, and the sweep
 //                                has to **refuse** the result instead of blaming the scene.
 
+import { playerCamera } from '../../js/modules/camera.js';
+
 const RIG = {
   portalId: 63,
   width: 8,
@@ -94,7 +96,7 @@ export async function runPoseSweep(options = {}) {
     return { x: (p.x * 0.5 + 0.5) * width(), y: (-p.y * 0.5 + 0.5) * height(), z: p.z };
   };
 
-  const savedCameraPosition = cameraEl.object3D.position.clone();
+  const savedPose = playerCamera.pose();
   const savedDimension = state.activeDimension;
   // Onde a câmara tem de estar durante toda a varredura. Se sair daqui, quem mede não é a moldura.
   const cameraSite = new THREE.Vector3(RIG.site.x, RIG.site.y, RIG.site.z);
@@ -265,7 +267,11 @@ export async function runPoseSweep(options = {}) {
   try {
     started = performance.now();
     restoreMaterials = injectFault();
-    cameraEl.object3D.position.set(RIG.site.x, RIG.site.y, RIG.site.z);
+    // A câmara no sítio **e a olhar a −Z**, que é a direcção do portal do rig. Desde a D77 a pose de
+    // chegada de uma sala já não olha a −Z (chega virada ao centro do anel), e sem esta linha a
+    // varredura mede o rig pelas costas: não recusa — salta as poses cujas barras caem fora do ecrã, e
+    // o veredicto fica sem metade da medição (medido: 39 de 84 poses na sala 3).
+    playerCamera.setPose({ position: [RIG.site.x, RIG.site.y, RIG.site.z], yaw: 0, pitch: 0 });
     window.portalDebug.setActiveDimension(0);
     await nextFrame();
 
@@ -385,7 +391,7 @@ export async function runPoseSweep(options = {}) {
     setBarsVisible(true);
     bars.forEach((bar, i) => { bar.visible = barVisibleBefore[i]; });
     rig.remove();
-    cameraEl.object3D.position.copy(savedCameraPosition);
+    playerCamera.setPose(savedPose);
     window.portalDebug.setActiveDimension(savedDimension);
     await nextFrame();
   }

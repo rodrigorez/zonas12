@@ -19,7 +19,8 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateScene, unreachableWorlds, missingArrivals } from '../../js/scene/validation.js';
+import { validateScene, unreachableWorlds, missingArrivals, repeatedDestinations } from '../../js/scene/validation.js';
+import { FIXTURES, isFixture } from '../../js/scene/fixtures.js';
 import { checkArranques } from './arranques.mjs';
 import { diskQuestions } from './disk.mjs';
 import { ENTRY_WORLD } from '../../js/modules/portal-kinds.js';
@@ -37,8 +38,9 @@ const root = resolve(here, '..', '..');
 // não é um mundo que se visite. O `r9` é o ensaio dos quatro valores que a D30 dava como não
 // construídos (B5/B6/B7): abre-se com `?scene=r9` e não tem porta nenhuma. O `exemplo-ficha` é a
 // ficha em cheio (D62): quatro obras com texto de exemplo, para o autor ver a página antes de
-// escrever o texto verdadeiro — abre-se com `?scene=exemplo-ficha` ou por `obra.html?mundo=…`.
-const FIXTURES = ['example', 'shader', 'r9', 'exemplo-ficha'];
+// escrever o texto verdadeiro — abre-se com `?scene=exemplo-ficha` ou por `obra.html?mundo=…`. A
+// lista vive em `js/scene/fixtures.js` desde a lei L22: o browser precisa dela para não pedir anéis
+// a um fixture, e a página e a linha de comando têm de responder o mesmo sobre o mesmo ficheiro.
 
 // Um caminho absoluto já é erro de L12; não vale a pena perguntar ao disco por ele.
 const exists = (assetPath) => (/^([a-zA-Z]:[\\/]|[\\/])/.test(assetPath) ? undefined : existsSync(join(root, assetPath)));
@@ -85,7 +87,11 @@ for (const file of files) {
 
   validated.push(scene);
 
-  const report = validateScene(scene, options);
+  const report = validateScene(scene, Object.assign({}, options, {
+    // Um fixture (D9) não é uma sala: sem anéis (L22, L23) e sem a regra das três a cinco portas
+    // (L24). É a mesma distinção que o grafo faz abaixo, e vive numa casa só.
+    fixture: isFixture((scene.world && scene.world.slug) || basename(file, '.json'))
+  }));
   const counts = report.summary
     ? `${report.summary.dimensions} dimensions, ${report.summary.artworks} artworks, ` +
       `${report.summary.portals} portals, ${report.summary.assets} assets, ` +
@@ -148,6 +154,19 @@ if (worlds.size > 1) {
     console.log(`  warning: ${gap.from} -> ${gap.to}: portals[${gap.portals.join(', ')}] and no door of ` +
       `"${gap.to}" says it is the arrival from "${gap.from}" — the visitor starts where the camera says`);
   }
+
+  // L25 (D77): duas salas não podem ter o mesmo conjunto de destinos — quem entra em duas não deve
+  // encontrar o mesmo corredor. O conjunto não conta a ordem nem a porta do portão (todas as salas
+  // têm uma). É do grafo, como a L19: precisa de todos os ficheiros de uma vez.
+  const repeated = repeatedDestinations(rooms, ENTRY_WORLD);
+  console.log('destinations: ' + (repeated.length === 0
+    ? 'every room has its own set of destinations (L25)'
+    : `${repeated.length} set(s) of destinations repeated (L25)`));
+  for (const entry of repeated) {
+    console.error(`  error: ${entry.worlds.join(' and ')} both point at ${entry.destinations.join(', ')} ` +
+      `— law L25 (each room chooses differently)`);
+  }
+  if (repeated.length) failed++;
 
   // D53: a janela de uma porta de mundo que desenha o fundo do destino **ao vivo** tem de nomear o
   // shader que o destino desenha. Um shader trocado aqui não é um detalhe: a porta passaria a mentir

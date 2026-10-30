@@ -21,12 +21,12 @@
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { FIXTURES } from '../../js/scene/fixtures.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
 
-// Os fixtures não são salas (D9) — a mesma lista de `tools/scene/validate.mjs`.
-const FIXTURES = ['example', 'shader', 'r9', 'exemplo-ficha'];
+// Os fixtures não são salas (D9) — a lista vive em `js/scene/fixtures.js` desde a lei L22.
 const apply = process.argv.includes('--aplicar');
 
 // As duas portas que saem: a cidade fica com cinco (gate, praia, becos, imersões, mangue).

@@ -256,7 +256,9 @@ async function saveWorld(request, response, context, slug) {
   // regra do export (erros travam, avisos não) passa a ser a regra da gravação.
   const worlds = worldsIn(root);
   const report = validateScene(data, Object.assign(diskQuestions(root), {
-    worldExists: (name) => worlds.includes(name)
+    worldExists: (name) => worlds.includes(name),
+    // Um fixture (D9) não é uma sala: sem anéis e sem a regra das três a cinco portas.
+    fixture: isFixture(data.world && data.world.slug)
   }));
   if (report.errors.length > 0) {
     sendJson(response, 422, {

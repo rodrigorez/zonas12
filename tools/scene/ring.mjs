@@ -21,12 +21,13 @@ import {
   RING, angularGap, bestPhase, chord, clearanceCeiling, gapPhase, requiredClearance, ringDeviation,
   ringPositions
 } from '../../js/scene/ring.js';
+import { FIXTURES } from '../../js/scene/fixtures.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
 
-// Os fixtures não são salas (D9) — a mesma lista de `tools/scene/validate.mjs`.
-const FIXTURES = ['example', 'shader', 'r9', 'exemplo-ficha'];
+// Os fixtures não são salas (D9) — a lista vive em `js/scene/fixtures.js` desde a lei L22, porque o
+// browser também precisa dela.
 
 const args = process.argv.slice(2);
 const showPositions = args.includes('--posicoes');

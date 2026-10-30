@@ -15,7 +15,9 @@
 //     picture, never a live world), L14 (the 2:1 shape of a panorama, and its size — a warning only
 //     above the standard), L15 (the reserved band of ids), L16 and L17 (the arrival point, and one
 //     arrival door per origin), L18 (the two axes combine legally), L20 (the ficha of a work is one
-//     page, D62) and L21 (the measurement id of a room, when there is one, is a GA4 id).
+//     page, D62), L21 (the measurement id of a room, when there is one, is a GA4 id), L22 and L23
+//     (the two rings, and the clearance between them — D77) and L24 (three to five doors per room,
+//     one of them to the gate — D77).
 //   - the graph of the worlds, when the caller has all of them: the rooms nobody can reach
 //     (`unreachableWorlds`) and the doors whose destination says nothing about where the visitor
 //     comes from (`missingArrivals`, law L19).
@@ -34,10 +36,18 @@ import {
   PANORAMA_WIDTH,
   PANORAMA_HEIGHT
 } from '../core/index.js';
-import { validateDoor } from '../modules/portal-kinds.js';
+import { validateDoor, ENTRY_WORLD } from '../modules/portal-kinds.js';
 import { arrivalPoint } from './arrival.js';
+import { RING, angularGap, requiredClearance, ringCoordinates } from './ring.js';
 
 const EYE_HEIGHT = 1.6;
+
+// Uma sala tem de três a cinco portas (D77): abaixo de três não há escolha nenhuma — duas portas são
+// um corredor —, e acima de cinco a sala deixa de ser uma sala e passa a ser um átrio, que é o que o
+// portão é. O limite é da regra, não do anel: a 60 m seis caixas de 12 m ainda ficam a 60 m umas das
+// outras.
+const MIN_DOORS = 3;
+const MAX_DOORS = 5;
 
 // The shape of the name of an asset file (law L10): assets/<type>/<name>.<ext>, all lowercase, with
 // the hyphens the D7 rule uses. It is a warning and not an error because a file in the wrong place
@@ -191,6 +201,21 @@ export function validateScene(scene, options = {}) {
           `(${extent.toFixed(1)}) — law L1 (the background of the active dimension shows up inside the window)`);
       }
     }
+  }
+
+  // ---- L22 and L23: the two rings, and the clearance between them ----
+  //
+  // The disposition of D77: the works on a circle of radius R1 and the doors on a concentric circle
+  // of radius R2, equal steps inside each ring, and the front of every object turned to the centre.
+  // The arithmetic lives in js/scene/ring.js — the same that writes the data — and what is proved
+  // here is that the data is still what it wrote: a work dragged in the editor, or a `position`
+  // edited by hand, breaks the law and the report says which one and by how much.
+  //
+  // A fixture (D9) is not a room and has no rings: `options.fixture` turns both off.
+  if (options.fixture !== true) {
+    ringErrors(scene.artworks || [], RING.artworks.radius, 'artworks', err);
+    ringErrors(scene.portals || [], RING.portals.radius, 'portals', err);
+    clearanceErrors(scene.artworks || [], scene.portals || [], err);
   }
 
   // ---- artworks: what they show, and how they open ----
@@ -385,6 +410,26 @@ export function validateScene(scene, options = {}) {
       ` (the extra ones get no window)`);
   }
 
+  // ---- L24: three to five doors per room, one of them to the gate ----
+  //
+  // The gate is not a room: it is where the visitor comes in, and it has a door per world. The
+  // minimum is choice (two doors is a corridor) and the maximum belongs to the rule, not to the
+  // ring: at 60 m, six doors would still be 60 m apart — what six doors lose is the room being a
+  // room (D77).
+  const worldSlug = scene.world && scene.world.slug;
+  if (options.fixture !== true && worldSlug !== ENTRY_WORLD) {
+    const roomDoors = scene.portals || [];
+    if (roomDoors.length < MIN_DOORS || roomDoors.length > MAX_DOORS) {
+      err(`the world has ${roomDoors.length} door(s) — law L24 (a room has three to five, or it is ` +
+        `not a room)`);
+    }
+    const toEntry = roomDoors.filter((portal) => (portal.action || {}).target === ENTRY_WORLD).length;
+    if (toEntry !== 1) {
+      err(`${toEntry} door(s) to the gate ("${ENTRY_WORLD}") — law L24 (exactly one, or the visitor ` +
+        `has no way back)`);
+    }
+  }
+
   return { ok: errors.length === 0, errors, warnings, skipped, summary };
 }
 
@@ -475,6 +520,102 @@ function insideBox(point, portal) {
   const centre = portal.boxPosition || [0, 0, 0];
   const half = portal.box.map((side) => side / 2);
   return [0, 1, 2].every((axis) => Math.abs(local[axis] - centre[axis]) <= half[axis]);
+}
+
+// ---- the two rings (L22 and L23) ----
+
+// What is wrong with one ring, one line of the report per object.
+//
+// Three things: the object is on the circle (radius within the tolerance of the ring), it faces the
+// centre (rotation.y = −θ, the same convention the camera and the works use), and the step to its
+// neighbour is the step of the ring. The first two are per object; the third is the ring as a whole,
+// so it is reported once — the first wrong step says what happened, and the rest would be the same
+// sentence.
+function ringErrors(objects, radius, what, err) {
+  const angles = [];
+  for (const object of objects) {
+    const at = ringCoordinates(object.position);
+    if (Math.abs(at.radius - radius) > RING.radiusTolerance) {
+      err(`${what}[${object.id}]: ${at.radius.toFixed(1)} m from the centre and the ring is at ` +
+        `${radius} m — law L22 (the works and the doors are two circles around the point where the ` +
+        `visitor comes in)`);
+      continue;
+    }
+    const yaw = Array.isArray(object.rotation) && typeof object.rotation[1] === 'number'
+      ? object.rotation[1]
+      : 0;
+    if (angularGap(-at.angle, yaw) > RING.angleTolerance) {
+      err(`${what}[${object.id}]: rotation.y is ${yaw} and the object looks at ${(-at.angle).toFixed(1)} ` +
+        `— law L22 (the front of every object of a ring looks at the centre)`);
+    }
+    angles.push(at.angle);
+  }
+
+  if (angles.length < 2) return;
+  const sorted = angles.slice().sort((a, b) => a - b);
+  const step = 360 / sorted.length;
+  for (let index = 0; index < sorted.length; index++) {
+    const next = (sorted[(index + 1) % sorted.length] - sorted[index] + 360) % 360;
+    if (Math.abs(next - step) > RING.angleTolerance) {
+      err(`${what}: the step between two neighbours is ${next.toFixed(1)}° and the ring asks for ` +
+        `${step.toFixed(1)}° — law L22 (equal steps inside a ring)`);
+      return;
+    }
+  }
+}
+
+// The closest pair between the two rings (L23): a work between the visitor and a door hides the axis
+// of the door, and what is asked is the half-width of the work plus the margin of D77. Measured on
+// the data, not on the ring the rule would have written — so a ring that was dragged still gets the
+// honest answer.
+function clearanceErrors(artworks, portals, err) {
+  if (artworks.length === 0 || portals.length === 0) return;
+  const widths = artworks
+    .map((artwork) => (artwork.size && Number(artwork.size[0])) || 0)
+    .filter((width) => width > 0);
+  const needed = requiredClearance(widths.length > 0 ? Math.max.apply(null, widths) : 4, RING.artworks.radius);
+
+  let closest = { gap: Infinity, artwork: null, portal: null };
+  for (const portal of portals) {
+    const door = ringCoordinates(portal.position);
+    for (const artwork of artworks) {
+      const work = ringCoordinates(artwork.position);
+      const gap = angularGap(door.angle, work.angle);
+      if (gap < closest.gap) closest = { gap: gap, artwork: artwork, portal: portal };
+    }
+  }
+  if (closest.gap < needed) {
+    err(`portals[${closest.portal.id}] and artworks[${closest.artwork.id}] are ${closest.gap.toFixed(1)}° ` +
+      `apart and ${needed.toFixed(1)}° are asked — law L23 (the work stands in front of the axis of ` +
+      `the door)`);
+  }
+}
+
+// As salas com o mesmo conjunto de destinos (lei L25).
+//
+// A regra da D77 quer as portas de cada sala escolhidas **de forma diferente em cada uma**: quem
+// entra em duas salas não deve encontrar o mesmo corredor. O conjunto não conta a ordem nem a porta
+// do portão (todas as salas têm uma).
+//
+// Como `unreachableWorlds` e `missingArrivals`, precisa de todos os ficheiros de uma vez: a exposição
+// carrega um mundo e nunca vê os outros (D14), por isso só a linha de comando pode perguntar isto.
+export function repeatedDestinations(scenes, entrySlug) {
+  const bySignature = new Map();
+  for (const scene of scenes) {
+    const slug = scene.world && scene.world.slug;
+    if (!slug) continue;
+    const destinations = (scene.portals || [])
+      .map((portal) => (portal.action || {}).target)
+      .filter((target) => typeof target === 'string' && target !== entrySlug)
+      .sort();
+    if (destinations.length === 0) continue;
+    const signature = destinations.join('+');
+    if (!bySignature.has(signature)) bySignature.set(signature, []);
+    bySignature.get(signature).push(slug);
+  }
+  return [...bySignature.entries()]
+    .filter((entry) => entry[1].length > 1)
+    .map((entry) => ({ destinations: entry[0].split('+'), worlds: entry[1] }));
 }
 
 // ---- the shape, walked from schema.js ----
