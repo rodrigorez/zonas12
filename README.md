@@ -228,6 +228,21 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 
 ## Estado atual do código (v0.0.16)
 
+> **Atualização (2026-10-30, a disposição em dois anéis — em curso):** as obras e as portas deixaram as
+> filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as
+> portas a **60 m** —, e cada sala passou a ter **três a cinco portas**, uma delas de volta ao portão e
+> as outras escolhidas uma vez e gravadas no dado. O grafo fica com **50 portas** nas doze páginas (o
+> portão com **onze**, uma por mundo) e **39 retratos de porta**; o céu ganhou a dimensão `camera` que a
+> porta do portão pedia. A **chegada** passou a ser à **frente** da porta, virada ao centro, porque com
+> as obras por dentro do anel a sala está do lado para onde a porta olha. Quatro leis novas — **L22**
+> (os dois anéis), **L23** (a folga entre eles), **L24** (três a cinco portas, uma ao portão) e **L25**
+> (nenhuma sala com o mesmo conjunto de destinos) — e duas peças novas: `js/scene/ring.js` (a conta) e
+> `tools/scene/ring.mjs` (o instrumento que a mede e que escreve o dado). O que foi medido: `validate`
+> **0**, as leis **29 de 29**, o importador **21 de 21**, os doze **91 de 91** nas **13 páginas**, as
+> portas **156 de 156** e o i18n **9 de 9** — **6 de 6 baterias** (782,5 s). A regeração dos 39 retratos
+> (duas passagens) está a correr; o marco desta disposição fica para o fim dela. Decisão **D77** (§11 do
+> roadmap).
+
 > **Atualização (2026-10-29, a décima primeira sala):** o autor entregou as **cinco pílulas de conteúdo**
 > do AHUNAM — a série «#TesorosdelArchivo»: a Colección Ricardo Salazar Ahumada, «Los presidentes y la
 > Universidad» e os fundos Heriberto Jara Corona, Ignacio García Téllez e Ezequiel A. Chávez — e a
@@ -417,12 +432,14 @@ editor faz a cada tecla que re-cria uma entidade, e o que o T9 mede) não deixe 
 memória agarrada — e desde a Fase 3 cada
 módulo tem também a sua **fábrica**, que constrói uma entidade a partir do dado.
 
-O **`js/scene/`** é onde a cena em dados vive, e tem **cinco** ficheiros:
+O **`js/scene/`** é onde a cena em dados vive, e tem **sete** ficheiros:
 
 | Ficheiro | O que é |
 | --- | --- |
 | `schema.js` | A **forma do formato** (v3): campos, tipos, enumerações, as regras dos dois eixos da porta e o catálogo de assets. Puro — não conhece o DOM nem o A-Frame |
-| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L10, L11, L12, L13, L14, L15, L16, L17, L18 e L19 (esta última sobre o **grafo** dos mundos, com o `missingArrivals`), mais os **avisos da D30** para o que o esquema aceita e a cena ainda não constrói. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor corre a cada tecla |
+| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L10, L11, L12, L13, L14, L15, L16, L17, L18, L20, L21, L22 (os dois anéis), L23 (a folga entre eles) e L24 (três a cinco portas, uma ao portão); e, sobre o **grafo** dos mundos, a L19 (`missingArrivals`) e a L25 (`repeatedDestinations`). Um fixture (D9) é dispensado das leis da disposição por uma opção. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor corre a cada tecla |
+| `ring.js` | A **disposição em dois anéis** (D77): os lugares das obras e das portas a partir de um raio e de uma fase, a folga entre os dois anéis e o teto que a mede (`bestPhase`, `clearanceCeiling`). Puro; é a mesma conta que escreve o dado (`tools/scene/ring.mjs --aplicar`) e a que as leis L22 e L23 verificam |
+| `fixtures.js` | Os **mundos que não são salas** (D9): a lista que a página, a linha de comando e o editor leem para não pedirem anéis nem três a cinco portas a um banco de ensaio |
 | `arrival.js` | Onde o visitante aparece ao chegar de outro mundo (**L16**): puro e partilhado, para o construtor e o validador não discordarem da geometria |
 | `scene-builder.js` | O **único** que conhece o A-Frame: cria o `<a-assets>` (e **espera** que os ficheiros carreguem), a câmara, as dimensões, as obras e os portais, a partir do JSON. Desde o B3 aceita `{ preview: true }` e desliga a navegação (D32) |
 | `render-config.js` | As **regras de desenho** do renderer (`ar-config`: `stencil`, `alpha`, `antialias`), registadas uma só vez para os **dois** hosts — a exposição e a pré-visualização do editor (lei **L6**) |
@@ -1825,10 +1842,10 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 
 | Bateria | O que responde |
 | --- | --- |
-| `tools/scene/validate.mjs` | os 10 ficheiros de mundo (6 salas e 4 fixtures), as leis, o grafo das portas e os arranques |
-| `tools/scene/laws-selftest.mjs` | **22** avarias injectadas, todas detectadas, com o controlo limpo |
-| `tools/regression/twelve-tests.mjs` | **T2–T12** nas 7 páginas (**49** verificações) |
-| `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) — 20 portas, 54 verificações |
+| `tools/scene/validate.mjs` | os 16 ficheiros de mundo (12 salas e 4 fixtures), as leis, o grafo das portas e os arranques |
+| `tools/scene/laws-selftest.mjs` | **29** avarias injectadas, todas detectadas, com o controlo limpo |
+| `tools/regression/twelve-tests.mjs` | **T2–T12** nas 13 páginas (**91** verificações) |
+| `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) — 50 portas, 156 verificações |
 | `tools/regression/i18n.mjs` | as duas línguas: chaves, marcadores e `?lang=en` nas duas páginas |
 
 `--full` acrescenta as baterias arquivadas das Fases 4, 5, 7 e 8 — a costura das travessias, a ponte
@@ -1841,8 +1858,10 @@ minutos, por isso não são o `default`. Com `--full` são **26** baterias.
 Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
 repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.tsv` e escreve nos mundos o dado das
 obras (nome, créditos, descritivo, imagem e site) — com `--file` corre outra folha, e é assim que se vê
-o exemplo (`data/obras.exemplo.tsv`) sem tocar na definitiva —, e `node tools/scene/new-world.mjs
-<slug>` cria a pasta e o arranque de um mundo.
+o exemplo (`data/obras.exemplo.tsv`) sem tocar na definitiva —, `node tools/scene/new-world.mjs
+<slug>` cria a pasta e o arranque de um mundo, `node tools/scene/ring.mjs --aplicar` põe as obras e as
+portas nos dois anéis (D77) e `node tools/scene/portrait.mjs --todos` desenha os retratos das portas
+(duas passagens, e cada uma abre um Chrome por porta).
 
 Cada bateria continua a poder correr sozinha, com os argumentos que ela própria documenta — é o que
 se usa quando se está a investigar um número.
