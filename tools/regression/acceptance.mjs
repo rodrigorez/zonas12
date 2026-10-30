@@ -23,7 +23,8 @@
 //   T8  a consola: sem erros nem avisos (lida da sonda da sessão, quando existe)
 //   T9  criar e destruir portais em ciclo não deixa ouvintes nem registos para trás
 //   T10 o retrato aparece dentro da janela e em nenhum outro sítio
-//   T11 a chegada atrás da porta inversa (o mesmo que o T7, na direção em que o visitante fica)
+//   T11 a chegada do lado de dentro da porta inversa (o mesmo que o T7, na direção em que o
+//       visitante fica)
 //   T12 o retrato não sai da moldura, a duas distâncias
 //
 // Duas coisas que este instrumento **não** pode fazer sozinho, e que a sessão que o chama tem de
@@ -229,9 +230,10 @@ const estadoDoModal = () => {
 
 // --- os testes ---
 
-// A direção da travessia de uma porta: o seu -Z local, em coordenadas do mundo (é o que a chegada
-// pressupõe e o que o `arrivalPoint` usa). Sai da matriz da porta, e não do dado, para uma porta
-// rodada ser atravessada como o módulo a atravessa.
+// A direção da travessia de uma porta: o seu -Z local, em coordenadas do mundo — o lado para onde a
+// porta não olha. A chegada fica do outro lado, à frente (o +Z local, `js/scene/arrival.js`); é por
+// isso que andar para dentro da sala é o contrário desta direção, e atravessar é segui-la. Sai da
+// matriz da porta, e não do dado, para uma porta rodada ser atravessada como o módulo a atravessa.
 function eixoDaPorta(porta) {
   const centro = new THREE.Vector3();
   const quaterniao = new THREE.Quaternion();
@@ -518,16 +520,18 @@ export async function checkArrival(options = {}) {
     await proximoFrame();
   };
 
-  // O visitante fica virado na direção da travessia (o -Z da porta): andar para dentro da sala é
-  // seguir essa direção; voltar é o contrário.
-  const dentroDe = centro.clone().addScaledVector(direcao, 1.5);
-  const dentroPara = centro.clone().addScaledVector(direcao, 4.5);
+  // O visitante aparece à frente da porta, virado para a sala — o +Z local, o contrário da direção
+  // da travessia (é o que o `arrivalPoint` calcula). Andar para dentro é afastar-se da porta por
+  // esse lado; meia volta é atravessá-la, para o outro lado do plano.
+  const paraDentro = direcao.clone().multiplyScalar(-1);
+  const dentroDe = centro.clone().addScaledVector(paraDentro, 1.5);
+  const dentroPara = centro.clone().addScaledVector(paraDentro, 4.5);
   const antes = { janelas: contagem.janelas, navegacoes: contagem.navegacoesPedidas };
   await andar(dentroDe, dentroPara);
   const dentro = { janelas: contagem.janelas - antes.janelas, navegacoes: contagem.navegacoesPedidas - antes.navegacoes };
 
   const meio = { janelas: contagem.janelas, navegacoes: contagem.navegacoesPedidas };
-  await andar(dentroPara, centro.clone().addScaledVector(direcao, -1.5));
+  await andar(dentroPara, centro.clone().addScaledVector(direcao, 1.5));
   const volta = { janelas: contagem.janelas - meio.janelas, navegacoes: contagem.navegacoesPedidas - meio.navegacoes };
 
   const resultado = {

@@ -317,7 +317,7 @@ export function validateScene(scene, options = {}) {
     arrivalDoors.set(portal.arrivalFrom, portal.id);
   }
 
-  // ---- L16: the arrival is behind the door and away from every box ----
+  // ---- L16: the arrival is in front of the door and away from every box ----
   // The point is the one the builder will place the camera on (js/scene/arrival.js, one home for
   // the geometry), so what is proved here is what happens on the screen.
   const camera = scene.cameras && scene.cameras.player ? scene.cameras.player : {};

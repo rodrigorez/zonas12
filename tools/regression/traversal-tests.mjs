@@ -12,7 +12,7 @@
 //   T1   atravessar uma porta a passo de 0,1 m conta **uma** travessia: as que navegam levam a
 //        página ao mundo do `action.target` (com `?from=`); as de janela mudam a dimensão activa
 //        uma vez e não navegam.
-//   T7   a chegada não dispara travessias em cadeia: quem aparece atrás da porta inversa fica
+//   T7   a chegada não dispara travessias em cadeia: quem aparece à frente da porta inversa fica
 //        exactamente no ponto que o `arrivalPoint` calcula, andar para dentro da sala dispara
 //        **zero** travessias, e meia volta dispara **uma**.
 //   T11  é o mesmo que o T7, na direcção em que o visitante fica virado — é por isso que se medem
