@@ -239,8 +239,13 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > (nenhuma sala com o mesmo conjunto de destinos) — e duas peças novas: `js/scene/ring.js` (a conta) e
 > `tools/scene/ring.mjs` (o instrumento que a mede e que escreve o dado). O que foi medido: `validate`
 > **0**, as leis **29 de 29**, o importador **21 de 21**, os doze **91 de 91** nas **13 páginas**, as
-> portas **156 de 156** e o i18n **9 de 9** — **6 de 6 baterias** (782,5 s). A regeração dos 39 retratos
-> (duas passagens) está a correr; o marco desta disposição fica para o fim dela. Decisão **D77** (§11 do
+> portas **156 de 156** e o i18n **9 de 9** — **6 de 6 baterias** (782,5 s). A **regeneração dos 39
+> retratos** fechou depois, em duas passagens: **78 gerações** sem uma falha, ~185 s cada, porque o
+> retrato de um mundo contém as janelas das portas desse mundo (D46), e o `validate` ficou em **0**. A
+> **costura das travessias** continua **vermelha** e já estava antes do anel (medida no **v0.0.16**: **3,4
+> a 17,3** onde a meta é **0,50**); o que se corrigiu foi o **encosto** da travessia (D54), que levava o
+> vazio de trás da porta em vez da janela — **77,1 → 27,9** na porta 38 da sala 10 — e a porta que já
+> está a sair deixou de ser vigiada (o T1 voltou a contar **uma** travessia). Decisão **D77** (§11 do
 > roadmap).
 
 > **Atualização (2026-10-29, a décima primeira sala):** o autor entregou as **cinco pílulas de conteúdo**
