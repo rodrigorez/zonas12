@@ -126,6 +126,14 @@
         "en": "Sky 360º"
       },
       "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
     }
   ],
   "artworks": [
@@ -135,13 +143,13 @@
       "kind": "site",
       "asset": "capa-0",
       "position": [
-        -24,
+        34.64,
         1.5,
-        -131
+        -20
       ],
       "rotation": [
         0,
-        0,
+        -60,
         0
       ],
       "size": [
@@ -166,13 +174,13 @@
       "kind": "site",
       "asset": "capa-1",
       "position": [
-        -12,
+        0,
         1.5,
-        -131
+        40
       ],
       "rotation": [
         0,
-        0,
+        -180,
         0
       ],
       "size": [
@@ -197,13 +205,13 @@
       "kind": "site",
       "asset": "capa-2",
       "position": [
-        12,
+        -34.64,
         1.5,
-        -131
+        -20
       ],
       "rotation": [
         0,
-        0,
+        -300,
         0
       ],
       "size": [
@@ -228,9 +236,9 @@
       "id": 7,
       "ownedBy": 0,
       "position": [
+        57.96,
         0,
-        0,
-        -120
+        15.53
       ],
       "width": 10,
       "height": 12,
@@ -265,15 +273,20 @@
         "kind": "navigate",
         "target": "scene2"
       },
-      "arrivalFrom": "scene2"
+      "arrivalFrom": "scene2",
+      "rotation": [
+        0,
+        -105,
+        0
+      ]
     },
     {
       "id": 10,
       "ownedBy": 0,
       "position": [
-        20,
+        -15.53,
         0,
-        -120
+        57.96
       ],
       "width": 10,
       "height": 12,
@@ -308,15 +321,20 @@
         "kind": "navigate",
         "target": "scene4"
       },
-      "arrivalFrom": "scene4"
+      "arrivalFrom": "scene4",
+      "rotation": [
+        0,
+        -195,
+        0
+      ]
     },
     {
       "id": 20,
       "ownedBy": 0,
       "position": [
-        -40,
+        -57.96,
         0,
-        -120
+        -15.53
       ],
       "width": 10,
       "height": 12,
@@ -351,7 +369,58 @@
         "kind": "navigate",
         "target": "scene7"
       },
-      "arrivalFrom": "scene7"
+      "arrivalFrom": "scene7",
+      "rotation": [
+        0,
+        -285,
+        0
+      ]
+    },
+    {
+      "id": 47,
+      "ownedBy": 0,
+      "position": [
+        15.53,
+        0,
+        -57.96
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "arrivalFrom": "gate",
+      "rotation": [
+        0,
+        -15,
+        0
+      ]
     }
   ]
 }

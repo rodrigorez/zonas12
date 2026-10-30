@@ -181,22 +181,6 @@
         "pt": "Retrato do mundo Mangue 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Mangrove 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
-    },
-    "retrato-distopia": {
-      "path": "assets/previews/scene10-de-scene1.jpg",
-      "type": "image",
-      "alt": {
-        "pt": "Retrato do mundo Distopia 360º, visto da porta",
-        "en": "Portrait of the Dystopia 360º world, seen from the door"
-      }
-    },
-    "recorte-scene10-de-scene1": {
-      "path": "assets/previews/recorte-scene10-de-scene1.png",
-      "type": "image",
-      "alt": {
-        "pt": "Retrato do mundo Distopia 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Dystopia 360º world, seen from the door (recorte, para a janela ao vivo)"
-      }
     }
   },
   "dimensions": [
@@ -227,13 +211,13 @@
       "kind": "site",
       "asset": "capa-0",
       "position": [
-        -60,
+        17.36,
         1.5,
-        -55
+        -36.04
       ],
       "rotation": [
         0,
-        0,
+        -25.71,
         0
       ],
       "size": [
@@ -257,13 +241,13 @@
       "kind": "site",
       "asset": "capa-1",
       "position": [
-        -40,
+        39,
         1.5,
-        -55
+        -8.9
       ],
       "rotation": [
         0,
-        0,
+        -77.14,
         0
       ],
       "size": [
@@ -286,13 +270,13 @@
       "dimension": 0,
       "kind": "site",
       "position": [
-        -20,
+        31.27,
         1.5,
-        -55
+        24.94
       ],
       "rotation": [
         0,
-        0,
+        -128.57,
         0
       ],
       "size": [
@@ -319,11 +303,11 @@
       "position": [
         0,
         1.5,
-        -55
+        40
       ],
       "rotation": [
         0,
-        0,
+        -180,
         0
       ],
       "size": [
@@ -347,13 +331,13 @@
       "kind": "site",
       "asset": "capa-4",
       "position": [
-        20,
+        -31.27,
         1.5,
-        -55
+        24.94
       ],
       "rotation": [
         0,
-        0,
+        -231.43,
         0
       ],
       "size": [
@@ -378,13 +362,13 @@
       "kind": "site",
       "asset": "capa-5",
       "position": [
-        40,
+        -39,
         1.5,
-        -55
+        -8.9
       ],
       "rotation": [
         0,
-        0,
+        -282.86,
         0
       ],
       "size": [
@@ -408,13 +392,13 @@
       "kind": "site",
       "asset": "capa-6",
       "position": [
-        60,
+        -17.36,
         1.5,
-        -55
+        -36.04
       ],
       "rotation": [
         0,
-        0,
+        -334.29,
         0
       ],
       "size": [
@@ -438,9 +422,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
-        -25,
+        30.77,
         0,
-        -45
+        -51.51
       ],
       "width": 10,
       "height": 12,
@@ -473,15 +457,20 @@
         "kind": "navigate",
         "target": "gate"
       },
-      "arrivalFrom": "gate"
+      "arrivalFrom": "gate",
+      "rotation": [
+        0,
+        -30.85,
+        0
+      ]
     },
     {
       "id": 3,
       "ownedBy": 0,
       "position": [
-        25,
+        58.5,
         0,
-        -45
+        13.34
       ],
       "width": 10,
       "height": 12,
@@ -516,15 +505,20 @@
         "kind": "navigate",
         "target": "scene2"
       },
-      "arrivalFrom": "scene2"
+      "arrivalFrom": "scene2",
+      "rotation": [
+        0,
+        -102.85,
+        0
+      ]
     },
     {
       "id": 17,
       "ownedBy": 0,
       "position": [
-        50,
+        5.39,
         0,
-        -45
+        59.76
       ],
       "width": 10,
       "height": 12,
@@ -559,15 +553,20 @@
         "kind": "navigate",
         "target": "scene6"
       },
-      "arrivalFrom": "scene6"
+      "arrivalFrom": "scene6",
+      "rotation": [
+        0,
+        -174.85,
+        0
+      ]
     },
     {
       "id": 25,
       "ownedBy": 0,
       "position": [
-        -50,
+        -55.17,
         0,
-        -45
+        23.59
       ],
       "width": 10,
       "height": 12,
@@ -602,15 +601,20 @@
         "kind": "navigate",
         "target": "scene8"
       },
-      "arrivalFrom": "scene8"
+      "arrivalFrom": "scene8",
+      "rotation": [
+        0,
+        -246.85,
+        0
+      ]
     },
     {
       "id": 29,
       "ownedBy": 0,
       "position": [
-        75,
+        -39.48,
         0,
-        -45
+        -45.18
       ],
       "width": 10,
       "height": 12,
@@ -645,50 +649,12 @@
         "kind": "navigate",
         "target": "scene9"
       },
-      "arrivalFrom": "scene9"
-    },
-    {
-      "id": 33,
-      "ownedBy": 0,
-      "position": [
-        -75,
+      "arrivalFrom": "scene9",
+      "rotation": [
         0,
-        -45
-      ],
-      "width": 10,
-      "height": 12,
-      "box": [
-        12,
-        16,
-        1
-      ],
-      "boxPosition": [
-        0,
-        8,
+        -318.85,
         0
-      ],
-      "boxRotation": [
-        0,
-        0,
-        0
-      ],
-      "trigger": "plane",
-      "frame": {
-        "color": "#ff0000",
-        "thickness": 0.3
-      },
-      "window": {
-        "kind": "preview",
-        "asset": "retrato-distopia",
-        "radius": 120,
-        "shaderId": "nucleo",
-        "cutout": "recorte-scene10-de-scene1"
-      },
-      "action": {
-        "kind": "navigate",
-        "target": "scene10"
-      },
-      "arrivalFrom": "scene10"
+      ]
     }
   ]
 }

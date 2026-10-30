@@ -6,14 +6,15 @@
 // mesmo módulo que a Fase 3 há-de usar para reescrever o dado; aqui lê-se o disco e imprime-se a
 // tabela que decide se os raios servem.
 //
-// Esta ferramenta **não escreve nada** (o `--aplicar` é da Fase 3). O que ela responde é a pergunta
-// da Fase 1: a folga entre os dois anéis chega para nenhuma obra tapar o eixo de uma porta? As
-// caixas de 12 m cabem no anel? O fundo de cada sala é maior do que o anel (L1)? E o dado, está em
-// anel ou ainda nas filas de antes?
+// Esta ferramenta **não escreve nada** sem `--aplicar` (o `--posicoes` mostra o que a regra propõe).
+// O que ela responde é a pergunta da Fase 1: a folga entre os dois anéis chega para nenhuma obra
+// tapar o eixo de uma porta? As caixas de 12 m cabem no anel? O fundo de cada sala é maior do que o
+// anel (L1)? E o dado, está em anel ou ainda nas filas de antes?
 //
-// Uso: node tools/scene/ring.mjs [--posicoes] [mundo...]
+// Uso: node tools/scene/ring.mjs [--posicoes] [--aplicar] [mundo...]
 //      (--posicoes imprime também os lugares que a regra propõe, por mundo)
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+//      (--aplicar põe as obras e as portas nos anéis, e é a única coisa que escreve)
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -29,6 +30,7 @@ const FIXTURES = ['example', 'shader', 'r9', 'exemplo-ficha'];
 
 const args = process.argv.slice(2);
 const showPositions = args.includes('--posicoes');
+const apply = args.includes('--aplicar');
 const wanted = args.filter((arg) => !arg.startsWith('--'));
 
 const round = (value) => Math.round(value * 100) / 100;
@@ -47,11 +49,12 @@ if (!existsSync(directory)) {
 
 const worlds = [];
 for (const name of readdirSync(directory).filter((entry) => entry.endsWith('.json'))) {
-  const scene = JSON.parse(readFileSync(join(directory, name), 'utf8'));
+  const text = readFileSync(join(directory, name), 'utf8');
+  const scene = JSON.parse(text);
   const slug = (scene.world && scene.world.slug) || basename(name, '.json');
   if (FIXTURES.includes(slug)) continue;
   if (wanted.length > 0 && !wanted.includes(slug)) continue;
-  worlds.push({ slug: slug, scene: scene });
+  worlds.push({ slug: slug, scene: scene, file: name, eol: text.includes('\r\n') ? '\r\n' : '\n' });
 }
 
 // O portão primeiro e as salas pela ordem do número: é a ordem em que se lê a exposição.
@@ -136,6 +139,57 @@ function checkRing(places, radius) {
   return problems;
 }
 
+// Põe as obras e as portas nos anéis que a regra pede.
+//
+// A obra i fica no lugar i do seu anel; as portas ficam nos lugares por ordem do ficheiro, com uma
+// excepção: a porta do portão (a que se declara chegada do portão) fica no lugar mais próximo de 0°,
+// para quem atravessa o portão ver a sala de frente. A folga do anel não muda com isso — muda só
+// quem se senta onde. A altura é a que o dado já tinha: o anel decide o plano, não a altura.
+function assignRing(scene, measured) {
+  let moved = 0;
+  const place = (object, seat, height) => {
+    const before = Array.isArray(object.position) ? object.position : [0, 0, 0];
+    if (Math.abs(before[0] - seat.position[0]) > 0.01 || Math.abs(before[2] - seat.position[2]) > 0.01) {
+      moved++;
+    }
+    object.position = [seat.position[0], height, seat.position[2]];
+    object.rotation = [0, seat.rotation[1], 0];
+  };
+
+  (scene.artworks || []).forEach((artwork, index) => {
+    const seat = measured.artworksRing[index];
+    if (!seat) return;
+    const height = Array.isArray(artwork.position) && typeof artwork.position[1] === 'number'
+      ? artwork.position[1]
+      : RING.artworks.height;
+    place(artwork, seat, round(height));
+  });
+
+  const portals = scene.portals || [];
+  const seats = measured.portalsRing;
+  if (portals.length > 0 && seats.length > 0) {
+    const door = portals.findIndex((portal) => portal.arrivalFrom === 'gate');
+    const order = door >= 0 ? [door] : [];
+    for (let index = 0; index < portals.length; index++) {
+      if (index !== door) order.push(index);
+    }
+    let anchor = 0;
+    if (door >= 0) {
+      anchor = seats.reduce((best, seat, index) =>
+        (angularGap(seat.angle, 0) < angularGap(seats[best].angle, 0) ? index : best), 0);
+    }
+    const ringSeats = seats.slice(anchor).concat(seats.slice(0, anchor));
+    order.forEach((portalIndex, position) => {
+      const portal = portals[portalIndex];
+      const height = Array.isArray(portal.position) && typeof portal.position[1] === 'number'
+        ? portal.position[1]
+        : RING.portals.height;
+      place(portal, ringSeats[position], round(height));
+    });
+  }
+  return moved;
+}
+
 // O fundo de cada sala tem de ser maior do que o anel (L1): a obra de `radius` metros mostrada
 // dentro da janela é a mesma esfera que envolve a cena.
 function smallBackgrounds(scene) {
@@ -163,6 +217,8 @@ const tight = [];
 let withoutArtworks = 0;
 let onRingCount = 0;
 let failedWorlds = 0;
+let movedObjects = 0;
+const writtenWorlds = [];
 
 for (const world of worlds) {
   const measured = measure(world.scene);
@@ -206,6 +262,17 @@ for (const world of worlds) {
     fail(`anel das portas: ${problem}`);
   }
 
+  // O `--aplicar` é a única coisa que escreve, e escreve depois de todos os veredictos: um anel que
+  // não passa nas contas não chega ao dado.
+  if (apply && verdict !== 'falha') {
+    movedObjects += assignRing(world.scene, measured);
+    measured.artworkDeviation = ringDeviation(
+      measured.artworks, RING.artworks.radius, measured.artworkPhase, measured.artworks.length);
+    measured.portalsDeviation = ringDeviation(
+      measured.portals, RING.portals.radius, measured.portalsPhase, measured.portals.length);
+    writtenWorlds.push(world);
+  }
+
   if (verdict === 'ok' && tightNote) {
     verdict = 'justo';
     tight.push(`${world.slug}: ${tightNote}`);
@@ -240,6 +307,14 @@ for (const world of worlds) {
       console.log(`              θ ${pad(degrees(spot.angle), 8, true)}  ${place(spot.position, spot.rotation)}`);
     }
     console.log('');
+  }
+}
+
+// A escrita, com o fim de linha de cada ficheiro: o diff passa a ser só o que mudou.
+if (apply && writtenWorlds.length > 0) {
+  for (const world of writtenWorlds) {
+    const text = JSON.stringify(world.scene, null, 2).replace(/\n/g, world.eol) + world.eol;
+    writeFileSync(join(directory, world.file), text, 'utf8');
   }
 }
 
@@ -288,7 +363,11 @@ for (const failure of failures) console.error(`  error: ${failure}`);
 
 console.log(`${worlds.length} mundo(s) · ${worlds.length - withoutArtworks} com anel de obras · ` +
   `${worlds.length - tight.length - failedWorlds} ok, ${tight.length} justo(s), ${failedWorlds} falha(s)`);
-console.log(`o dado: ${onRingCount} de ${worlds.length} já em anel ` +
-  `(é o que a Fase 3 reescreve${onRingCount === worlds.length ? '' : '; use --posicoes para ver o que a regra pede'})`);
+console.log(`o dado: ${onRingCount} de ${worlds.length} em anel ` +
+  `(${onRingCount === worlds.length ? 'nada a fazer' : 'o `--aplicar` põe os que faltam; o `--posicoes` mostra o que a regra pede'})`);
+if (apply) {
+  console.log(`escrito: ${writtenWorlds.length} ficheiro(s) em data/worlds/ · ` +
+    `${movedObjects} objeto(s) postos no anel`);
+}
 
 if (failures.length > 0) process.exit(1);

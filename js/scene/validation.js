@@ -454,11 +454,19 @@ export function missingArrivals(scenes) {
 
 // The arrival point of a "from" portal, in the space of another portal's box. Position and
 // rotation of the box are the portal's, so a door that has been turned is handled like the
-// collision itself does (js/modules/portal.js, detectTraversal).
+// collision itself does (js/modules/portal.js, detectTraversal) — and that means the door's own
+// yaw counts: `boxRotation` is the rotation of the box *inside* the door, and a door of the ring is
+// turned by the ring (`rotation.y = −θ`). Reading only `boxRotation` worked while every door faced
+// +Z; with the rings it would prove a box in one place and the scene would collide in another.
 function insideBox(point, portal) {
-  const rotation = Array.isArray(portal.boxRotation) ? portal.boxRotation[1] || 0 : 0;
+  const doorYaw = Array.isArray(portal.rotation) && typeof portal.rotation[1] === 'number'
+    ? portal.rotation[1]
+    : 0;
+  const boxYaw = Array.isArray(portal.boxRotation) && typeof portal.boxRotation[1] === 'number'
+    ? portal.boxRotation[1]
+    : 0;
   const offset = [point[0] - portal.position[0], point[1] - portal.position[1], point[2] - portal.position[2]];
-  const angle = (-rotation * Math.PI) / 180;
+  const angle = (-(doorYaw + boxYaw) * Math.PI) / 180;
   const local = [
     offset[0] * Math.cos(angle) + offset[2] * Math.sin(angle),
     offset[1],

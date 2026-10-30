@@ -79,6 +79,22 @@
         "pt": "Retrato do mundo Noite 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Night 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-becos": {
+      "path": "assets/previews/scene6-de-scene5.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Becos 360º, visto da porta",
+        "en": "Portrait of the Alleys 360º world, seen from the door"
+      }
+    },
+    "recorte-scene6-de-scene5": {
+      "path": "assets/previews/recorte-scene6-de-scene5.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Becos 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Alleys 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
     }
   },
   "dimensions": [
@@ -109,13 +125,13 @@
       "kind": "site",
       "asset": "capa-0",
       "position": [
-        -50,
+        23.51,
         1.5,
-        -90
+        -32.36
       ],
       "rotation": [
         0,
-        0,
+        -36,
         0
       ],
       "size": [
@@ -139,13 +155,13 @@
       "kind": "image",
       "asset": "capa-1",
       "position": [
-        -30,
+        38.04,
         1.5,
-        -90
+        12.36
       ],
       "rotation": [
         0,
-        0,
+        -108,
         0
       ],
       "size": [
@@ -168,13 +184,13 @@
       "kind": "image",
       "asset": "capa-2",
       "position": [
-        -10,
+        0,
         1.5,
-        -90
+        40
       ],
       "rotation": [
         0,
-        0,
+        -180,
         0
       ],
       "size": [
@@ -197,13 +213,13 @@
       "kind": "image",
       "asset": "capa-3",
       "position": [
-        10,
+        -38.04,
         1.5,
-        -90
+        12.36
       ],
       "rotation": [
         0,
-        0,
+        -252,
         0
       ],
       "size": [
@@ -226,13 +242,13 @@
       "kind": "site",
       "asset": "capa-4",
       "position": [
-        30,
+        -23.51,
         1.5,
-        -90
+        -32.36
       ],
       "rotation": [
         0,
-        0,
+        -324,
         0
       ],
       "size": [
@@ -258,7 +274,7 @@
       "position": [
         0,
         0,
-        -80
+        -60
       ],
       "width": 10,
       "height": 12,
@@ -291,15 +307,20 @@
         "kind": "navigate",
         "target": "gate"
       },
-      "arrivalFrom": "gate"
+      "arrivalFrom": "gate",
+      "rotation": [
+        0,
+        0,
+        0
+      ]
     },
     {
       "id": 12,
       "ownedBy": 0,
       "position": [
-        19,
+        51.96,
         0,
-        -80
+        30
       ],
       "width": 10,
       "height": 12,
@@ -334,7 +355,60 @@
         "kind": "navigate",
         "target": "scene4"
       },
-      "arrivalFrom": "scene4"
+      "arrivalFrom": "scene4",
+      "rotation": [
+        0,
+        -120,
+        0
+      ]
+    },
+    {
+      "id": 40,
+      "ownedBy": 0,
+      "position": [
+        -51.96,
+        0,
+        30
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-becos",
+        "radius": 120,
+        "shaderId": "becos",
+        "cutout": "recorte-scene6-de-scene5"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene6"
+      },
+      "arrivalFrom": "scene6",
+      "rotation": [
+        0,
+        -240,
+        0
+      ]
     }
   ]
 }

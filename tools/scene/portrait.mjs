@@ -43,8 +43,15 @@ const TAMANHO = { largura: 2048, altura: 1024, face: 1536, qualidade: 0.85 };
 const PORTAS = [
   ['scene1', 'gate'],
   ['scene2', 'gate'],
+  ['scene3', 'gate'],
   ['scene4', 'gate'],
   ['scene5', 'gate'],
+  ['scene6', 'gate'],
+  ['scene7', 'gate'],
+  ['scene8', 'gate'],
+  ['scene9', 'gate'],
+  ['scene10', 'gate'],
+  ['scene11', 'gate'],
   ['scene2', 'scene1'],
   ['scene1', 'scene2'],
   ['scene3', 'scene2'],
@@ -53,24 +60,28 @@ const PORTAS = [
   ['scene4', 'scene3'],
   ['scene4', 'scene5'],
   ['scene5', 'scene4'],
-  ['scene6', 'gate'],
   ['scene6', 'scene1'],
   ['scene1', 'scene6'],
-  ['scene7', 'gate'],
   ['scene7', 'scene3'],
   ['scene3', 'scene7'],
-  ['scene8', 'gate'],
   ['scene8', 'scene1'],
   ['scene1', 'scene8'],
-  ['scene9', 'gate'],
   ['scene9', 'scene1'],
   ['scene1', 'scene9'],
-  ['scene10', 'gate'],
-  ['scene10', 'scene1'],
-  ['scene1', 'scene10'],
-  ['scene11', 'gate'],
   ['scene11', 'scene4'],
-  ['scene4', 'scene11']
+  ['scene4', 'scene11'],
+  // As seis arestas da disposição em dois anéis (D77). A porta do céu ao portão não está aqui: ela
+  // mostra a câmara (um par de dimensões), não um retrato.
+  ['scene9', 'scene10'],
+  ['scene10', 'scene9'],
+  ['scene6', 'scene5'],
+  ['scene5', 'scene6'],
+  ['scene8', 'scene7'],
+  ['scene7', 'scene8'],
+  ['scene2', 'scene11'],
+  ['scene11', 'scene2'],
+  ['scene11', 'scene10'],
+  ['scene10', 'scene11']
 ];
 
 const todos = process.argv[2] === '--todos';
@@ -114,7 +125,11 @@ const DESENHAR = (largura, altura, face, qualidade) => `(async () => {
 
   const alvoCubo = new THREE.WebGLCubeRenderTarget(${face}, {
     generateMipmaps: true,
-    minFilter: THREE.LinearMipmapLinearFilter
+    minFilter: THREE.LinearMipmapLinearFilter,
+    // A cena desenha com stencil (a lei L6, o stencil: true do renderer) e as janelas das portas
+    // são máscaras de stencil: um render target **sem** stencil desenha o cubo inteiro a zeros. Medido
+    // em 2026-10-29, com a sala em anel: 0,0 de brilho sem o stencil e 41,1 com ele, no mesmo sítio.
+    stencilBuffer: true
   });
   const cubo = new THREE.CubeCamera(0.1, 4000, alvoCubo);
   cubo.position.copy(posicao);
@@ -131,7 +146,9 @@ const DESENHAR = (largura, altura, face, qualidade) => `(async () => {
   const alvo = new THREE.WebGLRenderTarget(${largura}, ${altura}, {
     minFilter: THREE.LinearFilter,
     magFilter: THREE.LinearFilter,
-    format: THREE.RGBAFormat
+    format: THREE.RGBAFormat,
+    // Pelo mesmo motivo do cubo: sem stencil, o desdobramento sai preto.
+    stencilBuffer: true
   });
   // A cor sai como está e o **alfa vem do cubo**: com o fundo escondido, o que não tem objecto fica
   // transparente — é isso que faz do recorte um recorte.

@@ -57,20 +57,36 @@
         "pt": "Capa da obra Ministério da Solidão"
       }
     },
-    "retrato-cidade": {
-      "path": "assets/previews/scene1-de-scene10.jpg",
+    "retrato-mangue": {
+      "path": "assets/previews/scene9-de-scene10.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo Cidade 360º, visto da porta",
-        "en": "Portrait of the City 360º world, seen from the door"
+        "pt": "Retrato do mundo Mangue 360º, visto da porta",
+        "en": "Portrait of the Mangrove 360º world, seen from the door"
       }
     },
-    "recorte-scene1-de-scene10": {
-      "path": "assets/previews/recorte-scene1-de-scene10.png",
+    "recorte-scene9-de-scene10": {
+      "path": "assets/previews/recorte-scene9-de-scene10.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo Cidade 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the City 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "pt": "Retrato do mundo Mangue 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Mangrove 360º world, seen from the door (recorte, para a janela ao vivo)"
+      }
+    },
+    "retrato-memoria": {
+      "path": "assets/previews/scene11-de-scene10.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Memória 360º, visto da porta",
+        "en": "Portrait of the Memory 360º world, seen from the door"
+      }
+    },
+    "recorte-scene11-de-scene10": {
+      "path": "assets/previews/recorte-scene11-de-scene10.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Memória 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Memory 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
     }
   },
@@ -102,13 +118,13 @@
       "kind": "site",
       "asset": "capa-0",
       "position": [
-        -30,
+        28.28,
         1.5,
-        -90
+        -28.28
       ],
       "rotation": [
         0,
-        0,
+        -45,
         0
       ],
       "size": [
@@ -132,13 +148,13 @@
       "kind": "site",
       "asset": "capa-1",
       "position": [
-        -10,
+        28.28,
         1.5,
-        -90
+        28.28
       ],
       "rotation": [
         0,
-        0,
+        -135,
         0
       ],
       "size": [
@@ -162,13 +178,13 @@
       "kind": "site",
       "asset": "capa-2",
       "position": [
-        10,
+        -28.28,
         1.5,
-        -90
+        28.28
       ],
       "rotation": [
         0,
-        0,
+        -225,
         0
       ],
       "size": [
@@ -192,13 +208,13 @@
       "kind": "site",
       "asset": "capa-3",
       "position": [
-        30,
+        -28.28,
         1.5,
-        -90
+        -28.28
       ],
       "rotation": [
         0,
-        0,
+        -315,
         0
       ],
       "size": [
@@ -224,7 +240,7 @@
       "position": [
         0,
         0,
-        -80
+        -60
       ],
       "width": 10,
       "height": 12,
@@ -257,15 +273,20 @@
         "kind": "navigate",
         "target": "gate"
       },
-      "arrivalFrom": "gate"
+      "arrivalFrom": "gate",
+      "rotation": [
+        0,
+        0,
+        0
+      ]
     },
     {
-      "id": 32,
+      "id": 38,
       "ownedBy": 0,
       "position": [
-        19,
+        51.96,
         0,
-        -80
+        30
       ],
       "width": 10,
       "height": 12,
@@ -291,16 +312,69 @@
       },
       "window": {
         "kind": "preview",
-        "asset": "retrato-cidade",
+        "asset": "retrato-mangue",
         "radius": 120,
-        "shaderId": "grade-neon",
-        "cutout": "recorte-scene1-de-scene10"
+        "shaderId": "mangue",
+        "cutout": "recorte-scene9-de-scene10"
       },
       "action": {
         "kind": "navigate",
-        "target": "scene1"
+        "target": "scene9"
       },
-      "arrivalFrom": "scene1"
+      "arrivalFrom": "scene9",
+      "rotation": [
+        0,
+        -120,
+        0
+      ]
+    },
+    {
+      "id": 48,
+      "ownedBy": 0,
+      "position": [
+        -51.96,
+        0,
+        30
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-memoria",
+        "radius": 120,
+        "shaderId": "fichario",
+        "cutout": "recorte-scene11-de-scene10"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene11"
+      },
+      "arrivalFrom": "scene11",
+      "rotation": [
+        0,
+        -240,
+        0
+      ]
     }
   ]
 }
