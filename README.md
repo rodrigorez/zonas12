@@ -226,26 +226,22 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.16)
+## Estado atual do código (v0.0.18)
 
-> **Atualização (2026-10-30, a disposição em dois anéis — em curso):** as obras e as portas deixaram as
+> **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
 > filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as
 > portas a **60 m** —, e cada sala passou a ter **três a cinco portas**, uma delas de volta ao portão e
 > as outras escolhidas uma vez e gravadas no dado. O grafo fica com **50 portas** nas doze páginas (o
-> portão com **onze**, uma por mundo) e **39 retratos de porta**; o céu ganhou a dimensão `camera` que a
-> porta do portão pedia. A **chegada** passou a ser à **frente** da porta, virada ao centro, porque com
-> as obras por dentro do anel a sala está do lado para onde a porta olha. Quatro leis novas — **L22**
-> (os dois anéis), **L23** (a folga entre eles), **L24** (três a cinco portas, uma ao portão) e **L25**
-> (nenhuma sala com o mesmo conjunto de destinos) — e duas peças novas: `js/scene/ring.js` (a conta) e
-> `tools/scene/ring.mjs` (o instrumento que a mede e que escreve o dado). O que foi medido: `validate`
-> **0**, as leis **29 de 29**, o importador **21 de 21**, os doze **91 de 91** nas **13 páginas**, as
-> portas **156 de 156** e o i18n **9 de 9** — **6 de 6 baterias** (782,5 s). A **regeneração dos 39
-> retratos** fechou depois, em duas passagens: **78 gerações** sem uma falha, ~185 s cada, porque o
-> retrato de um mundo contém as janelas das portas desse mundo (D46), e o `validate` ficou em **0**. A
-> **costura das travessias** continua **vermelha** e já estava antes do anel (medida no **v0.0.16**: **3,4
-> a 17,3** onde a meta é **0,50**); o que se corrigiu foi o **encosto** da travessia (D54), que levava o
-> vazio de trás da porta em vez da janela — **77,1 → 27,9** na porta 38 da sala 10 — e a porta que já
-> está a sair deixou de ser vigiada (o T1 voltou a contar **uma** travessia). Decisão **D77** (§11 do
+> portão com **onze**, uma por mundo) e **39 retratos de porta**, todos refeitos depois da mudança; o céu
+> ganhou a dimensão `camera` que a porta do portão pedia. A **chegada** passou a ser à **frente** da
+> porta, virada ao centro, porque com as obras por dentro do anel a sala está do lado para onde a porta
+> olha. Quatro leis novas — **L22** (os dois anéis), **L23** (a folga entre eles), **L24** (três a cinco
+> portas, uma ao portão) e **L25** (nenhuma sala com o mesmo conjunto de destinos) — e duas peças novas:
+> `js/scene/ring.js` (a conta) e `tools/scene/ring.mjs` (o instrumento que a mede e que escreve o dado).
+> O que foi medido com tudo isto: `node tools/regression/all.mjs --full` — **25 de 26 baterias** em
+> **2300,2 s**, com o dado **0**, as leis **29 de 29**, os doze **91 de 91** nas 13 páginas e as portas
+> **156 de 156**. A que falta é a **costura das travessias** (**D46**), que está vermelha **desde antes
+> do anel**: medida no v0.0.16, deu **3,4 a 17,3** onde a meta é **0,50**. Decisão **D77** (§11 do
 > roadmap).
 
 > **Atualização (2026-10-29, a décima primeira sala):** o autor entregou as **cinco pílulas de conteúdo**

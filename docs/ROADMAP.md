@@ -4,7 +4,7 @@
 > secção [11](#11-decisões) com data. Nada de código foi implementado: este documento é o
 > guia de desenvolvimento, e o `README.md` descreve o que **já** existe.
 >
-> **Atualização (2026-10-30, a disposição em dois anéis — em curso):** o autor pediu que as obras e as
+> **Atualização (2026-10-30, a disposição em dois anéis — feita, v0.0.18):** o autor pediu que as obras e as
 > portas deixassem as filas e passassem a rodear o ponto onde o visitante entra — as obras num círculo
 > mais próximo, as portas noutro mais largo, com passos iguais dentro de cada anel — e que cada sala
 > tivesse **de três a cinco portas**, uma delas de volta ao portão e as outras escolhidas **uma vez** e
@@ -17,10 +17,15 @@
 > porta, virado ao centro. As leis novas são a **L22** (os dois anéis), a **L23** (a folga entre eles),
 > a **L24** (três a cinco portas, uma ao portão) e a **L25** (nenhuma sala com o mesmo conjunto de
 > destinos), todas com avaria injectada: **29 de 29** no `laws-selftest`, controlo limpo. O que foi
-> medido nas Fases 1 a 4: `validate` **0**, as leis **29 de 29**, o importador **21 de 21**, os doze
-> **91 de 91** nas **13 páginas**, as portas **156 de 156** e o i18n **9 de 9** — **6 de 6 baterias**
-> (782,5 s). A **Fase 5** — regerar os 39 retratos em duas passagens — está a correr; o marco desta
-> disposição fica para o fim dela. Decisão **D77** (§11).
+> medido com tudo isto: `validate` **0**, as leis **29 de 29**, o importador **21 de 21**, os doze
+> **91 de 91** nas **13 páginas**, as portas **156 de 156** e o i18n **9 de 9**; e a verificação
+> completa, `node tools/regression/all.mjs --full`, dá **25 de 26 baterias** em **2300,2 s**. A que
+> falta é a **costura das travessias** (**D46**): vermelha, e vermelha **desde antes do anel** — medida
+> em **v0.0.16**, deu **3,4 a 17,3** onde a meta é **0,50**. As quatro baterias arquivadas que este
+> marco apanhou a falhar por listas escritas à mão — os rótulos das portas contavam **duas** portas no
+> portão, os das obras davam **duas** caixas de debug ao portão, o do shader validava um **fixture**
+> como sala (L24) e a transição decidia-se por um `sleep` de 12 s — passaram a ler o dado. Decisão
+> **D77** (§11).
 >
 > **Atualização (2026-10-29, a décima primeira sala):** o autor entregou as cinco pílulas de conteúdo do
 > AHUNAM («#TesorosdelArchivo») e a exposição passou a ter **onze salas** — `scene11` (**Memória 360º**,
