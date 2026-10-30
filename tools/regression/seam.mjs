@@ -9,59 +9,52 @@
 // **0,5**. A coluna do maior passo inclui o próprio corte (é a maior diferença entre dois fotogramas
 // seguidos, travessia adentro) e fica ali como retrato do que é mexer.
 //
-// Só as portas com retrato entram na verificação: as duas que mostram a câmara (cidade 2 e praia 5)
-// levam ao portão, cuja imagem é a câmara ao vivo — uma fotografia nunca é igual a uma câmara a andar,
-// e isso não é um salto, é a realidade a mexer.
+// As portas que mostram a câmara — uma por sala, a do portão — são medidas mas não entram na
+// verificação: a imagem delas é a câmara ao vivo, e uma fotografia nunca é igual a uma câmara a andar.
+// Isso não é um salto, é a realidade a mexer.
+//
+// **O estado hoje: a bateria falha, e já falhava antes do anel.** Medida a mesma lista no marco
+// v0.0.16 (as filas, o código e os retratos de então), a costura deu 3,4 a 17,3 onde a meta é 0,50 —
+// os valores de 0,31 a 0,41 que estão no ROADMAP são de um estado anterior da janela (D53 passou a
+// desenhar o fundo do destino ao vivo, em vez do retrato). O que se corrigiu aqui foi o caminho: o
+// instrumento atravessava a porta **de fora para dentro**, e a janela é uma máscara de uma face.
+// O que falta é a janela e a chegada não darem a mesma imagem — fica por investigar, e até lá esta
+// bateria não serve de portão.
 //
 // Uso, da raiz do projeto: node tools/regression/seam.mjs [mundo] [porta]
-import { serveProject, openBrowser, checks, difference, sleep } from './harness.mjs';
+import { join } from 'node:path';
+import { readFileSync, readdirSync } from 'node:fs';
+import { ROOT, serveProject, openBrowser, checks, difference, sleep } from './harness.mjs';
 
 const LARGURA = 390;
 const ALTURA = 844;
 const ESCALA = 0.5;
 
-// As portas com retrato, e de que mundo são.
-const PORTAS = [
-  { mundo: 'gate', porta: 0, destino: 'scene1' },
-  { mundo: 'gate', porta: 1, destino: 'scene2' },
-  { mundo: 'gate', porta: 3, destino: 'scene5' },
-  { mundo: 'scene1', porta: 3, destino: 'scene2' },
-  { mundo: 'scene2', porta: 4, destino: 'scene1' },
-  { mundo: 'scene2', porta: 6, destino: 'scene3' },
-  { mundo: 'scene3', porta: 7, destino: 'scene2' },
-  { mundo: 'scene4', porta: 13, destino: 'scene5' },
-  { mundo: 'scene5', porta: 12, destino: 'scene4' },
-  { mundo: 'gate', porta: 14, destino: 'scene6' },
-  { mundo: 'scene1', porta: 17, destino: 'scene6' },
-  { mundo: 'scene6', porta: 16, destino: 'scene1' },
-  { mundo: 'gate', porta: 18, destino: 'scene7' },
-  { mundo: 'scene3', porta: 20, destino: 'scene7' },
-  { mundo: 'scene7', porta: 19, destino: 'scene3' },
-  { mundo: 'gate', porta: 22, destino: 'scene8' },
-  { mundo: 'scene1', porta: 25, destino: 'scene8' },
-  { mundo: 'scene8', porta: 24, destino: 'scene1' },
-  { mundo: 'gate', porta: 26, destino: 'scene9' },
-  { mundo: 'scene1', porta: 29, destino: 'scene9' },
-  { mundo: 'scene9', porta: 28, destino: 'scene1' },
-  { mundo: 'gate', porta: 30, destino: 'scene10' },
-  { mundo: 'scene1', porta: 33, destino: 'scene10' },
-  { mundo: 'scene10', porta: 32, destino: 'scene1' },
-  { mundo: 'gate', porta: 34, destino: 'scene11' },
-  { mundo: 'scene4', porta: 37, destino: 'scene11' },
-  { mundo: 'scene11', porta: 36, destino: 'scene4' }
-];
+// As portas, lidas do dado: uma entrada por porta que navega, com o mundo onde ela está e o destino.
+//
+// A lista esteve escrita à mão e envelheceu — a disposição em dois anéis (D77) mudou portas de sítio e
+// de id, e a lista continuava a apontar para a porta 33, que já não existe. O grafo é do dado, e é o
+// mesmo ficheiro que a exposição carrega que se lê aqui.
+//
+// As que levam ao portão mostram a câmara ao vivo: são medidas, mas não julgadas contra 0,5 — uma
+// fotografia nunca é igual a uma câmara a andar.
+function portasDoDado() {
+  const FIXTURES = ['example', 'shader', 'r9', 'exemplo-ficha'];
+  const portas = [];
+  for (const name of readdirSync(join(ROOT, 'data', 'worlds')).filter((entry) => entry.endsWith('.json'))) {
+    const scene = JSON.parse(readFileSync(join(ROOT, 'data', 'worlds', name), 'utf8'));
+    const mundo = scene.world && scene.world.slug;
+    if (!mundo || FIXTURES.includes(mundo)) continue;
+    for (const portal of scene.portals || []) {
+      const acao = portal.action || {};
+      if (acao.kind !== 'navigate' || typeof acao.target !== 'string') continue;
+      portas.push({ mundo: mundo, porta: portal.id, destino: acao.target });
+    }
+  }
+  return portas;
+}
 
-// As que levam ao portão, onde a imagem é a câmara: medidas, mas não verificadas contra 0,5.
-const CAMARA = [
-  { mundo: 'scene1', porta: 2, destino: 'gate' },
-  { mundo: 'scene2', porta: 5, destino: 'gate' },
-  { mundo: 'scene6', porta: 15, destino: 'gate' },
-  { mundo: 'scene7', porta: 21, destino: 'gate' },
-  { mundo: 'scene8', porta: 23, destino: 'gate' },
-  { mundo: 'scene9', porta: 27, destino: 'gate' },
-  { mundo: 'scene10', porta: 31, destino: 'gate' },
-  { mundo: 'scene11', porta: 35, destino: 'gate' }
-];
+const PORTAS = portasDoDado();
 
 const SONDA = `
   window.__trace = [];
@@ -115,22 +108,26 @@ const ASSINATURA = `
   })()
 `;
 
+// A travessia, feita pelo caminho do visitante: de **dentro** da sala, a olhar para a porta, até ficar
+// do outro lado. Com a disposição em anel (D77) as portas ficaram a 60 m do centro e viradas para
+// dentro, e o caminho que este instrumento fazia — começar atrás da porta e atravessá-la — passou a
+// ser o único que ninguém faz: entrava-se pelo lado de fora, sem retrato nenhum à vista, e media-se o
+// salto entre a sala de partida e a de chegada (65,9 numa porta que devia dar 0,3). O olhar vai pelo
+// `setPose` da câmara (D63), que é quem escreve no `look-controls`.
 const atravessar = (porta) => `(async () => {
-  const cena = document.querySelector('a-scene');
-  const cameraEl = cena.querySelector('a-camera');
+  const { playerCamera } = await import('/js/modules/camera.js');
   const alvo = window.portalDebug.state.portals.find((p) => p.data.id === ${porta});
   if (!alvo) { console.error('a porta ${porta} não está nesta página'); return; }
   const centro = new THREE.Vector3();
   alvo.el.object3D.getWorldPosition(centro);
-  const direcao = new THREE.Vector3(0, 0, 1)
+  const frente = new THREE.Vector3(0, 0, 1)
     .applyQuaternion(alvo.el.object3D.getWorldQuaternion(new THREE.Quaternion()));
-  const olhar = Math.atan2(direcao.x, direcao.z);
-  const inicio = centro.clone().addScaledVector(direcao, -6);
-  const fim = centro.clone().addScaledVector(direcao, 2.5);
+  const olhar = (Math.atan2(frente.x, frente.z) * 180) / Math.PI;
+  const inicio = centro.clone().addScaledVector(frente, 6);
+  const fim = centro.clone().addScaledVector(frente, -2.5);
   for (let i = 0; i <= 90; i++) {
     const ponto = inicio.clone().lerp(fim, i / 90);
-    cameraEl.object3D.position.set(ponto.x, 1.6, ponto.z);
-    cameraEl.object3D.rotation.set(0, olhar, 0);
+    playerCamera.setPose({ position: [ponto.x, 1.6, ponto.z], yaw: olhar, pitch: 0 });
     await new Promise((done) => requestAnimationFrame(done));
   }
 })()`;
@@ -215,7 +212,7 @@ async function main() {
   const result = checks();
 
   const alvos = escolhidoMundo
-    ? PORTAS.concat(CAMARA).filter((alvo) => alvo.mundo === escolhidoMundo &&
+    ? PORTAS.filter((alvo) => alvo.mundo === escolhidoMundo &&
       (escolhidaPorta === null || alvo.porta === escolhidaPorta))
     : PORTAS;
 

@@ -474,6 +474,12 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     // da porta: de lá ela enche o ecrã e o que se vê é o outro lado. Sem isto, o visitante via a sala
     // de origem a animar durante a espera, e era isso que ele descrevia como «vejo o ambiente onde
     // eu estava» antes de o destino aparecer.
+    // O lado é o da **frente da porta** e não o lado em que a câmara está: a travessia é detectada no
+    // plano, por isso a esta altura a câmara já passou para o outro lado, onde a janela não existe (é
+    // uma máscara de uma face) e o que a captura levava era o vazio de trás da porta — medido na porta
+    // 38 da sala 10, 77,1 para 27,9 com o encosto deste lado. Com a disposição em anel (D77) as portas
+    // passaram a estar viradas para dentro, que é o lado de onde o visitante vem: a frente da porta é
+    // sempre o lado da sala.
     // A preparação está dentro de um `try`: um erro a congelar ou a capturar não pode deixar o
     // visitante preso no mundo que ele já atravessou. O passo que conta — sair da página — acontece
     // sempre; o que falhou fica escrito no registo para a sonda o mostrar.
@@ -486,13 +492,9 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
       this.el.object3D.getWorldPosition(centro);
       const frente = new THREE.Vector3(0, 0, 1)
         .applyQuaternion(this.el.object3D.getWorldQuaternion(new THREE.Quaternion()));
-      const onde = playerCamera.worldPosition(new THREE.Vector3());
-      const lado = onde
-        ? (Math.sign((onde.x - centro.x) * frente.x + (onde.z - centro.z) * frente.z) || 1)
-        : 1;
       registo.encosto = Boolean(playerCamera.enterWindow({
-        x: centro.x + frente.x * lado * 0.05,
-        z: centro.z + frente.z * lado * 0.05
+        x: centro.x + frente.x * 0.05,
+        z: centro.z + frente.z * 0.05
       }));
       // The image bridge (D43): this page leaves the last frame it is showing for the one that
       // arrives, which paints it before it has a scene. `js/arrival-frame.js` is a classic script
@@ -526,6 +528,10 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
 AFRAME.registerComponent('portal-driver', {
   tick: function (time) {
     state.portals.slice().forEach(function (portal) {
+      // Uma porta que já pediu a travessia deixa de ser vigiada: a página está a ir-se embora, e o
+      // `encosto` mexe na câmara depois de a travessia ser detectada — voltar a olhar para a mesma
+      // porta lia esse movimento como uma travessia nova (medido no T1: três travessias onde há uma).
+      if (portal.navigating) return;
       // O movimento vem antes da colisão: a caixa é lida do mundo, por isso a porta é detectada onde
       // ela **está** neste quadro e não onde o ficheiro a escreveu (D59).
       portal.animate(time);
