@@ -4,6 +4,8 @@ node_modules/
 # Artefactos de teste/sessao (capturas de ecra, logs do browser)
 .playwright-mcp/
 /*.png
+# Saidas de sondas guardadas a mao na raiz (o `tmp-1.txt` dos instrumentos)
+/tmp-*.txt
 
 # Folhas em teste (rascunhos): o dado a serio e data/obras.tsv
 data/csv/*.csv
