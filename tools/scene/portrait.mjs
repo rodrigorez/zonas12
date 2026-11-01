@@ -109,6 +109,24 @@ const DESENHAR = (largura, altura, face, qualidade) => `(async () => {
   const cursor = document.querySelector('a-cursor');
   if (cursor) cursor.setAttribute('visible', false);
 
+  // A **porta por onde se chega** fica a ~1 m da câmara e o quadro dela tem 10x12 m: ocupa metade da
+  // fotografia e é ela que aparece como uma **tira vermelha** dentro da janela (D79). Não é do retrato
+  // — é a porta que o visitante tem atrás de si, e a janela nunca mostra essa direcção. Sai da
+  // fotografia, e com ela a tira.
+  //
+  // O arrivalFrom é do **dado do mundo**, não do componente: a porta viva encontra-se pelo id que o
+  // ficheiro diz (foi assim que a primeira versão desta correcção não escondeu nada).
+  const deOnde = new URLSearchParams(location.search).get('from');
+  let chegada = null;
+  if (deOnde && window.portalDebug && window.portalDebug.world) {
+    const mundo = await (await fetch('data/worlds/' + window.portalDebug.world + '.json')).json();
+    const dado = (mundo.portals || []).find((porta) => porta.arrivalFrom === deOnde);
+    if (dado) chegada = window.portalDebug.state.portals.find((porta) => porta.data.id === dado.id) || null;
+  }
+  const esconderChegada = (esconder) => {
+    if (chegada && chegada.portalGroup) chegada.portalGroup.visible = !esconder;
+  };
+
   const posicao = new THREE.Vector3();
   camera.getWorldPosition(posicao);
 
@@ -203,9 +221,10 @@ const DESENHAR = (largura, altura, face, qualidade) => `(async () => {
     return tela;
   };
 
-  // 1. O retrato inteiro: fundo opaco e tudo visível.
+  // 1. O retrato inteiro: fundo opaco e tudo visível — menos a porta por onde se chega (D79).
   renderer.setClearColor(0x000000, 1);
   esconderFundos(false);
+  esconderChegada(true);
   cubo.update(renderer, cena3d);
   const inteiro = ler(true).toDataURL('image/jpeg', ${qualidade});
 
@@ -215,6 +234,7 @@ const DESENHAR = (largura, altura, face, qualidade) => `(async () => {
   cubo.update(renderer, cena3d);
   const recorte = ler(false).toDataURL('image/png');
   esconderFundos(false);
+  esconderChegada(false);
   renderer.setClearColor(0x000000, 0);
 
   return { inteiro: inteiro, recorte: recorte, posicao: [posicao.x, posicao.y, posicao.z] };
