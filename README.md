@@ -247,6 +247,15 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > defeito que o alimentava) e o **T10/T12** passou a esconder a esfera em vez de tingir o `uTime`, que
 > deixou de mudar pixéis com o giro. Os 39 retratos foram refeitos, duas passagens. Decisão **D78** (§11
 > do roadmap).
+>
+> **Atualização (2026-11-01, a tira vermelha dentro da janela — D79):** o autor viu uma tira vermelha a
+> dividir a imagem dentro de duas portas do portão. Não era a moldura — as barras eram caixas com 0,2 m de
+> profundidade e cheguei a pôr a moldura plana, mas o artefacto não era esse e a moldura voltou a ser como
+> estava. Era o **quadro da porta por onde se chega**: fica a ~1 m da câmara do retrato e tem 10x12 m, e
+> ocupava metade da fotografia de cada retrato — a janela mostrava-o de lado. O `tools/scene/portrait.mjs`
+> passa a esconder essa porta enquanto desenha o cubo, e os 39 retratos foram refeitos: os recortes passam
+> de **398 kB** de média para **57 kB**, a porta 0 do portão vai de **2,11 → 0,28** e a costura de **119 →
+> 123 de 128**. Decisão **D79** (§11 do roadmap).
 
 > **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
 > filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as
