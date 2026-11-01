@@ -226,7 +226,27 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.18)
+## Estado atual do código (v0.0.19)
+
+> **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
+> pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
+> ignorava a direcção** — o `look-controls` zerava o `rotation` que o `arrivalPoint` calcula, e o
+> visitante aterrava sempre a olhar a **−Z**; nas sete salas cuja porta de chegada está em frente via a
+> própria porta a tapar o ecrã (era esse o «quadro verde» das portas do portão). As outras três: o **giro
+> do retrato** de cada porta, porque o fundo da janela é ancorado ao azimute do mundo de destino e a
+> janela está no mundo de origem (**L26**, `portraitTurn` em `js/scene/ring.js`, `window.azimuth` escrito
+> nas **39** portas por `tools/scene/azimuths.mjs`); o **instante** do fundo, que ia 0,25 s à frente da
+> ponte (`anchor` na política do shader, ancorado no `js/app.js` antes de a ponte sair); e o **recorte**,
+> que escondia as janelas das portas do destino e ficava com um buraco em cada uma. A chegada passou a
+> ser provada na direcção (**L27**, no T7/T11) e o instrumento da costura passou a medir **duas** coisas:
+> a imagem no mesmo instante (**≤ 0,50**) e o instante do corte (**≤ 1 quadro de fundo**). Medido: 27,79
+> → **0,29**, 13,90 → **0,10**, 45,61 → **2,11** e 1,26 → **0,27**, com **0 ms** de salto de tempo; a
+> bateria inteira dá **119 de 128** (era **111**), com **oito** portas ainda entre **0,58 e 2,29** — as
+> janelas das portas do destino, dentro do recorte, são uma fotografia parada e ao chegar são a coisa
+> viva. Duas lições de instrumento: o **T5** contava com a câmara a olhar a −Z por acidente (era o
+> defeito que o alimentava) e o **T10/T12** passou a esconder a esfera em vez de tingir o `uTime`, que
+> deixou de mudar pixéis com o giro. Os 39 retratos foram refeitos, duas passagens. Decisão **D78** (§11
+> do roadmap).
 
 > **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
 > filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as
@@ -438,8 +458,8 @@ O **`js/scene/`** é onde a cena em dados vive, e tem **sete** ficheiros:
 | Ficheiro | O que é |
 | --- | --- |
 | `schema.js` | A **forma do formato** (v3): campos, tipos, enumerações, as regras dos dois eixos da porta e o catálogo de assets. Puro — não conhece o DOM nem o A-Frame |
-| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L10, L11, L12, L13, L14, L15, L16, L17, L18, L20, L21, L22 (os dois anéis), L23 (a folga entre eles) e L24 (três a cinco portas, uma ao portão); e, sobre o **grafo** dos mundos, a L19 (`missingArrivals`) e a L25 (`repeatedDestinations`). Um fixture (D9) é dispensado das leis da disposição por uma opção. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor corre a cada tecla |
-| `ring.js` | A **disposição em dois anéis** (D77): os lugares das obras e das portas a partir de um raio e de uma fase, a folga entre os dois anéis e o teto que a mede (`bestPhase`, `clearanceCeiling`). Puro; é a mesma conta que escreve o dado (`tools/scene/ring.mjs --aplicar`) e a que as leis L22 e L23 verificam |
+| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L10, L11, L12, L13, L14, L15, L16, L17, L18, L20, L21, L22 (os dois anéis), L23 (a folga entre eles) e L24 (três a cinco portas, uma ao portão); e, sobre o **grafo** dos mundos, a L19 (`missingArrivals`), a L25 (`repeatedDestinations`) e a L26 (`portraitTurns`, o giro do retrato de cada porta). Um fixture (D9) é dispensado das leis da disposição por uma opção — e pelo próprio slug, que é como a bateria do shader o valida. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor corre a cada tecla |
+| `ring.js` | A **disposição em dois anéis** (D77): os lugares das obras e das portas a partir de um raio e de uma fase, a folga entre os dois anéis e o teto que a mede (`bestPhase`, `clearanceCeiling`); e o **giro do retrato** de uma porta de mundo (`portraitTurn`, D78), que é a conta que o dado guarda e a L26 prova. Puro; é a mesma conta que escreve o dado (`tools/scene/ring.mjs --aplicar`, `tools/scene/azimuths.mjs --aplicar`) e a que as leis L22, L23 e L26 verificam |
 | `fixtures.js` | Os **mundos que não são salas** (D9): a lista que a página, a linha de comando e o editor leem para não pedirem anéis nem três a cinco portas a um banco de ensaio |
 | `arrival.js` | Onde o visitante aparece ao chegar de outro mundo (**L16**): puro e partilhado, para o construtor e o validador não discordarem da geometria |
 | `scene-builder.js` | O **único** que conhece o A-Frame: cria o `<a-assets>` (e **espera** que os ficheiros carreguem), a câmara, as dimensões, as obras e os portais, a partir do JSON. Desde o B3 aceita `{ preview: true }` e desliga a navegação (D32) |
