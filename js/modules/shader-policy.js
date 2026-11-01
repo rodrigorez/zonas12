@@ -283,6 +283,17 @@ export function createPolicy(options) {
   return {
     frame,
     time: () => animationTime,
+    // A âncora (D78): põe o relógio no instante que veio na ponte e conta a partir de **agora**. É a
+    // mesma conta do `started` (ver `frame`), sem a espera do aquecimento: quem chama já tem uma cena
+    // desenhada, e o que interessa é o instante em que ela passou a ser visível.
+    anchor(seconds) {
+      if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0) return false;
+      animationTime = seconds;
+      const now = clock();
+      lastUpdateAt = now;
+      nextUpdateAt = now + 1000 / Math.min(cadence || defaults.targetFps, defaults.targetFps);
+      return true;
+    },
     setReducedMotion(reduced) {
       if (!reduced) return; // the preference is respected from the start and kept
       cadence = 0;

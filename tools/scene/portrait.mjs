@@ -26,6 +26,7 @@
 import { join } from 'node:path';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { serveProject, openBrowser, ROOT, sleep } from '../regression/harness.mjs';
+import { DERIVED_DIMENSION_BASE } from '../../js/core/index.js';
 
 // O tamanho da imagem. Enquanto o fundo era um panorama, quem mandava era a resolução: medido na
 // porta mais difícil (praia 4 �  cidade), 2560x1280 deixava a costura em **0,58** (falhava a meta de
@@ -115,8 +116,14 @@ const DESENHAR = (largura, altura, face, qualidade) => `(async () => {
   // e as portas, que é o que falta à janela para o corte não se ver. As obras também levam o atributo
   // data-dimension (é assim que o stencil lhes dá a dimensão), por isso o que se procura é o
   // **componente** da dimensão e não o atributo.
+  //
+  // O que sai são só as dimensões **da sala** (D78): as janelas das portas são dimensões derivadas
+  // (a banda de ids da L15), e tirá-las deixava o recorte com um **buraco** em cada porta — pela
+  // janela via-se o fundo através delas, e ao chegar via-se o retrato delas. Medido na porta 28 da
+  // sala 9: 1,11 de salto, com as duas portas do destino vazias no retrato.
   const fundos = Array.from(cena.querySelectorAll('[data-dimension]'))
-    .filter((elemento) => elemento.components && elemento.components['dimension-panorama']);
+    .filter((elemento) => elemento.components && elemento.components['dimension-panorama'])
+    .filter((elemento) => elemento.components['dimension-panorama'].data.dimension < ${DERIVED_DIMENSION_BASE});
   const esconderFundos = (esconder) => {
     fundos.forEach((elemento) => {
       elemento.object3D.visible = !esconder;

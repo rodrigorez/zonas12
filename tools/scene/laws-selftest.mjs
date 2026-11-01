@@ -16,7 +16,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateScene, unreachableWorlds, missingArrivals, repeatedDestinations } from '../../js/scene/validation.js';
+import { validateScene, unreachableWorlds, missingArrivals, portraitTurns, repeatedDestinations } from '../../js/scene/validation.js';
 import { checkArranques } from './arranques.mjs';
 import {
   WINDOW_KINDS,
@@ -423,6 +423,19 @@ const repeatedAsExpected = repeatedClean.length === 0 && repeatedFault.length ==
   repeatedFault[0].worlds.length === 2 &&
   repeatedFault[0].worlds.indexOf('scene2') !== -1 && repeatedFault[0].worlds.indexOf('scene3') !== -1;
 
+// L26 (D78): o giro do retrato. A exposição está com o giro que a conta dá (`azimuths.mjs`); a avaria
+// põe a porta 3 da sala 1 sem giro, que é o estado de onde se veio — o que se vê pela janela está
+// girado em relação ao que se vê ao chegar. Nas doze páginas a porta 38 da sala 10 media 27,79 de
+// salto no corte, com a meta em 0,50.
+const turnClean = portraitTurns(exhibition);
+const noTurn = exhibition.map((copy) => JSON.parse(JSON.stringify(copy)));
+const sala1 = noTurn.find((copy) => copy.world.slug === 'scene1');
+const vitima = sala1.portals.find((portal) => (portal.window || {}).azimuth !== undefined);
+delete vitima.window.azimuth;
+const turnFault = portraitTurns(noTurn);
+const turnsAsExpected = turnClean.length === 0 && turnFault.length === 1 &&
+  turnFault[0].from === 'scene1' && turnFault[0].door === vitima.id && turnFault[0].found === null;
+
 console.table(rows.map((row) => ({ law: row.law, 'injected fault': row.what, detected: row.ok ? 'yes' : 'NO', message: row.message.slice(0, 96) })));
 console.log(`laws and shape: ${detected} of ${cases.length} faults detected`);
 console.log(`control (nothing injected): ${control.ok ? 'clean' : 'FAILED'} — ` +
@@ -436,6 +449,10 @@ console.log(`arrivals (L19): the exhibition answers every door (${arrivals.answe
 console.log(`destinations (L25): the exhibition has a set of its own in every room ` +
   `(${repeatedClean.length} repeated), and two rooms pointing at the same ones is ` +
   `${repeatedAsExpected ? 'detected' : 'NOT detected'}`);
+console.log(`portrait turns (L26): the exhibition is turned to the arrival ` +
+  `(${turnClean.length} wrong), and a window with no turn is ` +
+  `${turnsAsExpected ? 'detected' : 'NOT detected'}` +
+  (turnFault.length ? ` (${turnFault.map((each) => each.from + ' ' + each.door + ' asks ' + each.expected + '°').join(', ')})` : ''));
 
 // The arranques (D28): one file per world, and the four the same outside the `<base>` line. Here the
 // disk is a map in memory, so a case can lie about it on purpose — which is the only way to know

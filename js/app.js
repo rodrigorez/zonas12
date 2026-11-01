@@ -16,7 +16,7 @@ import { startSession, cameraAlreadyAllowed, cameraFirstFrame, showStartButton, 
 import { playerCamera } from './modules/camera.js';
 import { closeArtwork, toggleArtworkLabels } from './modules/artwork.js';
 import { startFrameDriver, traversalRecord, freezeMotion } from './modules/portal.js';
-import { shaderStatus, freezeShaders } from './modules/dimension.js';
+import { shaderStatus, freezeShaders, anchorShaders } from './modules/dimension.js';
 // A sonda de campo (R14): só desenha alguma coisa com `?sonda=1`, e é o que permite ler os números
 // num telemóvel, onde não há consola.
 import { startSonda } from './modules/sonda.js';
@@ -226,7 +226,14 @@ async function start() {
   // the author saw in the middle of a crossing.
   if (window.arrivalFrame) {
     const drawn = new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    drawn.then(cameraFirstFrame).then(() => window.arrivalFrame.hide());
+    drawn.then(cameraFirstFrame).then(() => {
+      // O relógio do fundo volta ao instante que a ponte trouxe, **antes** de a ponte sair (D78): o
+      // primeiro quadro visível passa a ser o quadro que estava no ecrã. Sem isto, a animação avançou
+      // enquanto a ponte tapava a cena e o corte dá-se a ver.
+      const tempo = window.arrivalFrame.shaderTime();
+      if (typeof tempo === 'number') anchorShaders(tempo);
+      window.arrivalFrame.hide();
+    });
   }
 }
 

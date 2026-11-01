@@ -350,7 +350,8 @@
         "asset": "retrato-cidade",
         "radius": 120,
         "shaderId": "grade-neon",
-        "cutout": "recorte-scene1-de-scene6"
+        "cutout": "recorte-scene1-de-scene6",
+        "azimuth": -125.2
       },
       "action": {
         "kind": "navigate",
@@ -398,7 +399,8 @@
         "asset": "retrato-ondas",
         "radius": 120,
         "shaderId": "ondas",
-        "cutout": "recorte-scene5-de-scene6"
+        "cutout": "recorte-scene5-de-scene6",
+        "azimuth": 180
       },
       "action": {
         "kind": "navigate",

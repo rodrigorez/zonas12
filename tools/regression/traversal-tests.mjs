@@ -200,10 +200,12 @@ function verificarChegada(result, medida, mundo, deOnde) {
   }
   const dentro = medida.andarParaDentro || {};
   const volta = medida.meiaVolta || {};
-  result.check(nome + ' fica no ponto calculado, não dispara nada a entrar e dispara uma a voltar',
+  result.check(nome + ' fica no ponto calculado e olha para dentro, não dispara nada a entrar e ' +
+    'dispara uma a voltar',
     medida.passou === true,
     'porta=' + medida.porta + ', esperado=' + JSON.stringify(medida.esperado) +
       ', câmara=' + JSON.stringify(medida.camera) +
+      ', olhar=' + medida.yaw + '° (esperado ' + medida.yawEsperado + '°)' +
       ', a entrar=' + (dentro.janelas + dentro.navegacoes) +
       ', a voltar=' + (volta.janelas + volta.navegacoes));
 }

@@ -148,6 +148,21 @@ export function ringCoordinates(position) {
   return { radius: Math.hypot(x, z), angle: normaliseAngle(Math.atan2(x, -z) * DEGREES) };
 }
 
+// O giro do retrato de uma porta de mundo (D78). A janela de uma porta mostra o fundo do destino, e
+// esse fundo é ancorado ao **azimute do mundo dele** — mas a janela está no mundo de origem.
+//
+// As duas vistas que têm de coincidir: a janela olha **para fora**, na direcção do anel da porta de
+// onde se sai (`from`); a chegada olha **para dentro**, que é essa direcção rodada de meia volta no
+// anel do destino (`arrival + 180`). O que separa as duas é a diferença, e é isso que a esfera do
+// retrato tem de rodar — a mesma esfera desenha o shader e o recorte, e os dois ficam alinhados.
+//
+// Medido na porta 38 da sala 10: sem giro, 27,79 de salto no corte com a meta em 0,50; com ele, 0,27.
+// O resultado fica em (-180, 180] para o dado ser legível.
+export function portraitTurn(from, arrival) {
+  const turn = normaliseAngle(arrival + 180 - from);
+  return round(turn > 180 ? turn - 360 : turn, 1);
+}
+
 // Quanto é que o dado se afasta do anel que a regra pede: o pior desvio de raio e o pior desvio de
 // ângulo ao lugar mais próximo. É a medida que o `tools/scene/ring.mjs` imprime e que a Fase 3 leva
 // a zero.

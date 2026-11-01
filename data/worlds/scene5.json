@@ -349,7 +349,8 @@
         "asset": "retrato-noite",
         "radius": 120,
         "shaderId": "noite-aurora",
-        "cutout": "recorte-scene4-de-scene5"
+        "cutout": "recorte-scene4-de-scene5",
+        "azimuth": -105
       },
       "action": {
         "kind": "navigate",
@@ -397,7 +398,8 @@
         "asset": "retrato-becos",
         "radius": 120,
         "shaderId": "becos",
-        "cutout": "recorte-scene6-de-scene5"
+        "cutout": "recorte-scene6-de-scene5",
+        "azimuth": 180
       },
       "action": {
         "kind": "navigate",

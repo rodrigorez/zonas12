@@ -38,7 +38,7 @@ import {
 } from '../core/index.js';
 import { validateDoor, ENTRY_WORLD } from '../modules/portal-kinds.js';
 import { arrivalPoint } from './arrival.js';
-import { RING, angularGap, requiredClearance, ringCoordinates } from './ring.js';
+import { RING, angularGap, portraitTurn, requiredClearance, ringCoordinates } from './ring.js';
 import { isFixture } from './fixtures.js';
 
 const EYE_HEIGHT = 1.6;
@@ -502,8 +502,44 @@ export function missingArrivals(scenes) {
   return [...gaps.values()];
 }
 
-// The arrival point of a "from" portal, in the space of another portal's box. Position and
-// rotation of the box are the portal's, so a door that has been turned is handled like the
+// L26 (D78): o giro do retrato de cada porta de mundo é o que a conta dá. A janela mostra o fundo do
+// destino **ao vivo** (D53), e esse fundo é ancorado ao azimute do mundo de destino — mas a janela
+// está no mundo de origem. Sem o giro, o que se vê pela porta está girado em relação ao que se vê ao
+// chegar (medido na porta 38 da sala 10: **27,79** de salto no corte, com a meta em 0,50; com o giro,
+// **0,27**). Como a L19, esta lei precisa das duas páginas — o ângulo da porta de chegada está no
+// ficheiro do destino —, por isso só a linha de comando a pode provar.
+//
+// Devolve uma lista `{ from, door, to, expected, found }`; vazia é o caso bom.
+export function portraitTurns(scenes) {
+  const arrivals = new Map();
+  for (const scene of scenes) {
+    for (const portal of scene.portals || []) {
+      if (typeof portal.arrivalFrom !== 'string') continue;
+      arrivals.set(portal.arrivalFrom + ' -> ' + (scene.world && scene.world.slug),
+        ringCoordinates(portal.position).angle);
+    }
+  }
+
+  const wrong = [];
+  for (const scene of scenes) {
+    const from = scene.world && scene.world.slug;
+    for (const portal of scene.portals || []) {
+      const window = portal.window || {};
+      const action = portal.action || {};
+      if (window.kind !== 'preview' || action.kind !== 'navigate') continue;
+      const arrival = arrivals.get(from + ' -> ' + action.target);
+      if (typeof arrival !== 'number') continue; // sem porta de chegada é a L19 que responde
+      const expected = portraitTurn(ringCoordinates(portal.position).angle, arrival);
+      const found = typeof window.azimuth === 'number' ? window.azimuth : null;
+      if (found === null || angularGap(found, expected) > 0.05) {
+        wrong.push({ from: from, door: portal.id, to: action.target, expected: expected, found: found });
+      }
+    }
+  }
+  return wrong;
+}
+
+// The arrival point of a "from" portal, in the space of another portal's box. Position and// rotation of the box are the portal's, so a door that has been turned is handled like the
 // collision itself does (js/modules/portal.js, detectTraversal) — and that means the door's own
 // yaw counts: `boxRotation` is the rotation of the box *inside* the door, and a door of the ring is
 // turned by the ring (`rotation.y = −θ`). Reading only `boxRotation` worked while every door faced

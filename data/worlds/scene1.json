@@ -499,7 +499,8 @@
         "asset": "retrato-praia",
         "radius": 120,
         "shaderId": "por-do-sol",
-        "cutout": "recorte-scene2-de-scene1"
+        "cutout": "recorte-scene2-de-scene1",
+        "azimuth": 122.2
       },
       "action": {
         "kind": "navigate",
@@ -547,7 +548,8 @@
         "asset": "retrato-becos",
         "radius": 120,
         "shaderId": "becos",
-        "cutout": "recorte-scene6-de-scene1"
+        "cutout": "recorte-scene6-de-scene1",
+        "azimuth": 125.2
       },
       "action": {
         "kind": "navigate",
@@ -595,7 +597,8 @@
         "asset": "retrato-imersoes",
         "radius": 120,
         "shaderId": "holograma",
-        "cutout": "recorte-scene8-de-scene1"
+        "cutout": "recorte-scene8-de-scene1",
+        "azimuth": 53.2
       },
       "action": {
         "kind": "navigate",
@@ -643,7 +646,8 @@
         "asset": "retrato-mangue",
         "radius": 120,
         "shaderId": "mangue",
-        "cutout": "recorte-scene9-de-scene1"
+        "cutout": "recorte-scene9-de-scene1",
+        "azimuth": -18.9
       },
       "action": {
         "kind": "navigate",

@@ -388,7 +388,8 @@
         "asset": "retrato-ceu",
         "radius": 120,
         "shaderId": "nuvens",
-        "cutout": "recorte-scene3-de-scene7"
+        "cutout": "recorte-scene3-de-scene7",
+        "azimuth": -15
       },
       "action": {
         "kind": "navigate",
@@ -436,7 +437,8 @@
         "asset": "retrato-imersoes",
         "radius": 120,
         "shaderId": "holograma",
-        "cutout": "recorte-scene8-de-scene7"
+        "cutout": "recorte-scene8-de-scene7",
+        "azimuth": 180
       },
       "action": {
         "kind": "navigate",

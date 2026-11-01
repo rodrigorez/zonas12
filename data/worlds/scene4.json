@@ -405,7 +405,8 @@
         "asset": "retrato-ceu",
         "radius": 120,
         "shaderId": "nuvens",
-        "cutout": "recorte-scene3-de-scene4"
+        "cutout": "recorte-scene3-de-scene4",
+        "azimuth": -90
       },
       "action": {
         "kind": "navigate",
@@ -453,7 +454,8 @@
         "asset": "retrato-ondas",
         "radius": 120,
         "shaderId": "ondas",
-        "cutout": "recorte-scene5-de-scene4"
+        "cutout": "recorte-scene5-de-scene4",
+        "azimuth": 105
       },
       "action": {
         "kind": "navigate",
@@ -501,7 +503,8 @@
         "asset": "retrato-memoria",
         "radius": 120,
         "shaderId": "fichario",
-        "cutout": "recorte-scene11-de-scene4"
+        "cutout": "recorte-scene11-de-scene4",
+        "azimuth": -6
       },
       "action": {
         "kind": "navigate",

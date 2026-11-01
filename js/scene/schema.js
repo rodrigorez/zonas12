@@ -269,12 +269,17 @@ export const SCENE = {
           shaderId: { type: 'enum', oneOf: SHADER_IDS },
           // …and the **cutout**: the same view as the portrait but transparent where the background
           // was, drawn over the live shader so the works and the doors are there at the crossing.
-          cutout: { type: 'asset' }
+          cutout: { type: 'asset' },
+          // O giro do retrato (D78): o fundo da janela é ancorado ao azimute do mundo **de destino** e
+          // a janela está no mundo de origem, por isso a esfera roda o que separa os dois. Sem ele, o
+          // que se vê pela porta está girado em relação ao que se vê ao chegar — medido, 27,8 onde a
+          // meta é 0,50.
+          azimuth: { type: 'number' }
         },
         rules: [
-          { when: { kind: 'dimension-pair' }, require: ['dimensionA', 'dimensionB'], forbid: ['asset', 'radius', 'shaderId', 'cutout'] },
+          { when: { kind: 'dimension-pair' }, require: ['dimensionA', 'dimensionB'], forbid: ['asset', 'radius', 'shaderId', 'cutout', 'azimuth'] },
           { when: { kind: 'preview' }, require: ['asset', 'radius'], forbid: ['dimensionA', 'dimensionB'] },
-          { when: { kind: 'none' }, forbid: ['dimensionA', 'dimensionB', 'asset', 'radius', 'shaderId', 'cutout'] }
+          { when: { kind: 'none' }, forbid: ['dimensionA', 'dimensionB', 'asset', 'radius', 'shaderId', 'cutout', 'azimuth'] }
         ]
       },
       // The second axis: what the traversal does. `target` is the slug of the world this door

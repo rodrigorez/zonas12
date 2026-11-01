@@ -368,7 +368,8 @@
         "asset": "retrato-noite",
         "radius": 120,
         "shaderId": "noite-aurora",
-        "cutout": "recorte-scene4-de-scene11"
+        "cutout": "recorte-scene4-de-scene11",
+        "azimuth": 6
       },
       "action": {
         "kind": "navigate",
@@ -416,7 +417,8 @@
         "asset": "retrato-praia",
         "radius": 120,
         "shaderId": "por-do-sol",
-        "cutout": "recorte-scene2-de-scene11"
+        "cutout": "recorte-scene2-de-scene11",
+        "azimuth": -144
       },
       "action": {
         "kind": "navigate",
@@ -464,7 +466,8 @@
         "asset": "retrato-distopia",
         "radius": 120,
         "shaderId": "nucleo",
-        "cutout": "recorte-scene10-de-scene11"
+        "cutout": "recorte-scene10-de-scene11",
+        "azimuth": 141
       },
       "action": {
         "kind": "navigate",

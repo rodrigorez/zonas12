@@ -135,7 +135,8 @@ export async function buildScene(scene, options = {}) {
     if (axis.kind !== 'preview' || !axis.asset) continue;
     // Duas portas partilham a esfera quando mostram o mesmo retrato, com o mesmo raio **e o mesmo
     // shader** (D53): uma textura, um valor de stencil, um desenho.
-    const key = axis.asset + '@' + axis.radius + '@' + (axis.shaderId || '') + '@' + (axis.cutout || '');
+    const key = axis.asset + '@' + axis.radius + '@' + (axis.shaderId || '') + '@' + (axis.cutout || '') +
+      '@' + (axis.azimuth || 0);
     if (portraits.has(key)) continue;
     const id = DERIVED_DIMENSION_BASE + portraits.size;
     if (id >= MAX_DIMENSIONS) {
@@ -144,6 +145,11 @@ export async function buildScene(scene, options = {}) {
     }
     const el = createDimension({
       id,
+      // A janela mostra o destino **na orientação da chegada** (D78): o fundo é ancorado ao azimute
+      // do mundo do destino, e a janela está no mundo de origem, por isso a esfera do retrato tem de
+      // rodar o que separa os dois — senão o que se vê pela porta está girado em relação ao que se vê
+      // ao chegar.
+      rotation: [0, axis.azimuth || 0, 0],
       // D53: com um shader nomeado, a janela desenha o fundo do destino **ao vivo** e o **recorte**
       // (as obras e as portas, com transparência) por cima — a janela anima e o que se vê através
       // dela é o que se vê ao chegar. Sem shader (ou com `?shader=0`) é o retrato, como antes, e o
@@ -205,7 +211,8 @@ export async function buildScene(scene, options = {}) {
   for (const portal of scene.portals || []) {
     const axis = portal.window || {};
     const previewDimension = axis.kind === 'preview'
-      ? portraits.get(axis.asset + '@' + axis.radius + '@' + (axis.shaderId || '') + '@' + (axis.cutout || ''))
+      ? portraits.get(axis.asset + '@' + axis.radius + '@' + (axis.shaderId || '') + '@' + (axis.cutout || '') +
+        '@' + (axis.azimuth || 0))
       : undefined;
     const data = withDefaults(portal, SCENE.portals);
     elements.portals.push(createPortal(data, parent, {

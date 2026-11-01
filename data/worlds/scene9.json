@@ -315,7 +315,8 @@
         "asset": "retrato-cidade",
         "radius": 120,
         "shaderId": "grade-neon",
-        "cutout": "recorte-scene1-de-scene9"
+        "cutout": "recorte-scene1-de-scene9",
+        "azimuth": 18.9
       },
       "action": {
         "kind": "navigate",
@@ -363,7 +364,8 @@
         "asset": "retrato-distopia",
         "radius": 120,
         "shaderId": "nucleo",
-        "cutout": "recorte-scene10-de-scene9"
+        "cutout": "recorte-scene10-de-scene9",
+        "azimuth": 60
       },
       "action": {
         "kind": "navigate",

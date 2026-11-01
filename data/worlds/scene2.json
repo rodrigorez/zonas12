@@ -418,7 +418,8 @@
         "asset": "retrato-cidade",
         "radius": 120,
         "shaderId": "grade-neon",
-        "cutout": "recorte-scene1-de-scene2"
+        "cutout": "recorte-scene1-de-scene2",
+        "azimuth": -122.2
       },
       "action": {
         "kind": "navigate",
@@ -512,7 +513,8 @@
         "asset": "retrato-ceu",
         "radius": 120,
         "shaderId": "nuvens",
-        "cutout": "recorte-scene3-de-scene2"
+        "cutout": "recorte-scene3-de-scene2",
+        "azimuth": 150
       },
       "action": {
         "kind": "navigate",
@@ -560,7 +562,8 @@
         "asset": "retrato-memoria",
         "radius": 120,
         "shaderId": "fichario",
-        "cutout": "recorte-scene11-de-scene2"
+        "cutout": "recorte-scene11-de-scene2",
+        "azimuth": 144
       },
       "action": {
         "kind": "navigate",

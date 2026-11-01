@@ -267,7 +267,8 @@
         "asset": "retrato-praia",
         "radius": 120,
         "shaderId": "por-do-sol",
-        "cutout": "recorte-scene2-de-scene3"
+        "cutout": "recorte-scene2-de-scene3",
+        "azimuth": -150
       },
       "action": {
         "kind": "navigate",
@@ -315,7 +316,8 @@
         "asset": "retrato-noite",
         "radius": 120,
         "shaderId": "noite-aurora",
-        "cutout": "recorte-scene4-de-scene3"
+        "cutout": "recorte-scene4-de-scene3",
+        "azimuth": 90
       },
       "action": {
         "kind": "navigate",
@@ -363,7 +365,8 @@
         "asset": "retrato-presencas",
         "radius": 120,
         "shaderId": "aguas",
-        "cutout": "recorte-scene7-de-scene3"
+        "cutout": "recorte-scene7-de-scene3",
+        "azimuth": 15
       },
       "action": {
         "kind": "navigate",

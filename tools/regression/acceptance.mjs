@@ -362,6 +362,7 @@ export async function checkStackedDoors(options = {}) {
   const gl = sceneEl.renderer.getContext();
   const camera = cameraEl.components.camera.camera;
   const guardado = cameraEl.object3D.position.clone();
+  const poseGuardada = playerCamera.pose();
   const site = options.site || { x: 200, y: 1.6, z: 0 };
   const frente = options.frente || { id: 100, x: site.x, z: site.z - 20, width: 8, height: 10 };
   const tras = options.tras || { id: 101, x: site.x + 5, z: site.z - 30, width: 8, height: 10 };
@@ -375,7 +376,12 @@ export async function checkStackedDoors(options = {}) {
     return el;
   };
 
-  cameraEl.object3D.position.set(site.x, site.y, site.z);
+  // O olhar é explícito (D78): o teste põe as portas sintéticas a −Z de um ponto escolhido, e até
+  // aqui contava com a câmara a olhar a −Z por acidente — era o estado em que a chegada ficava, e o
+  // teste vivia dele. Com a chegada a olhar para dentro, quem não aponta a câmara mede uma janela que
+  // não está à vista (medido: `dentro=0, controlo=0` — a própria prova de que a medição não era vazia
+  // desaparecia).
+  playerCamera.setPose({ position: [site.x, site.y, site.z], yaw: 0, pitch: 0 });
   const a = criar(frente);
   const b = criar(tras);
   await proximoFrame();
@@ -406,7 +412,9 @@ export async function checkStackedDoors(options = {}) {
 
   a.remove();
   b.remove();
-  cameraEl.object3D.position.copy(guardado);
+  // A pose também se devolve pela casa que a escreve (D63): a posição sozinha deixava a câmara com o
+  // olhar do teste, e quem viesse a seguir media a partir de outro sítio.
+  playerCamera.setPose(poseGuardada);
   await proximoFrame();
 
   return {
@@ -525,6 +533,15 @@ export async function checkArrival(options = {}) {
   const esperado = modulo.arrivalPoint(dado, options.alturaDosOlhos || 1.6);
   const camera = cameraEl.object3D.position;
   const noSitio = Math.abs(esperado.position[0] - camera.x) < 0.05 && Math.abs(esperado.position[2] - camera.z) < 0.05;
+  // A orientação também é da chegada (D78): o `arrivalPoint` diz para onde se olha, e é isso que a
+  // janela mostrava antes de se atravessar. O `look-controls` escreve a rotação da entidade a partir
+  // dos seus próprios objectos, e o teste só perguntava pela posição — foi assim que todas as
+  // chegadas ficaram a olhar a −Z sem ninguém dar por isso (medido: `yaw` 0 nas três). Lê-se a pose
+  // pela casa que a escreve (D63), que é também quem a sabe devolver.
+  const pose = playerCamera.pose();
+  const yawEsperado = esperado.rotation[1];
+  const diferencaYaw = Math.abs((((pose.yaw - yawEsperado) % 360) + 540) % 360 - 180);
+  const olhando = diferencaYaw < 1;
 
   const { centro, direcao } = eixoDaPorta(porta);
   const andar = async (de, para) => {
@@ -558,11 +575,14 @@ export async function checkArrival(options = {}) {
     porta: dado.id,
     deOnde: deOnde,
     chegadaNoSitioCalculado: noSitio,
+    chegadaOrientada: olhando,
+    yaw: Number(pose.yaw.toFixed(2)),
+    yawEsperado: Number(yawEsperado.toFixed(2)),
     esperado: esperado.position.map((n) => Number(n.toFixed(2))),
     camera: [Number(camera.x.toFixed(2)), Number(camera.y.toFixed(2)), Number(camera.z.toFixed(2))],
     andarParaDentro: dentro,
     meiaVolta: volta,
-    passou: noSitio && dentro.janelas === 0 && dentro.navegacoes === 0 &&
+    passou: noSitio && olhando && dentro.janelas === 0 && dentro.navegacoes === 0 &&
       (volta.janelas + volta.navegacoes) === 1
   };
   // A meia volta de uma porta de mundo navega, e a navegação leva o contexto desta função com ela:
@@ -675,11 +695,14 @@ export async function checkPortrait(options = {}) {
       if (!entrada || !entrada.material) continue;
       const material = entrada.material;
       const ehShader = Boolean(material.isShaderMaterial);
-      const corOriginal = ehShader ? null : material.color.getHex();
-      const tempoOriginal = ehShader ? material.uniforms.uTime.value : null;
+      // A prova de que «a janela mostra esta dimensão» passou a ser **esconder a esfera**, e não tingir
+      // o shader (D78): com o giro do retrato (L26) a janela pode passar a mostrar uma zona do fundo
+      // que é lisa, e o `uTime` deixa de mudar pixéis nenhuns — o teste media a sensibilidade da
+      // paisagem em vez do que quer saber. Esconder a esfera muda sempre, seja qual for o sítio.
+      const visivelOriginal = entrada.mesh ? entrada.mesh.visible : true;
       const mudar = (ligado) => {
-        if (ehShader) material.uniforms.uTime.value = ligado ? tempoOriginal + 3.7 : tempoOriginal;
-        else material.color.setHex(ligado ? 0xff00ff : corOriginal);
+        if (entrada.mesh) entrada.mesh.visible = ligado ? false : visivelOriginal;
+        else if (ehShader) material.uniforms.uTime.value = ligado ? material.uniforms.uTime.value + 3.7 : material.uniforms.uTime.value;
       };
       for (const distancia of distancias) {
         await emFrenteDe(porta.el.object3D, porta.data.height / 2, distancia);
@@ -701,7 +724,7 @@ export async function checkPortrait(options = {}) {
           porta: porta.data.id,
           derivada: porta.data.previewDimension,
           distancia: distancia,
-          // T10: o retrato tingido muda os pixéis dentro da janela (o retrato está lá).
+          // T10: o retrato escondido muda os pixéis dentro da janela (o retrato está lá).
           mudadosDentroDaJanela: dentroDaJanela,
           // T12: e não muda nenhum fora da moldura (o retrato não sai de lá).
           mudadosForaDaMoldura: fora.contagem,

@@ -141,6 +141,8 @@ async function medir(browser, site, alvo) {
   const amostras = [];
   let aCorrer = true;
   let depoisDaPonte = null;
+  let mesmoInstante = null;
+  let relogio = null;
   const inicio = Date.now();
   const amostrar = (async () => {
     while (aCorrer && Date.now() - inicio < 9000) {
@@ -164,6 +166,26 @@ async function medir(browser, site, alvo) {
           await browser.evaluate('new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))')
             .catch(() => { /* a página vai-se embora */ });
           depoisDaPonte = await browser.screenshot(ESCALA);
+          // O instante que cada lado está a mostrar (D53/D78): a ponte leva-o consigo, e a chegada
+          // continua-o. A diferença entre os dois é o **salto de tempo** no corte.
+          relogio = await browser.evaluate(`(() => {
+            const ponte = window.arrivalFrame && window.arrivalFrame.shaderTime
+              ? window.arrivalFrame.shaderTime() : null;
+            const politica = window.portalDebug && window.portalDebug.shader
+              ? window.portalDebug.shader().policy : null;
+            return { ponte: typeof ponte === 'number' ? ponte : null,
+              chegada: politica && typeof politica.time === 'number' ? politica.time : null };
+          })()`).catch(() => null);
+          // O mesmo quadro com a chegada **no instante da ponte**: a costura da imagem mede-se com os
+          // dois lados parados no mesmo instante, senão mede-se a animação a andar (D53 faz a janela
+          // animar, e 0,1 s de mangue vale 16 na assinatura).
+          if (relogio && typeof relogio.ponte === 'number') {
+            await browser.evaluate(`import('/js/modules/dimension.js').then((modulo) =>
+              modulo.anchorShaders(${relogio.ponte}))`).catch(() => null);
+            await browser.evaluate('new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))')
+              .catch(() => { /* a página vai-se embora */ });
+            mesmoInstante = await browser.screenshot(ESCALA);
+          }
         }
         amostras.push({ t: Date.now() - inicio, mean: shot.mean, blocks: shot.blocks, saiu: saiu });
       } catch (error) {
@@ -186,8 +208,17 @@ async function medir(browser, site, alvo) {
   // A chegada para a costura é o primeiro quadro depois de a ponte sair; o final fica só para se
   // poder olhar para a imagem.
   const chegada = depoisDaPonte || final;
-  const salto = ponte ? difference(ponte, chegada) : null;
-  const blocos = ponte ? ponte.blocks.map((valor, i) => Math.abs(valor - chegada.blocks[i])) : null;
+  // A costura da **imagem**: a ponte contra a chegada no mesmo instante (D78). Sem o mesmo instante,
+  // a diferença mede também a animação a andar — e o que se quer saber é se o quadro está no sítio.
+  const comMesmoInstante = mesmoInstante || chegada;
+  const salto = ponte ? difference(ponte, comMesmoInstante) : null;
+  const saltoNatural = ponte ? difference(ponte, chegada) : null;
+  const blocos = ponte ? ponte.blocks.map((valor, i) => Math.abs(valor - comMesmoInstante.blocks[i])) : null;
+  // O **salto de tempo** no corte: o instante que a página que chegou estava a mostrar menos o que a
+  // ponte trazia. É a outra metade da costura: a imagem pode estar no sítio e o instante não.
+  const instante = relogio && typeof relogio.ponte === 'number' && typeof relogio.chegada === 'number'
+    ? relogio.chegada - relogio.ponte
+    : null;
   // Para se poder olhar para as duas imagens: os pixels do quadro da ponte e o PNG da chegada.
   const pixelsDaPonte = await browser.evaluate('window.__quadroDaPonte || null').catch(() => null);
 
@@ -199,8 +230,9 @@ async function medir(browser, site, alvo) {
     if (saltoPasso !== null && saltoPasso > maiorPasso) maiorPasso = saltoPasso;
   }
 
-  return { mundo: mundo, escuros: escuros, salto: salto, blocos: blocos, maiorPasso: maiorPasso,
-    ponte: pixelsDaPonte, chegada: final, depoisDaPonte: depoisDaPonte,
+  return { mundo: mundo, escuros: escuros, salto: salto, saltoNatural: saltoNatural, instante: instante,
+    blocos: blocos, maiorPasso: maiorPasso,
+    ponte: pixelsDaPonte, chegada: final, depoisDaPonte: depoisDaPonte, mesmoInstante: mesmoInstante,
     amostras: amostras.filter((item) => !item.failed).length };
 }
 
@@ -217,13 +249,14 @@ async function main() {
     : PORTAS;
 
   try {
-    console.log('porta                     chega a   escuros   salto no corte   maior passo');
+    console.log('porta                     chega a   escuros   salto no corte   salto de tempo   maior passo');
     for (const alvo of alvos) {
       const medida = await medir(browser, site, alvo);
       const nome = (alvo.mundo + ' ' + alvo.porta).padEnd(22);
       console.log('  ' + nome + String(medida.mundo).padEnd(9) + String(medida.escuros).padEnd(10) +
         (medida.salto === null ? 'sem ponte' : medida.salto.toFixed(2)).padStart(10) + '          ' +
-        medida.maiorPasso.toFixed(2));
+        (medida.instante === null ? '—' : (medida.instante * 1000).toFixed(0) + ' ms').padStart(12) +
+        '   ' + medida.maiorPasso.toFixed(2));
       const comCamera = alvo.destino === 'gate';
       if (process.env.IMAGENS && medida.ponte) {
         // As duas imagens que se comparam: a que a ponte pintou e a que o mundo mostrou depois.
@@ -257,7 +290,15 @@ async function main() {
       result.check(alvo.mundo + ' ' + alvo.porta + ' → ' + alvo.destino + ': o salto no corte é ≤ 0,50',
         medida.salto !== null && medida.salto <= 0.5,
         medida.salto === null ? 'sem quadro da ponte'
-          : medida.salto.toFixed(2) + ' (o maior passo a caminhar é ' + medida.maiorPasso.toFixed(2) + ')');
+          : medida.salto.toFixed(2) + ' (no instante em que a página chegou era ' +
+            (medida.saltoNatural === null ? '—' : medida.saltoNatural.toFixed(2)) +
+            '; o maior passo a caminhar é ' + medida.maiorPasso.toFixed(2) + ')');
+      // A outra metade (D78): a imagem pode estar no sítio e o instante não. Um quadro de fundo é uma
+      // atualização da cadência — 50 ms a 20 por segundo, o intervalo em que o `uTime` pode mudar.
+      result.check(alvo.mundo + ' ' + alvo.porta + ' → ' + alvo.destino + ': o instante do corte é ≤ 1 quadro',
+        medida.instante !== null && Math.abs(medida.instante) <= 0.05,
+        medida.instante === null ? 'a página não diz o instante em que chegou'
+          : (medida.instante * 1000).toFixed(0) + ' ms de animação (um quadro de fundo é 50 ms)');
     }
   } finally {
     await browser.close();

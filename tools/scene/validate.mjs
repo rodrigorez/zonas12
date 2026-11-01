@@ -19,7 +19,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateScene, unreachableWorlds, missingArrivals, repeatedDestinations } from '../../js/scene/validation.js';
+import { validateScene, unreachableWorlds, missingArrivals, portraitTurns, repeatedDestinations } from '../../js/scene/validation.js';
 import { FIXTURES, isFixture } from '../../js/scene/fixtures.js';
 import { checkArranques } from './arranques.mjs';
 import { diskQuestions } from './disk.mjs';
@@ -167,6 +167,20 @@ if (worlds.size > 1) {
       `— law L25 (each room chooses differently)`);
   }
   if (repeated.length) failed++;
+
+  // L26 (D78): o giro do retrato de cada porta de mundo. O fundo da janela é ancorado ao azimute do
+  // mundo de **destino** e a janela está no mundo de origem; o dado guarda a diferença, e a lei
+  // recalcula-a. Do grafo, como a L19 e a L25 — o ângulo da porta de chegada está no outro ficheiro.
+  const turns = portraitTurns(rooms);
+  console.log('portrait turns: ' + (turns.length === 0
+    ? 'every window is turned to the arrival it shows (L26)'
+    : `${turns.length} window(s) with the wrong turn (L26)`));
+  for (const turn of turns) {
+    console.error(`  error: ${turn.from} door ${turn.door} → ${turn.to}: the turn is ` +
+      `${turn.found === null ? 'missing' : turn.found}° and the two rings ask for ${turn.expected}° ` +
+      `— law L26 (run tools/scene/azimuths.mjs --aplicar)`);
+  }
+  if (turns.length) failed++;
 
   // D53: a janela de uma porta de mundo que desenha o fundo do destino **ao vivo** tem de nomear o
   // shader que o destino desenha. Um shader trocado aqui não é um detalhe: a porta passaria a mentir

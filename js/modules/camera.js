@@ -370,6 +370,19 @@ export function createPlayerCamera(player, parent) {
 
   parent.appendChild(el);
   playerEl = el;
+  // A rotação com que se chega (D78): o atributo `rotation` não sobrevive ao `look-controls`, que a
+  // cada quadro escreve a rotação da entidade a partir dos **seus** objectos de yaw e pitch — e os
+  // dele nascem a zero. Medido nas três chegadas que o instrumento mede: `yaw` 0 em todas, ou seja o
+  // visitante aterrava a olhar a −Z em vez de a olhar para dentro da sala, e nas salas cuja porta de
+  // chegada está em frente (azimute 0) via a própria porta a tapar o ecrã. O `setPose` (D63) é a casa
+  // que escreve no sítio certo, e aplica-se outra vez quando a entidade carrega.
+  if (player && Array.isArray(player.rotation)) {
+    const yaw = Number(player.rotation[1]) || 0;
+    const pitch = Number(player.rotation[0]) || 0;
+    if (yaw !== 0 || pitch !== 0) {
+      playerCamera.setPose({ position: player.position, yaw: yaw, pitch: pitch });
+    }
+  }
   if (player && typeof player.speed === 'number' && player.speed > 0) mobileSpeed = player.speed;
   // A orientação do telemóvel (D52): o `look-controls` só existe depois de a entidade carregar, e é
   // aí que se mede o ruído do sensor — um aparelho sem giroscópio faz a sala tremer.

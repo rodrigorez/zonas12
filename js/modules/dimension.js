@@ -228,7 +228,12 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
       requested: component.data.shader ? 'shader' : (component.flatColor ? 'color' : 'image'),
       mode: component.shaderActive ? 'shader' : (component.flatColor ? 'color' : 'image'),
       color: component.flatColor,
-      shaderId: component.shaderActive ? component.data.shader : null
+      shaderId: component.shaderActive ? component.data.shader : null,
+      // Escrever o instante à força (D78): é o que a âncora da travessia usa para o primeiro quadro
+      // visível ser o quadro que a ponte trazia.
+      apply: component.shaderActive
+        ? (seconds) => { component.material.uniforms.uTime.value = seconds; }
+        : null
     });
     backgrounds.push(this.entry);
 
@@ -381,6 +386,9 @@ export function createDimension(dimension, parent) {
   // sphere sits at the door (D26) — the sphere of a declared dimension follows the camera or sits at
   // the origin. It is set before the entity is added, so the component initialises once (law L7).
   if (Array.isArray(dimension.position)) el.setAttribute('position', vector(dimension.position));
+  // A orientação de uma esfera de retrato (D78): o fundo do destino é ancorado ao azimute do mundo
+  // **dele**, e a janela está no mundo de origem — a diferença entre os dois é este giro.
+  if (Array.isArray(dimension.rotation)) el.setAttribute('rotation', vector(dimension.rotation));
   el.setAttribute(DIMENSION_COMPONENT, settings);
   parent.appendChild(el);
   return el;
@@ -410,5 +418,23 @@ export function shaderStatus() {
 export function freezeShaders() {
   if (!pagePolicy) return false;
   pagePolicy.setReducedMotion(true);
+  return true;
+}
+
+// A âncora do relógio na travessia (D78): a ponte mostra o quadro que a página que saiu desenhou,
+// parado no instante T; a página que chega começou a animar assim que desenhou o primeiro quadro, e
+// quando a ponte sai já vai em T + Δ — a Δ chama-se "o tempo que a cena levou a estar pronta" e vê-se
+// como um salto no corte (medido: 0,25 s de mangue dão 6,6 onde a meta é 0,50). Ancorar o relógio no
+// instante que veio na ponte, **no momento em que a ponte sai**, é o que faz o primeiro quadro visível
+// ser o quadro que estava no ecrã.
+export function anchorShaders(seconds) {
+  if (!pagePolicy || typeof seconds !== 'number' || !Number.isFinite(seconds)) return false;
+  if (!pagePolicy.anchor(seconds)) return false;
+  // O `uTime` é escrito já, e não no próximo passo da cadência: entre a âncora e esse passo passam até
+  // 50 ms, e é esse resto que se vê no corte — medido no mangue, 50 ms dão 8 dos 6,7 que ficaram.
+  for (const component of backgrounds) {
+    const vivo = component();
+    if (vivo && vivo.apply) vivo.apply(seconds);
+  }
   return true;
 }

@@ -315,7 +315,8 @@
         "asset": "retrato-mangue",
         "radius": 120,
         "shaderId": "mangue",
-        "cutout": "recorte-scene9-de-scene10"
+        "cutout": "recorte-scene9-de-scene10",
+        "azimuth": -60
       },
       "action": {
         "kind": "navigate",
@@ -363,7 +364,8 @@
         "asset": "retrato-memoria",
         "radius": 120,
         "shaderId": "fichario",
-        "cutout": "recorte-scene11-de-scene10"
+        "cutout": "recorte-scene11-de-scene10",
+        "azimuth": -141
       },
       "action": {
         "kind": "navigate",

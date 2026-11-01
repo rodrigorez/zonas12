@@ -245,7 +245,8 @@
         "asset": "retrato-cidade",
         "radius": 120,
         "shaderId": "grade-neon",
-        "cutout": "recorte-scene1-de-gate"
+        "cutout": "recorte-scene1-de-gate",
+        "azimuth": -149.1
       },
       "action": {
         "kind": "navigate",
@@ -293,7 +294,8 @@
         "asset": "retrato-praia",
         "radius": 120,
         "shaderId": "por-do-sol",
-        "cutout": "recorte-scene2-de-gate"
+        "cutout": "recorte-scene2-de-gate",
+        "azimuth": 102.3
       },
       "action": {
         "kind": "navigate",
@@ -341,7 +343,8 @@
         "asset": "retrato-noite",
         "radius": 120,
         "shaderId": "noite-aurora",
-        "cutout": "recorte-scene4-de-gate"
+        "cutout": "recorte-scene4-de-gate",
+        "azimuth": 129.5
       },
       "action": {
         "kind": "navigate",
@@ -389,7 +392,8 @@
         "asset": "retrato-ondas",
         "radius": 120,
         "shaderId": "ondas",
-        "cutout": "recorte-scene5-de-gate"
+        "cutout": "recorte-scene5-de-gate",
+        "azimuth": 81.8
       },
       "action": {
         "kind": "navigate",
@@ -437,7 +441,8 @@
         "asset": "retrato-becos",
         "radius": 120,
         "shaderId": "becos",
-        "cutout": "recorte-scene6-de-gate"
+        "cutout": "recorte-scene6-de-gate",
+        "azimuth": 49.1
       },
       "action": {
         "kind": "navigate",
@@ -485,7 +490,8 @@
         "asset": "retrato-presencas",
         "radius": 120,
         "shaderId": "aguas",
-        "cutout": "recorte-scene7-de-gate"
+        "cutout": "recorte-scene7-de-gate",
+        "azimuth": 16.4
       },
       "action": {
         "kind": "navigate",
@@ -533,7 +539,8 @@
         "asset": "retrato-imersoes",
         "radius": 120,
         "shaderId": "holograma",
-        "cutout": "recorte-scene8-de-gate"
+        "cutout": "recorte-scene8-de-gate",
+        "azimuth": -16.4
       },
       "action": {
         "kind": "navigate",
@@ -581,7 +588,8 @@
         "asset": "retrato-mangue",
         "radius": 120,
         "shaderId": "mangue",
-        "cutout": "recorte-scene9-de-gate"
+        "cutout": "recorte-scene9-de-gate",
+        "azimuth": -49.1
       },
       "action": {
         "kind": "navigate",
@@ -629,7 +637,8 @@
         "asset": "retrato-distopia",
         "radius": 120,
         "shaderId": "nucleo",
-        "cutout": "recorte-scene10-de-gate"
+        "cutout": "recorte-scene10-de-gate",
+        "azimuth": -81.8
       },
       "action": {
         "kind": "navigate",
@@ -677,7 +686,8 @@
         "asset": "retrato-memoria",
         "radius": 120,
         "shaderId": "fichario",
-        "cutout": "recorte-scene11-de-gate"
+        "cutout": "recorte-scene11-de-gate",
+        "azimuth": -105.5
       },
       "action": {
         "kind": "navigate",
@@ -725,7 +735,8 @@
         "asset": "retrato-ceu",
         "radius": 120,
         "shaderId": "nuvens",
-        "cutout": "recorte-scene3-de-gate"
+        "cutout": "recorte-scene3-de-gate",
+        "azimuth": -132.3
       },
       "action": {
         "kind": "navigate",
