@@ -11,5 +11,7 @@ export const state = {
   portals: [],
   stencilValues: new Map(),
   signature: null,
-  drawOrder: { mask: 1, panorama: 2, artwork: 3, frame: 4, debug: 10 }
+  // `cutout` fica entre o fundo da janela e as obras da sala ativa: é a camada que traz as obras e as
+  // portas do destino, e tem de ser tapada por uma obra que esteja à frente da janela (D80).
+  drawOrder: { mask: 1, panorama: 2, cutout: 2.5, artwork: 3, frame: 4, debug: 10 }
 };

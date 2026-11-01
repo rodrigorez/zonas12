@@ -2,8 +2,8 @@ import { state } from './state.js';
 import { MAX_DIMENSIONS } from './limits.js';
 import { applyStencilState } from './stencil.js';
 
-// Registers a mesh (the panorama of a dimension, or an artwork) as content of that
-// dimension. `role` is 'panorama' or 'artwork' and only changes the draw order.
+// Registers a mesh (the panorama of a dimension, the cutout drawn over it, or an artwork) as content
+// of that dimension. `role` is 'panorama', 'cutout' or 'artwork' and only changes the draw order.
 // The material's original depth settings are remembered: they are restored whenever the
 // dimension becomes the active one again.
 export function registerContent(dimensionId, mesh, role) {
@@ -19,6 +19,7 @@ export function registerContent(dimensionId, mesh, role) {
       mesh: mesh,
       material: mesh.material,
       panorama: role === 'panorama',
+      cutout: role === 'cutout',
       depth: { test: mesh.material.depthTest, write: mesh.material.depthWrite }
     });
   }

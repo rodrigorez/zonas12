@@ -63,6 +63,10 @@ const ARQUIVADAS = [
   // R18: a queda para a imagem num aparelho que não sustenta o shader — na política (sem GPU) e na cena.
   { nome: 'a queda para a imagem (R18)', script: 'tools/regression/queda.mjs' },
   { nome: 'a costura das travessias (D46)', script: 'tools/regression/seam.mjs' },
+  // D80: o conteúdo da janela não passa por cima do que está à frente dela. Constrói a sobreposição
+  // (a obra encostada à porta) em vez de a esperar do mundo, e traz o controlo positivo que mostra o
+  // defeito quando o recorte é transparente.
+  { nome: 'a ordem da janela (D80)', script: 'tools/regression/ordem-da-janela.mjs' },
   { nome: 'a orientação do telemóvel (D52)', script: 'tools/regression/orientation.mjs' },
   { nome: 'a chegada por uma porta (D37)', script: 'tools/regression/camera-arrival.mjs' },
   { nome: 'a ponte de imagem (D43)', script: 'tools/regression/image-bridge.mjs' },

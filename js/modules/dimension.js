@@ -203,23 +203,26 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     registerContent(this.data.dimension, sphere, 'panorama');
 
     // O recorte da janela (D53): as obras e as portas do destino, por cima do shader ao vivo. É uma
-    // esfera ligeiramente menor, transparente e sem escrita de profundidade — desenha-se depois do
-    // fundo (o `transparent` do material põe-no no passe certo) e dentro do mesmo stencil.
+    // esfera ligeiramente menor, sem escrita de profundidade e com um `alphaTest` em vez de
+    // transparência (D80): um material transparente vai para o passe seguinte a **toda** a geometria
+    // opaca, e aí o `renderOrder` deixa de contar — a obra do destino pintava por cima da obra que
+    // está na sala do visitante, à frente da janela. Opaco, entra no mesmo passe das obras da sala e
+    // desenha-se antes delas (`drawOrder.cutout`).
     if (this.data.cutout && this.shaderActive) {
       const overlayMaterial = new THREE.MeshBasicMaterial({
         map: textureFrom(this.data.cutout),
-        transparent: true,
+        alphaTest: 0.5,
         depthWrite: false,
         side: THREE.BackSide
       });
       const overlay = new THREE.Mesh(
         new THREE.SphereGeometry(this.data.radius * 0.98, 64, 64), overlayMaterial);
       overlay.name = 'dimension-' + this.data.dimension + '-recorte';
-      overlay.renderOrder = state.drawOrder.panorama;
+      overlay.renderOrder = state.drawOrder.cutout;
       overlay.frustumCulled = false;
       this.overlay = overlay;
       this.el.setObject3D('recorte', overlay);
-      registerContent(this.data.dimension, overlay, 'panorama');
+      registerContent(this.data.dimension, overlay, 'cutout');
     }
 
     const component = this;

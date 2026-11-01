@@ -35,29 +35,34 @@ export function applyStencilRule(material, ref) {
 // 'stencil:changed' instead of being called from here.
 export function applyStencilState() {
   const drawOrder = state.drawOrder;
+  const windowOrder = (entry) => entry.cutout ? drawOrder.cutout
+    : entry.panorama ? drawOrder.panorama : drawOrder.panorama + 0.5;
+  const normalOrder = (entry) => entry.cutout ? drawOrder.cutout
+    : entry.panorama ? drawOrder.panorama : drawOrder.artwork;
   Object.keys(state.dimensions).forEach(function (key) {
     const id = Number(key);
     const value = state.stencilValues.has(id) ? state.stencilValues.get(id) : null;
     state.dimensions[key].forEach(function (entry) {
       const material = entry.material;
-      const normalOrder = entry.panorama ? drawOrder.panorama : drawOrder.artwork;
       if (id === state.activeDimension) {
         material.stencilWrite = false;
         material.depthTest = entry.depth.test;
         material.depthWrite = entry.depth.write;
-        entry.mesh.renderOrder = normalOrder;
+        entry.mesh.renderOrder = normalOrder(entry);
       } else if (value !== null) {
         applyStencilRule(material, value);
         material.depthTest = false;
         material.depthWrite = false;
         // Leaves before the artworks of the active dimension: the artworks in front of the
-        // window draw afterwards, over the content of the window.
-        entry.mesh.renderOrder = entry.panorama ? drawOrder.panorama : drawOrder.panorama + 0.5;
+        // window draw afterwards, over the content of the window. The order only holds while
+        // every layer is in the same pass of the renderer — a `transparent` material goes to
+        // the pass after every opaque one, where the order stops counting (D80).
+        entry.mesh.renderOrder = windowOrder(entry);
       } else {
         applyStencilRule(material, null);
         material.depthTest = entry.depth.test;
         material.depthWrite = entry.depth.write;
-        entry.mesh.renderOrder = normalOrder;
+        entry.mesh.renderOrder = normalOrder(entry);
       }
     });
   });

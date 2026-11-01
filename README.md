@@ -256,6 +256,21 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > passa a esconder essa porta enquanto desenha o cubo, e os 39 retratos foram refeitos: os recortes passam
 > de **398 kB** de média para **57 kB**, a porta 0 do portão vai de **2,11 → 0,28** e a costura de **119 →
 > 123 de 128**. Decisão **D79** (§11 do roadmap).
+>
+> **Atualização (2026-11-02, a ordem da janela — D80):** o autor viu a obra que está *dentro* de uma porta
+> desenhada por cima da obra que está na sala dele. A ordem que a política do stencil decide já estava
+> certa — o recorte em `drawOrder.panorama`, as obras da sala em `drawOrder.artwork` — e não chegava: o
+> recorte era um material **`transparent`**, e o three.js desenha todos os materiais transparentes
+> **depois de toda a geometria opaca**, onde o `renderOrder` deixa de contar. O recorte passa a **opaco com
+> `alphaTest: 0.5`** (o alfa do retrato cozido é 99,5% transparente e 0,3–0,4% opaco) e ganha o lugar
+> **`drawOrder.cutout = 2.5`**: depois do fundo da janela, antes das obras da sala. A medição precisou de
+> um instrumento novo, `tools/regression/ordem-da-janela.mjs`, porque a sobreposição que o defeito pede é
+> uma coincidência do mundo (a obra em frente da janela **e** conteúdo do destino naquele sítio): a bateria
+> **constrói-a** — encosta uma obra a 3 m de uma porta com janela de shader e põe a câmara a 1,2 m dela — e
+> mede a coisa **e** o controlo positivo, que é o mesmo material posto em `transparent`. Medido: **0 px**
+> do recorte sobre a obra nas **11 salas**, contra **12 870 a 36 863 px** no controlo, **22 de 22**; os
+> doze continuam **91 de 91** e a costura **123 de 128**, com os mesmos cinco casos vermelhos e nenhum
+> deslocamento. Decisão **D80** (§11 do roadmap).
 
 > **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
 > filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as
@@ -1882,8 +1897,9 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 de imagem, a chegada por uma porta, os rótulos, o botão, a transição, o fundo shader (que mede a
 política e as duas páginas com uma), os quatro valores do R9 na cena e nos painéis, o lote por
 dimensão, o catálogo de assets, os portais em movimento, a ficha das obras, o **ensaio A/B do fundo**
-(`ensaio.mjs`, D66) e a **queda para a imagem** (`queda.mjs`, R18) — cada uma abre um Chrome e juntas somam
-minutos, por isso não são o `default`. Com `--full` são **26** baterias.
+(`ensaio.mjs`, D66), a **queda para a imagem** (`queda.mjs`, R18) e a **ordem da janela**
+(`ordem-da-janela.mjs`, D80) — cada uma abre um Chrome e juntas somam
+minutos, por isso não são o `default`. Com `--full` são **27** baterias.
 
 Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
 repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.tsv` e escreve nos mundos o dado das
