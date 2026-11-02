@@ -78,7 +78,7 @@
 > vermelhos de antes e nenhum deslocamento (a beira do recorte endureceu com o `alphaTest` e não se vê na
 > costura). Decisão **D80** (§11).
 >
-> **Atualização (2026-11-03, a emenda da esfera — D82):** o autor fotografou os onze fundos shader e
+> **Atualização (2026-11-02, a emenda da esfera — D82):** o autor fotografou os onze fundos shader e
 > pediu um estudo sobre a costura que se vê em vários deles — a emenda que o *shader* desenhado numa
 > esfera tem sempre entre o lado esquerdo e o direito. O estudo mediu-a e a causa era uma só, em quatro
 > disfarces: `az = atan(d.x, −d.z)` é um **serrilhado** (salta de +PI para −PI atrás do visitante), e
