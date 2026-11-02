@@ -296,12 +296,17 @@ export async function walkDoor(portalId, options = {}) {
   const avanco = options.avanco || 1.5;
   const recuo = options.recuo || 2.5;
   const passo = options.passo || 0.1;
+  // A altura da caminhada é a da porta onde ela **está** (D85): uma porta que oscila no eixo vertical
+  // (a B da sala de ensaio sobe 5 m) não tem caixa nenhuma à altura dos olhos, e a 1,6 m o passo
+  // atravessava o vazio. Para todas as outras portas — as 50 da exposição e as dos fixtures, que estão
+  // no chão — o `centro.y` é 0 e isto continua a valer 1,6 m, exactamente como antes.
+  const altura = 1.6 + Math.max(0, centro.y);
   const inicio = centro.clone().addScaledVector(direcao, -avanco);
   const fim = centro.clone().addScaledVector(direcao, recuo);
   const n = Math.max(2, Math.round((avanco + recuo) / passo));
   for (let i = 0; i <= n; i++) {
     const ponto = inicio.clone().lerp(fim, i / n);
-    cameraEl.object3D.position.set(ponto.x, 1.6, ponto.z);
+    cameraEl.object3D.position.set(ponto.x, altura, ponto.z);
     await proximoFrame();
   }
   await proximoFrame();

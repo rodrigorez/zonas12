@@ -150,10 +150,12 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     // preview, which has no key of its own, shows it from the start (it is a tool, D3).
     labelAlways: { type: 'boolean', default: false },
     // O movimento animado (D59). Vazio é uma porta parada, que é o que quase todas são.
-    motionKind: { type: 'string', default: '', oneOf: ['', 'spin', 'orbit'] },
+    motionKind: { type: 'string', default: '', oneOf: ['', 'spin', 'orbit', 'sway'] },
     motionPeriod: { type: 'number', default: 20 },
     motionAxis: { type: 'vec3', default: { x: 0, y: 1, z: 0 } },
-    motionRadius: { type: 'number', default: 0 }
+    motionRadius: { type: 'number', default: 0 },
+    motionAmplitude: { type: 'number', default: 0 },
+    motionAngle: { type: 'number', default: 0 }
   },
   init: function () {
     let id = this.data.id;
@@ -327,6 +329,26 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
       );
       return;
     }
+    if (kind === 'sway') {
+      // A oscilação (D85, na sala de ensaio da D84): a porta vai e volta em torno da pose do dado, com a
+      // translação e a rotação em fase e no mesmo eixo. O seno dá o ±amplitude e o ±ângulo; ao fim de um
+      // `period` está outra vez onde começou, e é isso que a bateria mede.
+      const axis = this.data.motionAxis;
+      const sway = Math.sin(phase * Math.PI * 2);
+      const amplitude = this.data.motionAmplitude;
+      const angle = THREE.MathUtils.degToRad(this.data.motionAngle);
+      this.el.object3D.position.set(
+        this.basePosition.x + sway * amplitude * axis.x,
+        this.basePosition.y + sway * amplitude * axis.y,
+        this.basePosition.z + sway * amplitude * axis.z
+      );
+      this.el.object3D.rotation.set(
+        base.x + sway * angle * axis.x,
+        base.y + sway * angle * axis.y,
+        base.z + sway * angle * axis.z
+      );
+      return;
+    }
     const radius = this.data.motionRadius;
     const angle = phase * Math.PI * 2;
     this.el.object3D.position.set(
@@ -336,6 +358,13 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     );
     // Vira-se com o círculo: a janela olha sempre para fora do centro que ela descreve.
     this.el.object3D.rotation.set(base.x, base.y + angle, base.z);
+  },
+  // Põe a porta na pose do dado (D85). Um instrumento que mede geometria e janelas não pode medir uma
+  // porta a meio de uma oscilação — a pose do dado é a única que serve de base a todas as contas, e é
+  // onde a porta está com o `motionFrozen` ligado a seguir.
+  settle: function () {
+    if (this.basePosition) this.el.object3D.position.copy(this.basePosition);
+    if (this.baseRotation) this.el.object3D.rotation.copy(this.baseRotation);
   },
   configureBox: function () {
     const box = this.data.box;
@@ -616,6 +645,8 @@ export function createPortal(portal, parent, derived = {}) {
     if (typeof portal.motion.period === 'number') settings.motionPeriod = portal.motion.period;
     if (portal.motion.axis) settings.motionAxis = vector(portal.motion.axis);
     if (typeof portal.motion.radius === 'number') settings.motionRadius = portal.motion.radius;
+    if (typeof portal.motion.amplitude === 'number') settings.motionAmplitude = portal.motion.amplitude;
+    if (typeof portal.motion.angle === 'number') settings.motionAngle = portal.motion.angle;
   }
 
   const el = document.createElement('a-entity');

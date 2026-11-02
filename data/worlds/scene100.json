@@ -193,6 +193,17 @@
         "shaderId": "nuvens",
         "cutout": "recorte-scene3-de-scene100",
         "azimuth": 90
+      },
+      "motion": {
+        "kind": "sway",
+        "period": 20,
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "angle": 45
       }
     },
     {
@@ -241,6 +252,17 @@
         "shaderId": "becos",
         "cutout": "recorte-scene6-de-scene100",
         "azimuth": 0
+      },
+      "motion": {
+        "kind": "sway",
+        "period": 20,
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "angle": 45
       }
     },
     {
@@ -289,6 +311,17 @@
         "shaderId": "mangue",
         "cutout": "recorte-scene9-de-scene100",
         "azimuth": -90
+      },
+      "motion": {
+        "kind": "sway",
+        "period": 20,
+        "axis": [
+          0,
+          0,
+          1
+        ],
+        "amplitude": 5,
+        "angle": 45
       }
     }
   ]

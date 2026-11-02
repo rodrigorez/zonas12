@@ -51,6 +51,14 @@ async function medirPagina(browser, site, pagina) {
     await sleep(200);
   }
   await sleep(2500);
+  // O movimento das portas pára **e as portas voltam à pose do dado** enquanto se mede (D85). A sala de
+  // ensaio tem três portas a oscilar, e os T4, T5 e T10/T12 fotografam a janela de uma porta: medir
+  // pixéis numa janela que roda e anda entre o instante em que a câmara é posta e o instante em que se
+  // lê é medir a oscilação, não a janela — medido: 142 800 px «fora da moldura» e o retângulo da janela
+  // a não fechar. Nas outras páginas não há nada a parar nem a assentar.
+  await browser.evaluate(
+    '(() => { const d = window.portalDebug; if (d && d.settleMotion) d.settleMotion(); else if (d && d.freezeMotion) d.freezeMotion(true); return true; })()'
+  ).catch(() => { /* uma página sem o lever */ });
   const report = await browser.evaluate(
     `(async () => (await import(${JSON.stringify(endereco)})).runAcceptance())()`, 600000);
   const ruido = browser.console.slice(antes);

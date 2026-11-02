@@ -49,8 +49,9 @@ export const CONTENT_KINDS = ['image', 'video', 'model', 'text', 'site'];
 // para o endereço e `none` não abre nada.
 export const INTERACTIONS = ['modal', 'page', 'link', 'none'];
 export const TRIGGER_KINDS = ['plane', 'box'];
-// O movimento de uma porta (D59): rodar em torno de um eixo seu, ou dar a volta a um círculo.
-export const MOTION_KINDS = ['spin', 'orbit'];
+// O movimento de uma porta (D59): rodar em torno de um eixo seu, dar a volta a um círculo, ou oscilar
+// (D85) — ir e vir em torno da pose do dado, na translação **e** na rotação, num só eixo.
+export const MOTION_KINDS = ['spin', 'orbit', 'sway'];
 
 // A field descriptor:
 //   type      'int' | 'number' | 'string' | 'boolean' | 'vec3' | 'text' | 'asset'
@@ -323,8 +324,9 @@ export const SCENE = {
       // Movimento animado (D59, Fase 7 B8): até aqui uma porta era estática, e a §1 dizia «portais em
       // movimento animado fica para depois». `spin` roda a porta em torno de um eixo seu; `orbit`
       // faz-lhe dar a volta a um círculo de `radius` em torno de onde ela está, virando-se com o
-      // círculo. O `period` é o tempo de uma volta completa, em segundos. O `prefers-reduced-motion`
-      // do visitante pára tudo, como pára o shader.
+      // círculo; `sway` (D85) oscila — vai e volta, na translação de `amplitude` metros e na rotação de
+      // `angle` graus, num eixo só e em fase. O `period` é o tempo de uma volta (ou de uma oscilação
+      // completa), em segundos. O `prefers-reduced-motion` do visitante pára tudo, como pára o shader.
       motion: {
         type: 'object',
         fields: {
@@ -333,11 +335,19 @@ export const SCENE = {
           // O eixo da rotação, como três números que valem 0 ou 1: [0,1,0] é o eixo vertical, que é o
           // que uma porta a girar no chão usa.
           axis: { type: 'vec3', default: [0, 1, 0] },
-          radius: { type: 'number', positive: true }
+          radius: { type: 'number', positive: true },
+          // A oscilação (D85, na sala de ensaio da D84): `amplitude` em metros para a translação e
+          // `angle` em graus para a rotação, ambos de um lado e do outro da pose do dado — ±5 m e ±45°
+          // são o que a sala de ensaio usa. Sem omissão: quem escreve `sway` diz os dois números, e um
+          // valor por omissão num campo que só existe num dos tipos é um número que o validador não sabe
+          // defender.
+          amplitude: { type: 'number', positive: true },
+          angle: { type: 'number', positive: true }
         },
         rules: [
-          { when: { kind: 'spin' }, forbid: ['radius'] },
-          { when: { kind: 'orbit' }, require: ['radius'] }
+          { when: { kind: 'spin' }, forbid: ['radius', 'amplitude', 'angle'] },
+          { when: { kind: 'orbit' }, require: ['radius'], forbid: ['amplitude', 'angle'] },
+          { when: { kind: 'sway' }, require: ['amplitude', 'angle'], forbid: ['radius'] }
         ]
       }
     }

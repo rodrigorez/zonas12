@@ -244,17 +244,17 @@ function card(portal, context, data) {
   windowAxis(box, portal, context, data);
   actionAxis(box, portal, context, data);
 
-  // O movimento animado (D59, B8). Os três campos seguem o tipo: `spin` pergunta o eixo, `orbit`
-  // pergunta o raio, e nenhum dos dois aparece quando a porta está parada.
+  // O movimento animado (D59, B8; a oscilação desde a D85). Os campos seguem o tipo: `spin` e `sway`
+  // perguntam o eixo, `orbit` pergunta o raio, `sway` pergunta também a amplitude e o ângulo, e nenhum
+  // deles aparece quando a porta está parada.
   const motion = portal.motion || {};
   const motionKind = selectField(box, {
     name: 'portal.' + portal.id + '.motion.kind',
     labelKey: 'editor.portal.motion',
     value: motion.kind || '',
-    options: ['', 'spin', 'orbit'].map((kind) => ({
+    options: ['', 'spin', 'orbit', 'sway'].map((kind) => ({
       value: kind,
-      label: kind === '' ? t('editor.portal.motion.none')
-        : t(kind === 'spin' ? 'editor.portal.motion.spin' : 'editor.portal.motion.orbit')
+      label: kind === '' ? t('editor.portal.motion.none') : t('editor.portal.motion.' + kind)
     })),
     onChange: (kind) => {
       if (!kind) {
@@ -262,11 +262,22 @@ function card(portal, context, data) {
       } else {
         if (!portal.motion) portal.motion = { period: 20 };
         portal.motion.kind = kind;
-        // O que cada tipo não usa sai do dado: o esquema recusa um `radius` numa porta que roda e um
-        // eixo numa porta que dá a volta (as regras do formato), e um painel não escreve o que o
-        // validador vai recusar.
-        if (kind === 'orbit') delete portal.motion.axis;
-        else if (portal.motion.radius !== undefined) delete portal.motion.radius;
+        // O que cada tipo não usa sai do dado: o esquema recusa um `radius` numa porta que roda, um
+        // eixo numa porta que dá a volta e a amplitude/ângulo fora da oscilação (as regras do formato),
+        // e um painel não escreve o que o validador vai recusar.
+        if (kind === 'orbit') {
+          delete portal.motion.axis;
+          delete portal.motion.amplitude;
+          delete portal.motion.angle;
+        } else if (kind === 'sway') {
+          delete portal.motion.radius;
+          if (typeof portal.motion.amplitude !== 'number') portal.motion.amplitude = 5;
+          if (typeof portal.motion.angle !== 'number') portal.motion.angle = 45;
+        } else {
+          if (portal.motion.radius !== undefined) delete portal.motion.radius;
+          delete portal.motion.amplitude;
+          delete portal.motion.angle;
+        }
       }
       applyGeometry();
       context.change();
@@ -320,11 +331,39 @@ function card(portal, context, data) {
     }
   });
 
+  const motionAmplitude = numberField(box, {
+    name: 'portal.' + portal.id + '.motion.amplitude',
+    labelKey: 'editor.portal.motionAmplitude',
+    value: typeof motion.amplitude === 'number' ? motion.amplitude : 5,
+    min: 0.1,
+    step: 0.5,
+    onChange: (value) => {
+      if (!portal.motion) return;
+      portal.motion.amplitude = value;
+      applyGeometry();
+    }
+  });
+
+  const motionAngle = numberField(box, {
+    name: 'portal.' + portal.id + '.motion.angle',
+    labelKey: 'editor.portal.motionAngle',
+    value: typeof motion.angle === 'number' ? motion.angle : 45,
+    min: 1,
+    step: 5,
+    onChange: (value) => {
+      if (!portal.motion) return;
+      portal.motion.angle = value;
+      applyGeometry();
+    }
+  });
+
   const syncMotion = () => {
     const kind = (portal.motion && portal.motion.kind) || '';
     motionPeriod.element.hidden = kind === '';
-    motionAxis.element.hidden = kind !== 'spin';
+    motionAxis.element.hidden = kind !== 'spin' && kind !== 'sway';
     motionRadius.element.hidden = kind !== 'orbit';
+    motionAmplitude.element.hidden = kind !== 'sway';
+    motionAngle.element.hidden = kind !== 'sway';
   };
   syncMotion();
   motionKind.input.addEventListener('change', syncMotion);

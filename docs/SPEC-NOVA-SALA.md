@@ -410,8 +410,37 @@ expectativa: em vez de exigir `from=scene100` na URL de destino, exige que ele *
 essa inversão a regra nova nunca seria medida (o teste ficava vermelho por ela estar certa). Os T2–T12
 medem a página como qualquer outra, porque a lista vem do dado.
 
-**O que vem depois (ainda não está feito, e é para isso que a sala existe).** Três das quatro portas vão
-oscilar: translação de **±5 m** e rotação de **±45°**, uma em cada eixo — a porta A em X, a B em Y e a C
-em Z. O movimento entra depois de a sala estar aprovada **parada**, e é medido por um instrumento novo
-(a posição e o ângulo da porta lidos ao longo do tempo, contra a amplitude pedida), pela mesma ordem das
-outras leis: primeiro o número, depois a aprovação.
+**O movimento (D85), feito depois da aprovação da sala parada.** Três das quatro portas oscilam — a
+**A** em X, a **B** em Y e a **C** em Z —, cada uma com translação de **±5 m** e rotação de **±45°**, em
+fase e com um período de **20 s**. O terceiro tipo de movimento entrou no mesmo sítio que os outros dois
+(`motion.kind` ganhou `sway`, com `amplitude` em metros e `angle` em graus, sem omissões: quem escreve
+`sway` diz os dois números); o `js/modules/portal.js` anima-o a partir da pose do dado, e o
+`prefers-reduced-motion` do visitante continua a pará-lo como pára o shader.
+
+O que se mede — e como — é a parte que a sala existe para ensinar:
+
+| o que | onde | medido |
+| --- | --- | --- |
+| a amplitude em cada eixo, os outros eixos parados, a translação e a rotação em fase | `tools/regression/motion.mjs` (a secção da sala de ensaio) | **5,000 m** e **45,00°** nas três, com os outros eixos a **0,000** |
+| o período | a mesma bateria, pela meia oscilação (o cruzamento do centro, onde a curva é inclinada e a amostra de 120 ms custa menos) | **10,00 s** nas três (**20 s** de período) |
+| a porta que não declara movimento não se mexe | a mesma bateria (o controlo) | **0,0000 m** e **0,0000 rad** |
+| `freezeMotion` pára a oscilação onde ela está | a mesma bateria | igual **1,5 s** depois |
+
+A bateria dos portais em movimento passa de **6 de 6** a **12 de 12**. Duas correcções que a oscilação
+obrigou, e que valem para lá dela:
+
+1. **A caminhada do T1 sobe com a porta** (`tools/regression/acceptance.mjs`): a porta B tem a caixa 5 m
+   acima do chão em metade do ciclo, e um passo a 1,6 m atravessava o vazio — medido, a porta 2 não era
+   atravessada. A caminhada passa a usar a altura da porta **onde ela está**; para as 50 portas da
+   exposição (todas no chão) a conta dá exactamente **1,6 m**, como antes.
+2. **Os instrumentos que fotografam a sala assentam as portas** (`portalDebug.settleMotion()`): medir
+   pixéis numa janela que roda 45° entre o instante em que a câmara é posta e o instante em que se lê é
+   medir a oscilação. Medido antes: **142 800 px** «fora da moldura» e o retângulo da janela a não
+   fechar; com as portas na pose do dado, o T4 e o T10/T12 voltam a fechar (**0 px** fora) e a sala é
+   medida de ponta a ponta como qualquer outra.
+
+**O que fica em aberto, e é honesto dizê-lo:** a porta B sobe 5 m em metade do ciclo, e um visitante que
+anda pelo chão só a atravessa na parte do ciclo em que a caixa desce até à altura dos olhos — cerca de
+**21%** do tempo. Não é um defeito: é o que a experiência pediu para ensaiar (±5 m no eixo vertical), e a
+sala existe para isso ser visto e medido antes de decidir se o movimento entra numa sala a sério.
+

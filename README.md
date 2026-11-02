@@ -61,8 +61,8 @@ zonas12/
 │                       **endereço**: `/` é o portão, `/scene1/` é a
 │                       primeira sala; o `?scene=<mundo>` continua a forçar um deles, para os testes)
 ├── i18n/
-│   ├── pt.json         textos da interface: 219 chaves (196 delas do editor), lidas por js/i18n.js
-│   └── en.json         as mesmas 219 chaves em inglês (?lang=en); um teste compara as duas
+│   ├── pt.json         textos da interface: 222 chaves (199 delas do editor), lidas por js/i18n.js
+│   └── en.json         as mesmas 222 chaves em inglês (?lang=en); um teste compara as duas
 ├── docs/
 │   ├── ROADMAP.md      plano de desenvolvimento (módulos, mundos e página de edição), com as
 │   │                   decisões (D1…) e as leis (L1…L28)
@@ -375,7 +375,10 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > `carryOrigin: false` (exige que o `from=` **não** esteja lá — sem isso a regra nova nunca seria
 > medida) e a das páginas passou a abrir a sala de ensaio por `?scene=scene100`. Medido: `validate`
 > **OK** (4 portas, 7 assets, 4 janelas distintas), os retratos de **39 → 42**, os doze **99 de 99** (era
-> 92 — a página nova medida de ponta a ponta). Decisão **D84** (§11 do roadmap) e §9 da spec.
+> 92 — a página nova medida de ponta a ponta). Decisão **D84** (§11) e §9 da spec. O **movimento** veio
+> a seguir, com a autorização do autor (D85): as três portas oscilam ±5 m e ±45°, uma em cada eixo, e a
+> bateria dos portais em movimento passou a medir isso — **12 de 12**, com a amplitude em cada eixo, a
+> meia oscilação de **10,00 s** e a porta do portão parada como controlo.
 
 > **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
 > filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as
@@ -532,7 +535,7 @@ mundos — D43), `js/editor.js` (**15**, a entrada do editor — D36), `js/edito
 (11 ficheiros, **604**), `css/` (**3** ficheiros: `style.css` **142**, `editor.css` **313** e
 `obra.css` **252**), **17** ficheiros em `data/worlds/` (o portão, as onze salas e os cinco fixtures,
 **7389 linhas** no total e **60 portas**, das quais **50** nas doze páginas da exposição),
-`i18n/pt.json` (**219** chaves), as **57 obras** na folha `data/obras.tsv`, os **87** ficheiros em
+`i18n/pt.json` (**222** chaves), as **57 obras** na folha `data/obras.tsv`, os **87** ficheiros em
 `assets/previews/` (**42** retratos e **42** recortes, um par por porta, mais os três panoramas — D46) e
 **56** ficheiros em `tools/` (**12798** linhas). O que esta versão entregou:
 
@@ -595,7 +598,7 @@ isso nenhum deles exige a interface da exposição para carregar (pendência **R
 | `camera.js` | A câmara-jogador (posição, D-pad, limites) e o erro de câmara; é o **único** ficheiro que sabe onde a câmara está — desde a Fase 3 recebe-a do construtor de cena, em vez de a procurar pelo nome | `playerCamera`, `createPlayerCamera`, `startSession`, `setupMobileControls`, `reportCameraError` |
 | `artwork.js` | A obra: o material dimensional, o clique e o modal (foco preso, `inert`, Escape) | componentes `dimensional-material` e `open-artwork`; `createArtwork`/`removeArtwork`; `closeArtwork` |
 | `dimension.js` | O fundo 360º de uma dimensão (imagem ou vídeo) | componente `dimension-panorama`; `createDimension`/`removeDimension` |
-| `portal.js` | A porta: janela (máscara), moldura, caixa de colisão, travessia e caixa de debug — e o **driver de frame** da cena. Desde o B4 da Fase 3B a travessia e a janela são decididas pelos **dois eixos** (`window`/`action`); a origem que a travessia leva no `?from` é decidida pelo mundo (`setWorld`, `carryOrigin` — D84) | componentes `stencil-portal` e `portal-driver`; `createPortal`/`removePortal`; `startFrameDriver` |
+| `portal.js` | A porta: janela (máscara), moldura, caixa de colisão, travessia e caixa de debug — e o **driver de frame** da cena. Desde o B4 da Fase 3B a travessia e a janela são decididas pelos **dois eixos** (`window`/`action`); a origem que a travessia leva no `?from` é decidida pelo mundo (`setWorld`, `carryOrigin` — D84); o movimento tem três tipos (`spin`, `orbit` e `sway`, D59/**D85**) e `settleMotion()` devolve as portas à pose do dado para os instrumentos que medem geometria | componentes `stencil-portal` e `portal-driver`; `createPortal`/`removePortal`; `startFrameDriver` |
 | `portal-kinds.js` | A **tabela dos dois eixos**, pura: o que cada `window` mostra e o que cada `action` faz, a matriz das combinações legais, a validação de uma porta e o endereço de um mundo. Corre também em `node` (é ela que o validador lê) | `WINDOW_KINDS`/`ACTION_KINDS`, `isLegalCombination`, `validateDoor`, `worldHref` e `ENTRY_WORLD` |
 
 Cada módulo tem o seu `remove()`, para que criar e destruir conteúdo em ciclo (o que o
@@ -650,7 +653,7 @@ com os **dois eixos** — `window` (o que a janela mostra, com o par de dimensõ
 | Desfazer, «alterado» e guarda de saída | Editar → desfazer (**50** instantâneos do JSON, **D35**) → exportar; a marca «alterado» e o aviso antes de fechar com alterações que não saíram num ficheiro (**D32**); e a exportação **recusa** um mundo com erros — valida tudo antes de exportar |
 | As leis no editor | O editor corre o **mesmo** `validation.js` e responde às duas perguntas que eram só da linha de comando: o asset existe (**L9**) e a imagem mede 2:1 (**L14**). Num mundo saudável o relatório diz `Erros: 0 · Avisos: 0 · Por verificar: 0` |
 | Gravação direta | Com o **servidor da ferramenta** (`node tools/server/serve.mjs`) o editor ganha o botão «Gravar»: escreve o mundo em `data/worlds/` com o **mesmo** validador, uma cópia de segurança antes e escrita atómica (**D48–D51**); sem servidor o botão não aparece e o «Exportar» fica como estava |
-| Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**219** chaves) e, em inglês, de `i18n/en.json` (as mesmas **219**), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` escolhe a língua e uma chave que falte cai no português com **1** aviso |
+| Interface por catálogo | Todo o texto da interface — exposição **e** editor — sai de `i18n/pt.json` (**222** chaves) e, em inglês, de `i18n/en.json` (as mesmas **222**), por `data-i18n` no markup ou `t('chave')` no código; `?lang=en` escolhe a língua e uma chave que falte cai no português com **1** aviso |
 | Portas de mundo | A travessia de uma porta de mundo **navega** para o endereço do destino e o visitante aparece **atrás** da porta que lá se declara a chegada (`arrivalFrom`), na direcção em que vinha — o regresso é **um passo** (L16/L17/L19). Como cada mundo é uma **página** (D24), a chegada **arranca a exposição sozinha** (`?from=`, D37): o botão «ATIVAR EXPOSIÇÃO» fica para a primeira visita e volta se a câmara for recusada. E a porta que volta ao portão mostra a **realidade ao vivo** pela janela (**D38**): a sala declara uma dimensão `kind: "camera"`, que não desenha nada, e o rectângulo fica transparente sobre o vídeo — vê-se a câmara dos **dois lados**, que é o que a porta mostrava na Fase 3 |
 | Dimensões e portais com ID | 512 dimensões e 512 portais de organização; o ID está no dado (`"id"`) e, na cena construída, em `data-dimension`, `data-portal-id`, nas classes e nos nomes dos objetos 3D |
 | Grafo de dimensões | Portais bidirecionais entre duas dimensões, com uma **dimensão ativa** global; dentro de cada mundo é o que resta do grafo antigo, e o **grafo de mundos** é conferido pela linha de comando (alcançabilidade a partir do portão) |
@@ -980,10 +983,11 @@ repetições (cerca de 6 minutos por celular para as três tecnologias nos dois 
 
 ### Verificado nesta versão (medido no browser)
 
-> **Atualização (2026-11-02, os números da v0.0.23 e da sala de ensaio — D84):** o que esta versão
+> **Atualização (2026-11-02, os números da v0.0.23 e da sala de ensaio — D84/D85):** o que esta versão
 > mediu, com `node tools/regression/all.mjs --full`: o dado **0**, as leis **29 de 29** com o controlo
 > limpo, o importador da folha **21 de 21**, os doze testes **99 de 99** nas páginas que o dado declara
-> (catorze, com a sala de ensaio), as portas e as chegadas **165 de 165**, a ordem da janela **22 de
+> (catorze, com a sala de ensaio), as portas e as chegadas **165 de 165**, os portais em movimento
+> **12 de 12** (com a oscilação da sala de ensaio: ±5 m e ±45° em cada eixo), a ordem da janela **22 de
 > 22**, a emenda da esfera **15 de 15** e a costura das travessias **125 de 128** — vermelha desde
 > antes do anel (**D46**), com duas portas estáveis na casa dos **0,5** e um caso intermitente (um
 > fotograma escuro na chegada). Na corrida de **28 baterias** ficaram **27 verdes**, em **2 819,2 s**;
@@ -1138,7 +1142,8 @@ fechado. O que a fase entregou:
   `?scene=r9` — **6 de 6** na cena e **8 de 8** nos painéis
 - **B8** — os portais em movimento (**D59**): `spin` e `orbit`, com o período em segundos, a colisão
   lida do mundo (a travessia acontece onde a porta **está**) e o `prefers-reduced-motion` a pará-los
-  — **6 de 6**; e os doze testes com uma porta a rodar no fixture, nos números da Fase 6
+  — **6 de 6**; e os doze testes com uma porta a rodar no fixture, nos números da Fase 6. Desde a
+  **D84**/**D85** a mesma bateria mede a **oscilação** (`sway`) na sala de ensaio — **12 de 12**
 - **B9** — o shader em produção, já descrito acima
 - **B10** — este fecho
 
@@ -2015,8 +2020,9 @@ de chegada: `/scene2/?from=scene1`. O mundo de ensaio do fundo shader (Fase 7, *
 
 A **sala de ensaio** (D84) é `?scene=scene100`, e é o único caminho para lá: nenhuma porta do projeto
 aponta para ela. As **quatro** portas dela levam ao portão e às salas 3, 6 e 9, e levam **sem
-`?from`** — o destino abre como uma primeira visita. É onde se experimenta o que ainda não entra no
-caminho do visitante.
+`?from`** — o destino abre como uma primeira visita. Três delas **oscilam** (D85): a A em X, a B em Y e a
+C em Z, com translação de **±5 m** e rotação de **±45°** num período de **20 s** (a do portão fica
+parada, como controlo). É onde se experimenta o que ainda não entra no caminho do visitante.
 
 ### 2. Personalizar Conteúdo
 

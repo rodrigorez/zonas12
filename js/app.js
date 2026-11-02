@@ -72,6 +72,14 @@ window.portalDebug = {
   },
   // O movimento das portas, sozinho (D59), para um instrumento que só olha para elas.
   freezeMotion: (frozen) => freezeMotion(frozen),
+  // As portas **na pose do dado** e o movimento parado (D85): é o que um instrumento que mede geometria
+  // ou janelas precisa numa sala com portas a oscilar. Sem isto, o T4 e o T10/T12 da sala de ensaio
+  // mediam a oscilação em vez da janela — medido: 142 800 px «fora da moldura» e o retângulo da janela
+  // a não fechar, só porque a porta tinha rodado 45° entre um passo e o outro.
+  settleMotion: () => {
+    state.portals.forEach((portal) => { if (portal.settle) portal.settle(); });
+    return freezeMotion(true);
+  },
   // Onde a câmara está e para onde olha (D63): é o que o regresso da ficha guarda e devolve, e é o
   // que os instrumentos leem para provar que o visitante voltou ao mesmo sítio.
   pose: () => playerCamera.pose()
