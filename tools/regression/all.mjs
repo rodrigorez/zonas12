@@ -8,7 +8,7 @@
 //
 // O que corre por omissão são as três camadas que decidem uma fase:
 //   · o dado — o validador dos mundos e as leis com as avarias injectadas (node, segundos);
-//   · a cena — os doze testes (T2–T12) nas 7 páginas;
+//   · a cena — os doze testes (T2–T12) nas páginas que o dado declara;
 //   · as portas — o T1 e o T7/T11, que precisam de navegações de página.
 //
 // As baterias arquivadas (a costura, a ponte, os rótulos, o botão, a transição — Fases 4 e 5 — e o
@@ -32,7 +32,7 @@ const NUCLEO = [
 ];
 
 const CENA = [
-  { nome: 'a cena: os doze testes (T2–T12) nas 13 páginas', script: 'tools/regression/twelve-tests.mjs' },
+  { nome: 'a cena: os doze testes (T2–T12) nas páginas do dado', script: 'tools/regression/twelve-tests.mjs' },
   { nome: 'as portas: o T1 e a chegada (T7/T11)', script: 'tools/regression/traversal-tests.mjs' },
   // Fase 7 (B2): as duas línguas dizem o mesmo. Corre por omissão porque uma chave nova que entre só
   // no `pt.json` é uma frase portuguesa a aparecer a quem abrir em inglês.

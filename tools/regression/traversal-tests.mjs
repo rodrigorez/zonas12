@@ -20,31 +20,22 @@
 //
 // Uso, da raiz do projeto:
 //
-//   node tools/regression/traversal-tests.mjs                    as 13 páginas, todas as portas
+//   node tools/regression/traversal-tests.mjs                    todas as páginas do dado, todas as portas
 //   node tools/regression/traversal-tests.mjs scene1             só as portas de um mundo
 //
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, serveProject, openBrowser, checks, sleep } from './harness.mjs';
+import { paginasDaExposicao, cobertura } from './paginas.mjs';
 
 // A rota de cada página: o portão é a raiz, cada sala é uma pasta (D28) e o fixture vem pelo
-// `?scene=` (D9). É a mesma lista do `twelve-tests.mjs`, pela mesma razão: o que se mede é a
-// exposição que o visitante abre.
-const MUNDOS = [
-  { slug: 'gate', rota: '/' },
-  { slug: 'scene1', rota: '/scene1/' },
-  { slug: 'scene2', rota: '/scene2/' },
-  { slug: 'scene3', rota: '/scene3/' },
-  { slug: 'scene4', rota: '/scene4/' },
-  { slug: 'scene5', rota: '/scene5/' },
-  { slug: 'scene6', rota: '/scene6/' },
-  { slug: 'scene7', rota: '/scene7/' },
-  { slug: 'scene8', rota: '/scene8/' },
-  { slug: 'scene9', rota: '/scene9/' },
-  { slug: 'scene10', rota: '/scene10/' },
-  { slug: 'scene11', rota: '/scene11/' },
-  { slug: 'example', rota: '/', cena: 'example' }
-];
+// `?scene=` (D9). A lista vem do dado (P1 da `docs/SPEC-NOVA-SALA.md`) — a mesma do `twelve-tests.mjs`,
+// pela mesma razão: o que se mede é a exposição que o visitante abre, e uma lista escrita à mão deixa
+// uma sala nova de fora sem que ninguém dê por isso.
+const LISTA = paginasDaExposicao();
+const MUNDOS = LISTA.paginas.map((pagina) => (pagina.cena
+  ? { slug: pagina.slug, rota: pagina.rota, cena: pagina.cena }
+  : { slug: pagina.slug, rota: pagina.rota }));
 
 // As marcas que as sondas deixam antes de a página se ir embora (ver `acceptance.mjs`).
 const MARCA = 'zonas12-aceitacao';
@@ -244,6 +235,12 @@ async function main() {
   const site = await serveProject();
   const browser = await openBrowser({ width: 1400, height: 900, camera: true });
   const result = checks();
+  // P3 da spec: a lista derivada tem de cobrir todas as salas do dado.
+  const coberto = cobertura(LISTA);
+  result.check('a lista cobre todas as salas do dado (' + coberto.salas + ')', coberto.ok,
+    coberto.deFora.length ? 'de fora: ' + coberto.deFora.join(', ')
+      : coberto.ignorados.length ? 'ilegíveis: ' + coberto.ignorados.join(' | ')
+        : coberto.paginas + ' páginas medidas');
 
   try {
     console.log('== T1: as portas, uma a uma ==');

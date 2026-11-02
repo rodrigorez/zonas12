@@ -25,24 +25,14 @@
 // Se o número voltar, é para investigar — o instrumento diz onde mudou (`caixaForaDaMoldura`).
 //
 // Uso, da raiz do projeto: node tools/regression/twelve-tests.mjs [slug[:from] ...]
-// Sem argumentos mede as treze páginas: o portão, as onze salas e o fixture.
+// Sem argumentos mede todas as páginas do dado: o portão, as salas e o fixture de ensaio.
 import { serveProject, openBrowser, checks, sleep } from './harness.mjs';
+import { paginasDaExposicao, cobertura } from './paginas.mjs';
 
-const PAGINAS = [
-  { slug: 'gate', from: null },
-  { slug: 'scene1', from: 'gate' },
-  { slug: 'scene2', from: 'scene1' },
-  { slug: 'scene3', from: 'scene2' },
-  { slug: 'scene4', from: 'gate' },
-  { slug: 'scene5', from: 'gate' },
-  { slug: 'scene6', from: 'gate' },
-  { slug: 'scene7', from: 'gate' },
-  { slug: 'scene8', from: 'gate' },
-  { slug: 'scene9', from: 'gate' },
-  { slug: 'scene10', from: 'gate' },
-  { slug: 'scene11', from: 'gate' },
-  { slug: 'example', from: null }
-];
+// As páginas vêm do dado (P1 da `docs/SPEC-NOVA-SALA.md`): uma sala nova entra sozinha, e não há lista
+// escrita à mão para envelhecer — era por ela que uma sala podia ficar verde sem ser medida.
+const LISTA = paginasDaExposicao();
+const PAGINAS = LISTA.paginas.map((pagina) => ({ slug: pagina.slug, from: pagina.from }));
 
 const url = (site, pagina) =>
   site.base + '/?' + ['scene=' + pagina.slug, pagina.from ? 'from=' + pagina.from : null,
@@ -139,6 +129,13 @@ async function main() {
   const site = await serveProject();
   const browser = await openBrowser({ width: 1400, height: 900, camera: true });
   const result = checks();
+  // P3 da spec: a lista derivada do dado tem de cobrir todas as salas. Sem esta conta, uma derivação
+  // que filtrasse a mais dava uma bateria verde por ter medido menos páginas.
+  const coberto = cobertura(LISTA);
+  result.check('a lista cobre todas as salas do dado (' + coberto.salas + ')', coberto.ok,
+    coberto.deFora.length ? 'de fora: ' + coberto.deFora.join(', ')
+      : coberto.ignorados.length ? 'ilegíveis: ' + coberto.ignorados.join(' | ')
+        : coberto.paginas + ' páginas medidas');
   try {
     for (const pagina of paginas) {
       const { report, ruido } = await medirPagina(browser, site, pagina);

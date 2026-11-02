@@ -1914,7 +1914,12 @@ de chegada: `/scene2/?from=scene1`. O mundo de ensaio do fundo shader (Fase 7, *
   nos painéis (passo 6)
 - Para acrescentar um **mundo**: `node tools/scene/new-world.mjs <slug>` cria a pasta e o arranque
   (D31), o editor grava (ou exporta) o `data/worlds/<slug>.json`, e a porta que o liga ao portão
-  cria-se no painel «Mundo» — com o retrato do destino em `assets/previews/` e o `radius` do retrato
+  cria-se no painel «Mundo» — com o retrato do destino em `assets/previews/` e o `radius` do retrato.
+  O roteiro inteiro, com as armadilhas e a lista de aceitação, está em
+  [`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md); o atalho das fases 1 a 7 é
+  `node tools/scene/new-room.mjs <slug> --destinos <salas>`, que escreve o esqueleto do dado nos dois
+  lados (as dimensões, o fundo, as portas, os assets dos retratos) e corre os anéis, o giro, os buracos
+  do mundo real e o validador
 - As imagens têm de ser **2:1** e ficam melhor com 2048 de largura (lei L14); a ferramenta
   `tools/assets/normalize.mjs` corta e reduz sem ampliar
 - Valide antes de publicar: `node tools/scene/validate.mjs` (confere todos os mundos e o grafo)
@@ -1934,8 +1939,8 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 | --- | --- |
 | `tools/scene/validate.mjs` | os 16 ficheiros de mundo (12 salas e 4 fixtures), as leis, o grafo das portas e os arranques |
 | `tools/scene/laws-selftest.mjs` | **29** avarias injectadas, todas detectadas, com o controlo limpo |
-| `tools/regression/twelve-tests.mjs` | **T2–T12** nas 13 páginas (**91** verificações) |
-| `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) — 50 portas, 156 verificações |
+| `tools/regression/twelve-tests.mjs` | **T2–T12** nas páginas do **dado** (hoje 13: portão, salas e o fixture) — **92** verificações, uma delas a cobertura da lista |
+| `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) — 50 portas, **157** verificações |
 | `tools/regression/i18n.mjs` | as duas línguas: chaves, marcadores e `?lang=en` nas duas páginas |
 
 `--full` acrescenta as baterias arquivadas das Fases 4, 5, 7 e 8 — a costura das travessias, a ponte
@@ -1950,9 +1955,16 @@ Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que
 repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.tsv` e escreve nos mundos o dado das
 obras (nome, créditos, descritivo, imagem e site) — com `--file` corre outra folha, e é assim que se vê
 o exemplo (`data/obras.exemplo.tsv`) sem tocar na definitiva —, `node tools/scene/new-world.mjs
-<slug>` cria a pasta e o arranque de um mundo, `node tools/scene/ring.mjs --aplicar` põe as obras e as
-portas nos dois anéis (D77) e `node tools/scene/portrait.mjs --todos` desenha os retratos das portas
-(duas passagens, e cada uma abre um Chrome por porta).
+<slug>` cria a pasta e o arranque de um mundo, `node tools/scene/new-room.mjs <slug> --destinos …`
+escreve o esqueleto de uma sala nova e as portas que ela pede (ver
+[`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md)), `node tools/scene/ring.mjs --aplicar` põe as obras
+e as portas nos dois anéis (D77) e `node tools/scene/portrait.mjs --todos` desenha os retratos das
+portas (duas passagens, e cada uma abre um Chrome por porta).
+
+As duas baterias que medem a exposição **página a página** (os T2–T12 e o T1/T7/T11) tiram a lista de
+páginas do **dado** (`tools/regression/paginas.mjs`): uma sala nova entra sozinha, e a bateria verifica
+«a lista cobre todas as salas do dado (N)» antes de medir — foi assim que uma sala deixou de poder
+ficar verde por não estar numa lista escrita à mão.
 
 Cada bateria continua a poder correr sozinha, com os argumentos que ela própria documenta — é o que
 se usa quando se está a investigar um número.

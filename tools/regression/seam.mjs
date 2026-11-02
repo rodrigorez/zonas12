@@ -25,6 +25,7 @@
 import { join } from 'node:path';
 import { readFileSync, readdirSync } from 'node:fs';
 import { ROOT, serveProject, openBrowser, checks, difference, sleep } from './harness.mjs';
+import { FIXTURES } from '../../js/scene/fixtures.js';
 
 const LARGURA = 390;
 const ALTURA = 844;
@@ -39,7 +40,6 @@ const ESCALA = 0.5;
 // As que levam ao portão mostram a câmara ao vivo: são medidas, mas não julgadas contra 0,5 — uma
 // fotografia nunca é igual a uma câmara a andar.
 function portasDoDado() {
-  const FIXTURES = ['example', 'shader', 'r9', 'exemplo-ficha'];
   const portas = [];
   for (const name of readdirSync(join(ROOT, 'data', 'worlds')).filter((entry) => entry.endsWith('.json'))) {
     const scene = JSON.parse(readFileSync(join(ROOT, 'data', 'worlds', name), 'utf8'));
