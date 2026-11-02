@@ -274,12 +274,26 @@ export const SCENE = {
           // a janela está no mundo de origem, por isso a esfera roda o que separa os dois. Sem ele, o
           // que se vê pela porta está girado em relação ao que se vê ao chegar — medido, 27,8 onde a
           // meta é 0,50.
-          azimuth: { type: 'number' }
+          azimuth: { type: 'number' },
+          // Onde a janela tem de deixar passar o **mundo real** (D81): os retângulos, em azimute e
+          // elevação (graus, no referencial do mundo de destino), das portas do destino que mostram a
+          // dimensão `camera`. Ali o fundo ao vivo da janela é descartado e o `<video>` da câmara, que
+          // fica atrás do canvas, aparece — como aparece ao chegar. É dado derivado, escrito por
+          // `tools/scene/reality.mjs --aplicar` e provado pela lei L28, como o `azimuth` da D78.
+          reality: {
+            type: 'array',
+            item: {
+              az0: { type: 'number', required: true },
+              el0: { type: 'number', required: true },
+              az1: { type: 'number', required: true },
+              el1: { type: 'number', required: true }
+            }
+          }
         },
         rules: [
-          { when: { kind: 'dimension-pair' }, require: ['dimensionA', 'dimensionB'], forbid: ['asset', 'radius', 'shaderId', 'cutout', 'azimuth'] },
+          { when: { kind: 'dimension-pair' }, require: ['dimensionA', 'dimensionB'], forbid: ['asset', 'radius', 'shaderId', 'cutout', 'azimuth', 'reality'] },
           { when: { kind: 'preview' }, require: ['asset', 'radius'], forbid: ['dimensionA', 'dimensionB'] },
-          { when: { kind: 'none' }, forbid: ['dimensionA', 'dimensionB', 'asset', 'radius', 'shaderId', 'cutout', 'azimuth'] }
+          { when: { kind: 'none' }, forbid: ['dimensionA', 'dimensionB', 'asset', 'radius', 'shaderId', 'cutout', 'azimuth', 'reality'] }
         ]
       },
       // The second axis: what the traversal does. `target` is the slug of the world this door

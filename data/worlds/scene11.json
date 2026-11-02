@@ -369,7 +369,15 @@
         "radius": 120,
         "shaderId": "noite-aurora",
         "cutout": "recorte-scene4-de-scene11",
-        "azimuth": 6
+        "azimuth": 6,
+        "reality": [
+          {
+            "az0": 56.99,
+            "el0": -1.14,
+            "az1": 61.85,
+            "el1": 7.34
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
@@ -418,7 +426,15 @@
         "radius": 120,
         "shaderId": "por-do-sol",
         "cutout": "recorte-scene2-de-scene11",
-        "azimuth": -144
+        "azimuth": -144,
+        "reality": [
+          {
+            "az0": -3.01,
+            "el0": -1.14,
+            "az1": 1.85,
+            "el1": 7.34
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
@@ -467,7 +483,15 @@
         "radius": 120,
         "shaderId": "nucleo",
         "cutout": "recorte-scene10-de-scene11",
-        "azimuth": 141
+        "azimuth": 141,
+        "reality": [
+          {
+            "az0": 27.25,
+            "el0": -0.91,
+            "az1": 32.08,
+            "el1": 5.9
+          }
+        ]
       },
       "action": {
         "kind": "navigate",

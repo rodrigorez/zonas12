@@ -389,7 +389,15 @@
         "radius": 120,
         "shaderId": "nuvens",
         "cutout": "recorte-scene3-de-scene7",
-        "azimuth": -15
+        "azimuth": -15,
+        "reality": [
+          {
+            "az0": 56.99,
+            "el0": -1.14,
+            "az1": 61.85,
+            "el1": 7.34
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
@@ -438,7 +446,15 @@
         "radius": 120,
         "shaderId": "holograma",
         "cutout": "recorte-scene8-de-scene7",
-        "azimuth": 180
+        "azimuth": 180,
+        "reality": [
+          {
+            "az0": 27.25,
+            "el0": -0.91,
+            "az1": 32.08,
+            "el1": 5.9
+          }
+        ]
       },
       "action": {
         "kind": "navigate",

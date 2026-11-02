@@ -316,7 +316,15 @@
         "radius": 120,
         "shaderId": "mangue",
         "cutout": "recorte-scene9-de-scene10",
-        "azimuth": -60
+        "azimuth": -60,
+        "reality": [
+          {
+            "az0": 27.25,
+            "el0": -0.91,
+            "az1": 32.08,
+            "el1": 5.9
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
@@ -365,7 +373,15 @@
         "radius": 120,
         "shaderId": "fichario",
         "cutout": "recorte-scene11-de-scene10",
-        "azimuth": -141
+        "azimuth": -141,
+        "reality": [
+          {
+            "az0": 50.99,
+            "el0": -1.14,
+            "az1": 55.85,
+            "el1": 7.34
+          }
+        ]
       },
       "action": {
         "kind": "navigate",

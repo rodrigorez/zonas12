@@ -37,10 +37,20 @@ void main() {
 
 // The prelude and the tail of every fragment. Exported because the validator composes exactly the
 // same text before compiling a body.
+//
+// O preâmbulo tem uma coisa que não é paisagem: os **buracos do mundo real** (D81). Uma janela de
+// porta mostra uma fotografia do destino, mas uma porta do destino que mostra a dimensão `camera` não
+// desenha nada — quem olha por ela vê o `<video>` da câmara, que fica atrás do canvas do renderer. Na
+// janela esse sítio tem de ficar vazio também, senão via-se ali o fundo do destino e ao chegar via-se
+// a câmara (medido: 0,62 a 1,70 de salto na costura). Os retângulos vêm do dado (`window.reality`) e
+// são (azimute, elevação) em graus, no referencial em que o retrato foi cozido — que é o mesmo em que
+// este `vDir` é lido.
 export const FRAGMENT_HEAD = `
 precision mediump float;
 varying vec3 vDir;
 uniform float uTime;
+uniform int uHolesN;
+uniform vec4 uHoles[4];
 const float PI = 3.14159265;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float noise(vec2 p) {
@@ -52,6 +62,11 @@ void main() {
   vec3 d = normalize(vDir);
   float az = atan(d.x, -d.z);
   float el = asin(clamp(d.y, -1.0, 1.0));
+  for (int i = 0; i < 4; i++) {
+    if (i >= uHolesN) break;
+    vec4 hole = uHoles[i];
+    if (az > hole.x && az < hole.z && el > hole.y && el < hole.w) discard;
+  }
   vec3 col;
 `;
 export const FRAGMENT_TAIL = `

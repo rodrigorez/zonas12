@@ -350,7 +350,15 @@
         "radius": 120,
         "shaderId": "noite-aurora",
         "cutout": "recorte-scene4-de-scene5",
-        "azimuth": -105
+        "azimuth": -105,
+        "reality": [
+          {
+            "az0": 12.59,
+            "el0": -0.77,
+            "az1": 17.41,
+            "el1": 4.99
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
@@ -399,7 +407,15 @@
         "radius": 120,
         "shaderId": "becos",
         "cutout": "recorte-scene6-de-scene5",
-        "azimuth": 180
+        "azimuth": 180,
+        "reality": [
+          {
+            "az0": 27.25,
+            "el0": -0.91,
+            "az1": 32.08,
+            "el1": 5.9
+          }
+        ]
       },
       "action": {
         "kind": "navigate",

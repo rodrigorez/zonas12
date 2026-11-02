@@ -19,7 +19,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateScene, unreachableWorlds, missingArrivals, portraitTurns, repeatedDestinations } from '../../js/scene/validation.js';
+import { validateScene, unreachableWorlds, missingArrivals, portraitTurns, repeatedDestinations, realityWindows } from '../../js/scene/validation.js';
 import { FIXTURES, isFixture } from '../../js/scene/fixtures.js';
 import { checkArranques } from './arranques.mjs';
 import { diskQuestions } from './disk.mjs';
@@ -181,6 +181,21 @@ if (worlds.size > 1) {
       `— law L26 (run tools/scene/azimuths.mjs --aplicar)`);
   }
   if (turns.length) failed++;
+
+  // L28 (D81): os buracos do mundo real na janela. Uma porta do destino que mostra a dimensão
+  // `camera` não desenha nada — o visitante vê o `<video>` da câmara atrás do canvas —, e a janela,
+  // que é uma fotografia, tem de deixar esse sítio vazio. O dado guarda os retângulos; a lei
+  // recalcula-os do destino, como a L26 faz com o giro.
+  const holes = realityWindows(rooms);
+  console.log('reality holes: ' + (holes.length === 0
+    ? 'every window leaves the real world where the destination shows it (L28)'
+    : `${holes.length} window(s) with the wrong holes (L28)`));
+  for (const entry of holes) {
+    console.error(`  error: ${entry.from} door ${entry.door} → ${entry.to}: the holes are ` +
+      `${JSON.stringify(entry.found)} and the destination asks for ${JSON.stringify(entry.expected)} ` +
+      `— law L28 (run tools/scene/reality.mjs --aplicar)`);
+  }
+  if (holes.length) failed++;
 
   // D53: a janela de uma porta de mundo que desenha o fundo do destino **ao vivo** tem de nomear o
   // shader que o destino desenha. Um shader trocado aqui não é um detalhe: a porta passaria a mentir

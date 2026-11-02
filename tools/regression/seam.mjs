@@ -45,15 +45,20 @@ function portasDoDado() {
     const scene = JSON.parse(readFileSync(join(ROOT, 'data', 'worlds', name), 'utf8'));
     const mundo = scene.world && scene.world.slug;
     if (!mundo || FIXTURES.includes(mundo)) continue;
+    MUNDOS.set(mundo, scene);
     for (const portal of scene.portals || []) {
       const acao = portal.action || {};
       if (acao.kind !== 'navigate' || typeof acao.target !== 'string') continue;
-      portas.push({ mundo: mundo, porta: portal.id, destino: acao.target });
+      portas.push({ mundo: mundo, porta: portal.id, destino: acao.target,
+        // Os buracos do mundo real desta janela (D81): os blocos que eles ocupam na imagem não são
+        // comparados (ver `blocosDoMundoReal`).
+        reality: portal.window && Array.isArray(portal.window.reality) ? portal.window.reality : [] });
     }
   }
   return portas;
 }
 
+const MUNDOS = new Map();
 const PORTAS = portasDoDado();
 
 const SONDA = `
@@ -131,6 +136,65 @@ const atravessar = (porta) => `(async () => {
     await new Promise((done) => requestAnimationFrame(done));
   }
 })()`;
+
+// A diferença de duas assinaturas 4x4, **ignorando os blocos onde está o mundo real** (D81). Uma porta
+// do destino que mostra a dimensão `camera` não desenha nada: o que se vê por ela é o `<video>` da
+// câmara, atrás do canvas. Na janela e na chegada está a mesma câmara, mas cada página abre o **seu**
+// stream e dois fotogramas nunca coincidem (verde contra preto media 2,34 onde a geometria dá 0,28) —
+// o mundo real não é uma imagem, e o que esta bateria mede é a imagem. Os blocos ignorados contam-se do
+// retângulo que o dado guarda em `window.reality`, projectado com a câmara da chegada.
+function diferencaSem(um, outro, ignorados) {
+  if (!um || !outro || !um.blocks || !outro.blocks) return null;
+  let total = 0;
+  let contados = 0;
+  for (let i = 0; i < um.blocks.length; i++) {
+    if (ignorados.has(i)) continue;
+    total += Math.abs(um.blocks[i] - outro.blocks[i]);
+    contados += 1;
+  }
+  return contados === 0 ? null : total / contados;
+}
+
+// Os blocos 4x4 (índice = linha * 4 + coluna) que o mundo real ocupa na chegada, a partir dos
+// retângulos em azimute/elevação que o dado da porta de origem guarda. A janela e a chegada vêem a
+// mesma direcção (é o que a D78 alinhou), por isso o mesmo retângulo serve para as duas imagens.
+function blocosDoMundoReal(alvo, mundoDestino) {
+  const ignorados = new Set();
+  const buracos = Array.isArray(alvo.reality) ? alvo.reality : [];
+  if (buracos.length === 0) return ignorados;
+  const chegada = (mundoDestino.portals || []).find((porta) => porta.arrivalFrom === alvo.mundo);
+  if (!chegada) return ignorados;
+  // A direcção da chegada: o visitante aterra virado para **dentro** da sala, meio giro depois da
+  // porta que atravessou (js/scene/arrival.js). O eixo da câmara é o mesmo que a janela mostra — é o
+  // que a D78 alinhou —, por isso o retângulo do dado serve para as duas imagens.
+  const yaw = (((chegada.rotation && chegada.rotation[1]) || 0) + 180) * (Math.PI / 180);
+  // O eixo da câmara para uma rotação de A-Frame: a frente (0,0,−1) rodada por `yaw`, e a direita.
+  const frente = [-Math.sin(yaw), 0, -Math.cos(yaw)];
+  const direita = [Math.cos(yaw), 0, -Math.sin(yaw)];
+  const vertical = (60 * Math.PI) / 180;
+  const horizontal = 2 * Math.atan(Math.tan(vertical / 2) * (LARGURA / ALTURA));
+  for (const buraco of buracos) {
+    for (const az of [buraco.az0, buraco.az1]) {
+      for (const el of [buraco.el0, buraco.el1]) {
+        const radianos = { az: (az * Math.PI) / 180, el: (el * Math.PI) / 180 };
+        const direcao = [
+          Math.sin(radianos.az) * Math.cos(radianos.el),
+          Math.sin(radianos.el),
+          -Math.cos(radianos.az) * Math.cos(radianos.el)
+        ];
+        const profundidade = direcao[0] * frente[0] + direcao[2] * frente[2];
+        if (profundidade <= 0.01) continue;
+        const x = ((direcao[0] * direita[0] + direcao[2] * direita[2]) / profundidade) /
+          Math.tan(horizontal / 2);
+        const y = (direcao[1] / profundidade) / Math.tan(vertical / 2);
+        const coluna = Math.min(3, Math.max(0, Math.floor(((x + 1) / 2) * 4)));
+        const linha = Math.min(3, Math.max(0, Math.floor(((1 - y) / 2) * 4)));
+        ignorados.add(linha * 4 + coluna);
+      }
+    }
+  }
+  return ignorados;
+}
 
 async function medir(browser, site, alvo) {
   const bust = 'bust=' + Date.now() + Math.random();
@@ -211,9 +275,11 @@ async function medir(browser, site, alvo) {
   // A costura da **imagem**: a ponte contra a chegada no mesmo instante (D78). Sem o mesmo instante,
   // a diferença mede também a animação a andar — e o que se quer saber é se o quadro está no sítio.
   const comMesmoInstante = mesmoInstante || chegada;
-  const salto = ponte ? difference(ponte, comMesmoInstante) : null;
-  const saltoNatural = ponte ? difference(ponte, chegada) : null;
-  const blocos = ponte ? ponte.blocks.map((valor, i) => Math.abs(valor - comMesmoInstante.blocks[i])) : null;
+  // O mundo real não é uma imagem (D81): os blocos que ele ocupa não entram nesta conta.
+  const ignorados = blocosDoMundoReal(alvo, MUNDOS.get(alvo.destino));
+  const salto = ponte ? diferencaSem(ponte, comMesmoInstante, ignorados) : null;
+  const saltoNatural = ponte ? diferencaSem(ponte, chegada, ignorados) : null;
+  const blocos = ponte ? ponte.blocks.map((valor, i) => (ignorados.has(i) ? null : Math.abs(valor - comMesmoInstante.blocks[i]))) : null;
   // O **salto de tempo** no corte: o instante que a página que chegou estava a mostrar menos o que a
   // ponte trazia. É a outra metade da costura: a imagem pode estar no sítio e o instante não.
   const instante = relogio && typeof relogio.ponte === 'number' && typeof relogio.chegada === 'number'
@@ -276,7 +342,7 @@ async function main() {
         console.log('    blocos (|ponte - chegada|):');
         for (let linha = 0; linha < 4; linha++) {
           console.log('      ' + medida.blocos.slice(linha * 4, linha * 4 + 4)
-            .map((valor) => valor.toFixed(1).padStart(7)).join(''));
+            .map((valor) => (valor === null ? '   real' : valor.toFixed(1).padStart(7))).join(''));
         }
       }
       result.check(alvo.mundo + ' ' + alvo.porta + ' → ' + alvo.destino + ': a travessia chega e não tem fotograma escuro',

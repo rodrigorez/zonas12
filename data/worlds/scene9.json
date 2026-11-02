@@ -316,7 +316,15 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene1-de-scene9",
-        "azimuth": 18.9
+        "azimuth": 18.9,
+        "reality": [
+          {
+            "az0": 81.6,
+            "el0": -1.39,
+            "az1": 86.5,
+            "el1": 8.95
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
@@ -365,7 +373,15 @@
         "radius": 120,
         "shaderId": "nucleo",
         "cutout": "recorte-scene10-de-scene9",
-        "azimuth": 60
+        "azimuth": 60,
+        "reality": [
+          {
+            "az0": -32.08,
+            "el0": -0.91,
+            "az1": -27.25,
+            "el1": 5.9
+          }
+        ]
       },
       "action": {
         "kind": "navigate",

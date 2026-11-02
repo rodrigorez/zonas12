@@ -22,6 +22,11 @@ import { shaderPolicy } from './shader-policy.js';
 
 const DIMENSION_COMPONENT = 'dimension-panorama';
 
+// Quantos buracos do mundo real um fundo sabe descartar — o tamanho do `uniform vec4 uHoles[4]` do
+// preâmbulo dos fundos (`js/modules/shaders.js`).
+const HOLES_LIMIT = 4;
+const RADIANS = Math.PI / 180;
+
 // A-Frame's vec3 in the object form needs { x, y, z }: an array there is read as an object with no
 // axes and falls back to the default, silently (measured in A-Frame 1.8, utils/coordinates.js
 // parse). The data writes vectors as arrays, so the factory translates.
@@ -68,9 +73,23 @@ function flatMaterial(color) {
   }, stencilWrite));
 }
 
-function shaderMaterial(definition) {
+function shaderMaterial(definition, holes) {
+  const list = (Array.isArray(holes) ? holes : []).slice(0, HOLES_LIMIT);
+  const rects = [];
+  for (let i = 0; i < HOLES_LIMIT; i++) {
+    const hole = list[i];
+    rects.push(hole
+      ? new THREE.Vector4(hole.az0 * RADIANS, hole.el0 * RADIANS, hole.az1 * RADIANS, hole.el1 * RADIANS)
+      : new THREE.Vector4());
+  }
   return new THREE.ShaderMaterial(Object.assign({
-    uniforms: { uTime: { value: 2 } },
+    uniforms: {
+      uTime: { value: 2 },
+      // Os buracos do mundo real (D81): o que cai dentro deles não é desenhado, e é a câmara — que
+      // está atrás do canvas — que aparece. O `vazio` de um shader sem janelas é o retângulo zero.
+      uHolesN: { value: list.length },
+      uHoles: { value: rects }
+    },
     vertexShader: VERTEX,
     fragmentShader: definition.fragment,
     side: THREE.BackSide,
@@ -149,7 +168,11 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
     // the second layer of the same dimension — same stencil, same registry, same release.
     cutout: { type: 'selector' },
     // O fundo liso (D56): a cor de uma dimensão `kind: "color"`, quando não há imagem nem shader.
-    color: { type: 'color', default: '' }
+    color: { type: 'color', default: '' },
+    // Os buracos do mundo real (D81), numa janela de porta: retângulos { az0, el0, az1, el1 } em
+    // graus, no referencial do mundo de destino. Vazio em tudo o que não é uma janela com uma porta
+    // de câmara à vista.
+    holes: { type: 'array', default: [] }
   },
   // A-Frame calls `update` right after `init` (and whenever the attribute changes), so building
   // the sphere here avoids building it twice.
@@ -168,7 +191,7 @@ AFRAME.registerComponent(DIMENSION_COMPONENT, {
       // The material can throw (no WebGL context, a driver that refuses the program); the image
       // fallback is the answer, and it is already decoded.
       try {
-        this.material = shaderMaterial(definition);
+        this.material = shaderMaterial(definition, this.data.holes);
         this.shaderActive = true;
         pagePolicy = shaderPolicy(pixelRatioAdapter(this.el.sceneEl), this.giveUp());
         this.policy = pagePolicy;
@@ -383,6 +406,8 @@ export function createDimension(dimension, parent) {
   }
   if (typeof dimension.radius === 'number') settings.radius = dimension.radius;
   if (typeof dimension.followCamera === 'boolean') settings.followCamera = dimension.followCamera;
+  // Os buracos do mundo real (D81): só uma janela de porta os tem — a esfera da sala nunca.
+  if (Array.isArray(dimension.holes) && dimension.holes.length > 0) settings.holes = dimension.holes;
 
   const el = document.createElement('a-entity');
   // The position is not a field of the format: it is what the builder passes for a portrait, whose

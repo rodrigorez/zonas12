@@ -271,6 +271,22 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > do recorte sobre a obra nas **11 salas**, contra **12 870 a 36 863 px** no controlo, **22 de 22**; os
 > doze continuam **91 de 91** e a costura **123 de 128**, com os mesmos cinco casos vermelhos e nenhum
 > deslocamento. Decisão **D80** (§11 do roadmap).
+>
+> **Atualização (2026-11-02, o mundo real atrás da porta — D81):** com a D80 fechada ficaram quatro casos
+> na costura, todos com a mesma causa: a porta `dimension-pair` que mostra a dimensão `camera` não
+> desenha nada — vê-se o **mundo real** através dela porque o renderer tem `alpha: true` e o `<video>` da
+> câmara fica atrás do canvas. A janela de uma porta de mundo é uma fotografia, e nela esse sítio ficava
+> com o *fundo do destino*: o céu onde ao chegar se vê a câmara (medido **0,72 / 1,70 / 0,76 / 0,62**).
+> Uma fotografia da câmara não existe, e não deve existir — a câmara de quem olha não é um asset —, por
+> isso o que se fura é o **fundo ao vivo**: o preâmbulo dos shaders descarta os fragmentos que caem nos
+> retângulos de `window.reality`, o pixel fica com o alfa do canvas e aparece a **mesma** câmara da
+> página, na janela e na chegada. A conta é uma só (`js/scene/reality.js`), o dado é escrito por
+> `tools/scene/reality.mjs --aplicar` (**28** portas) e provado pela **lei L28**, com a avaria injectada a
+> ser detectada. Medido nas quatro portas: **0,14 / 0,20 / 0,29 / 0,30** (meta 0,50). A costura passou a
+> **não comparar os blocos onde o mundo real está**: um fotograma de câmara não é uma imagem e cada página
+> abre o seu stream — verde contra preto media **2,34** onde a geometria dá **0,28**. Os blocos ignorados
+> saem do mesmo retângulo do dado, projectado com a câmara da chegada, e o resto da janela continua a ser
+> julgado. Decisão **D81** (§11 do roadmap).
 
 > **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
 > filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as

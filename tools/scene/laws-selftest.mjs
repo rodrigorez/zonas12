@@ -16,7 +16,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateScene, unreachableWorlds, missingArrivals, portraitTurns, repeatedDestinations } from '../../js/scene/validation.js';
+import { validateScene, unreachableWorlds, missingArrivals, portraitTurns, repeatedDestinations, realityWindows } from '../../js/scene/validation.js';
 import { checkArranques } from './arranques.mjs';
 import {
   WINDOW_KINDS,
@@ -436,6 +436,21 @@ const turnFault = portraitTurns(noTurn);
 const turnsAsExpected = turnClean.length === 0 && turnFault.length === 1 &&
   turnFault[0].from === 'scene1' && turnFault[0].door === vitima.id && turnFault[0].found === null;
 
+// L28 (D81): os buracos do mundo real na janela. A exposição está com os buracos que a conta dá
+// (`reality.mjs --aplicar`); a avaria tira-os da porta 3 da sala 1, que é o estado de onde se veio —
+// pela janela via-se o fundo do destino onde ao chegar se vê a câmara. Medido na porta 7 da sala 3,
+// 0,72 de salto no corte (1,70 na porta 9 da sala 4), com a meta em 0,50.
+const holesClean = realityWindows(exhibition);
+const noHoles = exhibition.map((copy) => JSON.parse(JSON.stringify(copy)));
+const salaDasJanelas = noHoles.find((copy) => copy.world.slug === 'scene1');
+const comBuracos = salaDasJanelas.portals.find((portal) => Array.isArray((portal.window || {}).reality) &&
+  portal.window.reality.length > 0);
+delete comBuracos.window.reality;
+const holesFault = realityWindows(noHoles);
+const holesAsExpected = holesClean.length === 0 && holesFault.length === 1 &&
+  holesFault[0].from === 'scene1' && holesFault[0].door === comBuracos.id &&
+  holesFault[0].expected.length === 1;
+
 console.table(rows.map((row) => ({ law: row.law, 'injected fault': row.what, detected: row.ok ? 'yes' : 'NO', message: row.message.slice(0, 96) })));
 console.log(`laws and shape: ${detected} of ${cases.length} faults detected`);
 console.log(`control (nothing injected): ${control.ok ? 'clean' : 'FAILED'} — ` +
@@ -453,6 +468,11 @@ console.log(`portrait turns (L26): the exhibition is turned to the arrival ` +
   `(${turnClean.length} wrong), and a window with no turn is ` +
   `${turnsAsExpected ? 'detected' : 'NOT detected'}` +
   (turnFault.length ? ` (${turnFault.map((each) => each.from + ' ' + each.door + ' asks ' + each.expected + '°').join(', ')})` : ''));
+console.log(`reality holes (L28): the exhibition leaves the real world where the destination shows it ` +
+  `(${holesClean.length} wrong), and a window with no holes is ` +
+  `${holesAsExpected ? 'detected' : 'NOT detected'}` +
+  (holesFault.length ? ` (${holesFault.map((each) => each.from + ' ' + each.door + ' asks ' +
+  JSON.stringify(each.expected)).join(', ')})` : ''));
 
 // The arranques (D28): one file per world, and the four the same outside the `<base>` line. Here the
 // disk is a map in memory, so a case can lie about it on purpose — which is the only way to know

@@ -353,7 +353,15 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene1-de-scene8",
-        "azimuth": -53.2
+        "azimuth": -53.2,
+        "reality": [
+          {
+            "az0": 46.25,
+            "el0": -0.82,
+            "az1": 51.07,
+            "el1": 5.32
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
@@ -402,7 +410,15 @@
         "radius": 120,
         "shaderId": "aguas",
         "cutout": "recorte-scene7-de-scene8",
-        "azimuth": 180
+        "azimuth": 180,
+        "reality": [
+          {
+            "az0": 27.25,
+            "el0": -0.91,
+            "az1": 32.08,
+            "el1": 5.9
+          }
+        ]
       },
       "action": {
         "kind": "navigate",

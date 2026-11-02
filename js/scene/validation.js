@@ -38,6 +38,7 @@ import {
 } from '../core/index.js';
 import { validateDoor, ENTRY_WORLD } from '../modules/portal-kinds.js';
 import { arrivalPoint } from './arrival.js';
+import { realityHoles, sameHoles } from './reality.js';
 import { RING, angularGap, portraitTurn, requiredClearance, ringCoordinates } from './ring.js';
 import { isFixture } from './fixtures.js';
 
@@ -532,6 +533,35 @@ export function portraitTurns(scenes) {
       const expected = portraitTurn(ringCoordinates(portal.position).angle, arrival);
       const found = typeof window.azimuth === 'number' ? window.azimuth : null;
       if (found === null || angularGap(found, expected) > 0.05) {
+        wrong.push({ from: from, door: portal.id, to: action.target, expected: expected, found: found });
+      }
+    }
+  }
+  return wrong;
+}
+
+// ---- L28: a janela que tem de deixar passar o mundo real ----
+//
+// Uma porta `dimension-pair` que mostra a dimensão `camera` não desenha nada: quem olha por ela vê o
+// `<video>` da câmara, que fica **atrás do canvas**. A janela de uma porta de mundo é uma fotografia
+// (o retrato e o recorte) e não tem câmara lá dentro, por isso o dado diz onde é que o fundo ao vivo
+// tem de ser furado (D81) — e a conta é a mesma que a ferramenta escreve (`realityHoles`), como a L26
+// faz com o giro do retrato. Devolve uma lista `{ from, door, to, expected, found }`; vazia é o caso
+// bom.
+export function realityWindows(scenes) {
+  const byWorld = new Map(scenes.map((scene) => [scene.world && scene.world.slug, scene]));
+  const wrong = [];
+  for (const scene of scenes) {
+    const from = scene.world && scene.world.slug;
+    for (const portal of scene.portals || []) {
+      const window = portal.window || {};
+      const action = portal.action || {};
+      if (window.kind !== 'preview' || action.kind !== 'navigate') continue;
+      const destination = byWorld.get(action.target);
+      if (!destination) continue; // a L11 responde por um destino que não existe
+      const expected = realityHoles(destination, from);
+      const found = Array.isArray(window.reality) ? window.reality : [];
+      if (!sameHoles(found, expected)) {
         wrong.push({ from: from, door: portal.id, to: action.target, expected: expected, found: found });
       }
     }

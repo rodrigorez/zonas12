@@ -134,9 +134,12 @@ export async function buildScene(scene, options = {}) {
     const axis = portal.window || {};
     if (axis.kind !== 'preview' || !axis.asset) continue;
     // Duas portas partilham a esfera quando mostram o mesmo retrato, com o mesmo raio **e o mesmo
-    // shader** (D53): uma textura, um valor de stencil, um desenho.
+    // shader** (D53): uma textura, um valor de stencil, um desenho. Os buracos do mundo real (D81)
+    // entram na chave pela mesma razão que o giro: a mesma fotografia furada em sítios diferentes é
+    // outra esfera.
+    const real = Array.isArray(axis.reality) ? axis.reality : [];
     const key = axis.asset + '@' + axis.radius + '@' + (axis.shaderId || '') + '@' + (axis.cutout || '') +
-      '@' + (axis.azimuth || 0);
+      '@' + (axis.azimuth || 0) + '@' + real.map((hole) => [hole.az0, hole.el0, hole.az1, hole.el1].join(',')).join(';');
     if (portraits.has(key)) continue;
     const id = DERIVED_DIMENSION_BASE + portraits.size;
     if (id >= MAX_DIMENSIONS) {
@@ -158,6 +161,9 @@ export async function buildScene(scene, options = {}) {
       shaderId: axis.shaderId,
       fallbackAsset: axis.shaderId ? axis.asset : undefined,
       cutout: axis.shaderId ? axis.cutout : undefined,
+      // D81: os retângulos onde a janela tem de deixar passar o mundo real — o fundo ao vivo é
+      // descartado ali, e a câmara, que está atrás do canvas, aparece como aparece ao chegar.
+      holes: real,
       asset: axis.asset,
       radius: axis.radius,
       followCamera: false,
@@ -212,7 +218,8 @@ export async function buildScene(scene, options = {}) {
     const axis = portal.window || {};
     const previewDimension = axis.kind === 'preview'
       ? portraits.get(axis.asset + '@' + axis.radius + '@' + (axis.shaderId || '') + '@' + (axis.cutout || '') +
-        '@' + (axis.azimuth || 0))
+        '@' + (axis.azimuth || 0) + '@' + (Array.isArray(axis.reality) ? axis.reality : [])
+          .map((hole) => [hole.az0, hole.el0, hole.az1, hole.el1].join(',')).join(';'))
       : undefined;
     const data = withDefaults(portal, SCENE.portals);
     elements.portals.push(createPortal(data, parent, {

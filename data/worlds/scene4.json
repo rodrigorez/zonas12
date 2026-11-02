@@ -406,7 +406,15 @@
         "radius": 120,
         "shaderId": "nuvens",
         "cutout": "recorte-scene3-de-scene4",
-        "azimuth": -90
+        "azimuth": -90,
+        "reality": [
+          {
+            "az0": 12.59,
+            "el0": -0.77,
+            "az1": 17.41,
+            "el1": 4.99
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
@@ -455,7 +463,15 @@
         "radius": 120,
         "shaderId": "ondas",
         "cutout": "recorte-scene5-de-scene4",
-        "azimuth": 105
+        "azimuth": 105,
+        "reality": [
+          {
+            "az0": -32.08,
+            "el0": -0.91,
+            "az1": -27.25,
+            "el1": 5.9
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
@@ -504,7 +520,15 @@
         "radius": 120,
         "shaderId": "fichario",
         "cutout": "recorte-scene11-de-scene4",
-        "azimuth": -6
+        "azimuth": -6,
+        "reality": [
+          {
+            "az0": -37.84,
+            "el0": -1.14,
+            "az1": -32.98,
+            "el1": 7.34
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
