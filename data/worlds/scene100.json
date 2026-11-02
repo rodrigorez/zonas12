@@ -1,0 +1,295 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "scene100",
+    "name": {
+      "pt": "Sala de ensaio",
+      "en": "Rehearsal room"
+    },
+    "carryOrigin": false
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "fundo-100": {
+      "path": "assets/panoramas/cidade-d0-forest.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama de reserva da sala de ensaio",
+        "en": "Rehearsal room fallback panorama"
+      }
+    },
+    "retrato-scene3": {
+      "path": "assets/previews/scene3-de-scene100.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo de destino, visto da porta da sala de ensaio",
+        "en": "Portrait of the destination world, seen from the rehearsal room door"
+      }
+    },
+    "recorte-scene3-de-scene100": {
+      "path": "assets/previews/recorte-scene3-de-scene100.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo de destino, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the destination world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene6": {
+      "path": "assets/previews/scene6-de-scene100.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo de destino, visto da porta da sala de ensaio",
+        "en": "Portrait of the destination world, seen from the rehearsal room door"
+      }
+    },
+    "recorte-scene6-de-scene100": {
+      "path": "assets/previews/recorte-scene6-de-scene100.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo de destino, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the destination world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene9": {
+      "path": "assets/previews/scene9-de-scene100.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo de destino, visto da porta da sala de ensaio",
+        "en": "Portrait of the destination world, seen from the rehearsal room door"
+      }
+    },
+    "recorte-scene9-de-scene100": {
+      "path": "assets/previews/recorte-scene9-de-scene100.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo de destino, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the destination world, seen from the door (cutout, for the live window)"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "nucleo",
+      "fallbackAsset": "fundo-100",
+      "name": {
+        "pt": "Ensaio",
+        "en": "Rehearsal"
+      },
+      "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [],
+  "portals": [
+    {
+      "id": 0,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        -16
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      }
+    },
+    {
+      "id": 1,
+      "ownedBy": 0,
+      "position": [
+        16,
+        0,
+        0
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 90
+      }
+    },
+    {
+      "id": 2,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        16
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene6"
+      },
+      "rotation": [
+        0,
+        -180,
+        0
+      ],
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene6",
+        "radius": 120,
+        "shaderId": "becos",
+        "cutout": "recorte-scene6-de-scene100",
+        "azimuth": 0
+      }
+    },
+    {
+      "id": 3,
+      "ownedBy": 0,
+      "position": [
+        -16,
+        0,
+        0
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene9"
+      },
+      "rotation": [
+        0,
+        -270,
+        0
+      ],
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene9",
+        "radius": 120,
+        "shaderId": "mangue",
+        "cutout": "recorte-scene9-de-scene100",
+        "azimuth": -90
+      }
+    }
+  ]
+}

@@ -31,8 +31,16 @@ const PORTAL_COMPONENT = 'stencil-portal';
 // (the module never reads the data) — the same shape as `useRealCamera` in the camera module.
 let worldSlug = null;
 
-export function setWorld(slug) {
+// Whether the doors of this world carry the origin in `?from` (D84). Every room of the exhibition
+// does: arriving through a door is what starts the other page by itself and what picks the door the
+// visitor appears behind (D37/L17). A world that is **not** part of the graph — the rehearsal room
+// `scene100` — says `false`: its doors open the plain address of the destination, which is what
+// keeps the rest of the exhibition untouched by a room that only exists to measure.
+let carriesOrigin = true;
+
+export function setWorld(slug, options) {
   worldSlug = typeof slug === 'string' ? slug : null;
+  carriesOrigin = !(options && options.carryOrigin === false);
 }
 
 // Whether a door may leave the page (D32). The exhibition navigates; the editor's preview does not —
@@ -462,8 +470,11 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     this.navigating = true;
     const url = new URL(worldHref(this.data.target, document.baseURI));
     // The only thing that crosses the boundary, besides the address, is the slug of this world: the
-    // destination uses it to choose which door the visitor appears behind (law L17).
-    if (worldSlug) url.searchParams.set('from', worldSlug);
+    // destination uses it to choose which door the visitor appears behind (law L17). A world that
+    // says it does not carry it (D84, `world.carryOrigin: false`) opens the plain address of the
+    // destination — the visitor arrives at the room's own start, as a first visit, and no room needs
+    // an arrival door for it.
+    if (worldSlug && carriesOrigin) url.searchParams.set('from', worldSlug);
     // O registo da travessia (sonda). Quem sai escreve-o um instante antes de sair e quem chega lê-o:
     // é a única prova que fica de uma travessia, porque o documento que a pediu já não existe quando
     // se quer saber o que ela fez. Sem ele, um aparelho que atravessa e não muda de página não deixa

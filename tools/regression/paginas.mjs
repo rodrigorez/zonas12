@@ -20,10 +20,19 @@ import { ENTRY_WORLD } from '../../js/modules/portal-kinds.js';
 // As chegadas deliberadas: uma sala que se abre por uma porta que não é a do portão.
 const CHEGADAS = { scene2: 'scene1', scene3: 'scene2' };
 
-// O fixture que estas baterias abrem (os outros três têm as suas próprias: o `shader` é do ensaio do
-// fundo, o `r9` dos quatro valores e o `exemplo-ficha` da ficha). Ele não tem pasta: abre-se na página
-// da raiz, com `?scene=`.
-const FIXTURE_ABERTO = 'example';
+// Os fixtures que estas baterias abrem (os outros três têm as suas próprias: o `shader` é do ensaio do
+// fundo, o `r9` dos quatro valores e o `exemplo-ficha` da ficha). Não têm pasta: abrem-se na página da
+// raiz, com `?scene=`.
+//
+// O `example` é o fixture de sempre; a `scene100` é a **sala de ensaio** (D84) e é aberta aqui de
+// propósito — é o único caminho por onde se entra nela, porque nenhuma porta do projeto lá chega. Se
+// não estivesse nesta lista, a sala que só se alcança por fora ficava a única página da exposição que
+// nenhuma bateria mede.
+const FIXTURES_ABERTOS = ['example', 'scene100'];
+
+// O primeiro deles, para quem só quer "o fixture" (é o `example`, o que tem as fichas e as portas de
+// ensaio).
+const FIXTURE_ABERTO = FIXTURES_ABERTOS[0];
 
 // A ordem em que se lê a exposição: o portão primeiro e as salas pelo número (o mesmo `order` que o
 // `tools/scene/ring.mjs` usa para ler o dado).
@@ -80,7 +89,9 @@ export function paginasDaExposicao() {
             : chegadas[0] || null
     });
   }
-  paginas.push({ slug: FIXTURE_ABERTO, rota: '/', cena: FIXTURE_ABERTO, from: null });
+  for (const fixture of FIXTURES_ABERTOS) {
+    paginas.push({ slug: fixture, rota: '/', cena: fixture, from: null });
+  }
 
   return { paginas, salas: salas.map((sala) => sala.slug), ignorados };
 }
@@ -90,12 +101,12 @@ export function paginasDaExposicao() {
 // o diz — em vez de a bateria ficar verde por ter medido menos páginas.
 export function cobertura(lista) {
   const deFora = lista.salas.filter((slug) => !lista.paginas.some((pagina) => pagina.slug === slug));
+  const dasSalas = lista.paginas.filter((pagina) => !FIXTURES_ABERTOS.includes(pagina.slug)).length;
   return {
     salas: lista.salas.length,
-    paginas: lista.paginas.filter((pagina) => pagina.slug !== FIXTURE_ABERTO).length,
+    paginas: dasSalas,
     deFora,
     ignorados: lista.ignorados,
-    ok: deFora.length === 0 && lista.ignorados.length === 0 &&
-      lista.paginas.filter((pagina) => pagina.slug !== FIXTURE_ABERTO).length === lista.salas.length
+    ok: deFora.length === 0 && lista.ignorados.length === 0 && dasSalas === lista.salas.length
   };
 }

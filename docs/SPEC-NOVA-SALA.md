@@ -3,7 +3,9 @@
 > **Estado: aprovada com as três propostas feitas** (2026-11-02). Nada nesta spec foi inventado: cada
 > passo é o que o repositório já faz, e cada número citado é um número medido por uma ferramenta que lá
 > está. As fases 1–7 têm agora um comando (`tools/scene/new-room.mjs`) e as listas das baterias passaram
-> a vir do dado; o que continua à mão é o que a spec diz que continua à mão.
+> a vir do dado; o que continua à mão é o que a spec diz que continua à mão. A **§9** junta o caso que
+> não é uma sala: o **mundo de ensaio** (`scene100`, D84), onde se experimenta o que ainda não entra no
+> caminho do visitante.
 >
 > **Para que serve.** Uma sala nova toca **oito** sítios que não se vêem uns aos outros: a página, o
 > dado da sala, o dado do portão, o dado de **cada** sala de destino, a folha das obras, os retratos
@@ -29,9 +31,9 @@
 | as **portas de mundo** (janela, retrato, chegada, giro, mundo real) | o JSON da sala **e** o de cada destino | o editor + `azimuths.mjs` + `reality.mjs` + `portrait.mjs` | L11, L13, L16, L17, L19, L26, L28 |
 
 O número de hoje, para se saber quando é que um passo ficou a meio: **12 páginas** (o portão e onze
-salas), **16 ficheiros de mundo** (as 12 e 4 fixtures), **50 portas**, **57 obras**, **39 retratos**
-(um par `.jpg` + `.png` por porta com janela de pré-visualização), **29 leis** e **28 baterias** no
-`--full`.
+salas), **17 ficheiros de mundo** (as 12 e 5 fixtures, dos quais a sala de ensaio da §9), **50 portas**
+nas salas, **57 obras**, **42 retratos** (um par `.jpg` + `.png` por porta com janela de
+pré-visualização), **29 leis** e **28 baterias** no `--full`.
 
 ---
 
@@ -358,3 +360,58 @@ passos continuam a ser os que a spec não automatiza — e são os que a próxim
 4. **O `new-room.mjs` é o atalho das fases 1 a 7**, e a spec continua a explicar o que ele faz por baixo.
 5. **Em aberto, para a próxima sala real:** os retratos (duas passagens) e a composição no editor são
    os dois passos que nenhum ensaio cobriu.
+
+---
+
+## 9. Um mundo de ensaio — a `scene100` (D84)
+
+O ensaio que a §7 descreve foi apagado. A **sala de ensaio** é o mesmo exercício, mas fica no projeto:
+uma sala onde se experimenta o que ainda não se quer no caminho do visitante — e o primeiro que lá se
+experimenta é o **movimento das portas**.
+
+**O que ela é.** Um mundo como os outros em tudo o que o dado diz (dimensões, câmaras, portas, fundo,
+janelas), e diferente em duas coisas: **não tem pasta** e **não está no grafo**. É um **fixture**
+(`js/scene/fixtures.js`), e é isso, e não uma lei nova, que a torna possível:
+
+| o que a lei pede | porque não se aplica |
+| --- | --- |
+| L19 (quem chega tem porta de chegada) | o `validate.mjs` calcula as chegadas sobre as salas **sem** os fixtures |
+| L25 (destinos diferentes dos das outras salas) | a mesma lista, `rooms = validated.filter(!FIXTURES.includes(slug))` |
+| L26 (giro de cada retrato) e L28 (buracos) | idem |
+| L22/L24 (dois anéis, 3 a 5 portas com uma ao portão) | `js/scene/validation.js` salta o bloco inteiro quando `fixture` |
+
+Não foi preciso mudar nenhuma lei, e nenhum outro mundo foi tocado: um fixture já estava fora do grafo
+(o `example` tem portas que navegam desde a D9). A `scene100` só passou a estar na lista.
+
+**As duas regras que ela tem a mais.**
+
+1. **Só se sai, nunca se entra.** Nenhuma porta do projeto aponta para `scene100`; as quatro portas dela
+   apontam para fora (o portão e as salas 3, 6 e 9). Chega-se lá escrevendo o endereço — a bateria abre-a
+   por `?scene=scene100` (`tools/regression/paginas.mjs`, `FIXTURES_ABERTOS`).
+2. **As portas dela entram no destino sem `?from`** (`world.carryOrigin: false`). O `?from=` que uma
+   porta escreve é o que faz a página de destino **arrancar sozinha e pôr a câmara na porta de chegada**
+   (D37); sem ele o destino é uma **primeira visita** — botão de arranque (ou o arranque automático, se
+   a câmara já tiver permissão) e a pose por omissão do mundo. É a regra que isola o ensaio: o destino
+   não precisa de saber que a sala de ensaio existe, e nenhuma porta do projeto ganha uma chegada a mais.
+
+O campo vive no dado (`world.carryOrigin`, booleano, por omissão `true`), o `scene-builder.js` passa-o ao
+`portal.js`, e é o `portal.js` que o aplica no sítio único onde a URL é escrita — não há uma segunda
+cópia da regra.
+
+**Os retratos de uma porta sem `?from`.** `tools/scene/portrait.mjs --direto` desenha a **primeira
+visita**: abre o mundo de destino **sem** `?from` e a câmara fica na pose por omissão (`cameras.player`),
+que é exactamente o que o visitante vê ao entrar por uma porta da sala de ensaio. E os pares deixaram de
+estar escritos à mão: `PORTAS` passou a ser **derivada do dado** (cada porta `preview` que navega, com o
+retrato na convenção `<destino>-de-<origem>`), o que trouxe os três pares da `scene100` sem uma linha a
+mais e deixou de fora o `example` (que aponta para um panorama antigo, não para um retrato).
+
+**O que as baterias medem nela.** A T1 atravessa as quatro portas e, para `carryOrigin: false`, inverte a
+expectativa: em vez de exigir `from=scene100` na URL de destino, exige que ele **não** esteja lá — sem
+essa inversão a regra nova nunca seria medida (o teste ficava vermelho por ela estar certa). Os T2–T12
+medem a página como qualquer outra, porque a lista vem do dado.
+
+**O que vem depois (ainda não está feito, e é para isso que a sala existe).** Três das quatro portas vão
+oscilar: translação de **±5 m** e rotação de **±45°**, uma em cada eixo — a porta A em X, a B em Y e a C
+em Z. O movimento entra depois de a sala estar aprovada **parada**, e é medido por um instrumento novo
+(a posição e o ângulo da porta lidos ao longo do tempo, contra a amplitude pedida), pela mesma ordem das
+outras leis: primeiro o número, depois a aprovação.

@@ -159,10 +159,18 @@ function verificarPorta(result, mundo, porta, medida) {
   if (porta.action.kind === 'navigate') {
     const marca = medida.depois.marca || {};
     const chegou = medida.depois.mundo === porta.action.target;
-    const voltou = String(medida.depois.url).indexOf('from=' + mundo.slug) >= 0;
+    // D84: a **sala de ensaio** navega *sem* `?from` (`world.carryOrigin: false`) — o destino dela é
+    // uma primeira visita, não uma chegada por uma porta. A regra mede-se nos dois sentidos: quem leva
+    // a origem tem de a levar na URL, quem não leva tem de não a levar. Sem esta inversão o teste
+    // exigia o `?from` a todas as portas e a regra nova nunca seria medida.
+    const levaOrigem = (dadosDoMundo(mundo.slug).world || {}).carryOrigin !== false;
+    const levou = String(medida.depois.url).indexOf('from=' + mundo.slug) >= 0;
+    const voltou = levaOrigem ? levou : !levou;
     result.check(nome + ' (navega para ' + porta.action.target + ') atravessa-se uma vez e chega lá',
       marca.porta === porta.id && marca.navegacoes === 1 && chegou && voltou,
-      'travessias=' + marca.navegacoes + ', mundo=' + medida.depois.mundo + ', url=' + medida.depois.url);
+      'travessias=' + marca.navegacoes + ', mundo=' + medida.depois.mundo +
+        ', from=' + (levou ? 'sim' : 'não') + (levaOrigem ? '' : ' (esperado não)') +
+        ', url=' + medida.depois.url);
     // D55: o registo que a sonda mostra. Sem ele, uma travessia que fica a meio é indistinguível de
     // o visitante não ter chegado à porta — e foi assim que um atravessar sem mudar de página passou
     // por «não aconteceu nada» no telemóvel.

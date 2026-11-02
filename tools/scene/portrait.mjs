@@ -22,9 +22,13 @@
 //
 // Uso, da raiz do projeto:
 //   node tools/scene/portrait.mjs --todos
-//   node tools/scene/portrait.mjs <mundo> <origem> [ficheiro]
+//   node tools/scene/portrait.mjs <mundo> <origem> [ficheiro] [--direto]
+//
+// `--direto` desenha a **primeira visita**: a câmara fica na pose por omissão do mundo em vez de numa
+// porta de chegada. É o que uma porta da sala de ensaio mostra (D84), porque lá o `?from` não viaja.
+// Os pares vêm do dado (`preview` que navega, com o retrato na convenção `<destino>-de-<origem>`).
 import { join } from 'node:path';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import { serveProject, openBrowser, ROOT, sleep } from '../regression/harness.mjs';
 import { DERIVED_DIMENSION_BASE } from '../../js/core/index.js';
 
@@ -39,55 +43,46 @@ import { DERIVED_DIMENSION_BASE } from '../../js/core/index.js';
 // resolução.
 const TAMANHO = { largura: 2048, altura: 1024, face: 1536, qualidade: 0.85 };
 
-// As trinta portas com retrato, como (mundo de destino, mundo de origem): é o par que diz de
-// onde a câmara parte para desenhar a chegada. `--todos` desenha as trinta.
-const PORTAS = [
-  ['scene1', 'gate'],
-  ['scene2', 'gate'],
-  ['scene3', 'gate'],
-  ['scene4', 'gate'],
-  ['scene5', 'gate'],
-  ['scene6', 'gate'],
-  ['scene7', 'gate'],
-  ['scene8', 'gate'],
-  ['scene9', 'gate'],
-  ['scene10', 'gate'],
-  ['scene11', 'gate'],
-  ['scene2', 'scene1'],
-  ['scene1', 'scene2'],
-  ['scene3', 'scene2'],
-  ['scene2', 'scene3'],
-  ['scene3', 'scene4'],
-  ['scene4', 'scene3'],
-  ['scene4', 'scene5'],
-  ['scene5', 'scene4'],
-  ['scene6', 'scene1'],
-  ['scene1', 'scene6'],
-  ['scene7', 'scene3'],
-  ['scene3', 'scene7'],
-  ['scene8', 'scene1'],
-  ['scene1', 'scene8'],
-  ['scene9', 'scene1'],
-  ['scene1', 'scene9'],
-  ['scene11', 'scene4'],
-  ['scene4', 'scene11'],
-  // As seis arestas da disposição em dois anéis (D77). A porta do céu ao portão não está aqui: ela
-  // mostra a câmara (um par de dimensões), não um retrato.
-  ['scene9', 'scene10'],
-  ['scene10', 'scene9'],
-  ['scene6', 'scene5'],
-  ['scene5', 'scene6'],
-  ['scene8', 'scene7'],
-  ['scene7', 'scene8'],
-  ['scene2', 'scene11'],
-  ['scene11', 'scene2'],
-  ['scene11', 'scene10'],
-  ['scene10', 'scene11']
-];
+// As portas com retrato, lidas do **dado** (D84): uma entrada por porta `preview` que navega, com o
+// mundo de destino, o mundo de origem e se essa origem leva o `?from` (as salas levam; a sala de
+// ensaio não — `world.carryOrigin: false`).
+//
+// A lista esteve escrita à mão (39 pares) e teria de crescer à mão com cada porta nova — a mesma
+// lição que a P1 da spec (D83) deixou nas baterias. O que continua a ser uma regra está aqui: só se
+// desenha o que segue a convenção `<destino>-de-<origem>.jpg`, porque é essa a porta que a janela
+// mostra; um fixture que aponte para um panorama antigo (o `example` aponta para `praia.jpg`) fica de
+// fora em vez de ser substituído por um retrato.
+const CONVENCAO = /(^|\/)previews\/[a-z0-9-]+-de-[a-z0-9-]+\.jpg$/;
+
+function portasDoDado() {
+  const pasta = join(ROOT, 'data', 'worlds');
+  const portas = [];
+  const vistas = new Set();
+  for (const nome of readdirSync(pasta).filter((entrada) => entrada.endsWith('.json'))) {
+    const cena = JSON.parse(readFileSync(join(pasta, nome), 'utf8'));
+    const origem = (cena.world && cena.world.slug) || nome.replace(/\.json$/, '');
+    const direto = Boolean(cena.world && cena.world.carryOrigin === false);
+    for (const portal of cena.portals || []) {
+      const janela = portal.window || {};
+      const acao = portal.action || {};
+      if (janela.kind !== 'preview' || acao.kind !== 'navigate') continue;
+      const retrato = (cena.assets && cena.assets[janela.asset] && cena.assets[janela.asset].path) || null;
+      if (!retrato || !CONVENCAO.test(retrato)) continue;
+      const chave = origem + '>' + acao.target;
+      if (vistas.has(chave)) continue;
+      vistas.add(chave);
+      portas.push({ destino: acao.target, origem, direto, retrato });
+    }
+  }
+  return portas.sort((a, b) => a.destino.localeCompare(b.destino) || a.origem.localeCompare(b.origem));
+}
+
+const PORTAS = portasDoDado();
 
 const todos = process.argv[2] === '--todos';
 const mundo = todos ? null : process.argv[2];
 const origem = todos ? null : process.argv[3];
+const direto = process.argv.includes('--direto');
 if (!todos && (!mundo || !origem)) {
   console.error('uso: node tools/scene/portrait.mjs <mundo> <origem> [ficheiro]');
   console.error('     node tools/scene/portrait.mjs --todos');
@@ -249,12 +244,17 @@ function recorteDe(destino) {
   return pasta + 'recorte-' + nome + '.png';
 }
 
-async function gerar(mundo, origem, destino) {
+async function gerar(mundo, origem, destino, opcoes = {}) {
   const tamanho = TAMANHO;
   const site = await serveProject();
   const browser = await openBrowser({ width: 1280, height: 800, camera: true });
   try {
-    const url = site.base + '/' + mundo + '/?from=' + origem + '&bust=' + Date.now();
+    // `--direto`: a origem não leva `?from` — é o caso da sala de ensaio (D84), cujas portas entram no
+    // destino como uma **primeira visita**. A câmara fica então na pose por omissão do mundo
+    // (`cameras.player`), e não numa porta de chegada; é essa a imagem que o visitante vê ao entrar.
+    const url = opcoes.direto
+      ? site.base + '/' + mundo + '/?bust=' + Date.now()
+      : site.base + '/' + mundo + '/?from=' + origem + '&bust=' + Date.now();
     const pronta = await browser.goto(url, 90000);
     if (!pronta) throw new Error('a cena de ' + mundo + ' não ficou pronta');
     // A sala só está construída quando `built` o diz (D68): `state.portals` enche-se antes disso, e com
@@ -290,7 +290,8 @@ async function gerar(mundo, origem, destino) {
     }
     await sleep(2500);
     // O `?from=` tem de ter posto a câmara no sítio: se não pôs, o mundo não tem porta de chegada
-    // para esta origem e o retrato sairia do lugar errado.
+    // para esta origem e o retrato sairia do lugar errado. Sem `?from` (D84) o que se confirma é que a
+    // câmara está **acima do chão**, e não a pose de repouso da entrada.
     const chegada = await browser.evaluate(`(() => {
       const cena = document.querySelector('a-scene');
       const camera = cena.camera;
@@ -298,7 +299,8 @@ async function gerar(mundo, origem, destino) {
       camera.getWorldPosition(posicao);
       return { mundo: window.portalDebug.world, posicao: [posicao.x, posicao.y, posicao.z] };
     })()`);
-    console.log('mundo ' + mundo + ' a chegar de ' + origem + ': câmara em [' +
+    console.log('mundo ' + mundo + ' a chegar de ' + (opcoes.direto ? '(primeira visita)' : origem) +
+      ': câmara em [' +
       chegada.posicao.map((valor) => Math.round(valor * 100) / 100).join(', ') + ']');
 
     // O shader **congela** antes de desenhar (2026-10-27). O retrato fixa o instante em cada material,
@@ -337,12 +339,14 @@ async function gerar(mundo, origem, destino) {
 
 async function main() {
   if (todos) {
-    for (const [de, de_origem] of PORTAS) {
-      await gerar(de, de_origem, join('assets', 'previews', de + '-de-' + de_origem + '.jpg'));
+    for (const porta of PORTAS) {
+      await gerar(porta.destino, porta.origem, porta.retrato, { direto: porta.direto });
     }
     return;
   }
-  await gerar(mundo, origem, process.argv[4] || join('assets', 'previews', mundo + '-de-' + origem + '.jpg'));
+  const pedido = process.argv[4] && !process.argv[4].startsWith('--') ? process.argv[4] : null;
+  await gerar(mundo, origem,
+    pedido || join('assets', 'previews', mundo + '-de-' + origem + '.jpg'), { direto });
 }
 
 main().catch((error) => {

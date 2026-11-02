@@ -99,7 +99,12 @@ export const SCENE = {
         fields: {
           id: { type: 'string' }
         }
-      }
+      },
+      // Se as portas deste mundo levam a origem no `?from` (D84). Omissão `true`, que é o que todas
+      // as salas fazem: é o `?from` que escolhe a porta de chegada no destino (L17) e que faz a
+      // página de lá arrancar sozinha (D37). Um mundo de ensaio fora do grafo diz `false`: as portas
+      // abrem o endereço simples do destino, e nenhuma sala precisa de uma porta de chegada dele.
+      carryOrigin: { type: 'boolean', default: true }
     }
   },
 

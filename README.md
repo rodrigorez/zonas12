@@ -56,7 +56,8 @@ zonas12/
 │                       ficheiros e a ponte com o servidor da ferramenta (Fase 5)
 ├── data/
 │   └── worlds/         uma cena por mundo (D24): gate, scene1, scene2, scene3, scene4, scene5,
-│                       scene6, scene7, scene8, scene9, scene10 e scene11, mais os fixtures (`example`, `exemplo-ficha`, `r9` e `shader`; o mundo sai do
+│                       scene6, scene7, scene8, scene9, scene10 e scene11, mais os fixtures (`example`,
+│                       `exemplo-ficha`, `r9`, `shader` e a sala de ensaio `scene100` — D84; o mundo sai do
 │                       **endereço**: `/` é o portão, `/scene1/` é a
 │                       primeira sala; o `?scene=<mundo>` continua a forçar um deles, para os testes)
 ├── i18n/
@@ -358,6 +359,24 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > até os retratos nascerem. Medido: os doze **92 de 92** (era 91) e as portas **157 de 157** (era 156) —
 > o `+1` de cada é a verificação de cobertura. Decisão **D83** (§11 do roadmap).
 
+> **Atualização (2026-11-02, a sala de ensaio — D84):** o autor pediu que a spec fosse **validada com
+> uma funcionalidade nova**: uma sala onde se experimenta o movimento das portas sem o pôr no caminho do
+> visitante. Nasceu a **`scene100`**, um **fixture** com dado (`data/worlds/scene100.json`) e sem pasta —
+> é um fixture, e não uma lei nova, que a torna possível: o validador e o `validation.js` já dispensam
+> os fixtures das leis da disposição (L19, L22, L24, L25, L26, L28), pelo que a sala está **fora do
+> grafo** sem que nenhum outro mundo mude. Duas regras só dela: **só se sai, nunca se entra** (nenhuma
+> porta do projeto aponta para lá; as quatro dela apontam para o portão e para as salas 3, 6 e 9) e as
+> portas dela **navegam sem `?from`** — um campo novo no dado, `world.carryOrigin: false`, aplicado no
+> sítio único onde o `js/modules/portal.js` escreve a URL, o que faz do destino uma **primeira visita**
+> (pose por omissão, sem porta de chegada). Os retratos dessas portas são a **primeira visita**:
+> `tools/scene/portrait.mjs` ganhou `--direto` e deixou de ter a lista de pares escrita à mão — os pares
+> passaram a sair do dado (cada porta `preview` que navega, na convenção `<destino>-de-<origem>`), o que
+> trouxe os três pares novos sem uma linha a mais. A bateria das portas inverteu a expectativa para
+> `carryOrigin: false` (exige que o `from=` **não** esteja lá — sem isso a regra nova nunca seria
+> medida) e a das páginas passou a abrir a sala de ensaio por `?scene=scene100`. Medido: `validate`
+> **OK** (4 portas, 7 assets, 4 janelas distintas), os retratos de **39 → 42**, os doze **99 de 99** (era
+> 92 — a página nova medida de ponta a ponta). Decisão **D84** (§11 do roadmap) e §9 da spec.
+
 > **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
 > filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as
 > portas a **60 m** —, e cada sala passou a ter **três a cinco portas**, uma delas de volta ao portão e
@@ -511,14 +530,15 @@ mundos — D43), `js/editor.js` (**15**, a entrada do editor — D36), `js/edito
 **3497** linhas com os painéis e a ponte com o servidor), `js/i18n.js` (**93**), `js/core/` (7 ficheiros,
 **234**), `js/modules/` (11 ficheiros, **3410**), `js/scene/` (13 ficheiros, **2342**), `js/shaders/`
 (11 ficheiros, **604**), `css/` (**3** ficheiros: `style.css` **142**, `editor.css` **313** e
-`obra.css` **252**), **16** ficheiros em `data/worlds/` (o portão, as onze salas e os quatro fixtures,
-**7093 linhas** no total e **56 portas**, das quais **50** nas doze páginas da exposição),
-`i18n/pt.json` (**219** chaves), as **57 obras** na folha `data/obras.tsv`, os **81** ficheiros em
-`assets/previews/` (**39** retratos e **39** recortes, um par por porta, mais os três panoramas — D46) e
-**56** ficheiros em `tools/` (**12775** linhas). O que esta versão entregou:
+`obra.css` **252**), **17** ficheiros em `data/worlds/` (o portão, as onze salas e os cinco fixtures,
+**7389 linhas** no total e **60 portas**, das quais **50** nas doze páginas da exposição),
+`i18n/pt.json` (**219** chaves), as **57 obras** na folha `data/obras.tsv`, os **87** ficheiros em
+`assets/previews/` (**42** retratos e **42** recortes, um par por porta, mais os três panoramas — D46) e
+**56** ficheiros em `tools/` (**12798** linhas). O que esta versão entregou:
 
-A **v0.0.23** é a **spec de uma sala nova** (D83): o roteiro em `docs/SPEC-NOVA-SALA.md`, as listas das
-baterias a virem do dado e o `tools/scene/new-room.mjs`. Antes dela, a **v0.0.22** fechou a **emenda da
+A **v0.0.23** é a **spec de uma sala nova** (D83) e a **sala de ensaio** (D84): o roteiro em
+`docs/SPEC-NOVA-SALA.md` (com a §9 a descrever o mundo de ensaio), as listas das baterias a virem do
+dado e o `tools/scene/new-room.mjs`. Antes dela, a **v0.0.22** fechou a **emenda da
 esfera** (D82): o preâmbulo dos shaders ganhou `volta`, `azim` e `noise3`, os onze fundos foram
 reexcritos para não terem costura e os 39 retratos foram refeitos. A **v0.0.21** fechou o **mundo real
 atrás da porta** (D81) e a **v0.0.20** a **ordem da janela** (D80). O detalhe medido de cada uma está
@@ -575,7 +595,7 @@ isso nenhum deles exige a interface da exposição para carregar (pendência **R
 | `camera.js` | A câmara-jogador (posição, D-pad, limites) e o erro de câmara; é o **único** ficheiro que sabe onde a câmara está — desde a Fase 3 recebe-a do construtor de cena, em vez de a procurar pelo nome | `playerCamera`, `createPlayerCamera`, `startSession`, `setupMobileControls`, `reportCameraError` |
 | `artwork.js` | A obra: o material dimensional, o clique e o modal (foco preso, `inert`, Escape) | componentes `dimensional-material` e `open-artwork`; `createArtwork`/`removeArtwork`; `closeArtwork` |
 | `dimension.js` | O fundo 360º de uma dimensão (imagem ou vídeo) | componente `dimension-panorama`; `createDimension`/`removeDimension` |
-| `portal.js` | A porta: janela (máscara), moldura, caixa de colisão, travessia e caixa de debug — e o **driver de frame** da cena. Desde o B4 da Fase 3B a travessia e a janela são decididas pelos **dois eixos** (`window`/`action`) | componentes `stencil-portal` e `portal-driver`; `createPortal`/`removePortal`; `startFrameDriver` |
+| `portal.js` | A porta: janela (máscara), moldura, caixa de colisão, travessia e caixa de debug — e o **driver de frame** da cena. Desde o B4 da Fase 3B a travessia e a janela são decididas pelos **dois eixos** (`window`/`action`); a origem que a travessia leva no `?from` é decidida pelo mundo (`setWorld`, `carryOrigin` — D84) | componentes `stencil-portal` e `portal-driver`; `createPortal`/`removePortal`; `startFrameDriver` |
 | `portal-kinds.js` | A **tabela dos dois eixos**, pura: o que cada `window` mostra e o que cada `action` faz, a matriz das combinações legais, a validação de uma porta e o endereço de um mundo. Corre também em `node` (é ela que o validador lê) | `WINDOW_KINDS`/`ACTION_KINDS`, `isLegalCombination`, `validateDoor`, `worldHref` e `ENTRY_WORLD` |
 
 Cada módulo tem o seu `remove()`, para que criar e destruir conteúdo em ciclo (o que o
@@ -591,7 +611,7 @@ O **`js/scene/`** é onde a cena em dados vive, e tem **treze** ficheiros:
 | `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L10, L11, L12, L13, L14, L15, L16, L17, L18, L20, L21, L22 (os dois anéis), L23 (a folga entre eles), L24 (três a cinco portas, uma ao portão) e L28 (os buracos do mundo real, `realityWindows`); e, sobre o **grafo** dos mundos, a L19 (`missingArrivals`), a L25 (`repeatedDestinations`) e a L26 (`portraitTurns`, o giro do retrato de cada porta). A **L27** (a chegada põe a câmara no ponto e na direcção) não é do dado: prova-se na bateria T7/T11. Um fixture (D9) é dispensado das leis da disposição por uma opção — e pelo próprio slug, que é como a bateria do shader o valida. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor corre a cada tecla |
 | `ring.js` | A **disposição em dois anéis** (D77): os lugares das obras e das portas a partir de um raio e de uma fase, a folga entre os dois anéis e o teto que a mede (`bestPhase`, `clearanceCeiling`); e o **giro do retrato** de uma porta de mundo (`portraitTurn`, D78), que é a conta que o dado guarda e a L26 prova. Puro; é a mesma conta que escreve o dado (`tools/scene/ring.mjs --aplicar`, `tools/scene/azimuths.mjs --aplicar`) e a que as leis L22, L23 e L26 verificam |
 | `reality.js` | Onde a janela de uma porta tem de deixar passar o **mundo real** (D81): os retângulos (azimute e elevação) em que o destino mostra a dimensão `camera` — os que o preâmbulo dos shaders descarta e a L28 recalcula. Puro; é a conta que escreve o dado (`tools/scene/reality.mjs --aplicar`) |
-| `fixtures.js` | Os **mundos que não são salas** (D9): a lista que a página, a linha de comando e o editor leem para não pedirem anéis nem três a cinco portas a um banco de ensaio |
+| `fixtures.js` | Os **mundos que não são salas** (D9): a lista que a página, a linha de comando e o editor leem para não pedirem anéis nem três a cinco portas a um banco de ensaio. A **sala de ensaio** `scene100` é o quinto (D84) — é esta lista que a põe fora do grafo |
 | `arrival.js` | Onde o visitante aparece ao chegar de outro mundo (**L16**): puro e partilhado, para o construtor e o validador não discordarem da geometria |
 | `scene-builder.js` | O **único** que conhece o A-Frame: cria o `<a-assets>` (e **espera** que os ficheiros carreguem), a câmara, as dimensões, as obras e os portais, a partir do JSON. Desde o B3 aceita `{ preview: true }` e desliga a navegação (D32) |
 | `render-config.js` | As **regras de desenho** do renderer (`ar-config`: `stencil`, `alpha`, `antialias`), registadas uma só vez para os **dois** hosts — a exposição e a pré-visualização do editor (lei **L6**) |
@@ -960,14 +980,14 @@ repetições (cerca de 6 minutos por celular para as três tecnologias nos dois 
 
 ### Verificado nesta versão (medido no browser)
 
-> **Atualização (2026-11-02, os números da v0.0.23):** o que esta versão mediu, com
-> `node tools/regression/all.mjs --full`: o dado **0**, as leis **29 de 29** com o controlo limpo, o
-> importador da folha **21 de 21**, os doze testes **92 de 92** nas páginas que o dado declara, as
-> portas e as chegadas **157 de 157**, a ordem da janela **22 de 22**, a emenda da esfera **15 de 15**
-> e a costura das travessias **124 de 128** — vermelha desde antes do anel (**D46**), com duas portas
-> estáveis em **0,56** e **0,58** e o resto intermitente. Na corrida de 28 baterias ficaram **26
-> verdes**; as duas que falharam passam isoladas (o i18n com um `EBUSY` a ler o `DevToolsActivePort` e
-> a ficha com uma capa remota que não carregou), e nenhuma delas toca no que esta versão mudou. O
+> **Atualização (2026-11-02, os números da v0.0.23 e da sala de ensaio — D84):** o que esta versão
+> mediu, com `node tools/regression/all.mjs --full`: o dado **0**, as leis **29 de 29** com o controlo
+> limpo, o importador da folha **21 de 21**, os doze testes **99 de 99** nas páginas que o dado declara
+> (catorze, com a sala de ensaio), as portas e as chegadas **165 de 165**, a ordem da janela **22 de
+> 22**, a emenda da esfera **15 de 15** e a costura das travessias **125 de 128** — vermelha desde
+> antes do anel (**D46**), com duas portas estáveis na casa dos **0,5** e um caso intermitente (um
+> fotograma escuro na chegada). Na corrida de **28 baterias** ficaram **27 verdes**, em **2 819,2 s**;
+> a única vermelha é a costura, que já estava vermelha **antes** desta versão e não foi tocada por ela. O
 > detalhe por bateria está em §10 do [roadmap](docs/ROADMAP.md). O texto abaixo é o registo da **Fase
 > 4** e ficou como estava.
 
@@ -1993,6 +2013,11 @@ funcionam. E `&from=<mundo>` diz de que mundo se vem, o que faz o visitante apar
 de chegada: `/scene2/?from=scene1`. O mundo de ensaio do fundo shader (Fase 7, **R14**/**R15**) é
 `?scene=shader`, e `&shader=0` mostra a imagem de reserva em vez do shader — em qualquer mundo.
 
+A **sala de ensaio** (D84) é `?scene=scene100`, e é o único caminho para lá: nenhuma porta do projeto
+aponta para ela. As **quatro** portas dela levam ao portão e às salas 3, 6 e 9, e levam **sem
+`?from`** — o destino abre como uma primeira visita. É onde se experimenta o que ainda não entra no
+caminho do visitante.
+
 ### 2. Personalizar Conteúdo
 
 - Modifique as imagens e vídeos em `assets/{panoramas,artworks,video,previews}/`
@@ -2025,10 +2050,10 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 
 | Bateria | O que responde |
 | --- | --- |
-| `tools/scene/validate.mjs` | os 16 ficheiros de mundo (12 salas e 4 fixtures), as leis, o grafo das portas e os arranques |
+| `tools/scene/validate.mjs` | os 17 ficheiros de mundo (12 salas e 5 fixtures), as leis, o grafo das portas e os arranques |
 | `tools/scene/laws-selftest.mjs` | **29** avarias injectadas, todas detectadas, com o controlo limpo |
-| `tools/regression/twelve-tests.mjs` | **T2–T12** nas páginas do **dado** (hoje 13: portão, salas e o fixture) — **92** verificações, uma delas a cobertura da lista |
-| `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) — 50 portas, **157** verificações |
+| `tools/regression/twelve-tests.mjs` | **T2–T12** nas páginas do **dado** (hoje 14: portão, salas e os dois fixtures abertos) — **99** verificações, uma delas a cobertura da lista |
+| `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) — as 54 portas das catorze páginas, **165** verificações |
 | `tools/regression/i18n.mjs` | as duas línguas: chaves, marcadores e `?lang=en` nas duas páginas |
 
 `--full` acrescenta as baterias arquivadas das Fases 4, 5, 7 e 8 — a costura das travessias, a ponte
@@ -2047,12 +2072,14 @@ o exemplo (`data/obras.exemplo.tsv`) sem tocar na definitiva —, `node tools/sc
 escreve o esqueleto de uma sala nova e as portas que ela pede (ver
 [`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md)), `node tools/scene/ring.mjs --aplicar` põe as obras
 e as portas nos dois anéis (D77) e `node tools/scene/portrait.mjs --todos` desenha os retratos das
-portas (duas passagens, e cada uma abre um Chrome por porta).
+portas (duas passagens, e cada uma abre um Chrome por porta; `--direto` desenha a **primeira visita**, que
+é o que mostra uma porta da sala de ensaio — D84). Os pares saem do dado, não de uma lista à mão.
 
 As duas baterias que medem a exposição **página a página** (os T2–T12 e o T1/T7/T11) tiram a lista de
 páginas do **dado** (`tools/regression/paginas.mjs`): uma sala nova entra sozinha, e a bateria verifica
 «a lista cobre todas as salas do dado (N)» antes de medir — foi assim que uma sala deixou de poder
-ficar verde por não estar numa lista escrita à mão.
+ficar verde por não estar numa lista escrita à mão. Os **fixtures abertos** também estão nomeados lá
+(`FIXTURES_ABERTOS`): o `example` e a sala de ensaio `scene100`, que nenhuma porta do projeto alcança.
 
 Cada bateria continua a poder correr sozinha, com os argumentos que ela própria documenta — é o que
 se usa quando se está a investigar um número.

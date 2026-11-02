@@ -94,8 +94,11 @@ export async function buildScene(scene, options = {}) {
   const catalogue = scene.assets || {};
   const cameras = scene.cameras || {};
   // The world this page serves (D24). The portal module writes it into `?from` when a door
-  // navigates, and it never reads the data itself — the same shape as `useRealCamera`.
-  setWorld(scene.world && scene.world.slug);
+  // navigates, and it never reads the data itself — the same shape as `useRealCamera`. Desde a D84
+  // o mundo pode dizer que as suas portas **não** levam a origem (`world.carryOrigin: false`): é a
+  // regra da sala de ensaio, que abre os destinos pelo endereço simples.
+  setWorld(scene.world && scene.world.slug,
+    { carryOrigin: !(scene.world && scene.world.carryOrigin === false) });
   // O mesmo mundo, para a memória do ponto de vista (D63): a obra que abre a ficha guarda-o, e a
   // página do mundo lê-o ao voltar. Um sítio só para a pergunta «que mundo é este?».
   setReturnWorld(scene.world && scene.world.slug);
