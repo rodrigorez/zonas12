@@ -45,6 +45,17 @@ void main() {
 // a câmara (medido: 0,62 a 1,70 de salto na costura). Os retângulos vêm do dado (`window.reality`) e
 // são (azimute, elevação) em graus, no referencial em que o retrato foi cozido — que é o mesmo em que
 // este `vDir` é lido.
+//
+// O preâmbulo tem outra coisa que não é paisagem: a **emenda da esfera** (D82). `az` é um serrilhado
+// — salta de +PI para -PI atrás do visitante — pelo que tudo o que o use como linha recta herda o
+// corte. Ficam aqui as três ferramentas para não a ter, uma casa só para todas:
+//   · `volta` — o azimute em voltas, -0.5..+0.5. Um padrão periódico fecha na emenda se a frequência
+//     for um inteiro de voltas; e o índice de uma célula pintada ao acaso leva `mod(indice, N)`, para
+//     que a célula que atravessa a emenda receba uma só cor;
+//   · `azim` — o par (d.x, d.z), seno e cosseno do azimute, contínuo em toda a volta: para direcções e
+//     para o ruído que se desenrola ao longo da esfera;
+//   · `noise3` — ruído sobre a direcção, sem coordenada nenhuma que salte: é o que os fundos orgânicos
+//     usam em vez de `noise(vec2(az * …, el * …))`.
 export const FRAGMENT_HEAD = `
 precision mediump float;
 varying vec3 vDir;
@@ -58,10 +69,22 @@ float noise(vec2 p) {
   f = f * f * (3.0 - 2.0 * f);
   return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
 }
+float hash3(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
+float noise3(vec3 p) {
+  vec3 i = floor(p), f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(mix(hash3(i), hash3(i + vec3(1.0, 0.0, 0.0)), f.x),
+        mix(hash3(i + vec3(0.0, 1.0, 0.0)), hash3(i + vec3(1.0, 1.0, 0.0)), f.x), f.y),
+    mix(mix(hash3(i + vec3(0.0, 0.0, 1.0)), hash3(i + vec3(1.0, 0.0, 1.0)), f.x),
+        mix(hash3(i + vec3(0.0, 1.0, 1.0)), hash3(i + vec3(1.0, 1.0, 1.0)), f.x), f.y), f.z);
+}
 void main() {
   vec3 d = normalize(vDir);
   float az = atan(d.x, -d.z);
   float el = asin(clamp(d.y, -1.0, 1.0));
+  float volta = az / (2.0 * PI);
+  vec2 azim = d.xz;
   for (int i = 0; i < 4; i++) {
     if (i >= uHolesN) break;
     vec4 hole = uHoles[i];

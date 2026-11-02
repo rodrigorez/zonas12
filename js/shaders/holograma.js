@@ -27,7 +27,10 @@ float linhaPar = 1.0 - smoothstep(0.0, 0.028, par);
 // faz as linhas convergirem; o \`uTime\` corre na direcção do afastamento, para a grelha caminhar sob os
 // pés em vez de ficar colada.
 float prof = 1.0 / max(-el, 0.02);
-float gx = abs(fract(az * 2.6 * prof * 0.10) - 0.5);
+// O chão em coordenadas de mundo — o mesmo chão do \`nucleo\` —, e não em \`az\`: uma grelha contada em
+// \`az\` não fecha na volta e abria uma costura em leque atrás do visitante (D82).
+vec2 chaoP = vec2(sin(az), -cos(az)) * prof;
+float gx = abs(fract(chaoP.x * 0.26) - 0.5);
 float gz = abs(fract(prof * 0.55 - uTime * 0.30) - 0.5);
 float linhaChao = 1.0 - smoothstep(0.0, 0.055, gx);
 linhaChao = max(linhaChao, 1.0 - smoothstep(0.0, 0.055, gz));

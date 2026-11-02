@@ -43,12 +43,15 @@ float onda = 0.5 + 0.5 * sin(el * 9.0 - uTime * 1.6);
 vec3 fundoCor = vec3(0.010, 0.017, 0.024) + vec3(0.06, 0.26, 0.36) * centro * (0.30 + onda * 0.70) * 0.42;
 
 // Os bastidores: um por sector de \`az\`, cada um com a sua altura de luz e o seu ritmo de pisca,
-// tirados do \`hash\` do índice — é o que faz a sala não ser um papel de parede.
+// tirados do \`hash\` do índice — é o que faz a sala não ser um papel de parede. Os sectores contam-se
+// em **voltas** (20 por volta) e fecham com \`mod\`: em \`az\` o sector cortado pela emenda eram dois, e
+// atrás do visitante via-se um bastidor partido ao meio (D82).
 float SETORES = 20.0;
 float passo = 2.0 * PI / SETORES;
-float sector = floor(az / passo + 0.5);
+float sectorVolta = volta * SETORES + 0.5;
+float sector = mod(floor(sectorVolta), SETORES);
 float semente = hash(vec2(sector, 3.7));
-float desvio = az - sector * passo;
+float desvio = (fract(sectorVolta) - 0.5) * passo;
 // o corpo do bastidor: mais estreito que o sector, para ficar o corredor entre dois
 float corpo = 1.0 - smoothstep(0.052, 0.068, abs(desvio));
 corpo *= 1.0 - smoothstep(0.50, 0.56, el);

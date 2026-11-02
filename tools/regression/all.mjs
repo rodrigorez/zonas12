@@ -67,6 +67,9 @@ const ARQUIVADAS = [
   // (a obra encostada à porta) em vez de a esperar do mundo, e traz o controlo positivo que mostra o
   // defeito quando o recorte é transparente.
   { nome: 'a ordem da janela (D80)', script: 'tools/regression/ordem-da-janela.mjs' },
+  // D82: o fundo shader fecha na volta. Mede o degrau na emenda da esfera em cada shader, com dois
+  // controlos que provam que o instrumento vê o defeito.
+  { nome: 'a emenda da esfera (D82)', script: 'tools/regression/emenda.mjs' },
   { nome: 'a orientação do telemóvel (D52)', script: 'tools/regression/orientation.mjs' },
   { nome: 'a chegada por uma porta (D37)', script: 'tools/regression/camera-arrival.mjs' },
   { nome: 'a ponte de imagem (D43)', script: 'tools/regression/image-bridge.mjs' },

@@ -23,11 +23,14 @@ gradeChao *= 1.0 - smoothstep(70.0, 280.0, chaoD);
 vec3 chaoCor = vec3(0.024, 0.028, 0.032) + vec3(0.17, 0.20, 0.23) * gradeChao * 0.30;
 
 // As gavetas: vinte e quatro por volta. A parede é um cilindro, por isso passos iguais em \`az\` são
-// arcos iguais — a perspectiva sai da própria geometria e não de mais uma conta.
+// arcos iguais — a perspectiva sai da própria geometria e não de mais uma conta. A coluna conta-se em
+// **voltas** e fecha com \`mod\` (D82): a gaveta que atravessa a emenda era duas meias gavetas de tons
+// diferentes, e via-se a costura em cima da parede.
 float colunas = 24.0;
 float passo = 2.0 * PI / colunas;
-float coluna = floor(az / passo + 0.5);
-float desvioX = az - coluna * passo;
+float gavetaVolta = volta * colunas + 0.5;
+float coluna = mod(floor(gavetaVolta), colunas);
+float desvioX = (fract(gavetaVolta) - 0.5) * passo;
 // Sete filas entre o chão e o topo do fichário.
 float filas = 7.0;
 float altura = (topo - horizonte) / filas;
@@ -77,7 +80,7 @@ float cintila = respira + 0.04 * sin(uTime * 4.10) * sin(uTime * 2.70 + 0.7);
 // E a luz a escorrer pela parede: duas ondas de alturas diferentes a subir devagar, que é o que dá
 // vida à gaveta que está à altura dos olhos — sem elas o meio da sala (o que uma janela de porta
 // mostra a trinta metros) ficava parado, por mais que o tubo piscasse.
-float escorre = (0.55 + 0.45 * sin(el * 7.0 - uTime * 1.1 + az * 0.6)) *
+float escorre = (0.55 + 0.45 * sin(el * 7.0 - uTime * 1.1 + az * 1.0)) *
   (0.75 + 0.25 * sin(el * 3.1 + uTime * 0.7));
 
 // O varrimento: a luz a procurar uma ficha ao longo da parede, uma volta a cada vinte e dois segundos.
@@ -86,11 +89,12 @@ float diferenca = mod(az - posicao + PI, 2.0 * PI) - PI;
 float varrimento = 1.0 - smoothstep(0.05, 0.80, abs(diferenca));
 
 // O pó: pontos que sobem devagar dentro do halo. São pequenos, mas são o que dá a profundidade entre a
-// parede e o visitante.
-vec2 poeira = vec2(az * 5.0, el * 11.0) + vec2(uTime * 0.045, -uTime * 0.030);
+// parede e o visitante. A coluna conta-se em voltas inteiras (32 por volta) para o pó não saltar na
+// emenda.
+vec2 poeira = vec2(volta * 32.0, el * 11.0) + vec2(uTime * 0.045, -uTime * 0.030);
 vec2 celulaPoeira = fract(poeira) - 0.5;
 float pontoPoeira = 1.0 - smoothstep(0.05, 0.11, length(celulaPoeira));
-float temPoeira = step(0.90, hash(floor(poeira) + 0.5));
+float temPoeira = step(0.90, hash(vec2(mod(floor(poeira.x), 32.0), floor(poeira.y)) + 0.5));
 float poeiraBrilho = pontoPoeira * temPoeira * halo;
 
 // A composição da parede: o fundo escuro da ranhura, a face da gaveta por cima, o cartão, o latão, o

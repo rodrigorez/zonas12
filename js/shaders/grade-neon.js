@@ -8,7 +8,10 @@ export const shader = {
   body: `
       vec3 sky = mix(vec3(0.48, 0.12, 0.64), vec3(0.08, 0.0, 0.17), clamp(el * 2.0, 0.0, 1.0));
       float depth = 1.0 / max(-el, 0.02);
-      vec2 grid = vec2(az * 6.0 * depth * 0.12, depth + uTime * 2.0);
+      // O chão em coordenadas de mundo (D82): a grelha contada em \`az\` abria uma costura em leque
+      // atrás do visitante. \`0.72\` é o passo que a grelha tinha por radiano a menos de \`depth\`.
+      vec2 chaoP = vec2(sin(az), -cos(az)) * depth;
+      vec2 grid = vec2(chaoP.x * 0.72, depth + uTime * 2.0);
       vec2 line = smoothstep(0.04, 0.0, abs(fract(grid) - 0.5) - 0.46);
       float g = max(line.x, line.y) * smoothstep(0.0, -0.15, el);
       col = el > 0.0 ? sky : vec3(0.04, 0.0, 0.08) + vec3(1.0, 0.25, 0.8) * g;`

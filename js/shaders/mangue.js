@@ -18,8 +18,8 @@ float horizonte = -0.05;
 // A água: a profundidade é \`1/(horizonte - el)\`, a mesma conta do chão do \`holograma\`, e é ela que
 // comprime as ondulações ao longe e as abre aos pés.
 float prof = 1.0 / (max(horizonte - el, 0.0) + 0.03);
-float r1 = noise(vec2(az * 2.4 + uTime * 0.16, prof * 0.9 - uTime * 0.42));
-float fase = prof * 2.3 + uTime * 1.30 + r1 * 4.2 + az * 1.1;
+float r1 = noise3(vec3(azim * 2.4 + vec2(uTime * 0.16, 0.0), prof * 0.9 - uTime * 0.42));
+float fase = prof * 2.3 + uTime * 1.30 + r1 * 4.2 + az * 1.0;
 float brilho = sin(fase) * 0.5 + 0.5;
 // A lama: castanho-esverdeado escuro, e a crista clareia para um verde-palha.
 vec3 aguaCor = mix(vec3(0.022, 0.032, 0.017), vec3(0.135, 0.150, 0.072),
@@ -28,23 +28,26 @@ aguaCor += vec3(0.40, 0.44, 0.24) * pow(brilho, 10.0) * 0.50;
 // Junto ao horizonte a água devolve o céu: é o que lhe dá profundidade.
 float espelho = 1.0 - smoothstep(0.0, 0.20, horizonte - el);
 aguaCor = mix(aguaCor, vec3(0.30, 0.36, 0.22), espelho * 0.45);
-// O clarão que atravessa as raízes, partido na superfície.
-float coluna = 1.0 - smoothstep(0.05, 0.34, abs(az - 0.35));
+// O clarão que atravessa as raízes, partido na superfície. A distância é a da volta mais curta.
+float coluna = 1.0 - smoothstep(0.05, 0.34, abs(mod(az - 0.35 + PI, 2.0 * PI) - PI));
 aguaCor += vec3(1.00, 0.96, 0.70) * coluna * pow(brilho, 6.0) * 0.45;
 
 // Os troncos: um por sector de \`az\`, cada um com a sua largura, a sua altura e a sua curva, tiradas do
-// \`hash\` do índice — é o que faz a floresta não ser uma sebe. O \`afinamento\` só aperta no último terço:
-// uma raiz de propágulo é quase da mesma grossura até ao fim, e o que a afina é a distância, não a
-// ponta.
+// \`hash\` do índice — é o que faz a floresta não ser uma sebe. Os sectores contam-se em **voltas**
+// (26 deles por volta) e o índice fecha com \`mod\`: em \`az\` o sector que atravessa a emenda era dois
+// sectores, e via-se um tronco cortado ao meio atrás do visitante (D82).
 float SETORES = 26.0;
 float passo = 2.0 * PI / SETORES;
-float sector = floor(az / passo + 0.5);
+float sectorVolta = volta * SETORES + 0.5;
+float sector = mod(floor(sectorVolta), SETORES);
 float semente = hash(vec2(sector, 7.3));
-float desvio = az - sector * passo;
+float desvio = (fract(sectorVolta) - 0.5) * passo;
 float curva = desvio + sin(el * 2.6 + semente * 6.283) * 0.030
             + sin(uTime * 0.50 + semente * 6.283) * 0.003;
 float largura = 0.008 + semente * 0.013;
 float topo = 0.42 + semente * 0.55;
+// O \`afinamento\` só aperta no último terço: uma raiz de propágulo é quase da mesma grossura até ao
+// fim, e o que a afina é a distância, não a ponta.
 float afinamento = 1.0 - smoothstep(topo - 0.30, topo, el) * 0.25;
 // A sapata: junto à água a raiz abre, e é isso que a segura na lama.
 afinamento += (1.0 - smoothstep(horizonte, horizonte + 0.10, el)) * 0.45;
@@ -55,9 +58,10 @@ tronco *= 1.0 - smoothstep(topo, topo + 0.05, el);
 // Os pneumatóforos: muitos, finos, só na lama rasa. São o que se vê primeiro num mangue.
 float PINOS = 88.0;
 float passoPino = 2.0 * PI / PINOS;
-float indicePino = floor(az / passoPino + 0.5);
+float pinoVolta = volta * PINOS + 0.5;
+float indicePino = mod(floor(pinoVolta), PINOS);
 float sementePino = hash(vec2(indicePino, 11.0));
-float desvioPino = az - indicePino * passoPino;
+float desvioPino = (fract(pinoVolta) - 0.5) * passoPino;
 float pino = 1.0 - smoothstep(0.0, 0.0060, abs(desvioPino));
 float alturaPino = 0.020 + sementePino * 0.075;
 pino *= smoothstep(horizonte - 0.010, horizonte + 0.012, el);
@@ -67,9 +71,10 @@ pino += (1.0 - smoothstep(0.0, 0.0060, abs(desvioPino)))
       * (1.0 - smoothstep(0.0, 0.035, abs(el - horizonte + alturaPino * 0.45))) * 0.22;
 
 // A copa: duas camadas de ruído, uma grande e uma miúda (as folhas), e os buracos entre elas. O que
-// decide o contraste é a janela do \`smoothstep\`: estreita, e a copa fecha-se em manchas.
-float folhaGrande = noise(vec2(az * 7.0, el * 10.0 + uTime * 0.06));
-float folhaMiuda = noise(vec2(az * 17.0 + uTime * 0.09, el * 26.0));
+// decide o contraste é a janela do \`smoothstep\`: estreita, e a copa fecha-se em manchas. O ruído é
+// lido na direcção, que é a única coordenada que não tem emenda.
+float folhaGrande = noise3(vec3(azim * 7.0, el * 10.0 + uTime * 0.06));
+float folhaMiuda = noise3(vec3(azim * 17.0 + vec2(uTime * 0.09, 0.0), el * 26.0));
 float copaM = smoothstep(0.42, 0.62, folhaGrande * 0.60 + folhaMiuda * 0.40);
 vec3 copaCor = mix(vec3(0.002, 0.008, 0.004), vec3(0.048, 0.135, 0.042), copaM);
 // O céu por trás: esverdeado em cima, mais claro no horizonte — onde a luz entra de fora.
@@ -77,8 +82,8 @@ vec3 ceuCor = mix(vec3(0.42, 0.50, 0.30), vec3(0.10, 0.20, 0.14),
                   smoothstep(0.10, 1.10, el));
 vec3 cima = mix(ceuCor, copaCor, smoothstep(0.02, 0.14, el) * (0.55 + copaM * 0.45));
 
-// Os feixes de luz, a descerem de través entre os troncos.
-float feixe = pow(0.5 + 0.5 * sin(az * 4.6 - el * 2.4 + uTime * 0.50), 16.0);
+// Os feixes de luz, a descerem de través entre os troncos. O \`az\` entra por um inteiro de voltas (5).
+float feixe = pow(0.5 + 0.5 * sin(az * 5.0 - el * 2.4 + uTime * 0.50), 16.0);
 feixe *= smoothstep(horizonte, 0.55, el) * (1.0 - smoothstep(0.80, 1.30, el));
 
 // A composição: água em baixo, copa em cima, a linha da água a separar as duas.

@@ -20,24 +20,30 @@ float ceu = smoothstep(horizonte - 0.012, horizonte + 0.012, el);
 float prof = horizonte - el;
 float dist = 1.0 / (prof + 0.05);
 
-// Duas camadas de ruído: a de trás dobra o traçado, a da frente parte a crista.
-float r1 = noise(vec2(az * 2.2 + uTime * 0.30, dist * 0.55 - uTime * 0.55));
-float r2 = noise(vec2(az * 7.0 - uTime * 0.25, dist * 1.6 + uTime * 0.90));
+// Duas camadas de ruído: a de trás dobra o traçado, a da frente parte a crista. O ruído é lido na
+// direcção (D82): em \`az\` a água rasgava-se na emenda da esfera, e a esfera não tem emenda.
+float r1 = noise3(vec3(azim * 2.2 + vec2(uTime * 0.30, 0.0), dist * 0.55 - uTime * 0.55));
+float r2 = noise3(vec3(azim * 7.0 - vec2(uTime * 0.25, 0.0), dist * 1.6 + uTime * 0.90));
 
 // A fase corre para o visitante (\`dist\`) e é dobrada pelo ruído. O \`az\` entra pouco de propósito: uma
-// onda que corresse só em \`az\` desenhava riscas verticais, que é o que uma superfície não faz.
-float fase = dist * 2.6 + uTime * 1.8 + r1 * 5.0 + az * 1.4;
+// onda que corresse só em \`az\` desenhava riscas verticais, que é o que uma superfície não faz. E entra
+// por um número **inteiro** de voltas (2), que é a única maneira de ele não saltar na emenda.
+float fase = dist * 2.6 + uTime * 1.8 + r1 * 5.0 + az * 2.0;
 float faixa = sin(fase) * 0.5 + 0.5;
-float faixa2 = sin(fase * 2.7 - uTime * 1.1 + r2 * 4.0) * 0.5 + 0.5;
+// Os múltiplos da fase são **inteiros**: se o forem, a fase inteira fecha na volta (2 voltas em 3, 4 ou
+// 6) e a onda não tem emenda; um 2,7 punha 5,4 voltas em \`az\` e cortava a crista no meridiano.
+float faixa2 = sin(fase * 3.0 - uTime * 1.1 + r2 * 4.0) * 0.5 + 0.5;
 float brilho = faixa * 0.62 + faixa2 * 0.38;
 
 // A água: verde-azul fundo, e a crista clareia.
 vec3 aguaCor = mix(vec3(0.012, 0.075, 0.11), vec3(0.06, 0.32, 0.40), smoothstep(0.15, 0.95, brilho));
 aguaCor += vec3(0.30, 0.62, 0.68) * pow(brilho, 6.0) * 0.6;
 
-// O sol, a 0,45 rad da origem: a coluna reflectida parte-se nas ondas.
-float coluna = 1.0 - smoothstep(0.03, 0.22, abs(az - 0.45));
-float brilhoSol = pow(0.5 + 0.5 * sin(fase * 1.7 + uTime * 1.3 + r2 * 6.0), 10.0);
+// O sol, a 0,45 rad da origem: a coluna reflectida parte-se nas ondas. A distância ao sol é medida
+// pelo caminho mais curto na volta (\`mod\`), senão do outro lado da emenda a coluna desaparecia de
+// repente.
+float coluna = 1.0 - smoothstep(0.03, 0.22, abs(mod(az - 0.45 + PI, 2.0 * PI) - PI));
+float brilhoSol = pow(0.5 + 0.5 * sin(fase * 2.0 + uTime * 1.3 + r2 * 6.0), 10.0);
 aguaCor += vec3(1.0, 0.94, 0.75) * coluna * (0.18 + brilhoSol * 1.6);
 
 // Junto ao horizonte a água é um espelho: quanto mais rasante o olhar, mais ela devolve o céu.
@@ -50,7 +56,7 @@ aguaCor += vec3(0.78, 0.90, 0.93) * espuma * 0.35;
 
 // O céu: azul alto a desmaiar para o horizonte, com as nuvens a passar devagar.
 vec3 ceuCor = mix(vec3(0.68, 0.82, 0.90), vec3(0.20, 0.42, 0.68), smoothstep(horizonte, 1.2, el));
-float nuvem = noise(vec2(az * 1.7 + uTime * 0.04, el * 5.0));
+float nuvem = noise3(vec3(azim * 1.7 + vec2(uTime * 0.04, 0.0), el * 5.0));
 ceuCor = mix(ceuCor, vec3(0.96, 0.97, 1.0),
              smoothstep(0.56, 0.86, nuvem) * smoothstep(horizonte, 0.18, el) * 0.85);
 

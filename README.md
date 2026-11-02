@@ -287,6 +287,35 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > abre o seu stream — verde contra preto media **2,34** onde a geometria dá **0,28**. Os blocos ignorados
 > saem do mesmo retângulo do dado, projectado com a câmara da chegada, e o resto da janela continua a ser
 > julgado. Decisão **D81** (§11 do roadmap).
+>
+> **Atualização (2026-11-03, a emenda da esfera — D82):** o autor fotografou os onze fundos shader e pediu
+> um estudo da costura que se vê em vários deles — a emenda que um shader desenhado numa esfera tem sempre
+> entre o lado esquerdo e o direito. A causa é uma só, em quatro disfarces: `az = atan(d.x, −d.z)` é um
+> **serrilhado** (salta de +PI para −PI atrás do visitante), e tudo o que o use como linha recta se corta
+> ali — os sectores de um tronco, as colunas de um fichário, a fase de uma onda, as células de uma
+> estrela. Medido antes da correcção: **56,63** em `aguas`, **35,68** em `nuvens`, **32,78** em `mangue`,
+> **3,81** em `fichario`, **2,68** em `nucleo`. O preâmbulo passou a oferecer as três ferramentas, numa
+> casa só para todos os corpos: **`volta`** (o azimute em voltas, −0,5 a +0,5), **`azim`** (o par `d.xz`,
+> contínuo em toda a volta) e **`noise3`** (o ruído lido na direcção, que não tem coordenada que salte).
+> Com elas, quatro regras: o ruído orgânico (`nuvens`, `aguas`, `mangue`) lê-se na **direcção**; os
+> padrões (os 26 sectores do `mangue`, os 20 do `nucleo`, as 24 gavetas do `fichario`, os 69 tijolos por
+> volta do `becos`, as estrelas) contam-se em **voltas inteiras** e o índice da célula fecha com `mod`;
+> os múltiplos de `az` dentro de um seno são **inteiros** (era o mais escondido: `fase * 2,7` punha 5,4
+> voltas em `az`); e o chão de `holograma` e de `grade-neon` passa a ser contado em **coordenadas de
+> mundo**, como já era o do `nucleo`. A distância a um meridiano (o sol de `por-do-sol`, a coluna de
+> `aguas` e de `mangue`) é agora a da **volta mais curta**. Instrumento novo,
+> `tools/regression/emenda.mjs`: não há esfera nem câmara — um quadrado em que cada pixel vale por uma
+> direcção, a emenda na coluna do meio, o degrau medido **com a rampa descontada** e comparado com o maior
+> degrau que o shader já tem na mesma faixa, em cinco elevações e quatro instantes, com três controlos
+> (um corte a nu **255,00**, a volta e meia que se corrigiu **243,00**, a volta inteira que já fechava
+> **0,83**). Medido depois: **0,20 · 0,22 · 2,10 · 0,12 · 0,18** — nove dos onze abaixo de **0,25**, e os
+> dois que não ficam (`holograma` **2,79**, `mangue` **2,10**) ficam dentro do que o próprio shader
+> desenha na mesma faixa. Os **39 retratos** foram refeitos, duas passagens, e o validador dos shaders dá
+> **11 de 11** com a cadência intacta (19,8–20,0 atualizações/s). A verificação completa dá **27 de 28**
+> baterias em **2 735,7 s**; a que falta é a costura das travessias (**D46**), que já estava vermelha e
+> continua em **124 de 128** — o mesmo total de antes, com duas portas agora em **0,56–0,58**, logo acima
+> da meta de 0,50: o fundo mudou de desenho e o retrato e a vista ao vivo já não casam ao mesmo pixel.
+> Decisão **D82** (§11 do roadmap).
 
 > **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
 > filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as
@@ -1913,9 +1942,9 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 de imagem, a chegada por uma porta, os rótulos, o botão, a transição, o fundo shader (que mede a
 política e as duas páginas com uma), os quatro valores do R9 na cena e nos painéis, o lote por
 dimensão, o catálogo de assets, os portais em movimento, a ficha das obras, o **ensaio A/B do fundo**
-(`ensaio.mjs`, D66), a **queda para a imagem** (`queda.mjs`, R18) e a **ordem da janela**
-(`ordem-da-janela.mjs`, D80) — cada uma abre um Chrome e juntas somam
-minutos, por isso não são o `default`. Com `--full` são **27** baterias.
+(`ensaio.mjs`, D66), a **queda para a imagem** (`queda.mjs`, R18), a **ordem da janela**
+(`ordem-da-janela.mjs`, D80) e a **emenda da esfera** (`emenda.mjs`, D82) — cada uma abre um Chrome e
+juntas somam minutos, por isso não são o `default`. Com `--full` são **28** baterias.
 
 Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
 repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.tsv` e escreve nos mundos o dado das
@@ -2006,7 +2035,14 @@ consola e fica onde está — o editor serve para arrumar a sala, não para a vi
 ### 7. Enviar um shader
 
 O ficheiro é o **corpo** do fragment: `uTime`, `vDir`, `az`, `el` e `vec3 col` vêm do prelúdio, e o
-corpo só pinta `col` (sem texturas, sem `#`, sem `discard`). Da raiz do projeto:
+corpo só pinta `col` (sem texturas, sem `#`, sem `discard`). O prelúdio dá mais três coisas, e são as
+que fazem a esfera **fechar** na volta (D82): `volta` (o azimute em voltas, −0,5 a +0,5), `azim` (o par
+`d.xz`, seno e cosseno do azimute, contínuo em toda a volta) e `noise3` (o ruído lido na direcção).
+`az` é um serrilhado — salta de +PI para −PI atrás do visitante —, por isso um padrão conta-se em
+**voltas inteiras** (com o índice da célula a fechar em `mod(indice, N)`), um seno leva `az` por um
+**inteiro** (`sin(az * 18.0)` fecha, `sin(az * 1.4)` corta), o ruído orgânico lê-se em `noise3` com
+`azim`, e um chão lê-se em `vec2(sin(az), -cos(az)) * 1/(horizonte - el)`. Quem duvidar mede:
+`node tools/regression/emenda.mjs`. Da raiz do projeto:
 
 1. `node tools/shader/validate.mjs meu.glsl` — compila num Chrome sem cabeça e mede a cadência; diz
    **PASSA** ou **RECUSA** (e porquê).
