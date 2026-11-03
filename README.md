@@ -249,7 +249,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.23)
+## Estado atual do código (v0.0.24)
 
 > **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
 > pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
@@ -581,29 +581,35 @@ geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
 
-Resumo do que existe na v0.0.23 (medido em 2026-11-02): `index.html` (**93 linhas**) e as **onze**
+Resumo do que existe na v0.0.24 (medido em 2026-11-03): `index.html` (**93 linhas**) e as **onze**
 salas com o **mesmo** ficheiro (`scene1/` a `scene11/`, iguais fora da linha do `<base>` — D28),
 `editor.html` (**96**), `js/app.js` (**268**), `js/arrival-frame.js` (**204**, a ponte de imagem entre
 mundos — D43), `js/editor.js` (**15**, a entrada do editor — D36), `js/editor/` (**15** ficheiros,
 **3566** linhas com os painéis e a ponte com o servidor), `js/i18n.js` (**93**), `js/core/` (7 ficheiros,
-**234**), `js/modules/` (11 ficheiros, **3509**), `js/scene/` (14 ficheiros, **2561** — o `reach.js` é o
+**234**), `js/modules/` (11 ficheiros, **3509**), `js/scene/` (14 ficheiros, **2587** — o `reach.js` é o
 último, D87), `js/shaders/`
-(11 ficheiros, **604**), `css/` (**3** ficheiros: `style.css` **142**, `editor.css` **313** e
-`obra.css` **252**), **17** ficheiros em `data/worlds/` (o portão, as onze salas e os cinco fixtures,
-**7389 linhas** no total e **60 portas**, das quais **50** nas doze páginas da exposição),
+(11 ficheiros, **604**), `css/` (**3** ficheiros: `style.css` **142**, `editor.css` **314** e
+`obra.css` **253**), **17** ficheiros em `data/worlds/` (o portão, as onze salas e os cinco fixtures,
+**7457 linhas** no total e **60 portas**, das quais **50** nas doze páginas da exposição),
 `i18n/pt.json` (**224** chaves), as **57 obras** na folha `data/obras.tsv`, os **87** ficheiros em
 `assets/previews/` (**42** retratos e **42** recortes, um par por porta, mais os três panoramas — D46) e
-**57** ficheiros em `tools/` (**13335** linhas). O que esta versão entregou:
+**57** ficheiros em `tools/` (**13429** linhas). O que esta versão entregou:
 
-A **v0.0.23** é a **spec de uma sala nova** (D83) e a **sala de ensaio** (D84), mais o **movimento
-sorteado** das portas de uma sala nova (D87): o roteiro em
-`docs/SPEC-NOVA-SALA.md` (com a **§2.1** a descrever a estética de uma sala hoje, a §9 o mundo de
-ensaio e a §10 as regras do sorteio), as
-listas das baterias a virem do
-dado e o `tools/scene/new-room.mjs`. Antes dela, a **v0.0.22** fechou a **emenda da
-esfera** (D82): o preâmbulo dos shaders ganhou `volta`, `azim` e `noise3`, os onze fundos foram
+A **v0.0.24** pôs a **spec de uma sala nova em uso** — a **sala de ensaio** (D84), a **oscilação** das
+suas portas (D85), a rotação sobre o **centro da porta** (D86), o **movimento sorteado** das portas de
+uma sala nova com a lei nova **L29** (D87), a verificação da **documentação contra o método** (D88), as
+**portas sem chegada** julgadas pela L26 e pela L28 (D89) e o **roteiro posto à prova** numa sala
+descartável (D90). A **v0.0.23** foi a **spec** e a derivação das listas das baterias (D83): o roteiro
+em `docs/SPEC-NOVA-SALA.md`, as baterias a irem buscar as rotas ao dado e o `tools/scene/new-room.mjs`.
+Antes dela, a **v0.0.22** fechou a **emenda da esfera** (D82): o preâmbulo dos shaders ganhou `volta`,
+`azim` e `noise3`, os onze fundos foram
 reexcritos para não terem costura e os 39 retratos foram refeitos. A **v0.0.21** fechou o **mundo real
-atrás da porta** (D81) e a **v0.0.20** a **ordem da janela** (D80). O detalhe medido de cada uma está
+atrás da porta** (D81) e a **v0.0.20** a **ordem da janela** (D80). O que a v0.0.24 acrescentou ao
+repositório, medido contra a v0.0.23 (`50ca29c`): **um mundo** (a sala de ensaio: 16 → 17 ficheiros,
+7 093 → 7 457 linhas), **uma lei nova** (a L29 — o autoteste passou de 29 a 31 casos, com as portas sem
+chegada a serem julgadas pela L26 e pela L28) e **dois ficheiros de ferramenta**
+(`js/scene/reach.js`, `tools/scene/sorteio.mjs`). A exposição é a mesma: as **onze** salas, as **50**
+portas das doze páginas e os seus **42** retratos. O detalhe medido de cada uma está
 nos blocos datados acima e em [docs/ROADMAP.md](docs/ROADMAP.md) §11.
 
 Resumo do que existe na v0.0.16: `index.html` (**93 linhas**) e as **11** salas com o **mesmo** ficheiro
@@ -753,7 +759,7 @@ portais com stencil e ajuste automático do pixelRatio.
 atrás do visitante —, e um padrão contado em `az` corta-se ali a direito. Foi o que se viu em vários
 dos onze fundos, e é o que a bateria [`tools/regression/emenda.mjs`](tools/regression/emenda.mjs)
 mede em cada um (o degrau na coluna da emenda, em cinco elevações e quatro instantes, com três
-controlos): **15 de 15** na v0.0.23. O preâmbulo dá as três ferramentas para não a ter — `volta`,
+controlos): **15 de 15** na v0.0.24. O preâmbulo dá as três ferramentas para não a ter — `volta`,
 `azim` e `noise3` — e as regras estão no passo «Enviar um shader».
 
 #### Formato e tamanho das imagens
@@ -1043,8 +1049,8 @@ repetições (cerca de 6 minutos por celular para as três tecnologias nos dois 
 
 ### Verificado nesta versão (medido no browser)
 
-> **Atualização (2026-11-02, os números da v0.0.23, da sala de ensaio e do movimento sorteado —
-> D84/D85/D87):** o que esta versão mediu, com `node tools/regression/all.mjs --full`: o dado **0**, as
+> **Atualização (2026-11-03, os números da v0.0.24, da sala de ensaio e do movimento sorteado —
+> D84/D85/D87/D89):** o que esta versão mediu, com `node tools/regression/all.mjs --full`: o dado **0**, as
 > leis **31 de 31** com o controlo limpo, o importador da folha **21 de 21**, os doze testes **99 de 99**
 > nas páginas que o dado declara (catorze, com a sala de ensaio), as portas e as chegadas **165 de 165**,
 > os portais em movimento **16 de 16** (as quatro portas da sala de ensaio, cada uma com o eixo, a
