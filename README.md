@@ -85,7 +85,8 @@ zonas12/
 │   │                        mais o grafo dos mundos e os arranques), o instrumento das leis
 │   │                        (avarias injetadas, uma por lei), o verificador dos arranques (D28), a
 │   │                        ferramenta que cria a pasta e o arranque de um mundo novo (D31), a que
-│   │                        escreve o esqueleto de uma sala dos dois lados (D83), as que põem as
+│   │                        escreve o esqueleto de uma sala dos dois lados (D83), o que **sorteia o
+│   │                        movimento** das portas de uma sala nova (D87), as que põem as
 │   │                        obras e as portas nos anéis (D77), o giro dos retratos (D78) e os buracos
 │   │                        do mundo real (D81), a que desenha os retratos das portas (D46) e as
 │   │                        perguntas ao disco (`disk.mjs`): o asset existe e a imagem mede 2:1
@@ -341,7 +342,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 
 > **Atualização (2026-11-02, o roteiro de uma sala nova — D83):** o autor pediu uma spec — um roteiro que
 > desse «total confiança de termos as próximas cenas em funcionamento correto» — antes de sincronizar
-> versões. Nasceu o [docs/SPEC-NOVA-SALA.md](docs/SPEC-NOVA-SALA.md): o que uma sala é em cinco objetos,
+> versões. Nasceu o [docs/SPEC-NOVA-SALA.md](docs/SPEC-NOVA-SALA.md): o que uma sala é nos seus objetos,
 > as três decisões que se tomam antes de tocar em ficheiros, **doze fases** com comando e condição de
 > aceitação, as **doze armadilhas** com o número que cada uma custou, os ficheiros que uma sala toca (o
 > registo real da sala 11, 35 ficheiros) e a lista que fecha uma sala. A validação da spec encontrou um
@@ -642,6 +643,7 @@ O **`js/scene/`** é onde a cena em dados vive, e tem **treze** ficheiros:
 | `reality.js` | Onde a janela de uma porta tem de deixar passar o **mundo real** (D81): os retângulos (azimute e elevação) em que o destino mostra a dimensão `camera` — os que o preâmbulo dos shaders descarta e a L28 recalcula. Puro; é a conta que escreve o dado (`tools/scene/reality.mjs --aplicar`) |
 | `fixtures.js` | Os **mundos que não são salas** (D9): a lista que a página, a linha de comando e o editor leem para não pedirem anéis nem três a cinco portas a um banco de ensaio. A **sala de ensaio** `scene100` é o quinto (D84) — é esta lista que a põe fora do grafo |
 | `arrival.js` | Onde o visitante aparece ao chegar de outro mundo (**L16**): puro e partilhado, para o construtor e o validador não discordarem da geometria |
+| `reach.js` | O **alcance** de uma porta em movimento (**L29**, D87): a fracção do ciclo em que o olho do visitante fica dentro da caixa, medida sobre o par de fases dos dois períodos. Puro; é a conta que o `sorteio.mjs` usa para recusar um sorteio e a que o validador corre para provar o dado |
 | `scene-builder.js` | O **único** que conhece o A-Frame: cria o `<a-assets>` (e **espera** que os ficheiros carreguem), a câmara, as dimensões, as obras e os portais, a partir do JSON. Desde o B3 aceita `{ preview: true }` e desliga a navegação (D32) |
 | `render-config.js` | As **regras de desenho** do renderer (`ar-config`: `stencil`, `alpha`, `antialias`), registadas uma só vez para os **dois** hosts — a exposição e a pré-visualização do editor (lei **L6**) |
 | `artwork-page.js` | Onde vive a **ficha de uma obra** (D60/D62): um só nome, para a cena, a ficha e o editor não discordarem do endereço |
@@ -2105,8 +2107,8 @@ repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.tsv` e escreve n
 obras (nome, créditos, descritivo, imagem e site) — com `--file` corre outra folha, e é assim que se vê
 o exemplo (`data/obras.exemplo.tsv`) sem tocar na definitiva —, `node tools/scene/new-world.mjs
 <slug>` cria a pasta e o arranque de um mundo, `node tools/scene/new-room.mjs <slug> --destinos …`
-escreve o esqueleto de uma sala nova e as portas que ela pede (ver
-[`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md)), `node tools/scene/ring.mjs --aplicar` põe as obras
+escreve o esqueleto de uma sala nova, as portas que ela pede **e o movimento sorteado de cada porta**
+(ver [`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md)), `node tools/scene/ring.mjs --aplicar` põe as obras
 e as portas nos dois anéis (D77) e `node tools/scene/portrait.mjs --todos` desenha os retratos das
 portas (duas passagens, e cada uma abre um Chrome por porta; `--direto` desenha a **primeira visita**, que
 é o que mostra uma porta da sala de ensaio — D84). Os pares saem do dado, não de uma lista à mão.

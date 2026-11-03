@@ -149,6 +149,10 @@ console.log('\n' + aceites + ' portas · ' + aceites + ' aceites · ' + rejeitad
 
 if (!apply) {
   console.log('ensaio: nada foi escrito (corre com --aplicar para escrever)');
+  // A semente vai **na última linha** de propósito: é o que o `new-room.mjs` mostra de cada ferramenta
+  // (as últimas linhas), e sem ela o autor não conseguia repetir o sorteio de que gostou. Medido: a
+  // primeira versão imprimia a semente só no cabeçalho, e o atalho a deitava fora.
+  console.log('semente ' + semente + ' — repete este sorteio com --semente ' + semente);
   process.exit(0);
 }
 
@@ -159,3 +163,5 @@ for (const slug of wanted) {
   console.log('escrito data/worlds/' + file.name + ' (fim de linha ' +
     (file.eol === '\r\n' ? 'CRLF' : 'LF') + ')');
 }
+// A semente, no fim, pela mesma razão do ensaio: é a única maneira de repetir este sorteio.
+console.log('semente ' + semente + ' — repete este sorteio com --semente ' + semente);

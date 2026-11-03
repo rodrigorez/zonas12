@@ -108,7 +108,7 @@
 >
 > **Atualização (2026-11-02, o roteiro de uma sala nova — D83):** com a D82 fechada, o autor pediu uma
 > spec — um roteiro que desse «total confiança de termos as próximas cenas em funcionamento correto» —
-> antes de sincronizar versões. Nasceu o `docs/SPEC-NOVA-SALA.md`: o que uma sala é em cinco objetos, as
+> antes de sincronizar versões. Nasceu o `docs/SPEC-NOVA-SALA.md`: o que uma sala é nos seus objetos, as
 > três decisões que se tomam antes de tocar em ficheiros, **doze fases** com comando e condição de
 > aceitação, as **doze armadilhas** com o número que cada uma custou, os ficheiros que uma sala toca (o
 > registo real da sala 11, commit `08b644f`) e a lista que fecha a sala. A validação da spec encontrou

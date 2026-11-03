@@ -342,7 +342,7 @@ for (const mundo of tocados) {
 // quatro salas que não tinham sido tocadas. Nas 12 páginas de hoje as três ferramentas são
 // **idempotentes** (correm e dizem «nada a fazer»), por isso correr sobre tudo não custa nada nem move
 // o que já estava certo.
-const correr = (rotulo, script, argumentos) => {
+const correr = (rotulo, script, argumentos, mostrar = 4) => {
   const inicio = Date.now();
   const resultado = spawnSync(process.execPath, [join(ROOT, script), ...argumentos], { cwd: ROOT, encoding: 'utf8' });
   const segundos = ((Date.now() - inicio) / 1000).toFixed(1);
@@ -351,7 +351,7 @@ const correr = (rotulo, script, argumentos) => {
   console.log('');
   console.log('── ' + rotulo + ' — ' + (falhou ? 'FALHOU' : 'ok') + ' (' + segundos + ' s) ──');
   const linhas = saida.split(/\r?\n/).filter((linha) => linha.trim());
-  for (const linha of falhou ? linhas.slice(-12) : linhas.slice(-4)) console.log('  ' + linha);
+  for (const linha of falhou ? linhas.slice(-12) : linhas.slice(-mostrar)) console.log('  ' + linha);
   return !falhou;
 };
 
@@ -361,9 +361,10 @@ if (opcoes.ferramentas) {
   const buracos = correr('os buracos do mundo real (reality --aplicar)', 'tools/scene/reality.mjs', ['--aplicar']);
   // O movimento das portas, sorteado (D87): depois dos anéis, porque a amplitude sai da própria porta, e
   // antes do validador, porque a L29 tem de estar verde para a sala passar. A semente fica impressa —
-  // é ela que repete a mesma sala.
+  // é ela que repete a mesma sala —, e por isso esta chamada mostra mais linhas do que as outras: a
+  // semente é a **última** linha, e a lista de portas é o que o autor quer ler.
   const sorteio = correr('o movimento das portas (sorteio --aplicar)', 'tools/scene/sorteio.mjs',
-    [slug, '--aplicar', '--semente', String(Date.now() % 100000)]);
+    [slug, '--aplicar', '--semente', String(Date.now() % 100000)], 8);
   const validador = correr('o validador', 'tools/scene/validate.mjs', []);
   if (!aneis || !giro || !buracos || !sorteio || !validador) {
     console.error('');

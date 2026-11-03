@@ -6,14 +6,14 @@
 > a vir do dado; o que continua à mão é o que a spec diz que continua à mão. A **§9** junta o caso que
 > não é uma sala: o **mundo de ensaio** (`scene100`, D84), onde se experimenta o que ainda não entra no
 > caminho do visitante. A **§10** são as regras do **movimento sorteado** de cada porta (D87) — a única
-> coisa de uma sala nova que o autor **não** decide. A **§10** são as regras do **movimento sorteado** de cada porta (D87), que é a
-> única coisa do roteiro que o autor não decide.
->
-> **Para que serve.** Uma sala nova toca **oito** sítios que não se vêem uns aos outros: a página, o
+> coisa de uma sala nova que o autor **não** decide.
+
+> **Para que serve.** Uma sala nova toca **nove** sítios que não se vêem uns aos outros: a página, o
 > dado da sala, o dado do portão, o dado de **cada** sala de destino, a folha das obras, os retratos
-> (derivados), as listas de duas baterias e a documentação. Esquecer um deles não dá erro nenhum —
-> dá uma exposição que abre e está errada, ou uma bateria verde que **não mediu a sala**. O roteiro
-> existe para que o esquecimento seja impossível de confundir com sucesso.
+> (derivados), o **movimento das portas** (sorteado, §10), as listas de duas baterias e a documentação.
+> Esquecer um deles não dá erro nenhum — dá uma exposição que abre e está errada, ou uma bateria verde
+> que **não mediu a sala**. O roteiro existe para que o esquecimento seja impossível de confundir com
+> sucesso.
 >
 > **O que esta spec não é.** Não é o guia do editor (esse vive no `README.md`, § «A página de
 > edição»), não é o guia de testes de campo (`docs/GUIA-DE-TESTES.md`) e não decide a arte, os textos
@@ -22,12 +22,12 @@
 
 ---
 
-## 1. O que uma sala é, em cinco objetos
+## 1. O que uma sala é, em seis objetos
 
 | objeto | onde vive | quem o escreve | o que o guarda |
 | --- | --- | --- | --- |
 | a **página** | `<slug>/index.html` | `tools/scene/new-world.mjs` | `arranques.mjs` — o mesmo ficheiro da raiz, só com `<base href="../">` (D28) |
-| o **dado da sala** | `data/worlds/<slug>.json` | o editor (exporta) | `validate.mjs` + as leis L1–L21 |
+| o **dado da sala** | `data/worlds/<slug>.json` | o editor (exporta) | `validate.mjs` + as leis L1–L29 |
 | as **obras** (texto, capa, site) | `data/obras.tsv` → os mundos | `tools/artwork/from-csv.mjs` | `from-csv --check`, a lei L20 e a ficha |
 | as **posições** (dois anéis) | o mesmo JSON | `tools/scene/ring.mjs --aplicar` | L22 e L23 |
 | as **portas de mundo** (janela, retrato, chegada, giro, mundo real) | o JSON da sala **e** o de cada destino | o editor + `azimuths.mjs` + `reality.mjs` + `portrait.mjs` | L11, L13, L16, L17, L19, L26, L28 |
@@ -36,7 +36,7 @@
 O número de hoje, para se saber quando é que um passo ficou a meio: **12 páginas** (o portão e onze
 salas), **17 ficheiros de mundo** (as 12 e 5 fixtures, dos quais a sala de ensaio da §9), **50 portas**
 nas salas, **57 obras**, **42 retratos** (um par `.jpg` + `.png` por porta com janela de
-pré-visualização), **30 leis** e **28 baterias** no `--full`.
+pré-visualização), **29 leis** e **28 baterias** no `--full`.
 
 E o número que a §10 acrescenta, porque é ele que uma sala nova vai ter de cumprir: **cada porta da
 sala nova oscila**, e o sorteio do movimento é rejeitado uma vez em cada três (§10.3).
@@ -45,7 +45,7 @@ sala nova oscila**, e o sorteio do movimento é rejeitado uma vez em cada três 
 
 ## 2. As decisões que se tomam antes de tocar em ficheiros
 
-Nenhuma delas é reversível de graça, e as três mudam o que as fases seguintes fazem.
+Nenhuma delas é reversível de graça, e as quatro mudam o que as fases seguintes fazem.
 
 **D-A · O fundo.** Um shader dos onze (nada a instalar) ou um **panorama** (`kind: "image"`, 2:1,
 ≤ 2048×1024 — L14). Um shader novo obriga a `tools/shader/install.mjs` **antes** da fase 7 e a
@@ -64,7 +64,10 @@ precisar de uma porta que se declare a chegada dessa origem (L19) — e **no má
 não é do autor: eixos, amplitudes, ângulos e períodos saem do dado da própria porta e de um sorteio
 com rejeição (§10). A única escolha que resta é **não** querer portas em movimento, e essa não existe
 no roteiro — o que existe é a possibilidade de voltar a correr o `sorteio.mjs --aplicar` até gostar do
-que saiu.
+que saiu. (O painel **Portal** do editor mostra e deixa editar estes campos, porque é uma ferramenta e
+não uma política; o que o roteiro diz é que **não** se editam à mão — volta-se a sortear. Um valor
+escrito à mão não tem quem o defenda: a L29 julga-o, mas nada garante que a sala continue a parecer-se
+com uma sala.)
 
 ---
 
@@ -149,7 +152,9 @@ node tools/scene/ring.mjs --aplicar               # sem argumentos: **todos** os
 ```
 
 - **Tem de dizer:** a folga entre os anéis chega (L23), cada anel tem passos iguais (L22) e o desvio
-  ao raio fica dentro da tolerância de 0,5 m. As obras ficam a **40 m** e as portas a **60 m**.
+  ao raio fica dentro da tolerância de 0,5 m. As obras ficam a **40 m** e as portas a **60 m**. No fim:
+  `12 mundo(s) · 11 com anel de obras · 11 ok, 1 justo(s), 0 falha(s)` e `o dado: 12 de 12 em anel
+  (nada a fazer)` (é esta a frase de hoje; o «justo» é a margem de 0,28° da sala 1).
 - **Porque em todos e não só nos que a sala toca:** uma porta nova muda o número de lugares do anel
   dessa sala, e o anel distribui os lugares por igual (L22) — **todas** as portas dessa sala mudam de
   sítio. Medido no ensaio da spec: com os anéis a correr só nos mundos tocados, o validador acusou a
@@ -168,8 +173,11 @@ node tools/scene/azimuths.mjs --aplicar          # sem argumentos: todos
 Escreve `window.azimuth` em cada porta de mundo (L26): sem ele, o que se vê pela janela está girado em
 relação ao que se vê ao chegar (medido antes da correcção: **27,79** de salto, com a meta em 0,50).
 
-- **Tem de dizer:** `0 erradas` na coluna do giro, e nas salas que já estavam `nada a escrever`.
-- **Se não disser:** a porta de chegada do destino não está posta (fase 3).
+- **Tem de dizer:** `39 porta(s) de retrato, 0 sem porta de chegada` e `o dado já diz o mesmo — nada a
+  escrever` (é esta a frase do ensaio, e o mesmo vale com `--aplicar`: `nada a escrever`). O número é o
+  das portas de retrato das **salas**; os fixtures não entram (ver a nota da §9 sobre a `scene100`).
+- **Se não disser:** se contar portas **sem porta de chegada**, a porta de chegada do destino não está
+  posta (fase 3) — e é a L19 que a aponta.
 
 ### Fase 6 · Os buracos do mundo real
 
@@ -180,7 +188,8 @@ node tools/scene/reality.mjs --aplicar           # sem argumentos: todos
 Escreve `window.reality` (os retângulos onde o destino mostra a câmara — L28), para que a janela fure o
 fundo ao vivo e o visitante veja a **mesma** câmara antes e depois de atravessar.
 
-- **Tem de dizer:** `0 erradas`, e `nada a escrever` no que já estava.
+- **Tem de dizer:** `28 porta(s) de retrato, 28 com o mundo real à vista, 0 sem porta de chegada` e
+  `o dado já diz o mesmo — nada a escrever` (é esta a frase do ensaio).
 - **Se não disser:** o destino não tem a dimensão `camera`, ou a porta de chegada não está posta.
 
 ### Fase 6b · O movimento das portas (sorteado, e medido)
@@ -188,6 +197,7 @@ fundo ao vivo e o visitante veja a **mesma** câmara antes e depois de atravessa
 ```
 node tools/scene/sorteio.mjs <slug>                 # ensaio: diz o que sortearia, não escreve
 node tools/scene/sorteio.mjs <slug> --aplicar       # escreve no dado
+node tools/scene/sorteio.mjs <slug> --aplicar --semente 99   # o mesmo sorteio outra vez
 ```
 
 Sorteia, **por porta**, o eixo e a amplitude da translação, o eixo e o ângulo da rotação e os dois
@@ -197,7 +207,11 @@ D59 deixou de proibir uma porta de chegada em movimento, porque a chegada lê a 
 é a do dado (§10).
 
 - **Tem de dizer:** uma linha por porta com o eixo, a amplitude, o ângulo, os dois períodos e o
-  **alcance medido**; no fim, `N portas · N aceites · M rejeitados`.
+  **alcance medido**; no fim, `N portas · N aceites · M rejeitados`; e, na **última linha**, a
+  `semente` que gerou este sorteio.
+- **A semente é o que fica.** O sorteio não é uma escolha do autor (§2, D-D), mas **repetir** um
+  sorteio é: é para isso que a semente é impressa. Quem gostar do que saiu guarda-a (ela vai para o
+  commit, na mensagem); quem quiser outra sala corre outra vez sem `--semente`.
 - **Se não disser:** a porta não tem `width`/`height` (a amplitude sai delas), a sala tem menos de
   três portas (L24), ou um dos períodos saiu fora de `[10, 20]`.
 - **Porque é antes da fase 7:** a L29 é uma lei como as outras — um sorteio que não a passa não se
@@ -211,12 +225,12 @@ node tools/scene/validate.mjs
 node tools/scene/laws-selftest.mjs
 ```
 
-- **Tem de dizer:** `data/worlds/<slug>.json: OK (…)` para cada ficheiro, e as **29 de 29** avarias
+- **Tem de dizer:** `data/worlds/<slug>.json: OK (…)` para cada ficheiro, e as **31 de 31** avarias
   injectadas detectadas com o controlo limpo.
 - **O que ainda pode estar vermelho aqui, e só isto:** a **L9**, nos retratos da sala nova — os
-  ficheiros são derivados e só nascem na fase 8. Tudo o resto (L19, L22, L24, L25, L26, L28) tem de
-  estar limpo **antes** de se gastar GPU. O validador volta a correr no fim da fase 8, e aí é a verde
-  completa.
+  ficheiros são derivados e só nascem na fase 8. Tudo o resto (L19, L22, L24, L25, L26, L28 e a **L29**,
+  que é a que o sorteio da fase 6b tem de passar) tem de estar limpo **antes** de se gastar GPU. O
+  validador volta a correr no fim da fase 8, e aí é a verde completa.
 - **Se não disser:** **não se avança**. As mensagens citam a lei e a lei está explicada na §8 do
   `ROADMAP`.
 
@@ -231,8 +245,13 @@ node tools/scene/portrait.mjs --todos      # a segunda passagem, sempre
   `recorte-…png` por porta com janela, e nenhum erro de página.
 - **Porquê duas vezes:** o retrato de uma sala contém as **janelas das portas dessa sala**, que são
   retratos deles próprios. A primeira passagem cozinha o que lá estava, a segunda o que ficou (medido:
-  o mesmo retrato saiu com 438, 215 e 378 kB em passagens seguidas). Orçamento de hoje: **387 a 418 s**
-  por passagem com 39 retratos.
+  o mesmo retrato saiu com 438, 215 e 378 kB em passagens seguidas). Orçamento: **387 a 418 s** por
+  passagem com **39** retratos (medido a 2026-11-01); com os **42** de hoje são ~8% mais, e a passagem
+  passou a **assentar as portas** antes de desenhar (§10.5), o que não muda o tempo.
+- **O que mudou na D87:** o retrato é a imagem da **pose de repouso** — a que o visitante vê ao chegar.
+  Se as portas do destino oscilarem e o `settleMotion` não for chamado, a fotografia sai num instante
+  arbitrário e a janela deixa de mostrar o que a chegada mostra. O `portrait.mjs` chama-o sozinho; o
+  que não se pode é tirá-lo de lá.
 - **Quando é que isto se repete:** sempre que **mover uma obra** ou uma porta mude o que se vê de
   dentro de uma sala. É o passo que mais se esquece, e não dá erro — dá uma janela com a sala de ontem.
 
@@ -244,7 +263,7 @@ sala que não estivesse nela nunca era medida — a bateria ficava verde sem ter
 
 | ficheiro | o que passou a fazer |
 | --- | --- |
-| `tools/regression/paginas.mjs` | deriva as páginas de `data/worlds/` (portão primeiro, salas pelo número, o fixture `example` no fim) |
+| `tools/regression/paginas.mjs` | deriva as páginas de `data/worlds/` (portão primeiro, salas pelo número, e os **fixtures abertos** no fim: o `example` e a sala de ensaio `scene100`) |
 | `tools/regression/twelve-tests.mjs` | `PAGINAS` = a derivação, e uma verificação de cobertura |
 | `tools/regression/traversal-tests.mjs` | `MUNDOS` = a derivação, e a mesma verificação de cobertura |
 
@@ -264,9 +283,11 @@ node tools/regression/all.mjs --full     # a mesma mais as arquivadas (as 28)
 ```
 
 - **Tem de dizer:** `28 de 28 baterias passaram` e o tempo total.
-- **Se não disser:** a bateria vermelha diz qual é e porquê. A costura das travessias (D46) é a única
-  que pode estar vermelha **de antes** — o número dela tem de ser comparado com o último registo, não
-  com zero, e o caso novo tem de ser explicado na documentação.
+- **O que se aceita hoje:** **27 de 28**, com a única vermelha a ser a **costura das travessias**
+  (**D46**), vermelha desde antes do anel. O número dela tem de ser **comparado com o último registo**,
+  não com zero, e o caso novo tem de ser explicado na documentação. Qualquer outra vermelha é uma
+  paragem.
+- **Se não disser:** a bateria vermelha diz qual é e porquê.
 
 ### Fase 11 · A documentação e a versão
 
@@ -296,6 +317,9 @@ node tools/regression/all.mjs --full     # a mesma mais as arquivadas (as 28)
 | T11 | o EOL dos ficheiros de dado: cinco são **CRLF** e os outros **LF** — uma ferramenta que reescreva tudo muda o ficheiro inteiro | um diff de 5 000 linhas por uma posição | `new-room.mjs` preserva o EOL de cada ficheiro que toca; um ficheiro novo sai em `\n` |
 | T12 | um ficheiro gravado no Windows pode levar **BOM** | um `\ufeff` no início do commit | gravar UTF-8 sem BOM |
 
+As armadilhas do movimento das portas são **T13 a T17**, na §10.7 — ficam lá porque só existem desde a
+D87, e é lá que as regras que as evitam estão escritas.
+
 ---
 
 ## 5. Os ficheiros que uma sala nova toca (o registo real da sala 11)
@@ -304,24 +328,27 @@ Não é uma previsão: é o commit `08b644f` («A sala 11 entra…»), que é a 
 
 | ficheiro | o que muda |
 | --- | --- |
-| `data/worlds/<slug>.json` | novo (+343 linhas na sala 11) |
+| `data/worlds/<slug>.json` | novo (+343 linhas na sala 11) — e, desde a D87, o `motion` de cada porta |
 | `data/worlds/gate.json` | a porta nova (+95) |
 | `data/worlds/<cada destino>.json` | a porta de chegada (+59 numa sala) |
 | `data/obras.tsv` | as linhas das obras (+5) |
 | `<slug>/index.html` | novo (+93) |
 | `assets/previews/*.jpg` e `*.png` | os retratos novos **e os das salas vizinhas**, refeitos |
 | `js/shaders/<id>.js` + `js/modules/shaders.js` | só se a sala trouxer shader novo |
-| `tools/regression/twelve-tests.mjs` | a página na lista (T1) |
-| `tools/regression/traversal-tests.mjs` | a rota na lista (T1) |
+| ~~`tools/regression/twelve-tests.mjs`~~ | **já não** — a lista de páginas vem do dado (P1, fase 9) |
+| ~~`tools/regression/traversal-tests.mjs`~~ | **já não** — a rota vem do dado (P1, fase 9) |
 | `docs/ROADMAP.md`, `README.md`, (`PRE-EXPOSICAO.md`) | o registo e os números |
 
-Nada em `js/scene/` mudou — as leis servem a sala nova sem uma linha de código novo. Quando isso
-deixar de ser verdade, é sinal de que a sala está a pedir uma lei, e isso é uma decisão, não um passo.
+Nada em `js/scene/` mudou — as leis servem a sala nova sem uma linha de código novo — e a **D87 não
+abriu excepção**: a L29 e o `reach.js` entraram **uma vez**, para todas as salas. Quando uma sala
+precisar de uma lei que não existe, é sinal de que está a pedir uma lei, e isso é uma decisão, não um
+passo.
 
 Desde a **P2**, sete destas linhas são escritas pelo `tools/scene/new-room.mjs` numa só chamada: o dado
 da sala (as duas dimensões, o fundo e a reserva, as portas), a porta no portão, a porta de chegada em
-cada destino e as entradas de asset dos retratos que ainda não existem. O que fica para o autor é o que
-não é aritmética: **as obras na folha**, a **composição** no editor e os **retratos**.
+cada destino, as entradas de asset dos retratos que ainda não existem — e, desde a D87, o **movimento
+sorteado** de cada porta. O que fica para o autor é o que não é aritmética: **as obras na folha**, a
+**composição** no editor e os **retratos**.
 
 ---
 
@@ -337,7 +364,8 @@ Uma sala está pronta quando **todas** estas linhas forem verdade, pela ordem em
       admitida aqui é a L9 dos retratos
 - [ ] o `laws-selftest.mjs` diz **31 de 31** e o controlo limpo
 - [ ] o `ring.mjs` não tem desvios acima de **0,5 m** e a folga L23 passa
-- [ ] o `azimuths.mjs` e o `reality.mjs` dizem **0 erradas**
+- [ ] o `azimuths.mjs` e o `reality.mjs` dizem `nada a escrever` (e, na primeira vez, escrevem e voltam
+      a dizer o mesmo) — a frase de cada um está na fase 5 e na fase 6
 - [ ] o `sorteio.mjs <slug>` escreveu um `motion` em **cada** porta e todas passam a **L29** (o alcance
       ≥ 50% do ciclo), com os dois períodos em `[10, 20] s` — §10
 - [ ] há um par de retratos por porta com janela, **desenhados com as portas assentes**
@@ -370,7 +398,8 @@ uma sala de ensaio criada de propósito foi medida pelos T2–T12 **sem uma úni
 reserva copiados de uma sala que existe, dimensão `1` camera, o raio, a porta do portão com a janela da
 câmara, as portas dos destinos com o retrato e o recorte, e as entradas de asset dos retratos que ainda
 não existem) **nos dois lados** — a sala nova, o portão e cada destino — e depois corre os anéis, o
-giro, os buracos e o validador. Recusa antes de escrever: o slug, a pasta, o ficheiro que já existe, o
+giro, os buracos, o **sorteio do movimento** (D87, com a semente impressa) e o validador. Recusa antes
+de escrever: o slug, a pasta, o ficheiro que já existe, o
 destino que não existe, o número de portas da L24 e o conjunto repetido da L25 (que a spec põe como
 armadilha T4). Prova: a mesma sala de ensaio, criada só com o comando, ficou com **13 salas
 alcançáveis**, todas as chegadas (L19), os conjuntos distintos (L25), os giros certos (L26) e os buracos
@@ -494,6 +523,32 @@ obrigou, e que valem para lá dela:
 ciclo, e um visitante que anda pelo chão só a alcança em **60,4%** do tempo (medido; a primeira conta
 que aqui esteve, 21%, estava errada). É o número que justifica o piso da L29.
 
+> **Nota (D87) — esta secção é o registo do primeiro ensaio, não o estado de hoje.** Depois de a D86
+> fechar, o autor mandou que o movimento das portas de uma sala nova fosse **sorteado** (§10), e a
+> `scene100` foi **refeita pelo sorteio** (semente 99): hoje as **quatro** portas oscilam — nenhuma
+> fica parada como controlo —, com amplitudes de 5,0 e 6,0 m, ângulos de 45° e 90°, e **dois períodos
+> por porta** (10,0 a 19,7 s) em vez dos 20 s iguais de então. O controlo mudou com ela: deixou de ser
+> «a porta que não declara movimento não se mexe» e passou a ser «**assentes, as portas estão
+> exactamente onde o ficheiro as põe**» — que é a invariante de que dependem a L16, o retrato e o
+> `prefers-reduced-motion`. Os números de hoje estão na §10.8 e no `sorteio.mjs`.
+
+**O buraco que esta sala abriu, e que fica em aberto (encontrado na verificação de 2026-11-02).** Uma
+porta de uma sala com `carryOrigin: false` não tem **porta de chegada** no destino — é a regra que a
+isola —, e sem chegada não há par `(from, arrival)` para a conta do giro (L26). Por isso:
+
+- o `azimuths.mjs` **não lhe toca** (só percorre as salas, não os fixtures) e a L26 também não a julga;
+- o `window.azimuth` das três portas da `scene100` é o que a construção escreveu, pela mesma fórmula mas
+  com `arrival = 0` — o azimute com que o destino abre numa **primeira visita** (é a pose por omissão
+  de `cameras.player`). Medido no dado: **90° · 0° · −90°**, que é o que `portraitTurn(doorAngle, 0)`
+  dá para as portas a 90°, 180° e −90°;
+- e o instrumento da costura (`seam.mjs`) não mede estas portas, porque a costura compara o retrato com
+  a **chegada**, e aqui não há chegada por porta.
+
+Ou seja: o número está certo pela conta, mas **não é provado por nenhuma lei nem medido por nenhum
+instrumento** — é o único sítio da sala de ensaio onde a documentação afirma mais do que o repositório
+prova. Fechá-lo pede uma decisão (alargar o `azimuths.mjs` aos fixtures com `arrival = 0`, e uma L26 que
+aceite esse caso), e por isso fica escrito aqui em vez de resolvido à socapa.
+
 ---
 
 ## 10. O movimento das portas, sorteado na construção (D87)
@@ -604,9 +659,15 @@ exactamente o instante da chegada. É a peça que faz a §10.2 valer também par
 
 ### 10.6 O que a construção faz
 
-1. `node tools/scene/sorteio.mjs <slug>` — ensaio, não escreve.
+1. `node tools/scene/sorteio.mjs <slug>` — ensaio, não escreve, e imprime a **semente**.
 2. `node tools/scene/sorteio.mjs <slug> --aplicar` — escreve `motion` em cada porta.
-3. Os retratos, depois, com as portas assentes (fase 8 do roteiro).
+3. Se o sorteio não agradar, corre outra vez: **outra semente, outra sala**. Se agradar, guarda a
+   semente que a última linha imprimiu — é ela que o repete (`--semente N`), e é ela que vai na
+   mensagem do commit.
+4. Os retratos, depois, com as portas assentes (fase 8 do roteiro).
+
+O `new-room.mjs` faz os passos 1 e 2 sozinho, com uma semente do relógio, e mostra-a: quem criar a sala
+pelo atalho recebe a sala já sorteada e o número para a repetir.
 
 O bloco que entra no dado, por porta:
 
