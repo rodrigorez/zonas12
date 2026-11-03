@@ -456,7 +456,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > T7/T11 passam a **assentar as portas** antes de medir geometria (sem isso, **33 de 165** verificações
 > perdiam a meia volta). **Nada foi recozido**: a pose de repouso é a pose em que os 42 retratos já
 > estavam cozidos, portanto a imagem seria igual e não se gastou GPU (um lote de 39 pares custa 800–820 s,
-> medido). A `motion.mjs` foi de **13 para 19** verificações (a âncora — **10,57 m → 0,0e+0 m**; a andar
+> medido). A `motion.mjs` foi de **16 para 19** verificações (a âncora — **10,57 m → 0,0e+0 m**; a andar
 > ao lado do plano com a porta a varrer — **0 navegações**; a atravessar o plano — **1**, o controlo; e
 > as 5 portas da `scene1` a oscilar no ecrã). O comando, para repetir o sorteio:
 > `node tools/scene/sorteio.mjs gate scene1 … scene11 --aplicar --semente 20261103`; o que ficou escrito
