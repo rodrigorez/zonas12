@@ -149,6 +149,8 @@
     "editor.portal.motionAxis.y": "Vertical (Y)",
     "editor.portal.motionAxis.z": "Horizontal (Z)",
     "editor.portal.motionPeriod": "Uma volta completa leva (s)",
+    "editor.portal.motionRotationAxis": "Eixo da rotação",
+    "editor.portal.motionRotationPeriod": "A rotação completa leva (s)",
     "editor.portal.motionRadius": "Raio da volta (m)",
     "editor.portal.none": "Este mundo não tem portais.",
     "editor.portal.ownedBy": "Pertence à dimensão",

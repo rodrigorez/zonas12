@@ -53,18 +53,18 @@ const ler = (id) => `(() => {
 // roda sobre o centro, e por isso a origem descreve um arco de meia altura de raio. Medir a origem media
 // o arco. O controlo positivo — a mesma porta rodada sobre a base, que afastaria o centro 8,49 m — é o
 // que mostra que esta medida apanha o defeito.
-const AMOSTRAR = (ms) => `(async () => {
-  const ids = [0, 1, 2, 3];
+const AMOSTRAR = (ms, ids) => `(async () => {
+  const ids = ${JSON.stringify(ids)};
   const ler = () => {
     const linha = { t: performance.now(), portas: {} };
     for (const id of ids) {
       const portal = window.portalDebug.state.portals.find((cada) => cada.data.id === id);
       if (!portal) continue;
-      const object = portal.el.object3D;
       const meio = portal.centreWorld(new THREE.Vector3());
+      const q = portal.el.object3D.quaternion;
       linha.portas[id] = {
         p: [meio.x, meio.y, meio.z],
-        r: [object.rotation.x, object.rotation.y, object.rotation.z]
+        q: [q.x, q.y, q.z, q.w]
       };
     }
     return linha;
@@ -72,7 +72,7 @@ const AMOSTRAR = (ms) => `(async () => {
   const amostras = [ler()];
   const fim = performance.now() + ${ms};
   while (performance.now() < fim) {
-    await new Promise((done) => setTimeout(done, 120));
+    await new Promise((done) => setTimeout(done, 100));
     amostras.push(ler());
   }
   return amostras;
@@ -83,27 +83,69 @@ const centro = (valores) => (Math.max(...valores) + Math.min(...valores)) / 2;
 const graus = (valores) => amplitude(valores) * 180 / Math.PI;
 
 // A meia oscilação (o tempo entre dois cruzamentos do centro, em segundos): é onde a curva é mais
-// inclinada, e por isso onde a amostra de 120 ms custa menos — nos extremos ela é plana e o instante
-// medido escorrega. Devolve os intervalos todos (a mediana é o que conta) e com quantos cruzamentos se
-// ficou: uma medição que não viu nenhum tem de o dizer, em vez de aparecer como um número que falhou.
-function meiaOscilacao(amostras, id, eixo) {
-  const valores = amostras.map((amostra) => amostra.portas[id].p[eixo]);
+// inclinada, e por isso onde a amostra custa menos — nos extremos ela é plana e o instante medido
+// escorrega. Devolve os intervalos todos (a mediana é o que conta) e com quantos cruzamentos se ficou:
+// uma medição que não viu nenhum tem de o dizer, em vez de aparecer como um número que falhou.
+function meiaOscilacao(valores, tempos) {
   const meio = centro(valores);
-  const tempos = [];
-  for (let i = 1; i < amostras.length; i++) {
+  const cruzamentos = [];
+  for (let i = 1; i < valores.length; i++) {
     const antes = valores[i - 1] - meio;
     const agora = valores[i] - meio;
     if (antes * agora < 0) {
-      tempos.push(amostras[i - 1].t + (amostras[i].t - amostras[i - 1].t) * (antes / (antes - agora)));
+      cruzamentos.push(tempos[i - 1] + (tempos[i] - tempos[i - 1]) * (antes / (antes - agora)));
     }
   }
-  const intervalos = tempos.slice(1).map((tempo, i) => (tempo - tempos[i]) / 1000);
+  const intervalos = cruzamentos.slice(1).map((tempo, i) => (tempo - cruzamentos[i]) / 1000);
   const ordenados = intervalos.slice().sort((a, b) => a - b);
-  const mediana = ordenados.length
-    ? ordenados[Math.floor((ordenados.length - 1) / 2)]
-    : null;
-  return { segundos: mediana, intervalos, cruzamentos: tempos.length };
+  return {
+    segundos: ordenados.length ? ordenados[Math.floor((ordenados.length - 1) / 2)] : null,
+    intervalos,
+    cruzamentos: cruzamentos.length
+  };
 }
+
+// O ângulo **com sinal** de uma orientação em relação a outra, medido sobre um eixo da porta (D87).
+// Um ângulo sem sinal (o `2·acos`) dá meio valor — medido: 45° onde o dado diz 90° — e a série deixa de
+// ser um seno (é um `|seno|`, que dobra a frequência e estraga a leitura do período).
+//
+// A conta: `dq = q_repouso⁻¹ · q_agora`, e o ângulo com sinal sobre o eixo é `2·atan2(v·eixo, w)`.
+const multiplicarQ = (a, b) => [
+  a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1],
+  a[3] * b[1] - a[0] * b[2] + a[1] * b[3] + a[2] * b[0],
+  a[3] * b[2] + a[0] * b[1] - a[1] * b[0] + a[2] * b[3],
+  a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2]
+];
+const conjugado = (q) => [-q[0], -q[1], -q[2], q[3]];
+const anguloComSinal = (repouso, agora, eixoLocal) => {
+  const dq = multiplicarQ(conjugado(repouso), agora);
+  const senoMetade = dq[0] * eixoLocal[0] + dq[1] * eixoLocal[1] + dq[2] * eixoLocal[2];
+  return (2 * Math.atan2(senoMetade, dq[3]) * 180) / Math.PI;
+};
+// O deslocamento do centro projectado numa direcção do mundo (a do eixo da porta, levada pela rotação
+// do dado): é a amplitude da translação, medida no eixo que o sorteio nomeou.
+const projeccao = (p, base, direcao) =>
+  (p[0] - base[0]) * direcao[0] + (p[1] - base[1]) * direcao[1] + (p[2] - base[2]) * direcao[2];
+// O quanto do deslocamento **não** é ao longo do eixo: tem de ser zero.
+const residuo = (p, base, direcao, aoLongo) => Math.hypot(
+  p[0] - base[0] - direcao[0] * aoLongo,
+  p[1] - base[1] - direcao[1] * aoLongo,
+  p[2] - base[2] - direcao[2] * aoLongo
+);
+const eixoDoDado = (quaternion, eixo) => {
+  const [x, y, z, w] = quaternion;
+  const [ax, ay, az] = eixo;
+  // v' = q · v · q⁻¹, escrito à mão para não depender de three neste ficheiro.
+  const ix = w * ax + y * az - z * ay;
+  const iy = w * ay + z * ax - x * az;
+  const iz = w * az + x * ay - y * ax;
+  const iw = -x * ax - y * ay - z * az;
+  return [
+    ix * w + iw * -x + iy * -z - iz * -y,
+    iy * w + iw * -y + iz * -x - ix * -z,
+    iz * w + iw * -z + ix * -y - iy * -x
+  ];
+};
 
 async function main() {
   const result = checks();
@@ -208,72 +250,114 @@ async function main() {
       return relatorio.errors.map((erro) => erro.message || String(erro)).join(' | ');
     })()`);
     result.check('o validador recusa uma porta de chegada em movimento',
-      typeof lei === 'string' && /cannot be the one a visitor arrives behind/.test(lei),
-      lei.slice(0, 220));
+      typeof lei === 'string' && /can be the door a visitor arrives behind/.test(lei),
+      lei.slice(0, 260));
 
-    // ---- A sala de ensaio (D84/D85): a oscilação das três portas ---------------------------------
-    // O que se mede é o que o **dado** pede, e não a fórmula: a amplitude em cada eixo, os outros dois
-    // parados, a translação e a rotação em fase, e a meia oscilação contra o período declarado.
+    // ---- A sala de ensaio: as quatro portas **sorteadas** (D87) --------------------------------
+    // O que se mede é o que o **dado** pede, e não a fórmula: em cada porta, a amplitude da translação
+    // no eixo que o sorteio nomeou (e nada nos outros dois), o ângulo da rotação no eixo que ele
+    // nomeou, e os **dois** períodos — o da translação e o da rotação, que são independentes.
     const dado = JSON.parse(readFileSync(join(ROOT, 'data', 'worlds', 'scene100.json'), 'utf8'));
+    const comMovimento = dado.portals.filter((cada) => cada.motion && cada.motion.kind === 'sway');
+    const ids = comMovimento.map((cada) => cada.id);
     await browser.goto(site.base + '/?scene=scene100&bust=' + Date.now(), 60000);
     for (let i = 0; i < 150; i++) {
       if (await browser.evaluate(PRONTO).catch(() => false)) break;
       await sleep(200);
     }
     await sleep(2000);
-    // A pose do dado, lida antes de a oscilação recomeçar (D86): o `settleMotion` põe as portas onde o
-    // ficheiro as escreve e pára o relógio — é contra ela que a pose de cada instante é comparada. O
-    // movimento volta a andar logo a seguir, senão não havia nada para medir.
+    // A pose do dado (D86): o `settleMotion` põe as portas onde o ficheiro as escreve e pára o relógio.
+    // É contra ela que a pose de cada instante é comparada, e é ela que a chegada lê (a fase 0 do seno).
     const repouso = await browser.evaluate(`(() => {
       const d = window.portalDebug;
       if (d.settleMotion) d.settleMotion();
-      const estados = [0, 1, 2, 3].map((id) => {
+      const estados = {};
+      for (const id of ${JSON.stringify(ids)}) {
         const portal = d.state.portals.find((cada) => cada.data.id === id);
         const meio = portal.centreWorld(new THREE.Vector3());
-        return { p: [meio.x, meio.y, meio.z] };
-      });
-      d.freezeMotion(false);
+        const q = portal.el.object3D.quaternion;
+        estados[id] = { p: [meio.x, meio.y, meio.z], q: [q.x, q.y, q.z, q.w] };
+      }
       return estados;
     })()`);
-    // O movimento volta a andar **no instante em que o relógio está**, e por isso a porta salta da pose
-    // do dado para a pose daquele instante: esse salto atravessa o centro e inventava um cruzamento a
-    // mais (medido: meia oscilação de 7,66 s em vez de 10). Espera-se que o salto fique para trás antes
-    // de começar a amostrar.
+    // Assentes, as portas estão **exactamente** onde o ficheiro as põe — é esta invariante que mantém a
+    // L16 verdadeira, o retrato válido e a sala alcançável com o `prefers-reduced-motion`.
+    const assentes = await browser.evaluate(`(() => {
+      const d = window.portalDebug;
+      const desvios = [];
+      for (const id of ${JSON.stringify(ids)}) {
+        const portal = d.state.portals.find((cada) => cada.data.id === id);
+        const object = portal.el.object3D;
+        desvios.push({
+          id: id,
+          posicao: Math.max(...['x', 'y', 'z'].map((k, i) =>
+            Math.abs(object.position[k] - portal.basePosition[k]))),
+          rotacao: Math.max(...['x', 'y', 'z'].map((k) =>
+            Math.abs(object.rotation[k] - portal.baseRotation[k])))
+        });
+      }
+      return desvios;
+    })()`);
+    result.check('sala de ensaio · assentes, as portas estão onde o ficheiro as põe (a pose de repouso)',
+      assentes.every((cada) => cada.posicao <= 1e-6 && cada.rotacao <= 1e-6),
+      assentes.map((cada) => 'porta ' + cada.id + ': ' + cada.posicao.toExponential(1) + ' m, ' +
+        cada.rotacao.toExponential(1) + ' rad').join(' | '));
+    await browser.evaluate('window.portalDebug.freezeMotion(false)');
+    // O movimento volta a andar no instante em que o relógio está, e por isso a porta salta da pose do
+    // dado para a pose daquele instante: esse salto atravessa o centro e inventava um cruzamento a mais
+    // (medido: meia oscilação de 7,66 s em vez de 10). Espera-se que fique para trás.
     await sleep(1500);
-    // Uma oscilação e um pouco: com o período de 20 s, 23 s dão pelo menos dois cruzamentos do centro
-    // em cada porta, que é o que a meia oscilação precisa.
-    const amostras = await browser.evaluate(AMOSTRAR(23000), 60000);
+    // Duas oscilações do período mais longo (20 s): 42 s dão pelo menos dois cruzamentos em cada porta
+    // e em cada um dos dois movimentos.
+    const amostras = await browser.evaluate(AMOSTRAR(42000, ids), 90000);
+    const tempos = amostras.map((amostra) => amostra.t);
     const nomes = ['X', 'Y', 'Z'];
     const medidas = {};
-    for (const id of [1, 2, 3]) {
-      const porta = dado.portals.find((cada) => cada.id === id);
-      const eixo = porta.motion.axis.findIndex((valor) => valor === 1);
-      const posicoes = [0, 1, 2].map((k) => amostras.map((a) => a.portas[id].p[k]));
-      const rotacoes = [0, 1, 2].map((k) => amostras.map((a) => a.portas[id].r[k]));
-      const metros = posicoes.map(amplitude);
-      const angulos = rotacoes.map(graus);
-      const outros = [0, 1, 2].filter((k) => k !== eixo);
-      const meio = centro(posicoes[eixo]);
-      // Em fase: no instante em que a porta está no extremo positivo, a rotação também está.
-      const iMax = posicoes[eixo].indexOf(Math.max(...posicoes[eixo]));
-      const desvio = rotacoes[eixo][iMax] - centro(rotacoes[eixo]);
-      medidas[id] = meiaOscilacao(amostras, id, eixo);
-      // O centro é o que fica parado (D86): o desvio dele em relação à pose do dado mede-se eixo a eixo,
-      // e é a translação que o move — a rotação não move o centro, move a origem.
-      const desvios = [0, 1, 2].map((k) => Math.abs(centro(posicoes[k]) - repouso[id].p[k]));
-      result.check('sala de ensaio · porta ' + id + ' (' + nomes[eixo] + '): oscila ±' +
-        porta.motion.amplitude + ' m e ±' + porta.motion.angle +
-        '°, em fase e com os outros eixos parados',
-        Math.abs(metros[eixo] - porta.motion.amplitude) <= 0.15 &&
-          outros.every((k) => metros[k] <= 0.03) &&
-          Math.abs(angulos[eixo] - porta.motion.angle) <= 1.5 &&
-          outros.every((k) => angulos[k] <= 0.5) &&
-          desvios.every((valor) => valor <= 0.15) &&
-          desvio > 0 && Math.abs(desvio * 180 / Math.PI - porta.motion.angle) <= 2,
-        'centro ' + metros.map((valor) => valor.toFixed(3)).join(' / ') + ' m, rotação ' +
-          angulos.map((valor) => valor.toFixed(2)).join(' / ') + '°, desvio à pose do dado ' +
-          desvios.map((valor) => valor.toFixed(3)).join(' / ') + ' m');
+
+    for (const porta of comMovimento) {
+      const id = porta.id;
+      const base = repouso[id];
+      const eixoTranslacao = porta.motion.axis.findIndex((valor) => valor === 1);
+      const eixoRotacao = (porta.motion.rotationAxis || porta.motion.axis)
+        .findIndex((valor) => valor === 1);
+      // A direcção do eixo da porta, no mundo: a rotação do dado leva-a. É aí que a amplitude se mede.
+      const direcao = eixoDoDado(base.q, porta.motion.axis);
+      const deslocamentos = amostras.map((a) => projeccao(a.portas[id].p, base.p, direcao));
+      const residuos = amostras.map((a, i) => residuo(a.portas[id].p, base.p, direcao, deslocamentos[i]));
+      // O ângulo com sinal sobre o eixo que o sorteio nomeou: é o que dá a amplitude (em módulo) e a
+      // série certa para o período.
+      const angulosSerie = amostras.map((a) =>
+        anguloComSinal(base.q, a.portas[id].q, porta.motion.rotationAxis || porta.motion.axis));
+      const metros = amplitude(deslocamentos);
+      const angulos = amplitude(angulosSerie);
+      const translacao = meiaOscilacao(deslocamentos, tempos);
+      const rotacao = meiaOscilacao(angulosSerie, tempos);
+      medidas[id] = { translacao, rotacao };
+      result.check('sala de ensaio · porta ' + id + ' (' + porta.action.target + '): oscila ±' +
+        porta.motion.amplitude + ' m em ' + nomes[eixoTranslacao] + ' e ±' + porta.motion.angle +
+        '° em ' + nomes[eixoRotacao],
+        Math.abs(metros - porta.motion.amplitude) <= 0.15 &&
+          Math.abs(angulos - porta.motion.angle) <= 2 &&
+          Math.max(...residuos) <= 0.02,
+        'translação ' + metros.toFixed(3) + ' m (dado ' + porta.motion.amplitude + '), rotação ' +
+          angulos.toFixed(2) + '° (dado ' + porta.motion.angle + '), desvio fora do eixo ' +
+          Math.max(...residuos).toExponential(1) + ' m');
     }
+
+    const meiasTranslacao = comMovimento.map((porta) => medidas[porta.id].translacao.segundos);
+    const meiasRotacao = comMovimento.map((porta) => medidas[porta.id].rotacao.segundos);
+    const periodosTranslacao = comMovimento.map((porta) => porta.motion.period);
+    const periodosRotacao = comMovimento.map((porta) => porta.motion.rotationPeriod);
+    result.check('sala de ensaio · os dois períodos de cada porta são os do dado',
+      comMovimento.every((porta, i) =>
+        meiasTranslacao[i] !== null && Math.abs(meiasTranslacao[i] - periodosTranslacao[i] / 2) <= 0.8 &&
+        meiasRotacao[i] !== null && Math.abs(meiasRotacao[i] - periodosRotacao[i] / 2) <= 0.8),
+      'translação ' + comMovimento.map((porta, i) =>
+        (meiasTranslacao[i] === null ? '—' : meiasTranslacao[i].toFixed(2)) + '/' +
+        (porta.motion.period / 2).toFixed(2)).join(' · ') +
+      ' | rotação ' + comMovimento.map((porta, i) =>
+        (meiasRotacao[i] === null ? '—' : meiasRotacao[i].toFixed(2)) + '/' +
+        (porta.motion.rotationPeriod / 2).toFixed(2)).join(' · ') + ' (medido/esperado, s)');
 
     // O controlo positivo da D86: a mesma porta, rodada de 90° **sobre a base** — que é o que a
     // animação fazia antes desta correcção. Se a medida do centro não apanhasse o defeito, este número
@@ -281,7 +365,7 @@ async function main() {
     const controlo = await browser.evaluate(`(() => {
       const d = window.portalDebug;
       d.settleMotion();
-      const portal = d.state.portals.find((cada) => cada.data.id === 1);
+      const portal = d.state.portals.find((cada) => cada.data.id === ${ids[0]});
       const object = portal.el.object3D;
       const antes = portal.centreWorld(new THREE.Vector3());
       const base = portal.baseRotation.clone();
@@ -295,33 +379,65 @@ async function main() {
     result.check('sala de ensaio · o controlo: rodar sobre a base afastaria o centro da porta',
       controlo.desvio >= 5,
       'com o pivô na base o centro sai ' + controlo.desvio.toFixed(2) + ' m do lugar; com o pivô no ' +
-        'centro sai 0,000 m (a verificação da porta 1)');
-    const meias = [1, 2, 3].map((id) => medidas[id].segundos);
-    const cruzamentos = [1, 2, 3].map((id) => medidas[id].cruzamentos);
-    const periodo = dado.portals.find((cada) => cada.id === 1).motion.period;
-    result.check('sala de ensaio · a oscilação tem o período do dado (' + periodo + ' s)',
-      meias.every((valor) => valor !== null && Math.abs(valor - periodo / 2) <= 0.8),
-      'meia oscilação ' + meias.map((valor) => valor === null ? 'sem cruzamentos' : valor.toFixed(2) + ' s')
-        .join(' / ') + ' (esperado ' + (periodo / 2) + ' s), ' + amostras.length + ' amostras e ' +
-        cruzamentos.join(' / ') + ' cruzamentos; intervalos ' +
-        [1, 2, 3].map((id) => medidas[id].intervalos.map((valor) => valor.toFixed(2)).join('+'))
-          .join(' | '));
+        'centro sai 0,000 m (a diagonal da porta é o raio que ele descreveria)');
 
-    // O controlo: a porta do portão não declara `motion`, e por isso não pode mexer-se.
-    const quieta = [0, 1, 2].map((k) => amplitude(amostras.map((a) => a.portas[0].p[k])));
-    const quietaRotacao = [0, 1, 2].map((k) => amplitude(amostras.map((a) => a.portas[0].r[k])));
-    result.check('sala de ensaio · a porta do portão, que não declara movimento, fica parada',
-      quieta.every((valor) => valor <= 0.005) && quietaRotacao.every((valor) => valor <= 0.001),
-      'posição ' + quieta.map((valor) => valor.toFixed(4)).join(' / ') + ' m, rotação ' +
-        quietaRotacao.map((valor) => valor.toFixed(4)).join(' / ') + ' rad');
+    // ---- A travessia exige que o visitante ande (D87) --------------------------------------------
+    // A caixa de colisão roda com a porta e varre até 12 m para dentro da sala. Aqui a porta é **rodada
+    // à mão** com a câmara parada no ponto de chegada: os dois sentidos da mesma prova. Sem a condição,
+    // o cruzamento do plano dispara e o visitante é levado sem se mexer; com ela, não.
+    const parado = await browser.evaluate(`(async () => {
+      const d = window.portalDebug;
+      const portal = d.state.portals.find((cada) => cada.data.id === 1);
+      d.freezeMotion(true);
+      d.settleMotion();
+      const conta = { navegacoes: 0 };
+      const original = portal.navigate.bind(portal);
+      portal.navigate = function () { conta.navegacoes++; };
+      const camara = document.querySelector('a-camera').object3D;
+      // A câmara no ponto de chegada da porta (meia profundidade da caixa + 0,5 m à frente).
+      const centro = portal.centreWorld(new THREE.Vector3());
+      const frente = new THREE.Vector3(0, 0, 1)
+        .applyQuaternion(portal.portalGroup.getWorldQuaternion(new THREE.Quaternion()))
+        .normalize();
+      const distancia = portal.data.box ? portal.data.box.z / 2 + 0.5 : 1;
+      camara.position.set(centro.x + frente.x * distancia, 1.6, centro.z + frente.z * distancia);
+      const base = portal.baseRotation.clone();
+      const espera = () => new Promise((done) =>
+        requestAnimationFrame(() => requestAnimationFrame(done)));
+      // A porta varre uma volta inteira, com a câmara parada.
+      for (let i = 0; i < 24; i++) {
+        const angulo = (i / 24) * Math.PI * 2;
+        portal.el.object3D.rotation.set(base.x + angulo, base.y, base.z);
+        await espera();
+      }
+      const semAndar = conta.navegacoes;
+      // O controlo: a mesma varredura, com a câmara a andar 5 cm por passo.
+      conta.navegacoes = 0;
+      for (let i = 0; i < 24; i++) {
+        const angulo = (i / 24) * Math.PI * 2;
+        portal.el.object3D.rotation.set(base.x + angulo, base.y, base.z);
+        camara.position.z += 0.05;
+        await espera();
+      }
+      portal.navigate = original;
+      return { semAndar: semAndar, aAndar: conta.navegacoes };
+    })()`);
+    result.check('sala de ensaio · parado, a porta em movimento não leva o visitante',
+      parado.semAndar === 0,
+      'com a câmara parada e a porta a varrer uma volta inteira: ' + parado.semAndar +
+        ' navegação(ões); com a câmara a andar: ' + parado.aAndar);
+    result.check('sala de ensaio · e o controlo: a andar, a mesma varredura leva-o',
+      parado.aAndar > 0,
+      'sem este controlo, «parado não é levado» também passaria numa cena sem travessia nenhuma');
 
     const congelado = await browser.evaluate(`(async () => {
       window.portalDebug.freezeMotion(true);
-      const ler = () => [1, 2, 3].map((id) => {
+      const ler = () => ${JSON.stringify(ids)}.map((id) => {
         const portal = window.portalDebug.state.portals.find((cada) => cada.data.id === id);
-        const posicao = portal.el.object3D.getWorldPosition(new THREE.Vector3());
+        const posicao = portal.centreWorld(new THREE.Vector3());
+        const q = portal.el.object3D.quaternion;
         return posicao.x.toFixed(4) + ',' + posicao.y.toFixed(4) + ',' + posicao.z.toFixed(4) +
-          '@' + portal.el.object3D.rotation.toArray().slice(0, 3).map((v) => v.toFixed(4)).join(',');
+          '@' + [q.x, q.y, q.z, q.w].map((v) => v.toFixed(4)).join(',');
       });
       const antes = ler();
       await new Promise((done) => setTimeout(done, 1500));

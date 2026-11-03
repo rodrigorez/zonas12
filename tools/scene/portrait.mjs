@@ -303,6 +303,16 @@ async function gerar(mundo, origem, destino, opcoes = {}) {
       ': câmara em [' +
       chegada.posicao.map((valor) => Math.round(valor * 100) / 100).join(', ') + ']');
 
+    // As portas **assentam na pose do dado** antes de o shader congelar (D87). O retrato é a imagem
+    // que o visitante vê ao chegar, e a chegada acontece na fase 0 do seno — a pose de repouso. Uma
+    // sala com portas a oscilar (as salas novas, desde a D87) tinha o retrato cozido na fase em que a
+    // página estivesse — arbitrária, porque ela esteve aberta dezenas de segundos — e a janela deixava
+    // de mostrar o que o visitante ia ver. `settleMotion` põe as portas onde o ficheiro as escreve e
+    // pára o relógio; nas salas sem movimento não há nada a assentar.
+    await browser.evaluate(
+      '(() => { const d = window.portalDebug; if (d && d.settleMotion) d.settleMotion(); return true; })()'
+    ).catch(() => { /* uma página sem o lever */ });
+
     // O shader **congela** antes de desenhar (2026-10-27). O retrato fixa o instante em cada material,
     // mas o ciclo da exposição volta a escrever `uTime` a cada fotograma — e as seis faces do cubo são
     // desenhadas com esperas pelo meio, cada uma num instante diferente. Era isso que fazia o mesmo

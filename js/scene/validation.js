@@ -38,6 +38,7 @@ import {
 } from '../core/index.js';
 import { validateDoor, ENTRY_WORLD } from '../modules/portal-kinds.js';
 import { arrivalPoint } from './arrival.js';
+import { alcanceDaPorta, ALCANCE_MINIMO } from './reach.js';
 import { realityHoles, sameHoles } from './reality.js';
 import { RING, angularGap, portraitTurn, requiredClearance, ringCoordinates } from './ring.js';
 import { isFixture } from './fixtures.js';
@@ -330,13 +331,16 @@ export function validateScene(scene, options = {}) {
   const arrivalDoors = new Map();
   for (const portal of scene.portals || []) {
     if (typeof portal.arrivalFrom !== 'string') continue;
-    // D59: uma porta que se mexe não pode ser a porta de chegada. O ponto de chegada é calculado do
-    // dado (`js/scene/arrival.js`), e o dado de uma porta em movimento descreve onde ela estava no
-    // instante em que o ficheiro foi escrito — a L16 provaria uma coisa e a cena faria outra, com o
-    // visitante a aparecer dentro da caixa em movimento.
-    if (portal.motion && portal.motion.kind) {
+    // A porta de chegada **pode** oscilar desde a D87. A razão antiga (o dado descrevia onde a porta
+    // estava quando o ficheiro foi escrito) continua verdadeira, mas agora o que a chegada lê é a
+    // **pose de repouso** — a fase 0 do seno, que é exactamente a pose do dado. E o
+    // `prefers-reduced-motion` congela nessa mesma fase. Quem garante que a porta continua a ser
+    // alcançável é a L29, não esta.
+    if (portal.motion && portal.motion.kind && portal.motion.kind !== 'sway') {
       err(`portals[${portal.id}]: it is the arrival door of "${portal.arrivalFrom}" and it declares ` +
-        `motion "${portal.motion.kind}" — a moving door cannot be the one a visitor arrives behind (D59)`);
+        `motion "${portal.motion.kind}" — only an oscillation ("sway") can be the door a visitor ` +
+        `arrives behind (D87: the arrival reads the resting pose, which is the one in the file; ` +
+        `"spin" and "orbit" have no resting pose)`);
       continue;
     }
     const previous = arrivalDoors.get(portal.arrivalFrom);
@@ -433,6 +437,21 @@ export function validateScene(scene, options = {}) {
     if (toEntry !== 1) {
       err(`${toEntry} door(s) to the gate ("${ENTRY_WORLD}") — law L24 (exactly one, or the visitor ` +
         `has no way back)`);
+    }
+  }
+
+  // ---- L29: a moving door is reachable for at least half the cycle (D87) ----
+  //
+  // A conta vive em `reach.js` — a mesma que o sorteio usa para recusar um sorteio e a mesma que o
+  // instrumento mede. A oscilação tem dois períodos independentes, por isso a amostra é o par de fases
+  // (translação × rotação) e não um ciclo só.
+  for (const portal of scene.portals || []) {
+    if (!portal.motion || portal.motion.kind !== 'sway') continue;
+    const alcance = alcanceDaPorta(portal);
+    if (alcance.percentagem < ALCANCE_MINIMO) {
+      err(`portals[${portal.id}]: it oscillates and the visitor only reaches it in ` +
+        `${alcance.percentagem.toFixed(1)}% of the cycle — law L29 (at least ${ALCANCE_MINIMO}%: a ` +
+        `door that spends most of the time out of reach is a door that takes the visitor nowhere)`);
     }
   }
 

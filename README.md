@@ -65,7 +65,7 @@ zonas12/
 │   └── en.json         as mesmas 222 chaves em inglês (?lang=en); um teste compara as duas
 ├── docs/
 │   ├── ROADMAP.md      plano de desenvolvimento (módulos, mundos e página de edição), com as
-│   │                   decisões (D1…) e as leis (L1…L28)
+│   │                   decisões (D1…) e as leis (L1…L29)
 │   ├── SPEC-NOVA-SALA.md  o roteiro para abrir uma sala nova (D83): doze fases, doze armadilhas e
 │   │                   a lista de aceitação
 │   ├── GUIA-DE-TESTES.md  a ficha da obra e o ensaio A/B do shader nos três aparelhos
@@ -382,6 +382,27 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > da porta** (D86): rodar sobre a base prendia-a ao chão e a ±90° atirava-a para fora da moldura — medido,
 > com o pivô na base o centro sai **8,49 m** do lugar, e com o pivô no centro sai **0,000 m**.
 
+> **Atualização (2026-11-02, o movimento sorteado das salas novas — D87):** o autor quis que as portas de
+> uma sala nova **não escolhessem** o movimento. As regras ficaram escritas na spec (§10, com a fase 6b no
+> roteiro) **antes** de serem usadas: translação em X ou Y com **metade da dimensão do eixo**, rotação em
+> X, Y ou Z com **45° ou 90°**, dois períodos independentes em **[10, 20] s**, e o sorteio **repetido**
+> enquanto a lei nova — **L29**, o alcance do visitante ao longo do ciclo — não passar. Quatro coisas
+> apareceram e todas mudaram a conta: **os eixos são os da porta e não os do mundo** (com os do mundo,
+> metade das portas do anel passava a lei sem oscilar: 12 de 12 contra 8 de 12); **o alcance mede-se no
+> par de fases** (dois períodos percorrem um toro — um ciclo só dava 58,4% onde o toro dá 48,0%);
+> **a caixa varre o visitante parado** (chega a 10,01 m para dentro da sala, e 3 dos 8 sorteios legais
+> punham-no dentro dela entre 10,4% e 36,5% do ciclo, com a travessia a disparar pelo cruzamento do
+> plano — passou a exigir que ele **ande**); e **o retrato tem de ser cozido com as portas assentes**
+> (`settleMotion`), senão a janela mostra uma pose e a chegada outra. Medido: **8 das 12 combinações
+> passam** (rejeita **1 em 3**), **1,504 tentativas por porta**, translação **X 49,9% · Y 50,1%**,
+> rotação **X 0,0%** (nunca sai) **· Y 50,0% · Z 50,0%**, ângulo **45° 49,9% · 90° 50,1%**. A sala de
+> ensaio foi refeita com o sorteio — quatro portas, alcances **100 / 100 / 65,3 / 60,0%**, e a do portão
+> deixou de ser o controlo parado (as quatro oscilam; o controlo passou a ser «assentes, estão onde o
+> ficheiro as põe»). As leis passam a **31 de 31**, os portais em movimento a **16 de 16**, os doze
+> **99 de 99** e o i18n **9 de 9** (224 chaves); e a verificação completa, `all.mjs --full`, dá **27 de
+> 28** baterias em **2 842,7 s**, com a única vermelha a ser a costura (**D46**), como antes. Decisão
+> **D87** (§11 do roadmap).
+
 > **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
 > filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as
 > portas a **60 m** —, e cada sala passou a ter **três a cinco portas**, uma delas de volta ao portão e
@@ -530,19 +551,22 @@ nova da noite, e as notas abaixo continuam a valer.
 
 Resumo do que existe na v0.0.23 (medido em 2026-11-02): `index.html` (**93 linhas**) e as **onze**
 salas com o **mesmo** ficheiro (`scene1/` a `scene11/`, iguais fora da linha do `<base>` — D28),
-`editor.html` (**96**), `js/app.js` (**260**), `js/arrival-frame.js` (**204**, a ponte de imagem entre
+`editor.html` (**96**), `js/app.js` (**268**), `js/arrival-frame.js` (**204**, a ponte de imagem entre
 mundos — D43), `js/editor.js` (**15**, a entrada do editor — D36), `js/editor/` (**15** ficheiros,
-**3497** linhas com os painéis e a ponte com o servidor), `js/i18n.js` (**93**), `js/core/` (7 ficheiros,
-**234**), `js/modules/` (11 ficheiros, **3410**), `js/scene/` (13 ficheiros, **2342**), `js/shaders/`
+**3566** linhas com os painéis e a ponte com o servidor), `js/i18n.js` (**93**), `js/core/` (7 ficheiros,
+**234**), `js/modules/` (11 ficheiros, **3509**), `js/scene/` (14 ficheiros, **2561** — o `reach.js` é o
+último, D87), `js/shaders/`
 (11 ficheiros, **604**), `css/` (**3** ficheiros: `style.css` **142**, `editor.css` **313** e
 `obra.css` **252**), **17** ficheiros em `data/worlds/` (o portão, as onze salas e os cinco fixtures,
 **7389 linhas** no total e **60 portas**, das quais **50** nas doze páginas da exposição),
-`i18n/pt.json` (**222** chaves), as **57 obras** na folha `data/obras.tsv`, os **87** ficheiros em
+`i18n/pt.json` (**224** chaves), as **57 obras** na folha `data/obras.tsv`, os **87** ficheiros em
 `assets/previews/` (**42** retratos e **42** recortes, um par por porta, mais os três panoramas — D46) e
-**56** ficheiros em `tools/` (**12798** linhas). O que esta versão entregou:
+**57** ficheiros em `tools/` (**13335** linhas). O que esta versão entregou:
 
-A **v0.0.23** é a **spec de uma sala nova** (D83) e a **sala de ensaio** (D84): o roteiro em
-`docs/SPEC-NOVA-SALA.md` (com a §9 a descrever o mundo de ensaio), as listas das baterias a virem do
+A **v0.0.23** é a **spec de uma sala nova** (D83) e a **sala de ensaio** (D84), mais o **movimento
+sorteado** das portas de uma sala nova (D87): o roteiro em
+`docs/SPEC-NOVA-SALA.md` (com a §9 a descrever o mundo de ensaio e a §10 as regras do sorteio), as
+listas das baterias a virem do
 dado e o `tools/scene/new-room.mjs`. Antes dela, a **v0.0.22** fechou a **emenda da
 esfera** (D82): o preâmbulo dos shaders ganhou `volta`, `azim` e `noise3`, os onze fundos foram
 reexcritos para não terem costura e os 39 retratos foram refeitos. A **v0.0.21** fechou o **mundo real
@@ -985,14 +1009,15 @@ repetições (cerca de 6 minutos por celular para as três tecnologias nos dois 
 
 ### Verificado nesta versão (medido no browser)
 
-> **Atualização (2026-11-02, os números da v0.0.23 e da sala de ensaio — D84/D85):** o que esta versão
-> mediu, com `node tools/regression/all.mjs --full`: o dado **0**, as leis **29 de 29** com o controlo
-> limpo, o importador da folha **21 de 21**, os doze testes **99 de 99** nas páginas que o dado declara
-> (catorze, com a sala de ensaio), as portas e as chegadas **165 de 165**, os portais em movimento
-> **13 de 13** (com a oscilação da sala de ensaio: ±5 m e ±90°, cada porta a rodar sobre o seu centro), a
-> ordem da janela **22 de 22**, a emenda da esfera **15 de 15** e a costura das travessias **125 de 128** — vermelha desde
+> **Atualização (2026-11-02, os números da v0.0.23, da sala de ensaio e do movimento sorteado —
+> D84/D85/D87):** o que esta versão mediu, com `node tools/regression/all.mjs --full`: o dado **0**, as
+> leis **31 de 31** com o controlo limpo, o importador da folha **21 de 21**, os doze testes **99 de 99**
+> nas páginas que o dado declara (catorze, com a sala de ensaio), as portas e as chegadas **165 de 165**,
+> os portais em movimento **16 de 16** (as quatro portas da sala de ensaio, cada uma com o eixo, a
+> amplitude, o ângulo e **os dois períodos** do sorteio), a ordem da janela **22 de 22**, a emenda da
+> esfera **15 de 15** e a costura das travessias **125 de 128** — vermelha desde
 > antes do anel (**D46**), com duas portas estáveis na casa dos **0,5** e um caso intermitente (um
-> fotograma escuro na chegada). Na corrida de **28 baterias** ficaram **27 verdes**, em **2 806,2 s**;
+> fotograma escuro na chegada). Na corrida de **28 baterias** ficaram **27 verdes**, em **2 842,7 s**;
 > a única vermelha é a costura, que já estava vermelha **antes** desta versão e não foi tocada por ela. O
 > detalhe por bateria está em §10 do [roadmap](docs/ROADMAP.md). O texto abaixo é o registo da **Fase
 > 4** e ficou como estava.
@@ -1145,7 +1170,8 @@ fechado. O que a fase entregou:
 - **B8** — os portais em movimento (**D59**): `spin` e `orbit`, com o período em segundos, a colisão
   lida do mundo (a travessia acontece onde a porta **está**) e o `prefers-reduced-motion` a pará-los
   — **6 de 6**; e os doze testes com uma porta a rodar no fixture, nos números da Fase 6. Desde a
-  **D84**/**D85** a mesma bateria mede a **oscilação** (`sway`) na sala de ensaio — **13 de 13**
+  **D84**/**D85** a mesma bateria mede a **oscilação** (`sway`) na sala de ensaio, e desde a **D87** o
+  **movimento sorteado** de todas as portas — **16 de 16**
 - **B9** — o shader em produção, já descrito acima
 - **B10** — este fecho
 
@@ -2060,7 +2086,8 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 | Bateria | O que responde |
 | --- | --- |
 | `tools/scene/validate.mjs` | os 17 ficheiros de mundo (12 salas e 5 fixtures), as leis, o grafo das portas e os arranques |
-| `tools/scene/laws-selftest.mjs` | **29** avarias injectadas, todas detectadas, com o controlo limpo |
+| `tools/scene/laws-selftest.mjs` | **31** avarias injectadas, todas detectadas, com o controlo limpo — a L29 entra com a avaria **e** com o seu controlo negativo |
+| `tools/scene/sorteio.mjs` | o movimento **sorteado** das portas de uma sala nova (D87): ensaio por omissão, `--aplicar` para escrever, `--semente N` para repetir a mesma sala |
 | `tools/regression/twelve-tests.mjs` | **T2–T12** nas páginas do **dado** (hoje 14: portão, salas e os dois fixtures abertos) — **99** verificações, uma delas a cobertura da lista |
 | `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) — as 54 portas das catorze páginas, **165** verificações |
 | `tools/regression/i18n.mjs` | as duas línguas: chaves, marcadores e `?lang=en` nas duas páginas |

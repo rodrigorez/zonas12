@@ -5,7 +5,9 @@
 > está. As fases 1–7 têm agora um comando (`tools/scene/new-room.mjs`) e as listas das baterias passaram
 > a vir do dado; o que continua à mão é o que a spec diz que continua à mão. A **§9** junta o caso que
 > não é uma sala: o **mundo de ensaio** (`scene100`, D84), onde se experimenta o que ainda não entra no
-> caminho do visitante.
+> caminho do visitante. A **§10** são as regras do **movimento sorteado** de cada porta (D87) — a única
+> coisa de uma sala nova que o autor **não** decide. A **§10** são as regras do **movimento sorteado** de cada porta (D87), que é a
+> única coisa do roteiro que o autor não decide.
 >
 > **Para que serve.** Uma sala nova toca **oito** sítios que não se vêem uns aos outros: a página, o
 > dado da sala, o dado do portão, o dado de **cada** sala de destino, a folha das obras, os retratos
@@ -29,15 +31,19 @@
 | as **obras** (texto, capa, site) | `data/obras.tsv` → os mundos | `tools/artwork/from-csv.mjs` | `from-csv --check`, a lei L20 e a ficha |
 | as **posições** (dois anéis) | o mesmo JSON | `tools/scene/ring.mjs --aplicar` | L22 e L23 |
 | as **portas de mundo** (janela, retrato, chegada, giro, mundo real) | o JSON da sala **e** o de cada destino | o editor + `azimuths.mjs` + `reality.mjs` + `portrait.mjs` | L11, L13, L16, L17, L19, L26, L28 |
+| o **movimento das portas** (oscilação) | o mesmo JSON, em cada porta | `tools/scene/sorteio.mjs --aplicar` (sorteado, nunca escolhido — §10) | L29 (o alcance) |
 
 O número de hoje, para se saber quando é que um passo ficou a meio: **12 páginas** (o portão e onze
 salas), **17 ficheiros de mundo** (as 12 e 5 fixtures, dos quais a sala de ensaio da §9), **50 portas**
 nas salas, **57 obras**, **42 retratos** (um par `.jpg` + `.png` por porta com janela de
-pré-visualização), **29 leis** e **28 baterias** no `--full`.
+pré-visualização), **30 leis** e **28 baterias** no `--full`.
+
+E o número que a §10 acrescenta, porque é ele que uma sala nova vai ter de cumprir: **cada porta da
+sala nova oscila**, e o sorteio do movimento é rejeitado uma vez em cada três (§10.3).
 
 ---
 
-## 2. As três decisões que se tomam antes de tocar em ficheiros
+## 2. As decisões que se tomam antes de tocar em ficheiros
 
 Nenhuma delas é reversível de graça, e as três mudam o que as fases seguintes fazem.
 
@@ -54,6 +60,12 @@ recusa, e a mensagem diz qual é a repetida.
 precisar de uma porta que se declare a chegada dessa origem (L19) — e **no máximo uma por origem**
 (L17). É esta decisão que faz uma sala nova mexer em duas ou três salas que já existiam.
 
+**D-D · O movimento — que não é uma decisão.** As portas de uma sala nova **oscilam**, e o sorteio
+não é do autor: eixos, amplitudes, ângulos e períodos saem do dado da própria porta e de um sorteio
+com rejeição (§10). A única escolha que resta é **não** querer portas em movimento, e essa não existe
+no roteiro — o que existe é a possibilidade de voltar a correr o `sorteio.mjs --aplicar` até gostar do
+que saiu.
+
 ---
 
 ## 3. O roteiro, fase a fase
@@ -62,7 +74,9 @@ precisar de uma porta que se declare a chegada dessa origem (L19) — e **no má
 escreve o esqueleto do dado (as duas dimensões, o fundo com a reserva, as portas nos dois lados, os
 assets dos retratos que ainda não existem) e corre os anéis, o giro, os buracos e o validador. As
 fases abaixo continuam a ser a referência do que ele faz por baixo — e o que ele **não** faz: as
-obras, a composição no editor e os retratos continuam a ser passos à mão.
+obras, a composição no editor e os retratos continuam a ser passos à mão. Desde a **D87** ele também
+**sorteia o movimento** de cada porta (fase 6b): o comando é o atalho das fases 1 a 7 **incluindo** o
+movimento.
 
 Cada fase diz **o comando**, **o que ele tem de dizer** e **o que fazer se não disser**. Só se avança
 com a fase anterior verde: a fase 8 (retratos) custa minutos de GPU e não se gasta a descobrir um erro
@@ -168,6 +182,27 @@ fundo ao vivo e o visitante veja a **mesma** câmara antes e depois de atravessa
 
 - **Tem de dizer:** `0 erradas`, e `nada a escrever` no que já estava.
 - **Se não disser:** o destino não tem a dimensão `camera`, ou a porta de chegada não está posta.
+
+### Fase 6b · O movimento das portas (sorteado, e medido)
+
+```
+node tools/scene/sorteio.mjs <slug>                 # ensaio: diz o que sortearia, não escreve
+node tools/scene/sorteio.mjs <slug> --aplicar       # escreve no dado
+```
+
+Sorteia, **por porta**, o eixo e a amplitude da translação, o eixo e o ângulo da rotação e os dois
+períodos (a §10 tem as regras e o porquê), e **repete o sorteio enquanto o alcance do visitante (a
+L29) for menor do que 50% do ciclo**. A porta que volta ao portão entra no sorteio como as outras: a
+D59 deixou de proibir uma porta de chegada em movimento, porque a chegada lê a **pose de repouso**, que
+é a do dado (§10).
+
+- **Tem de dizer:** uma linha por porta com o eixo, a amplitude, o ângulo, os dois períodos e o
+  **alcance medido**; no fim, `N portas · N aceites · M rejeitados`.
+- **Se não disser:** a porta não tem `width`/`height` (a amplitude sai delas), a sala tem menos de
+  três portas (L24), ou um dos períodos saiu fora de `[10, 20]`.
+- **Porque é antes da fase 7:** a L29 é uma lei como as outras — um sorteio que não a passa não se
+  escreve, e o validador da fase 7 volta a calculá-la do dado para provar que o ficheiro não foi
+  editado à mão depois.
 
 ### Fase 7 · O validador e as leis (a porta de entrada para o resto)
 
@@ -300,12 +335,15 @@ Uma sala está pronta quando **todas** estas linhas forem verdade, pela ordem em
       (ou as fases 2–3 foram feitas à mão no editor, com o mesmo resultado)
 - [ ] o `validate.mjs` diz **OK** no ficheiro novo **e** nos que ele tocou; a **única** coisa vermelha
       admitida aqui é a L9 dos retratos
-- [ ] o `laws-selftest.mjs` diz **29 de 29** e o controlo limpo
+- [ ] o `laws-selftest.mjs` diz **31 de 31** e o controlo limpo
 - [ ] o `ring.mjs` não tem desvios acima de **0,5 m** e a folga L23 passa
 - [ ] o `azimuths.mjs` e o `reality.mjs` dizem **0 erradas**
-- [ ] há um par de retratos por porta com janela, todos com data de hoje, e o `validate.mjs` volta a
-      dizer **OK** sem a L9
+- [ ] o `sorteio.mjs <slug>` escreveu um `motion` em **cada** porta e todas passam a **L29** (o alcance
+      ≥ 50% do ciclo), com os dois períodos em `[10, 20] s` — §10
+- [ ] há um par de retratos por porta com janela, **desenhados com as portas assentes**
+      (`settleMotion`), todos com data de hoje, e o `validate.mjs` volta a dizer **OK** sem a L9
 - [ ] o `twelve-tests.mjs` diz **«a lista cobre todas as salas do dado (N)»** com o N do validador
+- [ ] o `traversal-tests.mjs` prova que **parado o visitante não é levado** pela porta em movimento
 - [ ] `node tools/regression/all.mjs --full` dá **28 de 28** (ou a única vermelha é a D46, com o
       número comparado com o último registo)
 - [ ] o `README.md` e o `ROADMAP.md` têm os números novos
@@ -452,8 +490,154 @@ obrigou, e que valem para lá dela:
    retângulo da janela a não fechar; com as portas na pose do dado, o T4 e o T10/T12 voltam a fechar
    (**0 px** fora) e a sala é medida de ponta a ponta como qualquer outra.
 
-**O que fica em aberto, e é honesto dizê-lo:** a porta B sobe 5 m em metade do ciclo, e um visitante que
-anda pelo chão só a atravessa na parte do ciclo em que a caixa desce até à altura dos olhos — cerca de
-**21%** do tempo. Não é um defeito: é o que a experiência pediu para ensaiar (±5 m no eixo vertical), e a
-sala existe para isso ser visto e medido antes de decidir se o movimento entra numa sala a sério.
+**O que a sala de ensaio mostrou, e que a §10 transformou em regras:** a porta B sobe 5 m em metade do
+ciclo, e um visitante que anda pelo chão só a alcança em **60,4%** do tempo (medido; a primeira conta
+que aqui esteve, 21%, estava errada). É o número que justifica o piso da L29.
 
+---
+
+## 10. O movimento das portas, sorteado na construção (D87)
+
+Uma sala nova não escolhe o movimento das portas: **sorteia-o**. É a única coisa do roteiro que não é
+decisão do autor — e é de propósito, porque o que se quer é que nenhuma sala se pareça com a outra.
+
+### 10.1 As regras
+
+| | translação | rotação |
+| --- | --- | --- |
+| eixo | **X ou Y** (os da porta) | **X, Y ou Z** (os da porta) |
+| amplitude | **metade da dimensão do eixo** (porta 10×12 → X 5,0 m · Y 6,0 m; porta 8×10 → 4,0 · 5,0) | **45° ou 90°**, em módulo, a oscilar entre +A e −A |
+| período | sorteado em **[10, 20] s** | sorteado em **[10, 20] s**, independente do da translação |
+
+Quatro coisas que as regras dizem e não são óbvias:
+
+- **Os eixos são os da porta, não os do mundo.** A oscilação é composta à direita da rotação do dado
+   (`R = R_dado · R_oscilação`) e a translação é levada por ela. Com os eixos do mundo, a mesma «rotação
+   em X» numa porta de yaw −90° girava-a no próprio plano em vez de a tombar — medido: **12 de 12**
+   combinações passavam a lei (metade das portas do anel não oscilava de facto), contra **8 de 12** com
+   a conta certa. É também o que torna os números da §10.3 os mesmos para qualquer porta,
+   independentemente do lado do anel em que ela está.
+- **Z não entra na translação.** A porta é um plano: metade da espessura da caixa dá **0,5 m** — um
+   tremor invisível. Z faz sentido na rotação, e lá está.
+- **A amplitude sai da porta, não de uma tabela.** Uma porta de 8×10 dá 4,0 e 5,0; a de 10×12 dá 5,0
+   e 6,0. É por isso que a lei da §10.3 é calculada **por porta**.
+- **O período 10–20 s é «a velocidade de hoje como mínimo, o dobro como máximo»**, lido no período:
+   dá 1,57 a 3,14 m/s (X), 1,88 a 3,77 m/s (Y), 14,1 a 28,3 °/s (45°) e 28,3 a 56,5 °/s (90°). Quem
+   quiser a **velocidade** constante tem de derivar o período da amplitude (`T = 2π·A/v`); o roteiro
+   usa o período, porque é o que o dado guarda e o que os instrumentos medem.
+
+### 10.2 O que o sorteio **não** muda
+
+A **pose de repouso** — a fase 0 do seno — é a pose do dado, seja qual for o sorteio. Daí saem três
+coisas que já estavam certas e continuam:
+
+- a **L16** (a chegada põe a câmara à frente da porta) continua verdadeira: no instante da chegada a
+  porta está onde o ficheiro diz;
+- o **retrato cozido** continua válido: foi desenhado na pose de repouso (ver 10.5), e é essa que o
+  visitante vê ao chegar;
+- o **`prefers-reduced-motion`** deixa a sala **alcançável**: congela na fase 0, que é a pose do dado.
+
+É esta invariante que permite a **D59 deixar de proibir uma porta de chegada em movimento**. A lei
+antiga existia porque «o dado descreve onde a porta estava quando o ficheiro foi escrito» — e continua
+a ser verdade: a diferença é que agora o repouso é *o* sítio da chegada, e não um instante perdido.
+
+### 10.3 A lei nova — L29, o alcance
+
+> **L29 · uma porta em movimento é alcançável em pelo menos metade do ciclo.**
+
+O alcance é a percentagem do ciclo em que o **visitante** — olho a 1,6 m, a caminhar de frente para a
+porta ao longo da normal dela, 1,5 m antes até 2,5 m depois — tem o olho dentro da caixa de colisão.
+
+- **Uma casa só para a conta:** `js/scene/reach.js`. O sorteio usa-a para recusar, o validador para
+  provar o dado, e o instrumento para medir. Três cópias dariam três números.
+- **O modelo é conservador de propósito:** o visitante chega de frente e em linha recta. Quem chega de
+  esguelha alcança mais; ninguém alcança menos.
+
+Medido, com a porta padrão (10×12, caixa 12×16×1), sobre o **par de fases** — dois períodos
+independentes fazem o movimento percorrer um toro, e não um ciclo só:
+
+| translação | rotação | 45° | 90° | |
+| --- | --- | --- | --- | --- |
+| X | X | 40,0% | **20,0%** | rejeitado nos dois |
+| X | Y | 100% | 100% | passa |
+| X | Z | 100% | 100% | passa |
+| Y | X | 48,0% | **26,2%** | rejeitado nos dois |
+| Y | Y | 60,0% | 60,0% | passa |
+| Y | Z | 65,3% | 61,8% | passa |
+
+**Passam 8 das 12 combinações** — rejeita-se **1 sorteio em 3**, que é o que se decidiu. (As primeiras
+duas versões desta conta deram «1 em 4» e «1 em 3» por razões erradas: a primeira tinha Z na
+translação e um ciclo só; a segunda lia os eixos no espaço do mundo em vez do espaço da porta. A conta
+que fica é esta, e é a do `reach.js` — a mesma que o validador corre.)
+
+O que sai depois da rejeição, medido em **200 000 sorteios**: **1,504 tentativas por porta** (teórico
+12/8 = 1,5); translação **X 49,9% · Y 50,1%**; rotação **X 0,0% · Y 50,0% · Z 50,0%**; ângulo
+**45° 49,9% · 90° 50,1%**. Duas consequências que valem a pena saber antes de ver a sala:
+
+- **a porta nunca tomba sobre a largura** (rotação em X): é a única combinação que a L29 recusa em
+  qualquer ângulo, e por isso a que não sai nunca. As portas **rodopiam** (Y) ou **giram no próprio
+  plano** (Z) — nunca caem para a frente.
+- a translação e o ângulo saem **meio a meio**; o eixo da rotação também, entre Y e Z.
+
+### 10.4 A armadilha que a lei não apanha — e o que a fecha
+
+O ponto de chegada fica a **1,0 m** à frente da porta (`arrival.js`), e a caixa de colisão mede
+12×16×1: rodada, ela varre muito para dentro da sala — medido, até **7,42 m a 45° e 10,01 m a 90°**
+quando roda no plano vertical (eixo X), **4,60 / 6,02 m** quando rodopia (Y), e **nada** quando gira no
+próprio plano (Z). Consequência: **3 dos 8 sorteios que passam a L29 põem o visitante parado dentro da
+caixa** — 16,7% e 10,4% do ciclo nos da translação em X, **36,5%** no `Y + Y a 90°` — e a travessia
+dispara pelo **cruzamento do plano**, não pelo movimento dele. Sem correcção, **um em cada três
+sorteios bons apanha o visitante parado e leva-o pela porta**.
+
+A travessia passa a exigir que a câmara **se tenha deslocado** desde o quadro anterior (mais de 1 cm;
+a 60 fps um passo normal anda ~2,7 cm). Um visitante parado nunca é levado; quem anda atravessa como
+sempre atravessou. A prova é uma verificação nova do `traversal-tests.mjs`: **«parado, a porta não o
+leva»**, medida numa sala cujo sorteio varre a chegada.
+
+### 10.5 O retrato tem de ser desenhado com as portas **assentes**
+
+`tools/scene/portrait.mjs` já congelava o shader; agora tem de **assentar as portas** antes de
+desenhar (`portalDebug.settleMotion()`). Sem isso o retrato coze as portas na fase em que estavam
+— que é arbitrária, porque a página do destino esteve aberta dezenas de segundos — e o retrato deixa de
+ser a imagem que o visitante vê ao chegar. Com o `settleMotion`, o retrato é a pose de repouso, que é
+exactamente o instante da chegada. É a peça que faz a §10.2 valer também para a janela.
+
+### 10.6 O que a construção faz
+
+1. `node tools/scene/sorteio.mjs <slug>` — ensaio, não escreve.
+2. `node tools/scene/sorteio.mjs <slug> --aplicar` — escreve `motion` em cada porta.
+3. Os retratos, depois, com as portas assentes (fase 8 do roteiro).
+
+O bloco que entra no dado, por porta:
+
+```json
+"motion": {
+  "kind": "sway",
+  "axis": [1, 0, 0], "amplitude": 5, "period": 12.1,
+  "rotationAxis": [0, 0, 1], "angle": 90, "rotationPeriod": 13.9
+}
+```
+
+### 10.7 As armadilhas desta fase
+
+| # | a armadilha | o número que custou |
+| --- | --- | --- |
+| **T13** | **A caixa varre o visitante parado** | 3 dos 8 sorteios, **10,4% a 36,5%** do ciclo; a caixa chega a **10,01 m** para dentro da sala. Fecha-se com a travessia a exigir movimento |
+| **T14** | **A rotação sobre a largura (X) é a que custa o alcance** | 20,0% a 90° e 40,0% a 45°; como os dois ficam abaixo do piso, **essa combinação nunca sai** (0,0% dos sorteios) |
+| **T15** | **Metade da altura enterra a porta** | a base vai de **−6 m a +18 m**; o alcance cai a 58,6% |
+| **T16** | **O retrato coze a fase em que as portas estavam** | sem `settleMotion`, a janela mostra uma pose e a chegada outra |
+| **T17** | **O instrumento caminha à altura da porta, não à do visitante** | o T1 caminha a `1,6 + max(0, altura)` — **6,6 m** na porta B — e fica verde numa porta que o público não alcança. A L29 é que mede o visitante |
+
+### 10.8 O que uma sala nova ganha, e o que não muda
+
+Fica com **todas** as portas em movimento — uma delas a de volta ao portão, como as outras: a D59
+relaxada não distingue. As **11 salas e o portão não são tocados** (as suas portas continuam paradas, e
+os seus 42 retratos continuam válidos), porque o sorteio é da **construção** de uma sala nova, não uma
+passagem sobre o que existe.
+
+**Porquê na construção e não a cada carregamento.** Sortear a cada carregamento é possível (o sorteio
+corre uma vez, no `buildScene`, e não custa um quadro) e a pose de repouso seria a mesma — mas
+sacrificava três coisas: um defeito relatado por um visitante **não se reproduz**; as leis deixam de
+poder provar a sala (só o gerador); e o editor mostra outra sala de cada vez que abre. Escrito no
+dado, o número é medível, reproduzível e o mesmo para todos. Quem quiser ver a sala a mudar tem o
+`--aplicar` a cada passagem.

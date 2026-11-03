@@ -342,12 +342,25 @@ export const SCENE = {
           // valor por omissão num campo que só existe num dos tipos é um número que o validador não sabe
           // defender.
           amplitude: { type: 'number', positive: true },
-          angle: { type: 'number', positive: true }
+          angle: { type: 'number', positive: true },
+          // Os dois eixos e o segundo período (D87): a rotação tem vida própria — eixo e período
+          // próprios, senão «rodar em X e deslizar em Y» era impossível. O eixo é **o da porta**, não o
+          // do mundo: é o que faz uma porta virada rodar como uma porta de frente.
+          rotationAxis: { type: 'vec3' },
+          rotationPeriod: { type: 'number', positive: true }
         },
         rules: [
-          { when: { kind: 'spin' }, forbid: ['radius', 'amplitude', 'angle'] },
-          { when: { kind: 'orbit' }, require: ['radius'], forbid: ['amplitude', 'angle'] },
-          { when: { kind: 'sway' }, require: ['amplitude', 'angle'], forbid: ['radius'] }
+          { when: { kind: 'spin' }, forbid: ['radius', 'amplitude', 'angle', 'rotationAxis', 'rotationPeriod'] },
+          {
+            when: { kind: 'orbit' },
+            require: ['radius'],
+            forbid: ['amplitude', 'angle', 'rotationAxis', 'rotationPeriod']
+          },
+          {
+            when: { kind: 'sway' },
+            require: ['amplitude', 'angle'],
+            forbid: ['radius']
+          }
         ]
       }
     }

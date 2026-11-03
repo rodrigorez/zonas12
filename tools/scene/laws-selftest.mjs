@@ -311,6 +311,36 @@ const cases = [
       const porta = copy.portals.find((portal) => portal.action && portal.action.target === 'gate');
       if (porta) porta.action.target = 'scene3';
     }
+  },
+  {
+    // L29 (D87): a porta que oscila e passa a maior parte do ciclo fora do alcance do visitante. A
+    // avaria é o que a sala de ensaio tinha antes de ser corrigida — translação em X com rotação em X
+    // a 90°, que dá 20,0% do ciclo. É a lei que faz o sorteio recusar um em cada três.
+    law: 'L29',
+    what: 'uma porta a oscilar em X e a rodar em X a 90°',
+    expect: 'law L29',
+    inject: (copy) => {
+      const porta = copy.portals[0];
+      porta.motion = {
+        kind: 'sway', axis: [1, 0, 0], amplitude: 5, period: 15,
+        rotationAxis: [1, 0, 0], angle: 90, rotationPeriod: 15
+      };
+    }
+  },
+  {
+    // A outra face da L29: um sorteio que passa. Sem este caso, uma lei que recusasse **tudo** também
+    // passaria o teste de cima — e é a diagonal do controlo que a distingue.
+    law: 'L29',
+    what: 'uma porta a oscilar em Y e a rodar em Y a 45° (o sorteio que passa)',
+    expect: 'law L29',
+    expectNone: true,
+    inject: (copy) => {
+      const porta = copy.portals[0];
+      porta.motion = {
+        kind: 'sway', axis: [0, 1, 0], amplitude: 6, period: 15,
+        rotationAxis: [0, 1, 0], angle: 45, rotationPeriod: 15
+      };
+    }
   }
 ];
 
@@ -325,7 +355,9 @@ for (const testCase of cases) {
   const messages = report.errors.concat(report.warnings);
   const found = messages.some((message) => message.includes(testCase.expect));
   const level = testCase.level === 'warning' ? report.ok : !report.ok;
-  const ok = found && level;
+  // Um caso `expectNone` é o controlo da própria lei: a mesma injecção que a deve deixar passar. Sem
+  // ele, uma lei que recusasse tudo passava os outros casos e ninguém dava por isso.
+  const ok = testCase.expectNone ? !found && report.ok : found && level;
   if (ok) detected++;
 
   rows.push({

@@ -84,6 +84,8 @@ const _boxPoint = new THREE.Vector3();
 // diferença entre as duas é o que mantém o centro parado quando a porta roda.
 const _pivotAtRest = new THREE.Vector3();
 const _pivotNow = new THREE.Vector3();
+const _deslocamento = new THREE.Vector3();
+const _swayQuaternion = new THREE.Quaternion();
 
 // Os instrumentos e o `prefers-reduced-motion` precisam de parar o movimento das portas (D59): uma
 // captura que compara dois instantes não pode ter uma porta a andar pelo meio. Fica aqui, no módulo,
@@ -159,7 +161,11 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     motionAxis: { type: 'vec3', default: { x: 0, y: 1, z: 0 } },
     motionRadius: { type: 'number', default: 0 },
     motionAmplitude: { type: 'number', default: 0 },
-    motionAngle: { type: 'number', default: 0 }
+    motionAngle: { type: 'number', default: 0 },
+    // A oscilação tem **dois** períodos independentes (D87): a translação e a rotação não estão presas
+    // uma à outra. Vazio = o mesmo da translação, que é o que a sala de ensaio usa.
+    motionRotationAxis: { type: 'vec3', default: { x: 0, y: 1, z: 0 } },
+    motionRotationPeriod: { type: 'number', default: 0 }
   },
   init: function () {
     let id = this.data.id;
@@ -179,6 +185,7 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     this.zSign = 1;
     this.insideBox = false;
     this.traversalStarted = false;
+    this.lastWorldPoint = null;
     this.navigating = false;
 
     this.configureBox();
@@ -349,32 +356,43 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
       return;
     }
     if (kind === 'sway') {
-      // A oscilação (D85), a rodar **sobre o centro da porta** (D86). Rodar sobre a origem do dado
-      // faria a porta descrever um arco com a base presa ao chão: a ±90° a janela saía da moldura de
-      // colisão e a porta parecia ter sido atirada para o lado. O centro fica parado, e o que se move é
-      // só a translação.
+      // A oscilação (D85), a rodar **sobre o centro da porta** (D86) e **nos eixos da porta** (D87).
+      // Rodar sobre a origem do dado faria a porta descrever um arco com a base presa ao chão: a ±90° a
+      // janela saía da moldura de colisão e a porta parecia ter sido atirada para o lado. Rodar sobre
+      // os eixos do mundo (somar o ângulo ao Euler do dado) fazia uma porta virada girar no próprio
+      // plano em vez de tombar — medido: metade das portas de uma sala passava a lei sem oscilar.
       //
-      // A conta é a de um pivô: `pos = base + amplitude + R_base·p − R(t)·p`, com `p` o centro no
-      // espaço da entidade. Quando `R(t) = R_base` (a porta na pose do dado) os dois últimos termos
-      // anulam-se e a posição é a do ficheiro.
-      const axis = this.data.motionAxis;
-      const sway = Math.sin(phase * Math.PI * 2);
+      // A conta é a de um pivô, composto à direita da pose do dado:
+      //   R(t)  = R_base · R_oscilação
+      //   pos   = base + R_base·(amplitude·eixo) + R_base·p − R(t)·p
+      // Quando a oscilação é zero, os dois últimos termos anulam-se e a pose é a do ficheiro.
+      const eixoRotacao = this.data.motionRotationAxis;
+      const phaseTranslacao = (time % (this.data.motionPeriod * 1000)) / (this.data.motionPeriod * 1000);
+      const periodoRotacao = this.data.motionRotationPeriod > 0
+        ? this.data.motionRotationPeriod : this.data.motionPeriod;
+      const phaseRotacao = (time % (periodoRotacao * 1000)) / (periodoRotacao * 1000);
+      const sway = Math.sin(phaseTranslacao * Math.PI * 2);
+      const swayRotacao = Math.sin(phaseRotacao * Math.PI * 2);
       const amplitude = this.data.motionAmplitude;
       const angle = THREE.MathUtils.degToRad(this.data.motionAngle);
       this.swayEuler.set(
-        base.x + sway * angle * axis.x,
-        base.y + sway * angle * axis.y,
-        base.z + sway * angle * axis.z
+        swayRotacao * angle * eixoRotacao.x,
+        swayRotacao * angle * eixoRotacao.y,
+        swayRotacao * angle * eixoRotacao.z
       );
-      this.swayQuaternion.setFromEuler(this.swayEuler);
+      _swayQuaternion.setFromEuler(this.swayEuler);
+      this.swayQuaternion.copy(this.baseQuaternion).multiply(_swayQuaternion);
+      this.el.object3D.quaternion.copy(this.swayQuaternion);
+      _deslocamento.set(this.data.motionAxis.x, this.data.motionAxis.y, this.data.motionAxis.z)
+        .multiplyScalar(sway * amplitude)
+        .applyQuaternion(this.baseQuaternion);
       _pivotAtRest.copy(this.pivot).applyQuaternion(this.baseQuaternion);
       _pivotNow.copy(this.pivot).applyQuaternion(this.swayQuaternion);
       this.el.object3D.position.set(
-        this.basePosition.x + sway * amplitude * axis.x + _pivotAtRest.x - _pivotNow.x,
-        this.basePosition.y + sway * amplitude * axis.y + _pivotAtRest.y - _pivotNow.y,
-        this.basePosition.z + sway * amplitude * axis.z + _pivotAtRest.z - _pivotNow.z
+        this.basePosition.x + _deslocamento.x + _pivotAtRest.x - _pivotNow.x,
+        this.basePosition.y + _deslocamento.y + _pivotAtRest.y - _pivotNow.y,
+        this.basePosition.z + _deslocamento.z + _pivotAtRest.z - _pivotNow.z
       );
-      this.el.object3D.rotation.copy(this.swayEuler);
       return;
     }
     const radius = this.data.motionRadius;
@@ -469,6 +487,14 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     if (!this.portalGroup.visible) { this.traversalStarted = false; return; }
     const worldPoint = playerCamera.worldPosition(_worldPoint);
     if (!worldPoint) return;
+    // A travessia exige que o **visitante** se tenha mexido desde o quadro anterior (D87). A caixa de
+    // colisão roda com a porta e varre até 12 m para dentro da sala: sem esta condição, uma porta a
+    // oscilar passa por cima de quem está parado e leva-o consigo, porque o que dispara a travessia é
+    // o cruzamento do plano e não o passo de quem anda. Medido: 4 dos 9 sorteios legais punham o
+    // visitante parado dentro da caixa entre 12% e 27% do ciclo.
+    const andou = !this.lastWorldPoint || this.lastWorldPoint.distanceTo(worldPoint) > 0.01;
+    if (this.lastWorldPoint) this.lastWorldPoint.copy(worldPoint);
+    else this.lastWorldPoint = worldPoint.clone();
 
     this.portalGroup.updateWorldMatrix(true, false);
     _boxPoint.copy(worldPoint);
@@ -495,7 +521,7 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
 
     this.insideBox = inside;
     this.zSign = zSign;
-    if (!crossed) return;
+    if (!crossed || !andou) return;
 
     this.onTraverse();
   },
@@ -674,6 +700,10 @@ export function createPortal(portal, parent, derived = {}) {
     if (typeof portal.motion.radius === 'number') settings.motionRadius = portal.motion.radius;
     if (typeof portal.motion.amplitude === 'number') settings.motionAmplitude = portal.motion.amplitude;
     if (typeof portal.motion.angle === 'number') settings.motionAngle = portal.motion.angle;
+    if (portal.motion.rotationAxis) settings.motionRotationAxis = vector(portal.motion.rotationAxis);
+    if (typeof portal.motion.rotationPeriod === 'number') {
+      settings.motionRotationPeriod = portal.motion.rotationPeriod;
+    }
   }
 
   const el = document.createElement('a-entity');

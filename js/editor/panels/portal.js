@@ -303,9 +303,10 @@ function card(portal, context, data) {
     { value: '1,0,0', labelKey: 'editor.portal.motionAxis.x' },
     { value: '0,0,1', labelKey: 'editor.portal.motionAxis.z' }
   ];
-  const axisAtual = Array.isArray(motion.axis) || (motion.axis && typeof motion.axis === 'object')
-    ? [motion.axis.x || 0, motion.axis.y || 0, motion.axis.z || 0].join(',')
-    : '0,1,0';
+  const eixoDoCampo = (valor) => (Array.isArray(valor) || (valor && typeof valor === 'object')
+    ? [valor.x || 0, valor.y || 0, valor.z || 0].join(',')
+    : '0,1,0');
+  const axisAtual = eixoDoCampo(motion.axis);
   const motionAxis = selectField(box, {
     name: 'portal.' + portal.id + '.motion.axis',
     labelKey: 'editor.portal.motionAxis',
@@ -314,6 +315,33 @@ function card(portal, context, data) {
     onChange: (value) => {
       if (!portal.motion) return;
       portal.motion.axis = value.split(',').map(Number);
+      applyGeometry();
+    }
+  });
+
+  // O eixo e o período da **rotação**, separados dos da translação (D87): é o que permite «deslizar em
+  // Y e rodar em Z», que a sala de ensaio exercita.
+  const motionRotationAxis = selectField(box, {
+    name: 'portal.' + portal.id + '.motion.rotationAxis',
+    labelKey: 'editor.portal.motionRotationAxis',
+    value: eixoDoCampo(motion.rotationAxis),
+    options: AXES.map((axis) => ({ value: axis.value, label: t(axis.labelKey) })),
+    onChange: (value) => {
+      if (!portal.motion) return;
+      portal.motion.rotationAxis = value.split(',').map(Number);
+      applyGeometry();
+    }
+  });
+
+  const motionRotationPeriod = numberField(box, {
+    name: 'portal.' + portal.id + '.motion.rotationPeriod',
+    labelKey: 'editor.portal.motionRotationPeriod',
+    value: typeof motion.rotationPeriod === 'number' ? motion.rotationPeriod : 20,
+    min: 1,
+    step: 0.1,
+    onChange: (value) => {
+      if (!portal.motion) return;
+      portal.motion.rotationPeriod = value;
       applyGeometry();
     }
   });
@@ -364,6 +392,8 @@ function card(portal, context, data) {
     motionRadius.element.hidden = kind !== 'orbit';
     motionAmplitude.element.hidden = kind !== 'sway';
     motionAngle.element.hidden = kind !== 'sway';
+    motionRotationAxis.element.hidden = kind !== 'sway';
+    motionRotationPeriod.element.hidden = kind !== 'sway';
   };
   syncMotion();
   motionKind.input.addEventListener('change', syncMotion);

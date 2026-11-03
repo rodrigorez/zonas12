@@ -359,8 +359,13 @@ if (opcoes.ferramentas) {
   const aneis = correr('os dois anéis (ring --aplicar)', 'tools/scene/ring.mjs', ['--aplicar']);
   const giro = correr('o giro dos retratos (azimuths --aplicar)', 'tools/scene/azimuths.mjs', ['--aplicar']);
   const buracos = correr('os buracos do mundo real (reality --aplicar)', 'tools/scene/reality.mjs', ['--aplicar']);
+  // O movimento das portas, sorteado (D87): depois dos anéis, porque a amplitude sai da própria porta, e
+  // antes do validador, porque a L29 tem de estar verde para a sala passar. A semente fica impressa —
+  // é ela que repete a mesma sala.
+  const sorteio = correr('o movimento das portas (sorteio --aplicar)', 'tools/scene/sorteio.mjs',
+    [slug, '--aplicar', '--semente', String(Date.now() % 100000)]);
   const validador = correr('o validador', 'tools/scene/validate.mjs', []);
-  if (!aneis || !giro || !buracos || !validador) {
+  if (!aneis || !giro || !buracos || !sorteio || !validador) {
     console.error('');
     console.error('new-room: uma das ferramentas falhou — o dado está escrito, corrija o que ela disse e');
     console.error('  volte a correr a mesma ferramenta (não é preciso criar a sala outra vez).');

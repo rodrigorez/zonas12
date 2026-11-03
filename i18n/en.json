@@ -149,6 +149,8 @@
     "editor.portal.motionAxis.y": "Vertical (Y)",
     "editor.portal.motionAxis.z": "Horizontal (Z)",
     "editor.portal.motionPeriod": "A full turn takes (s)",
+    "editor.portal.motionRotationAxis": "Axis of the rotation",
+    "editor.portal.motionRotationPeriod": "The rotation takes (s)",
     "editor.portal.motionRadius": "Radius of the turn (m)",
     "editor.portal.none": "This world has no doors.",
     "editor.portal.ownedBy": "Belongs to dimension",
