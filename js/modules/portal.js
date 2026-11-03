@@ -80,6 +80,10 @@ export function traversalRecord() {
 // Reused vectors: the driver and the collision run every frame and must not allocate.
 const _worldPoint = new THREE.Vector3();
 const _boxPoint = new THREE.Vector3();
+// As duas posições do centro da porta na oscilação (D86): na pose do dado e no instante medido. A
+// diferença entre as duas é o que mantém o centro parado quando a porta roda.
+const _pivotAtRest = new THREE.Vector3();
+const _pivotNow = new THREE.Vector3();
 
 // Os instrumentos e o `prefers-reduced-motion` precisam de parar o movimento das portas (D59): uma
 // captura que compara dois instantes não pode ter uma porta a andar pelo meio. Fica aqui, no módulo,
@@ -301,6 +305,21 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     this.configureBox();
     this.basePosition = this.el.object3D.position.clone();
     this.baseRotation = this.el.object3D.rotation.clone();
+    // O centro da porta (D86), em coordenadas da entidade: a metade da altura, no plano da janela.
+    // É o ponto em torno do qual a oscilação roda — a caixa de colisão é maior de propósito (é uma
+    // folga, não o objecto), e por isso não é ela que dá o centro.
+    this.pivot = new THREE.Vector3(0, this.data.height / 2, 0);
+    this.baseQuaternion = new THREE.Quaternion().setFromEuler(this.baseRotation);
+    this.swayEuler = new THREE.Euler();
+    this.swayQuaternion = new THREE.Quaternion();
+  },
+  // O centro da porta no mundo (D86): o ponto que a oscilação mantém parado, e que por isso é onde um
+  // instrumento tem de medir a posição. Medir a origem da entidade media o arco que ela descreve.
+  centreWorld: function (target) {
+    const ponto = target || new THREE.Vector3();
+    this.portalGroup.updateWorldMatrix(true, false);
+    ponto.set(0, this.data.height / 2, 0);
+    return this.portalGroup.localToWorld(ponto);
   },
   // O movimento animado (D59): uma volta completa a cada `motionPeriod` segundos. O relógio é o do
   // A-Frame (`time`, em ms) e não o `performance.now()` — assim a mesma cena anima o mesmo com um
@@ -330,23 +349,32 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
       return;
     }
     if (kind === 'sway') {
-      // A oscilação (D85, na sala de ensaio da D84): a porta vai e volta em torno da pose do dado, com a
-      // translação e a rotação em fase e no mesmo eixo. O seno dá o ±amplitude e o ±ângulo; ao fim de um
-      // `period` está outra vez onde começou, e é isso que a bateria mede.
+      // A oscilação (D85), a rodar **sobre o centro da porta** (D86). Rodar sobre a origem do dado
+      // faria a porta descrever um arco com a base presa ao chão: a ±90° a janela saía da moldura de
+      // colisão e a porta parecia ter sido atirada para o lado. O centro fica parado, e o que se move é
+      // só a translação.
+      //
+      // A conta é a de um pivô: `pos = base + amplitude + R_base·p − R(t)·p`, com `p` o centro no
+      // espaço da entidade. Quando `R(t) = R_base` (a porta na pose do dado) os dois últimos termos
+      // anulam-se e a posição é a do ficheiro.
       const axis = this.data.motionAxis;
       const sway = Math.sin(phase * Math.PI * 2);
       const amplitude = this.data.motionAmplitude;
       const angle = THREE.MathUtils.degToRad(this.data.motionAngle);
-      this.el.object3D.position.set(
-        this.basePosition.x + sway * amplitude * axis.x,
-        this.basePosition.y + sway * amplitude * axis.y,
-        this.basePosition.z + sway * amplitude * axis.z
-      );
-      this.el.object3D.rotation.set(
+      this.swayEuler.set(
         base.x + sway * angle * axis.x,
         base.y + sway * angle * axis.y,
         base.z + sway * angle * axis.z
       );
+      this.swayQuaternion.setFromEuler(this.swayEuler);
+      _pivotAtRest.copy(this.pivot).applyQuaternion(this.baseQuaternion);
+      _pivotNow.copy(this.pivot).applyQuaternion(this.swayQuaternion);
+      this.el.object3D.position.set(
+        this.basePosition.x + sway * amplitude * axis.x + _pivotAtRest.x - _pivotNow.x,
+        this.basePosition.y + sway * amplitude * axis.y + _pivotAtRest.y - _pivotNow.y,
+        this.basePosition.z + sway * amplitude * axis.z + _pivotAtRest.z - _pivotNow.z
+      );
+      this.el.object3D.rotation.copy(this.swayEuler);
       return;
     }
     const radius = this.data.motionRadius;
@@ -528,8 +556,7 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
       if (window.portalDebug && typeof window.portalDebug.freezeShaders === 'function') {
         window.portalDebug.freezeShaders();
       }
-      const centro = new THREE.Vector3();
-      this.el.object3D.getWorldPosition(centro);
+      const centro = this.centreWorld(new THREE.Vector3());
       const frente = new THREE.Vector3(0, 0, 1)
         .applyQuaternion(this.el.object3D.getWorldQuaternion(new THREE.Quaternion()));
       registo.encosto = Boolean(playerCamera.enterWindow({

@@ -203,7 +203,7 @@
           0
         ],
         "amplitude": 5,
-        "angle": 45
+        "angle": 90
       }
     },
     {
@@ -262,7 +262,7 @@
           0
         ],
         "amplitude": 5,
-        "angle": 45
+        "angle": 90
       }
     },
     {
@@ -321,7 +321,7 @@
           1
         ],
         "amplitude": 5,
-        "angle": 45
+        "angle": 90
       }
     }
   ]

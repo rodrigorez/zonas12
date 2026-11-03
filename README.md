@@ -376,9 +376,11 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > medida) e a das páginas passou a abrir a sala de ensaio por `?scene=scene100`. Medido: `validate`
 > **OK** (4 portas, 7 assets, 4 janelas distintas), os retratos de **39 → 42**, os doze **99 de 99** (era
 > 92 — a página nova medida de ponta a ponta). Decisão **D84** (§11) e §9 da spec. O **movimento** veio
-> a seguir, com a autorização do autor (D85): as três portas oscilam ±5 m e ±45°, uma em cada eixo, e a
-> bateria dos portais em movimento passou a medir isso — **12 de 12**, com a amplitude em cada eixo, a
-> meia oscilação de **10,00 s** e a porta do portão parada como controlo.
+> a seguir, com a autorização do autor (D85): as três portas oscilam ±5 m e ±90°, uma em cada eixo, e a
+> bateria dos portais em movimento passou a medir isso — **13 de 13**, com a amplitude em cada eixo, a
+> meia oscilação de **10,00 s** e a porta do portão parada como controlo. A rotação roda **sobre o centro
+> da porta** (D86): rodar sobre a base prendia-a ao chão e a ±90° atirava-a para fora da moldura — medido,
+> com o pivô na base o centro sai **8,49 m** do lugar, e com o pivô no centro sai **0,000 m**.
 
 > **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
 > filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as
@@ -987,10 +989,10 @@ repetições (cerca de 6 minutos por celular para as três tecnologias nos dois 
 > mediu, com `node tools/regression/all.mjs --full`: o dado **0**, as leis **29 de 29** com o controlo
 > limpo, o importador da folha **21 de 21**, os doze testes **99 de 99** nas páginas que o dado declara
 > (catorze, com a sala de ensaio), as portas e as chegadas **165 de 165**, os portais em movimento
-> **12 de 12** (com a oscilação da sala de ensaio: ±5 m e ±45° em cada eixo), a ordem da janela **22 de
-> 22**, a emenda da esfera **15 de 15** e a costura das travessias **125 de 128** — vermelha desde
+> **13 de 13** (com a oscilação da sala de ensaio: ±5 m e ±90°, cada porta a rodar sobre o seu centro), a
+> ordem da janela **22 de 22**, a emenda da esfera **15 de 15** e a costura das travessias **125 de 128** — vermelha desde
 > antes do anel (**D46**), com duas portas estáveis na casa dos **0,5** e um caso intermitente (um
-> fotograma escuro na chegada). Na corrida de **28 baterias** ficaram **27 verdes**, em **2 819,2 s**;
+> fotograma escuro na chegada). Na corrida de **28 baterias** ficaram **27 verdes**, em **2 806,2 s**;
 > a única vermelha é a costura, que já estava vermelha **antes** desta versão e não foi tocada por ela. O
 > detalhe por bateria está em §10 do [roadmap](docs/ROADMAP.md). O texto abaixo é o registo da **Fase
 > 4** e ficou como estava.
@@ -1143,7 +1145,7 @@ fechado. O que a fase entregou:
 - **B8** — os portais em movimento (**D59**): `spin` e `orbit`, com o período em segundos, a colisão
   lida do mundo (a travessia acontece onde a porta **está**) e o `prefers-reduced-motion` a pará-los
   — **6 de 6**; e os doze testes com uma porta a rodar no fixture, nos números da Fase 6. Desde a
-  **D84**/**D85** a mesma bateria mede a **oscilação** (`sway`) na sala de ensaio — **12 de 12**
+  **D84**/**D85** a mesma bateria mede a **oscilação** (`sway`) na sala de ensaio — **13 de 13**
 - **B9** — o shader em produção, já descrito acima
 - **B10** — este fecho
 
@@ -2021,8 +2023,9 @@ de chegada: `/scene2/?from=scene1`. O mundo de ensaio do fundo shader (Fase 7, *
 A **sala de ensaio** (D84) é `?scene=scene100`, e é o único caminho para lá: nenhuma porta do projeto
 aponta para ela. As **quatro** portas dela levam ao portão e às salas 3, 6 e 9, e levam **sem
 `?from`** — o destino abre como uma primeira visita. Três delas **oscilam** (D85): a A em X, a B em Y e a
-C em Z, com translação de **±5 m** e rotação de **±45°** num período de **20 s** (a do portão fica
-parada, como controlo). É onde se experimenta o que ainda não entra no caminho do visitante.
+C em Z, com translação de **±5 m** e rotação de **±90°** num período de **20 s**, e cada uma roda sobre o
+**centro da porta** e não sobre a base (D86) — a do portão fica parada, como controlo. É onde se
+experimenta o que ainda não entra no caminho do visitante.
 
 ### 2. Personalizar Conteúdo
 

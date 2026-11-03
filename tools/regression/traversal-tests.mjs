@@ -97,6 +97,13 @@ const estado = `(() => {
 // levam o documento com elas, por isso o resultado vem do `sessionStorage` depois de assentar.
 async function medirPorta(browser, site, mundo, porta) {
   await abrirPagina(browser, site, mundo);
+  // A porta mede-se **na pose do dado** (D86): numa sala com portas a oscilar, uma caminhada começada a
+  // meio de uma oscilação mede a oscilação. O `settleMotion` põe as portas onde o ficheiro as escreve e
+  // pára o relógio; nas salas sem movimento não há nada a parar. O que se prova aqui é a porta, e é a
+  // `motion.mjs` que prova o movimento.
+  await browser.evaluate(
+    '(() => { const d = window.portalDebug; if (d && d.settleMotion) d.settleMotion(); else if (d && d.freezeMotion) d.freezeMotion(true); return true; })()'
+  ).catch(() => { /* uma página sem o lever */ });
   // A porta só existe na dimensão onde está (`ownedBy`, -1 = nas duas): atravessar uma porta do
   // outro lado de uma janela exige pôr a cena nessa dimensão primeiro. Sem isto, a porta de volta
   // do fixture nunca é atravessada — e o teste diria «0 travessias» de uma porta que não estava lá.

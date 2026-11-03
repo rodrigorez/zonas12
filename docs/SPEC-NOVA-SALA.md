@@ -411,33 +411,46 @@ essa inversão a regra nova nunca seria medida (o teste ficava vermelho por ela 
 medem a página como qualquer outra, porque a lista vem do dado.
 
 **O movimento (D85), feito depois da aprovação da sala parada.** Três das quatro portas oscilam — a
-**A** em X, a **B** em Y e a **C** em Z —, cada uma com translação de **±5 m** e rotação de **±45°**, em
+**A** em X, a **B** em Y e a **C** em Z —, cada uma com translação de **±5 m** e rotação de **±90°**, em
 fase e com um período de **20 s**. O terceiro tipo de movimento entrou no mesmo sítio que os outros dois
 (`motion.kind` ganhou `sway`, com `amplitude` em metros e `angle` em graus, sem omissões: quem escreve
 `sway` diz os dois números); o `js/modules/portal.js` anima-o a partir da pose do dado, e o
 `prefers-reduced-motion` do visitante continua a pará-lo como pára o shader.
 
+**A rotação é sobre o centro da porta (D86).** A primeira versão rodava a entidade sobre a sua origem —
+a base, onde o ficheiro põe a porta —, e a ±90° isso lê-se como um defeito: a janela sai da moldura de
+colisão e a porta parece atirada para o lado, porque a base fica presa ao chão e o resto descreve um arco
+de meia altura de raio. A animação passou a usar um **pivô**: `pos = base + amplitude + R_base·p − R(t)·p`,
+com `p` o centro da porta no espaço da entidade (a metade da altura, no plano da janela). O centro fica
+parado e só a translação o move; os 12 m de altura deixam de contar como braço de alavanca. A caixa de
+colisão não dá o centro: ela é maior de propósito (é uma folga), e o que roda é o objecto.
+
 O que se mede — e como — é a parte que a sala existe para ensinar:
 
 | o que | onde | medido |
 | --- | --- | --- |
-| a amplitude em cada eixo, os outros eixos parados, a translação e a rotação em fase | `tools/regression/motion.mjs` (a secção da sala de ensaio) | **5,000 m** e **45,00°** nas três, com os outros eixos a **0,000** |
+| o **centro da porta** oscila a amplitude pedida no seu eixo, e fica parado nos outros dois | `tools/regression/motion.mjs` (a secção da sala de ensaio) | **5,000 m** e **90,00°** nas três, com os outros eixos a **0,000** e o desvio à pose do dado a **0,000** |
 | o período | a mesma bateria, pela meia oscilação (o cruzamento do centro, onde a curva é inclinada e a amostra de 120 ms custa menos) | **10,00 s** nas três (**20 s** de período) |
+| a rotação é mesmo sobre o centro | a mesma bateria, por um **controlo positivo**: a mesma porta rodada de 90° **sobre a base** | com o pivô na base o centro sai **8,49 m**; com o pivô no centro sai **0,000 m** |
 | a porta que não declara movimento não se mexe | a mesma bateria (o controlo) | **0,0000 m** e **0,0000 rad** |
 | `freezeMotion` pára a oscilação onde ela está | a mesma bateria | igual **1,5 s** depois |
 
-A bateria dos portais em movimento passa de **6 de 6** a **12 de 12**. Duas correcções que a oscilação
+A bateria dos portais em movimento passa de **6 de 6** a **13 de 13**. Três correcções que a oscilação
 obrigou, e que valem para lá dela:
 
-1. **A caminhada do T1 sobe com a porta** (`tools/regression/acceptance.mjs`): a porta B tem a caixa 5 m
-   acima do chão em metade do ciclo, e um passo a 1,6 m atravessava o vazio — medido, a porta 2 não era
-   atravessada. A caminhada passa a usar a altura da porta **onde ela está**; para as 50 portas da
-   exposição (todas no chão) a conta dá exactamente **1,6 m**, como antes.
-2. **Os instrumentos que fotografam a sala assentam as portas** (`portalDebug.settleMotion()`): medir
-   pixéis numa janela que roda 45° entre o instante em que a câmara é posta e o instante em que se lê é
-   medir a oscilação. Medido antes: **142 800 px** «fora da moldura» e o retângulo da janela a não
-   fechar; com as portas na pose do dado, o T4 e o T10/T12 voltam a fechar (**0 px** fora) e a sala é
-   medida de ponta a ponta como qualquer outra.
+1. **A medida passou a ser a do centro** (`portal.centreWorld()`): medir a origem da entidade mede o arco
+   que ela descreve para manter o centro parado — a ±90° são 6 m. É a mesma razão por que o controlo
+   existe: uma medida que não distingue os dois pivôs não prova nada.
+2. **A caminhada do T1 sobe com a porta e assenta as portas antes de andar** (`acceptance.mjs`,
+   `traversal-tests.mjs`): a porta B tem a caixa 5 m acima do chão em metade do ciclo, e um passo a 1,6 m
+   atravessava o vazio — medido, a porta 2 não era atravessada. E uma caminhada começada a meio de uma
+   oscilação mede a oscilação: o T1 passou a usar o `settleMotion` (as portas na pose do dado), como já
+   faziam os T2–T12.
+3. **Os instrumentos que fotografam a sala assentam as portas** (`portalDebug.settleMotion()`), que é o
+   que a #2 também usa: medir pixéis numa janela que roda entre o instante em que a câmara é posta e o
+   instante em que se lê é medir o movimento. Medido antes: **142 800 px** «fora da moldura» e o
+   retângulo da janela a não fechar; com as portas na pose do dado, o T4 e o T10/T12 voltam a fechar
+   (**0 px** fora) e a sala é medida de ponta a ponta como qualquer outra.
 
 **O que fica em aberto, e é honesto dizê-lo:** a porta B sobe 5 m em metade do ciclo, e um visitante que
 anda pelo chão só a atravessa na parte do ciclo em que a caixa desce até à altura dos olhos — cerca de
