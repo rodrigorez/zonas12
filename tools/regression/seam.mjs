@@ -121,6 +121,11 @@ const ASSINATURA = `
 // `setPose` da câmara (D63), que é quem escreve no `look-controls`.
 const atravessar = (porta) => `(async () => {
   const { playerCamera } = await import('/js/modules/camera.js');
+  // As portas na **pose do dado** antes de andar (D91): a caminhada entra pela porta que o ficheiro
+  // descreve, e uma porta a oscilar está a metros dela — sem assentar, a travessia não acontecia e a
+  // ponte não existia (medido: 36 de 128 verificações, contra 125 antes do movimento entrar nas salas).
+  if (window.portalDebug && window.portalDebug.settleMotion) window.portalDebug.settleMotion();
+  await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
   const alvo = window.portalDebug.state.portals.find((p) => p.data.id === ${porta});
   if (!alvo) { console.error('a porta ${porta} não está nesta página'); return; }
   const centro = new THREE.Vector3();
@@ -227,6 +232,11 @@ async function medir(browser, site, alvo) {
           // nada mudar no código. Congelar aqui põe os dois lados no mesmo instante.
           await browser.evaluate('(() => { if (window.portalDebug && window.portalDebug.freezeShaders) window.portalDebug.freezeShaders(); return true; })()')
             .catch(() => { /* sem política (fundo de imagem): nada a congelar */ });
+          // As portas, na **pose do dado** (D91): o retrato que a ponte mostra foi cozido com elas
+          // assentes, e congelar o movimento onde ele está deixava a porta do destino a meio de uma
+          // oscilação — a costura passava a medir isso em vez do corte.
+          await browser.evaluate('(() => { if (window.portalDebug && window.portalDebug.settleMotion) window.portalDebug.settleMotion(); return true; })()')
+            .catch(() => { /* sem portais em movimento: nada a assentar */ });
           await browser.evaluate('new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))')
             .catch(() => { /* a página vai-se embora */ });
           depoisDaPonte = await browser.screenshot(ESCALA);

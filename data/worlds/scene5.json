@@ -312,7 +312,24 @@
         0,
         0,
         0
-      ]
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 6,
+        "period": 12,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 19.9
+      }
     },
     {
       "id": 12,
@@ -369,7 +386,24 @@
         0,
         -120,
         0
-      ]
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 11.7,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 13.8
+      }
     },
     {
       "id": 40,
@@ -426,7 +460,24 @@
         0,
         -240,
         0
-      ]
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 6,
+        "period": 16.4,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 17.3
+      }
     }
   ]
 }

@@ -15,7 +15,7 @@ import {
 import { startSession, cameraAlreadyAllowed, cameraFirstFrame, showStartButton, showLoading } from './modules/camera.js';
 import { playerCamera } from './modules/camera.js';
 import { closeArtwork, toggleArtworkLabels } from './modules/artwork.js';
-import { startFrameDriver, traversalRecord, freezeMotion } from './modules/portal.js';
+import { startFrameDriver, traversalRecord, freezeMotion, anchorMotion } from './modules/portal.js';
 import { shaderStatus, freezeShaders, anchorShaders } from './modules/dimension.js';
 // A sonda de campo (R14): só desenha alguma coisa com `?sonda=1`, e é o que permite ler os números
 // num telemóvel, onde não há consola.
@@ -80,6 +80,10 @@ window.portalDebug = {
     state.portals.forEach((portal) => { if (portal.settle) portal.settle(); });
     return freezeMotion(true);
   },
+  // O instante zero da oscilação (D91). É o que o `app.js` pede quando a ponte de chegada sai — e é
+  // exposto para um instrumento poder provar que a âncora devolve as portas à pose do dado, que é a
+  // pose que o retrato mostra.
+  anchorMotion: () => anchorMotion(),
   // Onde a câmara está e para onde olha (D63): é o que o regresso da ficha guarda e devolve, e é o
   // que os instrumentos leem para provar que o visitante voltou ao mesmo sítio.
   pose: () => playerCamera.pose()
@@ -240,6 +244,10 @@ async function start() {
       // enquanto a ponte tapava a cena e o corte dá-se a ver.
       const tempo = window.arrivalFrame.shaderTime();
       if (typeof tempo === 'number') anchorShaders(tempo);
+      // O mesmo para as portas (D91), e pela mesma razão: o retrato que a ponte mostra foi cozido com
+      // as portas na pose do dado, portanto é **agora** que a oscilação tem de começar — senão a porta
+      // já andou metros por baixo da ponte e o corte mostra o salto que ela existe para esconder.
+      anchorMotion();
       window.arrivalFrame.hide();
     });
   }

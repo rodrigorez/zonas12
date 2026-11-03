@@ -80,6 +80,8 @@ export function traversalRecord() {
 // Reused vectors: the driver and the collision run every frame and must not allocate.
 const _worldPoint = new THREE.Vector3();
 const _boxPoint = new THREE.Vector3();
+// A posição do visitante no quadro **anterior**, lida outra vez com a caixa de agora (D91).
+const _previousPoint = new THREE.Vector3();
 // As duas posições do centro da porta na oscilação (D86): na pose do dado e no instante medido. A
 // diferença entre as duas é o que mantém o centro parado quando a porta roda.
 const _pivotAtRest = new THREE.Vector3();
@@ -103,6 +105,22 @@ if (typeof window !== 'undefined' && typeof window.matchMedia === 'function' &&
 export function freezeMotion(frozen) {
   motionFrozen = frozen !== false;
   return motionFrozen;
+}
+
+// O instante zero da oscilação (D91). O relógio é o da cena, que **começa no carregamento da página**;
+// sem esta âncora a porta já andou alguns metros quando a ponte de chegada sai, e o retrato que ela
+// mostra (a pose de repouso, que é a que os retratos cozeram) fica diferente do que se vê ao chegar —
+// um salto no meio do ecrã, exactamente o que a D78 fechou para o fundo com o `anchorShaders`.
+//
+// `js/app.js` chama isto no mesmo sítio em que ancora o shader: por baixo da ponte, antes de ela sair.
+// O valor do relógio só existe dentro do `animate`, por isso a âncora é pedida e resolvida no primeiro
+// quadro que passar (todos os portais recebem o mesmo `time`).
+let motionOrigin = 0;
+let motionOriginPending = false;
+
+export function anchorMotion() {
+  motionOriginPending = true;
+  return true;
 }
 
 // A-Frame's vec3 in the object form of setAttribute needs { x, y, z }: an array there is read as
@@ -335,10 +353,15 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
   // O `prefers-reduced-motion` do visitante e o `freezeMotion` dos instrumentos param o movimento no
   // **instante em que estão**: a porta fica onde está, como o shader fica no quadro em que estava.
   animate: function (time) {
+    // O tempo da oscilação conta a partir da âncora (D91), não do carregamento da página.
+    if (motionOriginPending) {
+      motionOrigin = time;
+      motionOriginPending = false;
+    }
     const kind = this.data.motionKind;
     if (!kind || motionFrozen || this.data.motionPeriod <= 0) return;
     const period = this.data.motionPeriod * 1000;
-    const phase = (time % period) / period;
+    const phase = ((time - motionOrigin) % period) / period;
     if (!this.basePosition) {
       this.basePosition = this.el.object3D.position.clone();
       this.baseRotation = this.el.object3D.rotation.clone();
@@ -367,10 +390,11 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
       //   pos   = base + R_base·(amplitude·eixo) + R_base·p − R(t)·p
       // Quando a oscilação é zero, os dois últimos termos anulam-se e a pose é a do ficheiro.
       const eixoRotacao = this.data.motionRotationAxis;
-      const phaseTranslacao = (time % (this.data.motionPeriod * 1000)) / (this.data.motionPeriod * 1000);
+      const decorrido = time - motionOrigin;
+      const phaseTranslacao = (decorrido % (this.data.motionPeriod * 1000)) / (this.data.motionPeriod * 1000);
       const periodoRotacao = this.data.motionRotationPeriod > 0
         ? this.data.motionRotationPeriod : this.data.motionPeriod;
-      const phaseRotacao = (time % (periodoRotacao * 1000)) / (periodoRotacao * 1000);
+      const phaseRotacao = (decorrido % (periodoRotacao * 1000)) / (periodoRotacao * 1000);
       const sway = Math.sin(phaseTranslacao * Math.PI * 2);
       const swayRotacao = Math.sin(phaseRotacao * Math.PI * 2);
       const amplitude = this.data.motionAmplitude;
@@ -483,30 +507,47 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
   // Collision with the box, in the space of the portal (position and rotation included): there
   // is no global distance, so it works with the portal moved, rotated, in motion and with
   // several portals.
+  //
+  // **Os dois pontos no mesmo plano (D91).** O cruzamento decide-se entre a posição do visitante no
+  // quadro anterior e a de agora, e as duas são lidas com a transformação **deste** quadro. Como o
+  // mesmo plano se aplica às duas, o que a porta andou desloca-as por igual e **não muda a diferença
+  // entre elas**: só o passo do visitante pode trocar o sinal. Era aqui que uma porta a oscilar levava
+  // quem estava parado — o sinal mudava porque o plano se movia, não porque alguém tivesse cruzado.
+  // Medido antes desta emenda, com o sorteio real das 12 páginas: 5,5% das chegadas disparavam uma
+  // travessia que ninguém pediu, e numa porta em Y a 90° chegava a 25%.
   detectTraversal: function () {
-    if (!this.portalGroup.visible) { this.traversalStarted = false; return; }
+    if (!this.portalGroup.visible) {
+      this.traversalStarted = false;
+      this.lastWorldPoint = null;
+      return;
+    }
     const worldPoint = playerCamera.worldPosition(_worldPoint);
     if (!worldPoint) return;
-    // A travessia exige que o **visitante** se tenha mexido desde o quadro anterior (D87). A caixa de
-    // colisão roda com a porta e varre até 12 m para dentro da sala: sem esta condição, uma porta a
-    // oscilar passa por cima de quem está parado e leva-o consigo, porque o que dispara a travessia é
-    // o cruzamento do plano e não o passo de quem anda. Medido: 4 dos 9 sorteios legais punham o
-    // visitante parado dentro da caixa entre 12% e 27% do ciclo.
-    const andou = !this.lastWorldPoint || this.lastWorldPoint.distanceTo(worldPoint) > 0.01;
+    this.portalGroup.updateWorldMatrix(true, false);
+
+    // A caixa de colisão roda com a porta e varre até 12 m para dentro da sala, por isso o ponto do
+    // quadro anterior tem de ser lido com a caixa de agora, e não com a de então.
+    const noEspacoDaCaixa = (ponto, alvo) => {
+      alvo.copy(ponto);
+      this.portalGroup.worldToLocal(alvo);
+      alvo.sub(this.boxCenter).applyQuaternion(this.boxRotationInverse);
+      return alvo;
+    };
+    const agora = noEspacoDaCaixa(worldPoint, _boxPoint);
+    const antes = this.lastWorldPoint ? noEspacoDaCaixa(this.lastWorldPoint, _previousPoint) : null;
+    const dentro = (ponto) => (
+      Math.abs(ponto.x) <= this.boxHalf.x &&
+      Math.abs(ponto.y) <= this.boxHalf.y &&
+      Math.abs(ponto.z) <= this.boxHalf.z
+    );
+    const andou = !antes || this.lastWorldPoint.distanceTo(worldPoint) > 0.01;
     if (this.lastWorldPoint) this.lastWorldPoint.copy(worldPoint);
     else this.lastWorldPoint = worldPoint.clone();
 
-    this.portalGroup.updateWorldMatrix(true, false);
-    _boxPoint.copy(worldPoint);
-    this.portalGroup.worldToLocal(_boxPoint);
-    _boxPoint.sub(this.boxCenter).applyQuaternion(this.boxRotationInverse);
-
-    const inside = (
-      Math.abs(_boxPoint.x) <= this.boxHalf.x &&
-      Math.abs(_boxPoint.y) <= this.boxHalf.y &&
-      Math.abs(_boxPoint.z) <= this.boxHalf.z
-    );
-    const zSign = _boxPoint.z < 0 ? -1 : 1;
+    const inside = dentro(agora);
+    const insideAntes = antes ? dentro(antes) : false;
+    const zSign = agora.z < 0 ? -1 : 1;
+    const zAntes = antes && antes.z < 0 ? -1 : 1;
 
     if (!this.traversalStarted) {
       this.traversalStarted = true;
@@ -516,8 +557,8 @@ AFRAME.registerComponent(PORTAL_COMPONENT, {
     }
 
     let crossed;
-    if (this.data.trigger === 'box') crossed = inside && !this.insideBox;
-    else crossed = inside && zSign !== this.zSign;
+    if (this.data.trigger === 'box') crossed = inside && !insideAntes;
+    else crossed = inside && antes !== null && zSign !== zAntes;
 
     this.insideBox = inside;
     this.zSign = zSign;

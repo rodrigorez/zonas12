@@ -1,7 +1,8 @@
 # Spec — abrir uma sala nova
 
-> **Estado: aprovada com as três propostas feitas** (2026-11-02), e **posta à prova** numa sala
-> descartável (2026-11-03, D90). Nada nesta spec foi inventado: cada
+> **Estado: aprovada com as três propostas feitas** (2026-11-02), **posta à prova** numa sala
+> descartável (2026-11-03, D90) e **levada às doze páginas da exposição** (D91). Nada nesta spec foi
+> inventado: cada
 > passo é o que o repositório já faz, e cada número citado é um número medido por uma ferramenta que lá
 > está. A **fase 1** tem um comando (`tools/scene/new-world.mjs`) e as **fases 3–7** têm outro
 > (`tools/scene/new-room.mjs`, que recusa sem a página da fase 1); as listas das baterias passaram a vir
@@ -10,7 +11,8 @@
 > hoje, que é o que o roteiro tem de produzir. A **§9** junta o caso que
 > não é uma sala: o **mundo de ensaio** (`scene100`, D84), onde se experimenta o que ainda não entra no
 > caminho do visitante. A **§10** são as regras do **movimento sorteado** de cada porta (D87) — a única
-> coisa de uma sala nova que o autor **não** decide.
+> coisa de uma sala nova que o autor **não** decide — e a **§11** é esse mesmo movimento já **nas salas
+> que existem** (D91): o que a medição obrigou a mudar no código, e o que não mudou.
 
 > **Para que serve.** Uma sala nova toca **nove** sítios que não se vêem uns aos outros: a página, o
 > dado da sala, o dado do portão, o dado de **cada** sala de destino, a folha das obras, os retratos
@@ -85,10 +87,10 @@ tabela, é a tabela que está certa — não é a sala que abre uma excepção.
 | quantas portas | **3 a 5**, uma delas ao portão com `arrivalFrom` | L24 |
 | o fundo | raio **500** (muito acima dos 60 m), e 2:1 quando é panorama | L1, L14 |
 | o olho | **1,6 m** — é com ele que o alcance é medido | `reach.js` (`OLHO`) |
-| o movimento | **cada** porta oscila: translação num eixo e rotação noutro, amplitude de translação = **metade da dimensão da porta nesse eixo**, rotação de **45° ou 90°** em módulo, **dois períodos** independentes, eixos **da porta** e não do mundo | §10, `sorteio.mjs` |
+| o movimento | **cada** porta oscila: translação num eixo e rotação noutro, amplitude de translação = **metade da dimensão da porta nesse eixo**, rotação de **45° ou 90°** em módulo, **dois períodos** independentes, eixos **da porta** e não do mundo (nas doze páginas da exposição desde a D91 — §11) | §10, `sorteio.mjs` |
 | o pivô | o **centro** da porta (`height/2`): o centro só sai do lugar pela translação | `motion.mjs` |
 | o alcance | ≥ **50 %** do ciclo, senão o sorteio rejeita e volta a tirar | L29 |
-| o repouso | a fase 0 é a pose do dado — é essa pose que os retratos desenham | §10.5, `settleMotion()` |
+| o repouso | a fase 0 é a pose do dado — é essa pose que os retratos desenham, e é nela que a oscilação começa quando a ponte de chegada sai | §10.5, §11.2, `anchorMotion()` |
 | o retrato de cada porta | derivado do destino, a partir da pose de repouso | `portrait.mjs` |
 | quem chega | toda a porta tem uma porta que se declara a sua chegada (L19); quem chega sem `?from` é julgado com o azimute **0** da primeira visita | L19, L26, L28 |
 
@@ -769,9 +771,14 @@ O bloco que entra no dado, por porta:
 ### 10.8 O que uma sala nova ganha, e o que não muda
 
 Fica com **todas** as portas em movimento — uma delas a de volta ao portão, como as outras: a D59
-relaxada não distingue. As **11 salas e o portão não são tocados** (as suas portas continuam paradas, e
-os seus 42 retratos continuam válidos), porque o sorteio é da **construção** de uma sala nova, não uma
-passagem sobre o que existe.
+relaxada não distingue. O sorteio é da **construção** de uma sala, não uma passagem a cada
+carregamento (a razão está no fim desta secção).
+
+> **Nota (D91) — a última frase desta secção era verdadeira até 2026-11-03.** Dizia que as **11 salas e
+> o portão não eram tocados**, e a decisão do autor foi a contrária: o movimento entrou nas **doze
+> páginas** (a §10.9 conta o que isso custou e o que teve de mudar no código). O que continua verdade:
+> os **42 retratos não foram refeitos**, porque a pose de repouso é exactamente a pose em que eles já
+> estavam cozidos.
 
 **Porquê na construção e não a cada carregamento.** Sortear a cada carregamento é possível (o sorteio
 corre uma vez, no `buildScene`, e não custa um quadro) e a pose de repouso seria a mesma — mas
@@ -779,3 +786,79 @@ sacrificava três coisas: um defeito relatado por um visitante **não se reprodu
 poder provar a sala (só o gerador); e o editor mostra outra sala de cada vez que abre. Escrito no
 dado, o número é medível, reproduzível e o mesmo para todos. Quem quiser ver a sala a mudar tem o
 `--aplicar` a cada passagem.
+
+---
+
+## 11. O movimento nas salas que já existem (D91)
+
+A pergunta do autor foi se a spec — seguida — deixava trazer o movimento às **11 salas e ao portão**,
+respeitando o que já está montado. A resposta foi medida antes de se tocar em qualquer ficheiro, e o
+que se seguiu foi só o que a medição exigiu.
+
+### 11.1 O dado
+
+As doze páginas têm **50 portas**: **11 no portão** (todas para as salas) e **39 nas salas**. E — o
+facto que decide tudo o resto — **as 50 são de duas mãos**: em cada uma, `arrivalFrom` é igual ao
+`action.target` (medido: **50 de 50**). Não há, portanto, «a porta que se sai» separada da «porta por
+onde se chega»: mexer numa é mexer na outra, e não existe a opção de deixar as portas de chegada
+paradas.
+
+```
+node tools/scene/sorteio.mjs gate scene1 scene2 scene3 scene4 scene5 scene6 scene7 scene8 scene9 \
+     scene10 scene11 --aplicar --semente 20261103
+```
+
+Medido, com a semente que ficou no dado (**20261103**): **50 portas, 50 aceites, 32 rejeitados**
+(**0,64** por porta — menos do que na sala de ensaio, 1,33, porque as portas do portão são mais
+pequenas e aceitam 10 das 12 combinações); translação **X 22 · Y 28**; rotação **Y 27 · X 4 · Z 19**;
+ângulo **45° 22 · 90° 28**; alcance de **51,6%** a **100,0%** (22 portas a 100%, as outras em 51,6 ·
+60,0 · 61,8 · 65,3 · 68,0%); e **25 das 50** portas põem a caixa sobre o ponto de chegada em algum
+instante do ciclo (10,4 · 11,8 · 13,0 · 16,7 · 36,5% dele). O dado cresceu **900 linhas** nos doze
+ficheiros, e **nenhum** outro campo mudou.
+
+### 11.2 O que a medição obrigou a mudar no código
+
+**1. A travessia passou a ser do visitante, não da porta.** O sinal do plano era lido só no ponto de
+agora: uma porta a rodar trocava-lhe o sinal **sem ninguém ter cruzado nada**, e quem estivesse a andar
+por perto era levado. Medido com a máquina de estados do `detectTraversal` sobre o dado publicado
+(chegar, 2 s parado, 4 s a andar a 1,4 m/s; 32 fases de entrada por porta, 60 amostras/s):
+**2,7% das chegadas** disparavam uma travessia não pedida, e **quatro portas** entre **26% e 40%** —
+todas com rotação em Y (o portão, `gate` p2 e as `scene2` p6, `scene4` p8, `scene5` p12). A correcção:
+os **dois** pontos — o de agora e o do quadro anterior — são lidos com a caixa **deste** quadro, e o
+cruzamento é a troca de sinal entre eles. Como o mesmo plano se aplica aos dois, o que a porta andou
+desloca-os por igual e não muda a diferença: só o passo do visitante pode trocar o sinal.
+
+**2. A oscilação começa quando a ponte de chegada sai** (`anchorMotion()`, no `app.js`, ao lado do
+`anchorShaders` da D78). Sem isto o relógio da cena começava no carregamento da página, a porta já
+tinha andado metros por baixo da ponte, e o corte mostrava o salto que a ponte existe para esconder —
+o retrato é a pose de repouso e a cena tinha outra.
+
+**3. Os instrumentos assentam as portas antes de medir geometria.** O `seam.mjs` passou a chamar
+`settleMotion()` (o `freezeShaders` congela o movimento **onde ele está**, e onde ele está já não é a
+pose do retrato) e o T7/T11 da `traversal-tests.mjs` também: sem isso, **33 de 165** verificações
+perdiam a meia volta, porque quem andava atravessava o plano do **dado** e a caixa já estava noutro
+sítio. O movimento mede-se na `motion.mjs`; aqui mede-se a geometria.
+
+### 11.3 O que **não** mudou
+
+- os **42 retratos** (39 portas com retrato nas doze páginas, mais as 3 da sala de ensaio): a pose de
+  repouso é a pose em que estavam cozidos, portanto a imagem seria **igual** e não se gastou um minuto
+  de GPU (a fase 8 custa **800–820 s** por lote de 39 pares — medido nos registos);
+- a **L16** (o ponto de chegada é o da pose do dado), a **L22/L23** (os anéis), a **L17** (que já
+  aceitava `sway` desde a D87), os buracos do mundo real (o `window.reality` roda com a janela), o i18n,
+  o editor e a geometria de tudo;
+- o **piso da L29**: ficou nos **50%**, como nas salas novas — é a decisão do autor, e é ela que deixa
+  metade das portas passável só 60–67% do ciclo (a translação em Y levanta a porta).
+
+### 11.4 O que a bateria passou a medir
+
+A `motion.mjs` foi de **13** para **19** verificações. As três novas, e a que mudou de sentido:
+
+| # | verificação | o que ela prova |
+| --- | --- | --- |
+| 11 | **a âncora põe a oscilação a começar na pose do dado** | depois de as portas andarem, `anchorMotion()` devolve-as ao ficheiro: medido **10,57 m → 0,0e+0 m** |
+| 12 | **a andar ao lado do plano, a porta não o leva** | a câmara anda 24 cm ao lado enquanto a porta varre uma volta inteira: **0 navegações** |
+| 12b | **a atravessar o plano, a porta leva-o** (controlo) | com a porta assente: **1 navegação** — sem este controlo, as duas de cima passavam numa cena sem travessia |
+| 13 | **as doze páginas · as 5 portas da `scene1` oscilam no ecrã** | a L29 prova o dado; esta prova que o dado chega à cena |
+
+---

@@ -20,7 +20,14 @@
 //   8. ao fim de uma oscilação completa está onde começou — medido pela meia oscilação contra o
 //      período do dado;
 //   9. a porta do portão, que não tem `motion`, não se mexe (é o controlo);
-//  10. `freezeMotion` pára a oscilação onde ela está.
+//  10. `freezeMotion` pára a oscilação onde ela está;
+//  11. a **âncora** da D91: depois de as portas andarem, `anchorMotion()` devolve-as à pose do dado — é
+//      o que o `app.js` pede quando a ponte de chegada sai, e é o que faz o retrato continuar a ser a
+//      imagem que se vê ao chegar;
+//  12. a travessia é do **visitante**: com a porta a varrer, parado e a andar ao lado do plano ele não é
+//      levado (D91), e a atravessar o plano é — o controlo das duas de cima;
+//  13. e, numa página a sério (`scene1`), as cinco portas oscilam no ecrã: a L29 prova o dado, esta
+//      prova que o dado chega à cena.
 //
 // Uso, da raiz do projeto:
 //
@@ -307,6 +314,29 @@ async function main() {
     // dado para a pose daquele instante: esse salto atravessa o centro e inventava um cruzamento a mais
     // (medido: meia oscilação de 7,66 s em vez de 10). Espera-se que fique para trás.
     await sleep(1500);
+    // A âncora (D91): o `app.js` chama-a quando a ponte de chegada sai, para a oscilação começar em 0 —
+    // que é a pose do dado, e portanto a que o retrato mostra. Aqui prova-se o mecanismo: depois de a
+    // porta ter andado, `anchorMotion()` devolve-a à pose do ficheiro.
+    const ancora = await browser.evaluate(`(async () => {
+      const d = window.portalDebug;
+      const desvioDoDado = () => Math.max(...d.state.portals.map((portal) =>
+        Math.max(...['x', 'y', 'z'].map((k) =>
+          Math.abs(portal.el.object3D.position[k] - portal.basePosition[k])))));
+      const antes = desvioDoDado();
+      d.anchorMotion();
+      // **Um** quadro: a passagem que resolve a âncora aplica a fase 0 no mesmo passo, portanto é este
+      // o instante em que a porta está exactamente na pose do dado. Dois quadros a mais já são
+      // centímetros de oscilação.
+      await new Promise((done) => requestAnimationFrame(done));
+      const depois = desvioDoDado();
+      return { antes: antes, depois: depois };
+    })()`);
+    result.check('sala de ensaio · a âncora põe a oscilação a começar na pose do dado (D91)',
+      ancora.antes > 0.5 && ancora.depois <= 1e-3,
+      'antes da âncora as portas estavam a ' + ancora.antes.toFixed(2) + ' m do dado; depois dela, ' +
+        ancora.depois.toExponential(1) + ' m');
+    // O instante zero passou a ser a âncora: a amostragem abaixo conta a partir daqui.
+    await sleep(1200);
     // Duas oscilações do período mais longo (20 s): 42 s dão pelo menos dois cruzamentos em cada porta
     // e em cada um dos dois movimentos.
     const amostras = await browser.evaluate(AMOSTRAR(42000, ids), 90000);
@@ -381,10 +411,15 @@ async function main() {
       'com o pivô na base o centro sai ' + controlo.desvio.toFixed(2) + ' m do lugar; com o pivô no ' +
         'centro sai 0,000 m (a diagonal da porta é o raio que ele descreveria)');
 
-    // ---- A travessia exige que o visitante ande (D87) --------------------------------------------
-    // A caixa de colisão roda com a porta e varre até 12 m para dentro da sala. Aqui a porta é **rodada
-    // à mão** com a câmara parada no ponto de chegada: os dois sentidos da mesma prova. Sem a condição,
-    // o cruzamento do plano dispara e o visitante é levado sem se mexer; com ela, não.
+    // ---- A travessia é do visitante, não da porta (D87, D91) -------------------------------------
+    // A caixa de colisão roda com a porta e varre até 12 m para dentro da sala. Três provas, com a
+    // porta rodada **à mão** e a câmara no ponto de chegada:
+    //   (a) parado, a porta varre uma volta inteira -> 0 navegações;
+    //   (b) a andar **ao lado** do plano (20 cm, mais que os 1 cm da guarda) enquanto a porta varre ->
+    //       0 navegações. É esta que a D91 fecha: o sinal do plano trocava porque a porta andava, não
+    //       porque alguém tivesse cruzado;
+    //   (c) a andar **através** do plano, com a porta parada -> pelo menos uma. Sem este controlo, (a) e
+    //       (b) também passavam numa cena onde a travessia não existe.
     const parado = await browser.evaluate(`(async () => {
       const d = window.portalDebug;
       const portal = d.state.portals.find((cada) => cada.data.id === 1);
@@ -396,39 +431,57 @@ async function main() {
       const camara = document.querySelector('a-camera').object3D;
       // A câmara no ponto de chegada da porta (meia profundidade da caixa + 0,5 m à frente).
       const centro = portal.centreWorld(new THREE.Vector3());
-      const frente = new THREE.Vector3(0, 0, 1)
-        .applyQuaternion(portal.portalGroup.getWorldQuaternion(new THREE.Quaternion()))
-        .normalize();
+      const quaternion = portal.portalGroup.getWorldQuaternion(new THREE.Quaternion());
+      const frente = new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion).normalize();
+      const lado = new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion).normalize();
       const distancia = portal.data.box ? portal.data.box.z / 2 + 0.5 : 1;
-      camara.position.set(centro.x + frente.x * distancia, 1.6, centro.z + frente.z * distancia);
+      const chegada = new THREE.Vector3(centro.x + frente.x * distancia, 1.6,
+        centro.z + frente.z * distancia);
+      camara.position.copy(chegada);
       const base = portal.baseRotation.clone();
       const espera = () => new Promise((done) =>
         requestAnimationFrame(() => requestAnimationFrame(done)));
-      // A porta varre uma volta inteira, com a câmara parada.
+      // (a) A porta varre uma volta inteira, com a câmara parada.
       for (let i = 0; i < 24; i++) {
         const angulo = (i / 24) * Math.PI * 2;
         portal.el.object3D.rotation.set(base.x + angulo, base.y, base.z);
         await espera();
       }
       const semAndar = conta.navegacoes;
-      // O controlo: a mesma varredura, com a câmara a andar 5 cm por passo.
+      // (b) A mesma varredura, com a câmara a andar 1 cm por passo **ao lado** do plano.
       conta.navegacoes = 0;
+      camara.position.copy(chegada);
       for (let i = 0; i < 24; i++) {
         const angulo = (i / 24) * Math.PI * 2;
         portal.el.object3D.rotation.set(base.x + angulo, base.y, base.z);
-        camara.position.z += 0.05;
+        camara.position.addScaledVector(lado, 0.01);
+        await espera();
+      }
+      const aoLado = conta.navegacoes;
+      // (c) A porta assente e a câmara a atravessar o plano: 1 cm por passo, para dentro.
+      conta.navegacoes = 0;
+      portal.el.object3D.rotation.copy(base);
+      camara.position.copy(chegada);
+      await espera();
+      for (let i = 0; i < 200; i++) {
+        camara.position.addScaledVector(frente, -0.01);
         await espera();
       }
       portal.navigate = original;
-      return { semAndar: semAndar, aAndar: conta.navegacoes };
+      return { semAndar: semAndar, aoLado: aoLado, atraves: conta.navegacoes };
     })()`);
     result.check('sala de ensaio · parado, a porta em movimento não leva o visitante',
       parado.semAndar === 0,
       'com a câmara parada e a porta a varrer uma volta inteira: ' + parado.semAndar +
-        ' navegação(ões); com a câmara a andar: ' + parado.aAndar);
-    result.check('sala de ensaio · e o controlo: a andar, a mesma varredura leva-o',
-      parado.aAndar > 0,
-      'sem este controlo, «parado não é levado» também passaria numa cena sem travessia nenhuma');
+        ' navegação(ões)');
+    result.check('sala de ensaio · a andar ao lado do plano, a porta também não o leva (D91)',
+      parado.aoLado === 0,
+      'com a câmara a andar 24 cm ao lado do plano e a porta a varrer uma volta inteira: ' +
+        parado.aoLado + ' navegação(ões) — antes da D91 o sinal do plano trocava por a porta andar');
+    result.check('sala de ensaio · e o controlo: a atravessar o plano, a porta leva-o',
+      parado.atraves > 0,
+      'com a porta assente e a câmara a atravessar o plano: ' + parado.atraves +
+        ' navegação(ões) — sem este controlo, as duas de cima também passavam numa cena sem travessia');
 
     const congelado = await browser.evaluate(`(async () => {
       window.portalDebug.freezeMotion(true);
@@ -447,6 +500,37 @@ async function main() {
       JSON.stringify(congelado.antes) === JSON.stringify(congelado.depois),
       JSON.stringify(congelado.antes.slice(0, 1)) + (congelado.antes[0] === congelado.depois[0]
         ? ' — igual 1,5 s depois' : ' — mudou'));
+
+    // ---- As doze páginas da exposição (D91) -------------------------------------------------------
+    // A L29 prova o **dado**; isto prova que o dado chega ao ecrã numa sala a sério, e não só na sala
+    // de ensaio. Mede-se o centro de cada porta da `scene1`, assente e depois de andar.
+    const sala = JSON.parse(readFileSync(join(ROOT, 'data', 'worlds', 'scene1.json'), 'utf8'));
+    const idsSala = sala.portals.filter((cada) => cada.motion && cada.motion.kind === 'sway')
+      .map((cada) => cada.id);
+    await browser.goto(site.base + '/scene1/?bust=' + Date.now() + 's', 60000);
+    for (let i = 0; i < 150; i++) {
+      if (await browser.evaluate(PRONTO).catch(() => false)) break;
+      await sleep(200);
+    }
+    await sleep(1500);
+    const salaMovida = await browser.evaluate(`(async () => {
+      const d = window.portalDebug;
+      d.settleMotion();
+      const ler = () => ${JSON.stringify(idsSala)}.map((id) => {
+        const portal = d.state.portals.find((cada) => cada.data.id === id);
+        const meio = portal.centreWorld(new THREE.Vector3());
+        return meio.x.toFixed(4) + ',' + meio.y.toFixed(4) + ',' + meio.z.toFixed(4);
+      });
+      const assentes = ler();
+      d.freezeMotion(false);
+      await new Promise((done) => setTimeout(done, 2000));
+      const depois = ler();
+      return { assentes: assentes, depois: depois, portas: ${JSON.stringify(idsSala)}.length };
+    })()`);
+    const movidas = salaMovida.assentes.filter((cada, i) => cada !== salaMovida.depois[i]).length;
+    result.check('as doze páginas · as ' + salaMovida.portas + ' portas da `scene1` oscilam no ecrã',
+      movidas === salaMovida.portas,
+      movidas + ' de ' + salaMovida.portas + ' portas saíram da pose assente em 2 s');
   } finally {
     await browser.close();
     await site.close();

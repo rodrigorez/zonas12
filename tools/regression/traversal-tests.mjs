@@ -145,6 +145,14 @@ async function medirPorta(browser, site, mundo, porta) {
 // o ponto de chegada e conta as travessias dos dois sentidos.
 async function medirChegada(browser, site, mundo, deOnde) {
   await abrirPagina(browser, site, mundo, 'from=' + deOnde);
+  // As portas na **pose do dado** (D86/D91): o que o T7/T11 mede é a geometria da chegada — o ponto, o
+  // olhar e os dois sentidos da travessia —, e uma porta a oscilar põe a caixa de colisão a metros do
+  // sítio onde o ficheiro a escreve. Medido sem assentar, depois de as salas passarem a oscilar (D91):
+  // **33 de 165** verificações perderam a meia volta, porque quem andava atravessava o plano do dado e
+  // não estava dentro da caixa onde ela estava. O movimento mede-se na `motion.mjs`.
+  await browser.evaluate(
+    '(() => { const d = window.portalDebug; if (d && d.settleMotion) d.settleMotion(); else if (d && d.freezeMotion) d.freezeMotion(true); return true; })()'
+  ).catch(() => { /* uma página sem o lever */ });
   const chamada = `(async () => {
     const modulo = await import(${sonda(site)});
     return modulo.checkArrival();

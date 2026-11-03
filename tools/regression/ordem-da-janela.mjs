@@ -193,6 +193,9 @@ try {
     // passaria a medir o shader (foi o primeiro erro desta sonda — números da ordem dos milhares onde
     // não havia nada).
     await browser.evaluate('(() => { window.portalDebug.freezeShaders(); return true; })()');
+    // E as portas na pose do dado (D91): a moldura de uma porta em movimento muda pixels entre as duas
+    // fotografias, e esta sonda mede a **ordem** da janela, não o movimento.
+    await browser.evaluate('(() => { if (window.portalDebug.settleMotion) window.portalDebug.settleMotion(); return true; })()');
     const montado = await browser.evaluate(MONTAR({ obra, camara, yaw, virada }));
     if (!montado) {
       console.log('skip ' + mundo + ': a sala não tem obras no DOM');

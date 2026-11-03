@@ -105,6 +105,10 @@ const ASSINATURA = `
 const atravessar = (portalId) => `(async () => {
   const sceneEl = document.querySelector('a-scene');
   const cameraEl = sceneEl.querySelector('a-camera');
+  // As portas na pose do dado antes de andar (D91): a caminhada atravessa a porta que o ficheiro
+  // descreve, e uma porta a oscilar já não está lá.
+  if (window.portalDebug && window.portalDebug.settleMotion) window.portalDebug.settleMotion();
+  await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
   const porta = window.portalDebug.state.portals.find((p) => p.data.id === ${portalId});
   if (!porta) { console.error('a porta ${portalId} não está nesta página'); return; }
   const centro = new THREE.Vector3();
