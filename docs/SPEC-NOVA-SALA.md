@@ -1,9 +1,13 @@
 # Spec — abrir uma sala nova
 
-> **Estado: aprovada com as três propostas feitas** (2026-11-02). Nada nesta spec foi inventado: cada
+> **Estado: aprovada com as três propostas feitas** (2026-11-02), e **posta à prova** numa sala
+> descartável (2026-11-03, D90). Nada nesta spec foi inventado: cada
 > passo é o que o repositório já faz, e cada número citado é um número medido por uma ferramenta que lá
-> está. As fases 1–7 têm agora um comando (`tools/scene/new-room.mjs`) e as listas das baterias passaram
-> a vir do dado; o que continua à mão é o que a spec diz que continua à mão. A **§9** junta o caso que
+> está. A **fase 1** tem um comando (`tools/scene/new-world.mjs`) e as **fases 3–7** têm outro
+> (`tools/scene/new-room.mjs`, que recusa sem a página da fase 1); as listas das baterias passaram a vir
+> do dado; e o que continua à mão é
+> o que a spec diz que continua à mão. A **§2.1** é o retrato do ponto de chegada — a estética de uma sala
+> hoje, que é o que o roteiro tem de produzir. A **§9** junta o caso que
 > não é uma sala: o **mundo de ensaio** (`scene100`, D84), onde se experimenta o que ainda não entra no
 > caminho do visitante. A **§10** são as regras do **movimento sorteado** de cada porta (D87) — a única
 > coisa de uma sala nova que o autor **não** decide.
@@ -69,17 +73,58 @@ não uma política; o que o roteiro diz é que **não** se editam à mão — vo
 escrito à mão não tem quem o defenda: a L29 julga-o, mas nada garante que a sala continue a parecer-se
 com uma sala.)
 
+### 2.1 · O ponto de chegada: a estética de uma sala hoje
+
+Tudo o que as fases seguintes produzem tem de dar **isto**. Se uma sala nova não se parecer com esta
+tabela, é a tabela que está certa — não é a sala que abre uma excepção.
+
+| o quê | o que uma sala tem hoje | quem o mede |
+|---|---|---|
+| as obras | um anel de **40 m** de raio, à altura de 1,5 m, passo angular constante a partir do centro (onde o visitante entra) | `ring.mjs`, L22 |
+| as portas | um anel **concêntrico de 60 m**, passo constante, e a folga angular da L23 para nenhuma obra tapar uma porta | `ring.mjs`, L23 |
+| quantas portas | **3 a 5**, uma delas ao portão com `arrivalFrom` | L24 |
+| o fundo | raio **500** (muito acima dos 60 m), e 2:1 quando é panorama | L1, L14 |
+| o olho | **1,6 m** — é com ele que o alcance é medido | `reach.js` (`OLHO`) |
+| o movimento | **cada** porta oscila: translação num eixo e rotação noutro, amplitude de translação = **metade da dimensão da porta nesse eixo**, rotação de **45° ou 90°** em módulo, **dois períodos** independentes, eixos **da porta** e não do mundo | §10, `sorteio.mjs` |
+| o pivô | o **centro** da porta (`height/2`): o centro só sai do lugar pela translação | `motion.mjs` |
+| o alcance | ≥ **50 %** do ciclo, senão o sorteio rejeita e volta a tirar | L29 |
+| o repouso | a fase 0 é a pose do dado — é essa pose que os retratos desenham | §10.5, `settleMotion()` |
+| o retrato de cada porta | derivado do destino, a partir da pose de repouso | `portrait.mjs` |
+| quem chega | toda a porta tem uma porta que se declara a sua chegada (L19); quem chega sem `?from` é julgado com o azimute **0** da primeira visita | L19, L26, L28 |
+
+E o que **não** é estética, é a ausência dela: uma sala a sério **não é um fixture**. As isenções da
+`scene100` (§9) vêm de ela estar em `js/scene/fixtures.js` e fora do grafo; pôr uma sala a sério nessa
+lista é apagá-la do grafo, das chegadas e das baterias — o `new-room.mjs` recusa o slug (`é um fixture
+de ensaio, não uma sala`).
+
 ---
 
 ## 3. O roteiro, fase a fase
 
-**O atalho.** As fases 1 a 7 têm um comando: `node tools/scene/new-room.mjs <slug> --destinos …`
-escreve o esqueleto do dado (as duas dimensões, o fundo com a reserva, as portas nos dois lados, os
-assets dos retratos que ainda não existem) e corre os anéis, o giro, os buracos e o validador. As
-fases abaixo continuam a ser a referência do que ele faz por baixo — e o que ele **não** faz: as
-obras, a composição no editor e os retratos continuam a ser passos à mão. Desde a **D87** ele também
-**sorteia o movimento** de cada porta (fase 6b): o comando é o atalho das fases 1 a 7 **incluindo** o
-movimento.
+**O atalho.** A **fase 1** tem um comando — `node tools/scene/new-world.mjs <slug>` — e as **fases 3 a
+7** têm outro: `node tools/scene/new-room.mjs <slug> --destinos a,b`. O segundo **exige a página**: sem
+`<slug>/index.html` recusa (`a página é da outra ferramenta: node tools/scene/new-world.mjs <slug>`),
+para não deixar um mundo no grafo sem endereço.
+
+```
+node tools/scene/new-room.mjs <slug> --destinos scene3,scene6 [opções]
+
+  --nome-pt "…"       o nome da sala em português (por omissão, o slug)
+  --nome-en "…"       o nome da sala em inglês (por omissão, o slug)
+  --fundo <mundo>     de que sala se copiam o fundo e a câmara (por omissão, `scene1`): traz o
+                      `shaderId` (ou o panorama) e a imagem de reserva, com o mesmo raio
+  --destinos a,b,…    **2 a 4** salas, **sem** o portão — ele entra sempre, e dá as 3 a 5 portas da
+                      L24; o conjunto tem de ser diferente do de todas as outras (L25), e isso é
+                      verificado **antes** de escrever
+  --sem-ferramentas   só escreve o dado: não corre anéis, giro, buracos nem o validador
+```
+
+Escreve o esqueleto do dado (as duas dimensões, o fundo com a reserva, as portas nos dois lados, os
+assets dos retratos que ainda não existem) — o que a fase 2 **exportaria** e o que a fase 3 colocaria à
+mão —, **sorteia o movimento** de cada porta (fase 6b, e imprime a **semente** na última linha) e corre
+os anéis, o giro, os buracos e o validador. As fases abaixo continuam a ser a referência do que ele faz
+por baixo — e o que ele **não** faz: as obras, a composição no editor e os retratos continuam a ser
+passos à mão.
 
 Cada fase diz **o comando**, **o que ele tem de dizer** e **o que fazer se não disser**. Só se avança
 com a fase anterior verde: a fase 8 (retratos) custa minutos de GPU e não se gasta a descobrir um erro
@@ -112,6 +157,10 @@ node tools/scene/new-world.mjs <slug>
   `index.html` da raiz perdeu o `<base href="./">`.
 
 ### Fase 2 · O mundo no editor
+
+> **O atalho dispensa esta fase** e não a substitui: o `new-room.mjs` escreve o **dado** que a
+> exportação produziria (e as chegadas da fase 3), mas não escolhe as obras nem compõe a sala. Quem usa
+> o atalho volta ao editor só para compor — e exporta então por cima do esqueleto.
 
 Abrir o editor e construir a sala (a cópia de uma sala vizinha é o caminho normal — o editor exporta,
 a ferramenta não inventa a sala):
@@ -345,7 +394,8 @@ abriu excepção**: a L29 e o `reach.js` entraram **uma vez**, para todas as sal
 precisar de uma lei que não existe, é sinal de que está a pedir uma lei, e isso é uma decisão, não um
 passo.
 
-Desde a **P2**, sete destas linhas são escritas pelo `tools/scene/new-room.mjs` numa só chamada: o dado
+Desde a **P2**, sete destas linhas são escritas pelo `tools/scene/new-room.mjs` numa só chamada (com a
+página da fase 1 já no sítio — ele exige-a): o dado
 da sala (as duas dimensões, o fundo e a reserva, as portas), a porta no portão, a porta de chegada em
 cada destino, as entradas de asset dos retratos que ainda não existem — e, desde a D87, o **movimento
 sorteado** de cada porta. O que fica para o autor é o que não é aritmética: **as obras na folha**, a
@@ -400,7 +450,7 @@ reserva copiados de uma sala que existe, dimensão `1` camera, o raio, a porta d
 câmara, as portas dos destinos com o retrato e o recorte, e as entradas de asset dos retratos que ainda
 não existem) **nos dois lados** — a sala nova, o portão e cada destino — e depois corre os anéis, o
 giro, os buracos, o **sorteio do movimento** (D87, com a semente impressa) e o validador. Recusa antes
-de escrever: o slug, a pasta, o ficheiro que já existe, o
+de escrever: o slug (e o slug de um **fixture**, que não é uma sala), a pasta, o ficheiro que já existe, o
 destino que não existe, o número de portas da L24 e o conjunto repetido da L25 (que a spec põe como
 armadilha T4). Prova: a mesma sala de ensaio, criada só com o comando, ficou com **13 salas
 alcançáveis**, todas as chegadas (L19), os conjuntos distintos (L25), os giros certos (L26) e os buracos
@@ -425,7 +475,8 @@ passos continuam a ser os que a spec não automatiza — e são os que a próxim
 2. **A fase 7 admite uma única coisa vermelha** — a L9 dos retratos —, e o validador volta a correr
    depois da fase 8. Sem essa emenda, a ordem «barato primeiro» seria impossível.
 3. **A fase 9 deixou de ser manual** (P1 + P3).
-4. **O `new-room.mjs` é o atalho das fases 1 a 7**, e a spec continua a explicar o que ele faz por baixo.
+4. **O `new-room.mjs` é o atalho das fases 3 a 7** (a fase 1 é o `new-world.mjs`, e o atalho recusa
+   sem ela), e a spec continua a explicar o que ele faz por baixo.
 5. **Em aberto, para a próxima sala real:** os retratos (duas passagens) e a composição no editor são
    os dois passos que nenhum ensaio cobriu.
 6. **A fase 6b entrou depois da D87** — o movimento é sorteado, não escolhido —, e com ela a **L29**: um
@@ -435,6 +486,14 @@ passos continuam a ser os que a spec não automatiza — e são os que a próxim
    esperar, a nota da sala de ensaio, a semente do sorteio — e fechou o único buraco que encontrou: as
    portas de uma sala **sem chegada** passaram a ser julgadas pela L26 e pela L28 (D89). Fica por medir
    a **costura** dessas portas, e está escrito na §9.
+8. **A verificação de 2026-11-03** correu o roteiro **à letra**, numa sala descartável (`sala-teste`,
+   apagada a seguir): o guia produz a estética nova — 3 portas, todas a oscilar, alcances de 60,0 %,
+   61,8 % e 100 %, nenhuma a varrer a chegada, e o validador verde em tudo menos a L9, como a fase 7
+   admite. O ensaio desmentiu a documentação em quatro pontos, e fechou-os: o «atalho das fases 1 a 7»
+   era **falso** (o comando exige a página da fase 1 e recusa sem ela, e não compõe a sala), a linha de
+   comando completa (`--nome-pt`, `--nome-en`, `--fundo`, `--sem-ferramentas`, os 2 a 4 destinos) não
+   estava escrita, a estética de uma sala não tinha um sítio único (§2.1) e faltava o aviso de que uma
+   sala a sério **não** é um fixture.
 
 ---
 

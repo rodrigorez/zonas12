@@ -415,6 +415,25 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > `reality` a dizerem `nada a escrever`. Fica por medir a **costura** destas portas, e está escrito.
 > A verificação completa, `all.mjs --full`, dá **27 de 28** baterias em **2 863,0 s**, com a única
 > vermelha a ser a costura (**D46**). Decisão **D89** (§11 do roadmap).
+>
+> **Atualização (2026-11-03, o roteiro posto à prova numa sala descartável — D90):** a pergunta foi
+> «a documentação orienta a criação de uma sala nova sob esta estética?», e a resposta não foi dada a
+> ler: o **roteiro foi corrido à letra**, numa sala `sala-teste` criada e **apagada a seguir**
+> (fase 1 com `new-world.mjs`, depois o atalho com `--destinos scene5,scene7`). O guia **produz** a
+> estética nova — **3 portas** (o portão e duas), as três a oscilar, eixos e ângulos sorteados
+> (Y ±6 m/Y ±45°, Y ±6 m/Z ±90°, X ±5 m/Z ±45°), alcances **60,0 / 61,8 / 100 %**, nenhuma a varrer o
+> ponto de chegada, semente `12048` na última linha — e o validador a seguir diz **13 salas alcançáveis**
+> com a L19, a L25, a L26, a L28 e a D53 verdes, **só a L9 vermelha** nos dez retratos que ninguém
+> cozinhou, que é exactamente o que a fase 7 admite. O ensaio desmentiu a documentação em **quatro**
+> pontos, e todos fechados: (1) «as fases 1 a 7 têm um comando» era **falso** — o `new-room.mjs` exige a
+> página (`a página é da outra ferramenta: … new-world.mjs`) e não compõe a sala, portanto é o atalho das
+> fases **3 a 7** e a fase 1 é outro comando; (2) a **linha de comando completa** nunca estava escrita
+> (`--nome-pt`, `--nome-en`, `--fundo`, `--sem-ferramentas`, os **2 a 4** destinos, a recusa do portão
+> em `--destinos` e a L25 verificada antes de escrever); (3) a **estética de uma sala não tinha um sítio
+> único** — passou a ter a **§2.1**, com o que cada número é e quem o mede; (4) faltava dizer que uma
+> sala a sério **não é um fixture** (as isenções da `scene100` vêm da lista em `js/scene/fixtures.js`,
+> e pôr lá uma sala apaga-a do grafo). Nada no código mudou — só a spec, e o ensaio não deixou rasto.
+> Decisão **D90** (§11 do roadmap).
 
 > **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
 > filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as
@@ -578,7 +597,8 @@ mundos — D43), `js/editor.js` (**15**, a entrada do editor — D36), `js/edito
 
 A **v0.0.23** é a **spec de uma sala nova** (D83) e a **sala de ensaio** (D84), mais o **movimento
 sorteado** das portas de uma sala nova (D87): o roteiro em
-`docs/SPEC-NOVA-SALA.md` (com a §9 a descrever o mundo de ensaio e a §10 as regras do sorteio), as
+`docs/SPEC-NOVA-SALA.md` (com a **§2.1** a descrever a estética de uma sala hoje, a §9 o mundo de
+ensaio e a §10 as regras do sorteio), as
 listas das baterias a virem do
 dado e o `tools/scene/new-room.mjs`. Antes dela, a **v0.0.22** fechou a **emenda da
 esfera** (D82): o preâmbulo dos shaders ganhou `volta`, `azim` e `noise3`, os onze fundos foram
@@ -2078,9 +2098,11 @@ experimenta o que ainda não entra no caminho do visitante.
   (D31), o editor grava (ou exporta) o `data/worlds/<slug>.json`, e a porta que o liga ao portão
   cria-se no painel «Mundo» — com o retrato do destino em `assets/previews/` e o `radius` do retrato.
   O roteiro inteiro, com as armadilhas e a lista de aceitação, está em
-  [`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md); o atalho das fases 1 a 7 é
-  `node tools/scene/new-room.mjs <slug> --destinos <salas>`, que escreve o esqueleto do dado nos dois
-  lados (as dimensões, o fundo, as portas, os assets dos retratos) e corre os anéis, o giro, os buracos
+  [`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md); o atalho das fases **3 a 7** é
+  `node tools/scene/new-room.mjs <slug> --destinos <salas>` (exige a pasta da fase 1 — recusa sem ela),
+  que escreve o esqueleto do dado nos dois
+  lados (as dimensões, o fundo, as portas, os assets dos retratos), **sorteia o movimento** de cada
+  porta e corre os anéis, o giro, os buracos
   do mundo real e o validador
 - As imagens têm de ser **2:1** e ficam melhor com 2048 de largura (lei L14); a ferramenta
   `tools/assets/normalize.mjs` corta e reduz sem ampliar
