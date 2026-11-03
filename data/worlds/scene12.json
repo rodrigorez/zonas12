@@ -1,0 +1,448 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "scene12",
+    "name": {
+      "pt": "Tesouros 360º",
+      "en": "Treasures 360º"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "praia": {
+      "path": "assets/panoramas/praia-d0-praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da praia, usado como reserva do fundo da sala 11",
+        "en": "360º panorama of the beach, used as the fallback for room 11"
+      }
+    },
+    "retrato-scene1": {
+      "path": "assets/previews/scene1-de-scene12.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta",
+        "en": "Portrait of the City 360º world, seen from the door"
+      }
+    },
+    "recorte-scene1-de-scene12": {
+      "path": "assets/previews/recorte-scene1-de-scene12.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Cidade 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the City 360º world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene6": {
+      "path": "assets/previews/scene6-de-scene12.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Becos 360º, visto da porta",
+        "en": "Portrait of the Alleys 360º world, seen from the door"
+      }
+    },
+    "recorte-scene6-de-scene12": {
+      "path": "assets/previews/recorte-scene6-de-scene12.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Becos 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Alleys 360º world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene9": {
+      "path": "assets/previews/scene9-de-scene12.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Mangue 360º, visto da porta",
+        "en": "Portrait of the Mangrove 360º world, seen from the door"
+      }
+    },
+    "recorte-scene9-de-scene12": {
+      "path": "assets/previews/recorte-scene9-de-scene12.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Mangue 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Mangrove 360º world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene10": {
+      "path": "assets/previews/scene10-de-scene12.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Distopia 360º, visto da porta",
+        "en": "Portrait of the Dystopia 360º world, seen from the door"
+      }
+    },
+    "recorte-scene10-de-scene12": {
+      "path": "assets/previews/recorte-scene10-de-scene12.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Distopia 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Dystopia 360º world, seen from the door (cutout, for the live window)"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "deposito",
+      "fallbackAsset": "praia",
+      "name": {
+        "pt": "Memória 360º",
+        "en": "Memory 360º"
+      },
+      "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-0",
+      "position": [
+        28.28,
+        1.5,
+        -28.28
+      ],
+      "rotation": [
+        0,
+        -45,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page"
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-1",
+      "position": [
+        28.28,
+        1.5,
+        28.28
+      ],
+      "rotation": [
+        0,
+        -135,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-2",
+      "position": [
+        -28.28,
+        1.5,
+        28.28
+      ],
+      "rotation": [
+        0,
+        -225,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "image",
+      "asset": "capa-3",
+      "position": [
+        -28.28,
+        1.5,
+        -28.28
+      ],
+      "rotation": [
+        0,
+        -315,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page"
+    }
+  ],
+  "portals": [
+    {
+      "id": 0,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        -60
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "arrivalFrom": "gate",
+      "rotation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 1,
+      "ownedBy": 0,
+      "position": [
+        57.06,
+        0,
+        -18.54
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene1",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene1-de-scene12"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene1"
+      },
+      "arrivalFrom": "scene1",
+      "rotation": [
+        0,
+        -72,
+        0
+      ]
+    },
+    {
+      "id": 2,
+      "ownedBy": 0,
+      "position": [
+        35.27,
+        0,
+        48.54
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene6",
+        "radius": 120,
+        "shaderId": "becos",
+        "cutout": "recorte-scene6-de-scene12"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene6"
+      },
+      "arrivalFrom": "scene6",
+      "rotation": [
+        0,
+        -144,
+        0
+      ]
+    },
+    {
+      "id": 3,
+      "ownedBy": 0,
+      "position": [
+        -35.27,
+        0,
+        48.54
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene9",
+        "radius": 120,
+        "shaderId": "mangue",
+        "cutout": "recorte-scene9-de-scene12"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene9"
+      },
+      "arrivalFrom": "scene9",
+      "rotation": [
+        0,
+        -216,
+        0
+      ]
+    },
+    {
+      "id": 4,
+      "ownedBy": 0,
+      "position": [
+        -57.06,
+        0,
+        -18.54
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene10",
+        "radius": 120,
+        "shaderId": "nucleo",
+        "cutout": "recorte-scene10-de-scene12"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene10"
+      },
+      "arrivalFrom": "scene10",
+      "rotation": [
+        0,
+        -288,
+        0
+      ]
+    }
+  ]
+}

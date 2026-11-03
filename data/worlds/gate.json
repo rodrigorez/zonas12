@@ -196,6 +196,22 @@
         "pt": "Retrato do mundo Céu 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Sky 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-scene12": {
+      "path": "assets/previews/scene12-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene12, visto da porta",
+        "en": "Portrait of the scene12 world, seen from the door"
+      }
+    },
+    "recorte-scene12-de-gate": {
+      "path": "assets/previews/recorte-scene12-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene12, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene12 world, seen from the door (cutout, for the live window)"
+      }
     }
   },
   "dimensions": [
@@ -280,9 +296,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        32.44,
+        30,
         0,
-        -50.48
+        -51.96
       ],
       "width": 8,
       "height": 10,
@@ -321,7 +337,7 @@
       "arrivalFrom": "scene2",
       "rotation": [
         0,
-        -32.73,
+        -30,
         0
       ],
       "motion": {
@@ -346,9 +362,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
-        54.58,
+        51.96,
         0,
-        -24.92
+        -30
       ],
       "width": 8,
       "height": 10,
@@ -387,7 +403,7 @@
       "arrivalFrom": "scene4",
       "rotation": [
         0,
-        -65.45,
+        -60,
         0
       ],
       "motion": {
@@ -412,9 +428,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        59.39,
+        60,
         0,
-        8.54
+        0
       ],
       "width": 8,
       "height": 10,
@@ -453,7 +469,7 @@
       "arrivalFrom": "scene5",
       "rotation": [
         0,
-        -98.18,
+        -90,
         0
       ],
       "motion": {
@@ -478,9 +494,9 @@
       "id": 14,
       "ownedBy": 0,
       "position": [
-        45.34,
+        51.96,
         0,
-        39.29
+        30
       ],
       "width": 8,
       "height": 10,
@@ -519,7 +535,7 @@
       "arrivalFrom": "scene6",
       "rotation": [
         0,
-        -130.91,
+        -120,
         0
       ],
       "motion": {
@@ -544,9 +560,9 @@
       "id": 18,
       "ownedBy": 0,
       "position": [
-        16.9,
+        30,
         0,
-        57.57
+        51.96
       ],
       "width": 8,
       "height": 10,
@@ -585,7 +601,7 @@
       "arrivalFrom": "scene7",
       "rotation": [
         0,
-        -163.64,
+        -150,
         0
       ],
       "motion": {
@@ -610,9 +626,9 @@
       "id": 22,
       "ownedBy": 0,
       "position": [
-        -16.9,
         0,
-        57.57
+        0,
+        60
       ],
       "width": 8,
       "height": 10,
@@ -651,7 +667,7 @@
       "arrivalFrom": "scene8",
       "rotation": [
         0,
-        -196.36,
+        -180,
         0
       ],
       "motion": {
@@ -676,9 +692,9 @@
       "id": 26,
       "ownedBy": 0,
       "position": [
-        -45.34,
+        -30,
         0,
-        39.29
+        51.96
       ],
       "width": 8,
       "height": 10,
@@ -717,7 +733,7 @@
       "arrivalFrom": "scene9",
       "rotation": [
         0,
-        -229.09,
+        -210,
         0
       ],
       "motion": {
@@ -742,9 +758,9 @@
       "id": 30,
       "ownedBy": 0,
       "position": [
-        -59.39,
+        -51.96,
         0,
-        8.54
+        30
       ],
       "width": 8,
       "height": 10,
@@ -783,7 +799,7 @@
       "arrivalFrom": "scene10",
       "rotation": [
         0,
-        -261.82,
+        -240,
         0
       ],
       "motion": {
@@ -808,9 +824,9 @@
       "id": 34,
       "ownedBy": 0,
       "position": [
-        -54.58,
+        -60,
         0,
-        -24.92
+        0
       ],
       "width": 8,
       "height": 10,
@@ -849,7 +865,7 @@
       "arrivalFrom": "scene11",
       "rotation": [
         0,
-        -294.55,
+        -270,
         0
       ],
       "motion": {
@@ -874,9 +890,9 @@
       "id": 46,
       "ownedBy": 0,
       "position": [
-        -32.44,
+        -51.96,
         0,
-        -50.48
+        -30
       ],
       "width": 8,
       "height": 10,
@@ -915,7 +931,7 @@
       "arrivalFrom": "scene3",
       "rotation": [
         0,
-        -327.27,
+        -300,
         0
       ],
       "motion": {
@@ -935,6 +951,54 @@
         "angle": 90,
         "rotationPeriod": 10.6
       }
+    },
+    {
+      "id": 4,
+      "ownedBy": 0,
+      "position": [
+        -30,
+        0,
+        -51.96
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene12",
+        "radius": 120,
+        "shaderId": "deposito",
+        "cutout": "recorte-scene12-de-gate"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene12"
+      },
+      "arrivalFrom": "scene12",
+      "rotation": [
+        0,
+        -330,
+        0
+      ]
     }
   ]
 }

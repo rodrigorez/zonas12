@@ -181,6 +181,22 @@
         "pt": "Retrato do mundo Mangue 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Mangrove 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-scene12": {
+      "path": "assets/previews/scene12-de-scene1.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene12, visto da porta",
+        "en": "Portrait of the scene12 world, seen from the door"
+      }
+    },
+    "recorte-scene12-de-scene1": {
+      "path": "assets/previews/recorte-scene12-de-scene1.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene12, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene12 world, seen from the door (cutout, for the live window)"
+      }
     }
   },
   "dimensions": [
@@ -776,6 +792,54 @@
         "angle": 45,
         "rotationPeriod": 11.5
       }
+    },
+    {
+      "id": 0,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene12",
+        "radius": 120,
+        "shaderId": "deposito",
+        "cutout": "recorte-scene12-de-scene1"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene12"
+      },
+      "arrivalFrom": "scene12",
+      "rotation": [
+        0,
+        0,
+        0
+      ]
     }
   ]
 }

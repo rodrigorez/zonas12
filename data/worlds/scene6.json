@@ -95,6 +95,22 @@
         "pt": "Retrato do mundo Ondas 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Waves 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-scene12": {
+      "path": "assets/previews/scene12-de-scene6.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene12, visto da porta",
+        "en": "Portrait of the scene12 world, seen from the door"
+      }
+    },
+    "recorte-scene12-de-scene6": {
+      "path": "assets/previews/recorte-scene12-de-scene6.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene12, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene12 world, seen from the door (cutout, for the live window)"
+      }
     }
   },
   "dimensions": [
@@ -273,9 +289,9 @@
       "id": 15,
       "ownedBy": 0,
       "position": [
+        9.39,
         0,
-        0,
-        -60
+        -59.26
       ],
       "width": 10,
       "height": 12,
@@ -311,7 +327,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        0,
+        -9,
         0
       ],
       "motion": {
@@ -336,9 +352,9 @@
       "id": 16,
       "ownedBy": 0,
       "position": [
-        51.96,
+        59.26,
         0,
-        30
+        9.39
       ],
       "width": 10,
       "height": 12,
@@ -385,7 +401,7 @@
       "arrivalFrom": "scene1",
       "rotation": [
         0,
-        -120,
+        -99,
         0
       ],
       "motion": {
@@ -410,9 +426,9 @@
       "id": 41,
       "ownedBy": 0,
       "position": [
-        -51.96,
+        -9.39,
         0,
-        30
+        59.26
       ],
       "width": 10,
       "height": 12,
@@ -459,7 +475,7 @@
       "arrivalFrom": "scene5",
       "rotation": [
         0,
-        -240,
+        -189,
         0
       ],
       "motion": {
@@ -479,6 +495,54 @@
         "angle": 90,
         "rotationPeriod": 18.7
       }
+    },
+    {
+      "id": 0,
+      "ownedBy": 0,
+      "position": [
+        -59.26,
+        0,
+        -9.39
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene12",
+        "radius": 120,
+        "shaderId": "deposito",
+        "cutout": "recorte-scene12-de-scene6"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene12"
+      },
+      "arrivalFrom": "scene12",
+      "rotation": [
+        0,
+        -279,
+        0
+      ]
     }
   ]
 }

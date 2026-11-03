@@ -88,6 +88,22 @@
         "pt": "Retrato do mundo Memória 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Memory 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-scene12": {
+      "path": "assets/previews/scene12-de-scene10.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene12, visto da porta",
+        "en": "Portrait of the scene12 world, seen from the door"
+      }
+    },
+    "recorte-scene12-de-scene10": {
+      "path": "assets/previews/recorte-scene12-de-scene10.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene12, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene12 world, seen from the door (cutout, for the live window)"
+      }
     }
   },
   "dimensions": [
@@ -301,9 +317,9 @@
       "id": 38,
       "ownedBy": 0,
       "position": [
-        51.96,
+        60,
         0,
-        30
+        0
       ],
       "width": 10,
       "height": 12,
@@ -350,7 +366,7 @@
       "arrivalFrom": "scene9",
       "rotation": [
         0,
-        -120,
+        -90,
         0
       ],
       "motion": {
@@ -375,9 +391,9 @@
       "id": 48,
       "ownedBy": 0,
       "position": [
-        -51.96,
         0,
-        30
+        0,
+        60
       ],
       "width": 10,
       "height": 12,
@@ -424,7 +440,7 @@
       "arrivalFrom": "scene11",
       "rotation": [
         0,
-        -240,
+        -180,
         0
       ],
       "motion": {
@@ -444,6 +460,54 @@
         "angle": 90,
         "rotationPeriod": 15.9
       }
+    },
+    {
+      "id": 0,
+      "ownedBy": 0,
+      "position": [
+        -60,
+        0,
+        0
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene12",
+        "radius": 120,
+        "shaderId": "deposito",
+        "cutout": "recorte-scene12-de-scene10"
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene12"
+      },
+      "arrivalFrom": "scene12",
+      "rotation": [
+        0,
+        -270,
+        0
+      ]
     }
   ]
 }
