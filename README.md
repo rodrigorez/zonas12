@@ -433,6 +433,9 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > único** — passou a ter a **§2.1**, com o que cada número é e quem o mede; (4) faltava dizer que uma
 > sala a sério **não é um fixture** (as isenções da `scene100` vêm da lista em `js/scene/fixtures.js`,
 > e pôr lá uma sala apaga-a do grafo). Nada no código mudou — só a spec, e o ensaio não deixou rasto.
+> A mesma passagem acertou as **versões**: o README chamava «v0.0.23» a um estado que a `v0.0.23` não
+> tem (a branch pára em `50ca29c`, antes da sala de ensaio), e o resumo passou a ser o da **v0.0.24**,
+> remedido ficheiro a ficheiro (§ «Estado atual do código»).
 > Decisão **D90** (§11 do roadmap).
 
 > **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
