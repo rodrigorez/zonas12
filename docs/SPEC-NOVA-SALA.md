@@ -441,10 +441,17 @@ Uma sala está pronta quando **todas** estas linhas forem verdade, pela ordem em
       antes de se escrever o resultado)
 - [ ] o `README.md` e o `ROADMAP.md` têm os números novos
 - [ ] o commit está no `main` e no ramo da versão
+- [ ] a **prova visual** foi feita — e está registada abaixo, com a data
 
 E a prova visual, que nenhuma bateria substitui: **entrar pela porta do portão, olhar em volta, sair
 pela porta de volta, e voltar a entrar** — é o caminho que o visitante faz e o único que exercita a
 chegada, o giro e o retrato ao mesmo tempo.
+
+> **Feita (2026-11-03, o autor):** as **doze páginas** publicadas no GitHub foram percorridas à mão,
+> com as **50 portas a oscilar** — o portão e as onze salas, o caminho completo de cada porta (entrar,
+> olhar em volta, sair pela porta de volta, voltar a entrar) —, e o resultado foi **sucesso**. É a
+> primeira vez que a estética da §2.1 e o movimento da §10/§11 passam por um olho humano em todas as
+> salas ao mesmo tempo; as baterias medem o que sabem medir, isto mede o resto.
 
 ---
 
