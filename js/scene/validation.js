@@ -40,7 +40,7 @@ import { validateDoor, ENTRY_WORLD } from '../modules/portal-kinds.js';
 import { arrivalPoint } from './arrival.js';
 import { alcanceDaPorta, ALCANCE_MINIMO } from './reach.js';
 import { realityHoles, sameHoles } from './reality.js';
-import { RING, angularGap, portraitTurn, requiredClearance, ringCoordinates } from './ring.js';
+import { RING, FIRST_VISIT_AZIMUTH, angularGap, portraitTurn, requiredClearance, ringCoordinates } from './ring.js';
 import { isFixture } from './fixtures.js';
 
 const EYE_HEIGHT = 1.6;
@@ -529,7 +529,12 @@ export function missingArrivals(scenes) {
 // **0,27**). Como a L19, esta lei precisa das duas páginas — o ângulo da porta de chegada está no
 // ficheiro do destino —, por isso só a linha de comando a pode provar.
 //
-// Devolve uma lista `{ from, door, to, expected, found }`; vazia é o caso bom.
+// Devolve uma lista `{ from, door, to, expected, found, firstVisit }`; vazia é o caso bom.
+//
+// Uma porta de uma sala com `world.carryOrigin: false` (D84) entra no destino **sem** porta de chegada:
+// o que a lei tem de usar como segundo termo é a pose de uma primeira visita, que é 0 por construção
+// (`FIRST_VISIT_AZIMUTH`). Sem isso a lei saltava essas portas em silêncio — e era o único ponto do
+// dado que nenhuma lei provava.
 export function portraitTurns(scenes) {
   const arrivals = new Map();
   for (const scene of scenes) {
@@ -543,16 +548,24 @@ export function portraitTurns(scenes) {
   const wrong = [];
   for (const scene of scenes) {
     const from = scene.world && scene.world.slug;
+    const firstVisit = Boolean(scene.world && scene.world.carryOrigin === false);
     for (const portal of scene.portals || []) {
       const window = portal.window || {};
       const action = portal.action || {};
       if (window.kind !== 'preview' || action.kind !== 'navigate') continue;
-      const arrival = arrivals.get(from + ' -> ' + action.target);
-      if (typeof arrival !== 'number') continue; // sem porta de chegada é a L19 que responde
+      let arrival = arrivals.get(from + ' -> ' + action.target);
+      if (typeof arrival !== 'number') {
+        // Sem porta de chegada: só é legítimo quando é o `carryOrigin` que a dispensa.
+        if (!firstVisit) continue; // a L19 responde por estas
+        arrival = FIRST_VISIT_AZIMUTH;
+      }
       const expected = portraitTurn(ringCoordinates(portal.position).angle, arrival);
       const found = typeof window.azimuth === 'number' ? window.azimuth : null;
       if (found === null || angularGap(found, expected) > 0.05) {
-        wrong.push({ from: from, door: portal.id, to: action.target, expected: expected, found: found });
+        wrong.push({
+          from: from, door: portal.id, to: action.target, expected: expected, found: found,
+          firstVisit: typeof arrivals.get(from + ' -> ' + action.target) !== 'number'
+        });
       }
     }
   }

@@ -14,7 +14,7 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { portraitTurn, ringCoordinates } from '../../js/scene/ring.js';
+import { FIRST_VISIT_AZIMUTH, portraitTurn, ringCoordinates } from '../../js/scene/ring.js';
 import { FIXTURES } from '../../js/scene/fixtures.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -54,12 +54,17 @@ for (const [slug, scene] of worlds) {
 const round = (value) => Math.round(value * 10) / 10;
 const pad = (value, width) => String(value).padStart(width);
 
+// As páginas que esta ferramenta **olha**: as salas todas, mais os mundos cujas portas navegam sem
+// origem (`carryOrigin: false`) — a sala de ensaio é um deles. Um fixture sem essa marca fica de fora:
+// não tem porta de chegada em lado nenhum e não há conta que lhe dê giro (é a L19 que responde).
 const rooms = [...worlds.keys()]
-  .filter((slug) => !FIXTURES.includes(slug))
+  .filter((slug) => !FIXTURES.includes(slug) ||
+    Boolean(worlds.get(slug).world && worlds.get(slug).world.carryOrigin === false))
   .filter((slug) => wanted.length === 0 || wanted.includes(slug));
 
 let pairs = 0;
 let missing = 0;
+let firstVisits = 0;
 console.log('porta               vai para   az saída   az chegada    giro   no dado');
 for (const slug of rooms) {
   const scene = worlds.get(slug);
@@ -71,7 +76,16 @@ for (const slug of rooms) {
     if (axis.kind !== 'preview' || action.kind !== 'navigate') continue;
     pairs += 1;
     const from = ringCoordinates(portal.position).angle;
-    const arrival = arrivals.get(slug + ' → ' + action.target);
+    let arrival = arrivals.get(slug + ' → ' + action.target);
+    // Uma porta de uma sala que navega **sem origem** (D84) entra no destino como primeira visita: não
+    // há porta de chegada, e o segundo termo da conta é o azimute com que a câmara do destino nasce —
+    // 0, porque ela olha sempre para −Z (D89).
+    const primeiraVisita = typeof arrival !== 'number' &&
+      Boolean(scene.world && scene.world.carryOrigin === false);
+    if (primeiraVisita) {
+      arrival = FIRST_VISIT_AZIMUTH;
+      firstVisits += 1;
+    }
     if (typeof arrival !== 'number') {
       missing += 1;
       console.log((slug + ' ' + portal.id).padEnd(19) + String(action.target).padEnd(11) +
@@ -88,14 +102,16 @@ for (const slug of rooms) {
     }
     console.log((slug + ' ' + portal.id).padEnd(19) + String(action.target).padEnd(11) +
       pad(round(from).toFixed(1), 10) + pad(round(arrival).toFixed(1), 12) + pad(turn.toFixed(1), 8) +
-      '   ' + escrito + (muda ? (current === null ? ' → escreve' : ' → ' + turn) : ''));
+      '   ' + escrito + (muda ? (current === null ? ' → escreve' : ' → ' + turn) : '') +
+      (primeiraVisita ? '  (primeira visita)' : ''));
   }
 }
 
 console.log('');
-console.log(pairs + ' porta(s) de retrato, ' + missing + ' sem porta de chegada');
+console.log(pairs + ' porta(s) de retrato, ' + missing + ' sem porta de chegada' +
+  (firstVisits ? ', ' + firstVisits + ' de primeira visita' : ''));
 if (missing > 0) {
-  // Uma porta de fixture não conta; uma sala sem porta de chegada é a L19 a falhar, e o validador di-lo.
+  // Uma sala sem porta de chegada é a L19 a falhar, e o validador di-lo.
   console.log('(a lei L19 responde pelas que faltam)');
 }
 

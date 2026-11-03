@@ -173,9 +173,10 @@ node tools/scene/azimuths.mjs --aplicar          # sem argumentos: todos
 Escreve `window.azimuth` em cada porta de mundo (L26): sem ele, o que se vê pela janela está girado em
 relação ao que se vê ao chegar (medido antes da correcção: **27,79** de salto, com a meta em 0,50).
 
-- **Tem de dizer:** `39 porta(s) de retrato, 0 sem porta de chegada` e `o dado já diz o mesmo — nada a
-  escrever` (é esta a frase do ensaio, e o mesmo vale com `--aplicar`: `nada a escrever`). O número é o
-  das portas de retrato das **salas**; os fixtures não entram (ver a nota da §9 sobre a `scene100`).
+- **Tem de dizer:** `42 porta(s) de retrato, 0 sem porta de chegada, 3 de primeira visita` e
+  `o dado já diz o mesmo — nada a escrever` (é esta a frase do ensaio, e o mesmo vale com `--aplicar`:
+  `nada a escrever`). As **3 de primeira visita** são as portas da sala de ensaio, que não têm porta de
+  chegada porque navegam sem origem (D84/D89).
 - **Se não disser:** se contar portas **sem porta de chegada**, a porta de chegada do destino não está
   posta (fase 3) — e é a L19 que a aponta.
 
@@ -188,7 +189,7 @@ node tools/scene/reality.mjs --aplicar           # sem argumentos: todos
 Escreve `window.reality` (os retângulos onde o destino mostra a câmara — L28), para que a janela fure o
 fundo ao vivo e o visitante veja a **mesma** câmara antes e depois de atravessar.
 
-- **Tem de dizer:** `28 porta(s) de retrato, 28 com o mundo real à vista, 0 sem porta de chegada` e
+- **Tem de dizer:** `42 porta(s) de retrato, 28 com o mundo real à vista, 0 sem porta de chegada` e
   `o dado já diz o mesmo — nada a escrever` (é esta a frase do ensaio).
 - **Se não disser:** o destino não tem a dimensão `camera`, ou a porta de chegada não está posta.
 
@@ -427,6 +428,13 @@ passos continuam a ser os que a spec não automatiza — e são os que a próxim
 4. **O `new-room.mjs` é o atalho das fases 1 a 7**, e a spec continua a explicar o que ele faz por baixo.
 5. **Em aberto, para a próxima sala real:** os retratos (duas passagens) e a composição no editor são
    os dois passos que nenhum ensaio cobriu.
+6. **A fase 6b entrou depois da D87** — o movimento é sorteado, não escolhido —, e com ela a **L29**: um
+   sorteio que deixe a porta fora do alcance do visitante não se escreve.
+7. **A verificação de 2026-11-02** (a documentação contra o método) corrigiu **onze** pontos de
+   coerência — contagens de leis e de avarias, frases de ferramentas, o que a fase 5 e a fase 6 mandavam
+   esperar, a nota da sala de ensaio, a semente do sorteio — e fechou o único buraco que encontrou: as
+   portas de uma sala **sem chegada** passaram a ser julgadas pela L26 e pela L28 (D89). Fica por medir
+   a **costura** dessas portas, e está escrito na §9.
 
 ---
 
@@ -532,22 +540,32 @@ que aqui esteve, 21%, estava errada). É o número que justifica o piso da L29.
 > exactamente onde o ficheiro as põe**» — que é a invariante de que dependem a L16, o retrato e o
 > `prefers-reduced-motion`. Os números de hoje estão na §10.8 e no `sorteio.mjs`.
 
-**O buraco que esta sala abriu, e que fica em aberto (encontrado na verificação de 2026-11-02).** Uma
-porta de uma sala com `carryOrigin: false` não tem **porta de chegada** no destino — é a regra que a
-isola —, e sem chegada não há par `(from, arrival)` para a conta do giro (L26). Por isso:
+**O buraco que esta sala abriu — e que a D89 fechou.** Uma porta de uma sala com `carryOrigin: false`
+não tem **porta de chegada** no destino — é a regra que a isola —, e sem chegada não havia par
+`(from, arrival)` para a conta do giro (L26). Até à D89 isso queria dizer que o `azimuths.mjs` não lhe
+tocava (só percorria as salas), a L26 não a julgava, e o `window.azimuth` das três portas da `scene100`
+era o que a construção escrevera **sem ninguém o provar**. O mesmo valia para os buracos do mundo real
+(L28).
 
-- o `azimuths.mjs` **não lhe toca** (só percorre as salas, não os fixtures) e a L26 também não a julga;
-- o `window.azimuth` das três portas da `scene100` é o que a construção escreveu, pela mesma fórmula mas
-  com `arrival = 0` — o azimute com que o destino abre numa **primeira visita** (é a pose por omissão
-  de `cameras.player`). Medido no dado: **90° · 0° · −90°**, que é o que `portraitTurn(doorAngle, 0)`
-  dá para as portas a 90°, 180° e −90°;
-- e o instrumento da costura (`seam.mjs`) não mede estas portas, porque a costura compara o retrato com
-  a **chegada**, e aqui não há chegada por porta.
+Ficou fechado assim:
 
-Ou seja: o número está certo pela conta, mas **não é provado por nenhuma lei nem medido por nenhum
-instrumento** — é o único sítio da sala de ensaio onde a documentação afirma mais do que o repositório
-prova. Fechá-lo pede uma decisão (alargar o `azimuths.mjs` aos fixtures com `arrival = 0`, e uma L26 que
-aceite esse caso), e por isso fica escrito aqui em vez de resolvido à socapa.
+| peça | o que passou a fazer |
+| --- | --- |
+| `js/scene/ring.js` | `FIRST_VISIT_AZIMUTH = 0` — o azimute com que um destino abre numa primeira visita. **Não é uma omissão**: o esquema de `cameras.player` só tem `position` e `speed`, e a câmara nasce sempre a olhar para **−Z** |
+| **L26** | para uma porta de um mundo com `carryOrigin: false` usa esse 0 como segundo termo da conta, e diz no erro que é uma primeira visita |
+| **L28** | passou a julgar as mesmas janelas (o que entra na fotografia é o que se vê da pose de uma primeira visita) |
+| `azimuths.mjs` e `reality.mjs` | percorrem também esses mundos, e a linha diz `(primeira visita)` / o total diz `3 de primeira visita` |
+| `laws-selftest.mjs` | a lei deixa de ser só um caso: **duas** avarias novas — uma porta rodada 30° (L26) e um buraco inventado (L28) —, ambas detectadas |
+
+Medido: `azimuths.mjs` diz `42 porta(s) de retrato, 0 sem porta de chegada, 3 de primeira visita` e
+`o dado já diz o mesmo — nada a escrever` — os valores do dado (90° · 0° · −90°) já eram os da conta,
+por isso **os retratos da sala não mudaram** e não houve nada a recozer. É o resultado que se quer de
+uma correcção de lei: provar o que já estava certo, sem tocar no que já estava feito.
+
+**O que continua por medir, e é honesto dizê-lo:** a **costura** destas portas. O instrumento
+(`seam.mjs`) compara o que se vê pela janela com o que se vê **ao chegar**, e a chegada de uma porta sem
+`?from` é uma página nova em pose por omissão — não há `?from` para pedir, e o instrumento ainda não sabe
+abrir o destino assim. É o único número que a sala de ensaio afirma sem medir.
 
 ---
 

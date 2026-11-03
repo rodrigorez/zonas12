@@ -163,6 +163,19 @@ export function portraitTurn(from, arrival) {
   return round(turn > 180 ? turn - 360 : turn, 1);
 }
 
+// O azimute com que um destino abre para uma **primeira visita** (D84/D89).
+//
+// Uma porta de uma sala com `world.carryOrigin: false` entra no destino **sem `?from`**, e sem `?from`
+// não há porta de chegada: o visitante aparece na pose por omissão de `cameras.player` — e o esquema
+// dessa câmara tem só `position` e `speed`, nenhuma rotação, porque a câmara nasce sempre a olhar para
+// **−Z**. O azimute da chegada é, por isso, 0 **por construção**, e não por omissão: não é um número
+// que se ajuste, é o que o formato permite.
+//
+// É a peça que faltava à L26 para poder julgar essas portas: sem porta de chegada, a conta do giro não
+// tinha segundo termo e a lei saltava-as em silêncio (era o único sítio onde o dado afirmava mais do
+// que uma lei provava).
+export const FIRST_VISIT_AZIMUTH = 0;
+
 // Quanto é que o dado se afasta do anel que a regra pede: o pior desvio de raio e o pior desvio de
 // ângulo ao lugar mais próximo. É a medida que o `tools/scene/ring.mjs` imprime e que a Fase 3 leva
 // a zero.

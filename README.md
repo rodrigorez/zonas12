@@ -401,8 +401,20 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > deixou de ser o controlo parado (as quatro oscilam; o controlo passou a ser «assentes, estão onde o
 > ficheiro as põe»). As leis passam a **31 de 31**, os portais em movimento a **16 de 16**, os doze
 > **99 de 99** e o i18n **9 de 9** (224 chaves); e a verificação completa, `all.mjs --full`, dá **27 de
-> 28** baterias em **2 842,7 s**, com a única vermelha a ser a costura (**D46**), como antes. Decisão
+> 28** baterias, com a única vermelha a ser a costura (**D46**), como antes. Decisão
 > **D87** (§11 do roadmap).
+>
+> **Atualização (2026-11-02, as portas sem chegada — D89):** a verificação da documentação encontrou o
+> único ponto onde o dado afirmava mais do que o repositório provava: as três portas da sala de ensaio
+> navegam **sem `?from`** (`carryOrigin: false`), e sem porta de chegada no destino não havia segundo
+> termo para a conta do giro — a **L26** saltava-as em silêncio, e a **L28** também. Ficou dito **o que é
+> uma primeira visita**: o azimute é **0 por construção** (`FIRST_VISIT_AZIMUTH`; `cameras.player` não
+> tem rotação e a câmara nasce a olhar para −Z), e as duas leis passam a julgar essas janelas, com as
+> ferramentas a percorrê-las (`3 de primeira visita`) e **duas** avarias novas no autoteste. O dado já
+> estava certo, por isso **nada foi recozido**: `validate` **0**, as leis **31 de 31**, o `azimuths` e o
+> `reality` a dizerem `nada a escrever`. Fica por medir a **costura** destas portas, e está escrito.
+> A verificação completa, `all.mjs --full`, dá **27 de 28** baterias em **2 863,0 s**, com a única
+> vermelha a ser a costura (**D46**). Decisão **D89** (§11 do roadmap).
 
 > **Atualização (2026-10-30, a disposição em dois anéis — feita):** as obras e as portas deixaram as
 > filas e passaram a dois círculos com o centro no ponto onde o visitante entra — as obras a **40 m**, as
@@ -639,7 +651,7 @@ O **`js/scene/`** é onde a cena em dados vive, e tem **treze** ficheiros:
 | --- | --- |
 | `schema.js` | A **forma do formato** (v3): campos, tipos, enumerações, as regras dos dois eixos da porta e o catálogo de assets. Puro — não conhece o DOM nem o A-Frame |
 | `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L10, L11, L12, L13, L14, L15, L16, L17, L18, L20, L21, L22 (os dois anéis), L23 (a folga entre eles), L24 (três a cinco portas, uma ao portão) e L28 (os buracos do mundo real, `realityWindows`); e, sobre o **grafo** dos mundos, a L19 (`missingArrivals`), a L25 (`repeatedDestinations`) e a L26 (`portraitTurns`, o giro do retrato de cada porta). A **L27** (a chegada põe a câmara no ponto e na direcção) não é do dado: prova-se na bateria T7/T11. Um fixture (D9) é dispensado das leis da disposição por uma opção — e pelo próprio slug, que é como a bateria do shader o valida. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor corre a cada tecla |
-| `ring.js` | A **disposição em dois anéis** (D77): os lugares das obras e das portas a partir de um raio e de uma fase, a folga entre os dois anéis e o teto que a mede (`bestPhase`, `clearanceCeiling`); e o **giro do retrato** de uma porta de mundo (`portraitTurn`, D78), que é a conta que o dado guarda e a L26 prova. Puro; é a mesma conta que escreve o dado (`tools/scene/ring.mjs --aplicar`, `tools/scene/azimuths.mjs --aplicar`) e a que as leis L22, L23 e L26 verificam |
+| `ring.js` | A **disposição em dois anéis** (D77): os lugares das obras e das portas a partir de um raio e de uma fase, a folga entre os dois anéis e o teto que a mede (`bestPhase`, `clearanceCeiling`); o **giro do retrato** de uma porta de mundo (`portraitTurn`, D78), que é a conta que o dado guarda e a L26 prova; e o azimute de uma **primeira visita** (`FIRST_VISIT_AZIMUTH`, D89) — 0 por construção, para a L26 poder julgar uma porta que não tem chegada. Puro; é a mesma conta que escreve o dado (`tools/scene/ring.mjs --aplicar`, `tools/scene/azimuths.mjs --aplicar`) e a que as leis L22, L23 e L26 verificam |
 | `reality.js` | Onde a janela de uma porta tem de deixar passar o **mundo real** (D81): os retângulos (azimute e elevação) em que o destino mostra a dimensão `camera` — os que o preâmbulo dos shaders descarta e a L28 recalcula. Puro; é a conta que escreve o dado (`tools/scene/reality.mjs --aplicar`) |
 | `fixtures.js` | Os **mundos que não são salas** (D9): a lista que a página, a linha de comando e o editor leem para não pedirem anéis nem três a cinco portas a um banco de ensaio. A **sala de ensaio** `scene100` é o quinto (D84) — é esta lista que a põe fora do grafo |
 | `arrival.js` | Onde o visitante aparece ao chegar de outro mundo (**L16**): puro e partilhado, para o construtor e o validador não discordarem da geometria |
@@ -1019,7 +1031,7 @@ repetições (cerca de 6 minutos por celular para as três tecnologias nos dois 
 > amplitude, o ângulo e **os dois períodos** do sorteio), a ordem da janela **22 de 22**, a emenda da
 > esfera **15 de 15** e a costura das travessias **125 de 128** — vermelha desde
 > antes do anel (**D46**), com duas portas estáveis na casa dos **0,5** e um caso intermitente (um
-> fotograma escuro na chegada). Na corrida de **28 baterias** ficaram **27 verdes**, em **2 842,7 s**;
+> fotograma escuro na chegada). Na corrida de **28 baterias** ficaram **27 verdes**, em **2 863,0 s**;
 > a única vermelha é a costura, que já estava vermelha **antes** desta versão e não foi tocada por ela. O
 > detalhe por bateria está em §10 do [roadmap](docs/ROADMAP.md). O texto abaixo é o registo da **Fase
 > 4** e ficou como estava.

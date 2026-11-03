@@ -468,6 +468,22 @@ const turnFault = portraitTurns(noTurn);
 const turnsAsExpected = turnClean.length === 0 && turnFault.length === 1 &&
   turnFault[0].from === 'scene1' && turnFault[0].door === vitima.id && turnFault[0].found === null;
 
+// L26, o caso que faltava (D89): uma porta de uma sala com `carryOrigin: false` não tem porta de
+// chegada no destino, e o segundo termo da conta é o azimute de uma **primeira visita** (0: a câmara do
+// jogador nasce a olhar para −Z). A sala de ensaio tem três dessas portas; a avaria roda uma delas 30°.
+const primeiraVisita = ['scene100', 'scene3', 'scene6', 'scene9']
+  .map((slug) => JSON.parse(readFileSync(join(root, 'data', 'worlds', slug + '.json'), 'utf8')));
+const turnsFirstClean = portraitTurns(primeiraVisita);
+const turnsFirstFaultLista = primeiraVisita.map((copy) => JSON.parse(JSON.stringify(copy)));
+const portaDaSala100 = turnsFirstFaultLista
+  .find((copy) => copy.world.slug === 'scene100').portals
+  .find((portal) => (portal.window || {}).kind === 'preview');
+portaDaSala100.window.azimuth = (portaDaSala100.window.azimuth || 0) + 30;
+const turnsFirstFault = portraitTurns(turnsFirstFaultLista);
+const turnsFirstAsExpected = turnsFirstClean.length === 0 && turnsFirstFault.length === 1 &&
+  turnsFirstFault[0].from === 'scene100' && turnsFirstFault[0].door === portaDaSala100.id &&
+  turnsFirstFault[0].firstVisit === true;
+
 // L28 (D81): os buracos do mundo real na janela. A exposição está com os buracos que a conta dá
 // (`reality.mjs --aplicar`); a avaria tira-os da porta 3 da sala 1, que é o estado de onde se veio —
 // pela janela via-se o fundo do destino onde ao chegar se vê a câmara. Medido na porta 7 da sala 3,
@@ -482,6 +498,20 @@ const holesFault = realityWindows(noHoles);
 const holesAsExpected = holesClean.length === 0 && holesFault.length === 1 &&
   holesFault[0].from === 'scene1' && holesFault[0].door === comBuracos.id &&
   holesFault[0].expected.length === 1;
+
+// L28, o caso da D89: as portas da sala de ensaio não têm porta de chegada, mas têm janela — e a conta
+// dos buracos faz-se na mesma. Ali o destino não mostra a câmara, por isso o esperado é **nenhum
+// buraco**; a avaria inventa um, que é o que a lei tem de apanhar (um buraco no sítio errado mostra o
+// fundo do destino onde o visitante devia ver a câmara).
+const holesFirstClean = realityWindows(primeiraVisita);
+const withFakeHole = primeiraVisita.map((copy) => JSON.parse(JSON.stringify(copy)));
+const portaComBuraco = withFakeHole.find((copy) => copy.world.slug === 'scene100').portals
+  .find((portal) => (portal.window || {}).kind === 'preview');
+portaComBuraco.window.reality = [{ az0: -10, el0: -5, az1: 10, el1: 5 }];
+const holesFirstFault = realityWindows(withFakeHole);
+const holesFirstAsExpected = holesFirstClean.length === 0 && holesFirstFault.length === 1 &&
+  holesFirstFault[0].from === 'scene100' && holesFirstFault[0].door === portaComBuraco.id &&
+  holesFirstFault[0].expected.length === 0;
 
 console.table(rows.map((row) => ({ law: row.law, 'injected fault': row.what, detected: row.ok ? 'yes' : 'NO', message: row.message.slice(0, 96) })));
 console.log(`laws and shape: ${detected} of ${cases.length} faults detected`);
@@ -500,11 +530,22 @@ console.log(`portrait turns (L26): the exhibition is turned to the arrival ` +
   `(${turnClean.length} wrong), and a window with no turn is ` +
   `${turnsAsExpected ? 'detected' : 'NOT detected'}` +
   (turnFault.length ? ` (${turnFault.map((each) => each.from + ' ' + each.door + ' asks ' + each.expected + '°').join(', ')})` : ''));
+console.log(`portrait turns (L26), uma porta sem chegada (D89): a sala de ensaio está com o giro da ` +
+  `primeira visita (${turnsFirstClean.length} wrong), e uma porta rodada 30° é ` +
+  `${turnsFirstAsExpected ? 'detected' : 'NOT detected'}` +
+  (turnsFirstFault.length ? ` (${turnsFirstFault.map((each) => each.from + ' ' + each.door +
+    ' asks ' + each.expected + '°').join(', ')})` : ''));
 console.log(`reality holes (L28): the exhibition leaves the real world where the destination shows it ` +
   `(${holesClean.length} wrong), and a window with no holes is ` +
   `${holesAsExpected ? 'detected' : 'NOT detected'}` +
   (holesFault.length ? ` (${holesFault.map((each) => each.from + ' ' + each.door + ' asks ' +
   JSON.stringify(each.expected)).join(', ')})` : ''));
+
+console.log(`reality holes (L28), uma porta sem chegada (D89): a sala de ensaio não tem buracos a pedir ` +
+  `(${holesFirstClean.length} wrong), e um buraco inventado é ` +
+  `${holesFirstAsExpected ? 'detected' : 'NOT detected'}` +
+  (holesFirstFault.length ? ` (${holesFirstFault.map((each) => each.from + ' ' + each.door +
+    ' esperava ' + JSON.stringify(each.expected)).join(', ')})` : ''));
 
 // The arranques (D28): one file per world, and the four the same outside the `<base>` line. Here the
 // disk is a map in memory, so a case can lie about it on purpose — which is the only way to know

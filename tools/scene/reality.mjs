@@ -40,8 +40,13 @@ for (const name of readdirSync(directory).filter((entry) => entry.endsWith('.jso
   files.set(slug, { name: name, eol: text.includes('\r\n') ? '\r\n' : '\n', written: false });
 }
 
+// As páginas que esta ferramenta olha: as salas e os mundos cujas portas navegam sem origem
+// (`carryOrigin: false`) — a sala de ensaio. Esses não têm porta de chegada no destino, mas têm janelas
+// e portanto buracos a calcular: o que entra na fotografia é o que se vê da **pose de uma primeira
+// visita** (D89). Um fixture sem essa marca continua de fora.
 const rooms = [...worlds.keys()]
-  .filter((slug) => !FIXTURES.includes(slug))
+  .filter((slug) => !FIXTURES.includes(slug) ||
+    Boolean(worlds.get(slug).world && worlds.get(slug).world.carryOrigin === false))
   .filter((slug) => wanted.length === 0 || wanted.includes(slug));
 
 const formatar = (holes) => (holes.length === 0 ? '—'
@@ -63,7 +68,11 @@ for (const slug of rooms) {
       console.log((slug + ' ' + portal.id).padEnd(19) + String(action.target).padEnd(11) + '  (destino desconhecido)');
       continue;
     }
-    if (!(destino.portals || []).some((door) => door.arrivalFrom === slug)) {
+    // Uma porta de uma sala que navega **sem origem** (D84) não tem porta de chegada no destino — mas
+    // tem janela, e os buracos contam-se na mesma: o que entra na fotografia é o que se vê da pose de
+    // uma primeira visita (D89). É a L19 que responde pelas salas a que falta a chegada.
+    const primeiraVisita = Boolean(scene.world && scene.world.carryOrigin === false);
+    if (!primeiraVisita && !(destino.portals || []).some((door) => door.arrivalFrom === slug)) {
       semChegada += 1;
       console.log((slug + ' ' + portal.id).padEnd(19) + String(action.target).padEnd(11) +
         '  (sem porta de chegada — a L19 responde)');

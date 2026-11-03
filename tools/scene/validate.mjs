@@ -134,6 +134,13 @@ for (const name of antigas) {
 // há mais do que um mundo — com um ficheiro só não há grafo nenhum.
 if (worlds.size > 1) {
   const rooms = validated.filter((scene) => !FIXTURES.includes(scene.world.slug));
+  // As páginas que as leis de grafo **não** julgam mas que a L26 e a L28 têm de julgar: um mundo cujas
+  // portas navegam sem origem (D84) tem retratos e janelas como qualquer sala — só não tem porta de
+  // chegada em lado nenhum. Ficam de fora as suas leis de grafo (L19, L22, L24, L25) e entram nas duas
+  // que são contas de geometria. É o que faz da sala de ensaio um ensaio a sério: o que ela afirma é
+  // provado, não assumido.
+  const comPrimeiraVisita = rooms.concat(validated.filter((scene) =>
+    FIXTURES.includes(scene.world.slug) && scene.world.carryOrigin === false));
   const unreachable = unreachableWorlds(rooms, ENTRY_WORLD);
   console.log(`world graph: ${rooms.length} rooms` +
     (worlds.size > rooms.length ? ` (+${worlds.size - rooms.length} fixture)` : '') +
@@ -168,25 +175,32 @@ if (worlds.size > 1) {
   }
   if (repeated.length) failed++;
 
-  // L26 (D78): o giro do retrato de cada porta de mundo. O fundo da janela é ancorado ao azimute do
-  // mundo de **destino** e a janela está no mundo de origem; o dado guarda a diferença, e a lei
+  // L26 (D78/D89): o giro do retrato de cada porta de mundo. O fundo da janela é ancorado ao azimute
+  // do mundo de **destino** e a janela está no mundo de origem; o dado guarda a diferença, e a lei
   // recalcula-a. Do grafo, como a L19 e a L25 — o ângulo da porta de chegada está no outro ficheiro.
-  const turns = portraitTurns(rooms);
+  //
+  // Julga **todas** as páginas de geometria, e não só as salas: uma porta de uma sala com
+  // `carryOrigin: false` (D84) não tem porta de chegada no destino, mas tem giro, e o segundo termo da
+  // conta é a pose de uma primeira visita — 0, porque a câmara do jogador nasce a olhar para −Z e o
+  // esquema não lhe dá rotação (D89). Sem isto, essas portas eram o único dado que nenhuma lei provava.
+  const turns = portraitTurns(comPrimeiraVisita);
   console.log('portrait turns: ' + (turns.length === 0
     ? 'every window is turned to the arrival it shows (L26)'
     : `${turns.length} window(s) with the wrong turn (L26)`));
   for (const turn of turns) {
     console.error(`  error: ${turn.from} door ${turn.door} → ${turn.to}: the turn is ` +
-      `${turn.found === null ? 'missing' : turn.found}° and the two rings ask for ${turn.expected}° ` +
-      `— law L26 (run tools/scene/azimuths.mjs --aplicar)`);
+      `${turn.found === null ? 'missing' : turn.found}° and ` +
+      `${turn.firstVisit ? 'a first visit' : 'the two rings'} ask${turn.firstVisit ? 's' : ''} for ` +
+      `${turn.expected}° — law L26 (run tools/scene/azimuths.mjs --aplicar)`);
   }
   if (turns.length) failed++;
 
-  // L28 (D81): os buracos do mundo real na janela. Uma porta do destino que mostra a dimensão
+  // L28 (D81/D89): os buracos do mundo real na janela. Uma porta do destino que mostra a dimensão
   // `camera` não desenha nada — o visitante vê o `<video>` da câmara atrás do canvas —, e a janela,
   // que é uma fotografia, tem de deixar esse sítio vazio. O dado guarda os retângulos; a lei
-  // recalcula-os do destino, como a L26 faz com o giro.
-  const holes = realityWindows(rooms);
+  // recalcula-os do destino, como a L26 faz com o giro. Julga o mesmo conjunto da L26: as salas e os
+  // mundos de primeira visita, que têm janelas iguais mas nenhuma porta de chegada (D89).
+  const holes = realityWindows(comPrimeiraVisita);
   console.log('reality holes: ' + (holes.length === 0
     ? 'every window leaves the real world where the destination shows it (L28)'
     : `${holes.length} window(s) with the wrong holes (L28)`));
