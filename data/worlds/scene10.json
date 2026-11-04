@@ -516,7 +516,24 @@
         0,
         -270,
         0
-      ]
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 16.4,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 15.2
+      }
     }
   ]
 }

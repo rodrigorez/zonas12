@@ -363,8 +363,14 @@ if (opcoes.ferramentas) {
   // antes do validador, porque a L29 tem de estar verde para a sala passar. A semente fica impressa —
   // é ela que repete a mesma sala —, e por isso esta chamada mostra mais linhas do que as outras: a
   // semente é a **última** linha, e a lista de portas é o que o autor quer ler.
+  //
+  // `--sem-movimento` e os mundos tocados na mesma chamada: as portas que esta ferramenta acrescentou ao
+  // portão e a cada destino nascem **paradas**, e sem isto ficavam paradas para sempre — medido na sala
+  // 12, em que a porta do portão não oscilava (as nove portas que já lá estavam foram deixadas como
+  // estavam, que é o que se quer: o movimento delas já foi visto e já foi medido).
   const sorteio = correr('o movimento das portas (sorteio --aplicar)', 'tools/scene/sorteio.mjs',
-    [slug, '--aplicar', '--semente', String(Date.now() % 100000)], 8);
+    [slug, ...tocados.map((mundo) => mundo.slug), '--aplicar', '--sem-movimento',
+      '--semente', String(Date.now() % 100000)], 8);
   const validador = correr('o validador', 'tools/scene/validate.mjs', []);
   if (!aneis || !giro || !buracos || !sorteio || !validador) {
     console.error('');

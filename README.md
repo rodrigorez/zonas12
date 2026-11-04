@@ -153,8 +153,10 @@ zonas12/
 - `README.md`, na raiz, contém a documentação principal: arquitetura, atributos, limites,
   requisitos técnicos e o estado atual do código.
 - O plano de desenvolvimento (roadmap, decisões em curso) fica em `docs/ROADMAP.md`.
-- `docs/` tem mais três documentos de trabalho: a **[spec de uma sala nova](docs/SPEC-NOVA-SALA.md)**
+- `docs/` tem os restantes documentos de trabalho: a **[spec de uma sala nova](docs/SPEC-NOVA-SALA.md)**
   (o roteiro para abrir uma cena, com as armadilhas e a lista de aceitação — D83), o
+  **[guia de uma sala nova](docs/GUIA-NOVA-SALA.md)** (o mesmo caminho, operacional: os comandos por
+  ordem e a frase que cada um tem de dizer), o
   [guia de testes](docs/GUIA-DE-TESTES.md) (a ficha da obra e o ensaio A/B do shader nos três
   aparelhos), o [roteiro de teste](docs/ROTEIRO-DE-TESTE.md) e o
   [que falta antes de abrir ao público](docs/PRE-EXPOSICAO.md).
@@ -175,6 +177,11 @@ zonas12/
 - SEMPRE use `assets/{panoramas,artworks,video,previews}/` para novos assets, com o nome em
   minúsculas e hífenes (`<mundo>-d<N>-<nome>.<ext>`, e `<destino>.jpg` nos retratos)
 - SEMPRE documente componentes novos no `README.md`
+- **SEMPRE que a tarefa for criar uma sala ou uma página nova, siga o
+  [`docs/GUIA-NOVA-SALA.md`](docs/GUIA-NOVA-SALA.md) do princípio ao fim** — os comandos por ordem e,
+  em cada passo, a frase que a ferramenta tem de imprimir. A [`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md)
+  é a **razão** das coisas (as leis, as medições, as decisões D-A a D-D) e abre-se quando o guia remete
+  para uma secção dela. Saltar o guia não dá erro nenhum: dá uma exposição que abre e está errada
 - NUNCA ponha na raiz nada que não seja preciso para o projeto funcionar
 - NÃO modifique o material **histórico** de `.harness/` (`dev/`, `imagenTeste/`) — o
   `.harness/skills/` é ferramenta ativa e mantém-se atualizado (regra 5)
@@ -656,7 +663,12 @@ A **v0.0.26** leva a **décima segunda sala** (D93) — `scene12` (**Tesouros 36
 **40 m / 60 m** para **60 m / 90 m**, porque a única combinação que a tabela do `ring.mjs` não tinha (7
 obras × 6 portas) ficava acima do teto da L23. Como o anel de todos os mundos se moveu, o giro (L26) e os
 buracos do mundo real (L28) voltaram a correr nos **13 mundos** e os **49 retratos** foram cozidos duas
-passagens. A **v0.0.25** levou o **movimento sorteado das portas às doze páginas** (D91): as **50**
+passagens. A prova visual, feita no servidor local, apanhou depois o que nenhuma lei via (**D94**): a
+porta que o portão ganhou para a sala 12 **não oscilava**, porque o roteiro só sorteava o mundo novo e
+as portas acrescentadas a mundos que já existem nasciam paradas. O `sorteio.mjs` ganhou
+`--sem-movimento` (só as portas que ainda não oscilam), o `new-room.mjs` passou a sortear também os
+mundos que tocou, e a bateria do movimento exige agora `motion: sway` em **cada** porta da exposição
+(**58 de 58**). A **v0.0.25** levou o **movimento sorteado das portas às doze páginas** (D91): as **50**
 portas do portão e das onze salas passaram a oscilar, com os eixos, as amplitudes, os ângulos e os dois
 períodos tirados do mesmo sorteio que serve uma sala nova (semente `20261103`). Duas correcções no
 runtime foram precisas para isso — a travessia passou a ser decidida pelo **segmento do visitante**
@@ -1109,6 +1121,18 @@ repetições (cerca de 6 minutos por celular para as três tecnologias nos dois 
 
 ### Verificado nesta versão (medido no browser)
 
+> **Atualização (2026-11-04, a porta parada do portão — D94):** a prova visual da sala 12 no servidor
+> local (`node tools/server/serve.mjs`) encontrou o que nenhuma lei via: a porta que o **portão** ganhou
+> para a sala 12 **não oscilava**. Não era defeito da sala — era do roteiro: a fase 3 acrescenta portas a
+> mundos que já existiam (a do portão e a de chegada em cada destino) e a fase 6b só sorteava o mundo
+> **novo**. A L29 também não podia vê-lo (mede o alcance de uma porta que oscila; uma porta parada
+> alcança-se sempre). Fechado em três sítios: `sorteio.mjs --sem-movimento` (sorteia só as portas que
+> ainda não oscilam, para não re-sortear o que já foi visto), o `new-room.mjs` a sortear **também os
+> mundos que tocou**, e a `motion.mjs` com a verificação **14** (`motion: sway` em cada porta das páginas
+> da exposição — **58 de 58**; a bateria passou de **19** para **20 de 20**). Medido: as quatro portas
+> novas oscilam (alcance **100%**, a varrer a chegada entre **0 e 16,7%** do ciclo, semente
+> `1793824526884`) e nenhum retrato foi refeito, porque a pose de repouso não mudou.
+>
 > **Atualização (2026-11-03, os números da v0.0.26, com a décima segunda sala e os anéis a 60 m — D93):**
 > o que esta versão mediu, com `node tools/regression/all.mjs --full`: o dado **0** (os 18 ficheiros de
 > mundo **OK**), as leis **31 de 31** com o controlo limpo, o importador da folha **21 de 21**, os doze
@@ -2175,16 +2199,15 @@ experimenta o que ainda não entra no caminho do visitante.
   caminho aparece lá **uma vez**, e as dimensões e as obras apontam para ele pelo nome (D20). O
   catálogo é a única parte que o editor não edita: as dimensões, as obras e as portas editam-se
   nos painéis (passo 6)
-- Para acrescentar um **mundo**: `node tools/scene/new-world.mjs <slug>` cria a pasta e o arranque
-  (D31), o editor grava (ou exporta) o `data/worlds/<slug>.json`, e a porta que o liga ao portão
-  cria-se no painel «Mundo» — com o retrato do destino em `assets/previews/` e o `radius` do retrato.
-  O roteiro inteiro, com as armadilhas e a lista de aceitação, está em
-  [`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md); o atalho das fases **3 a 7** é
-  `node tools/scene/new-room.mjs <slug> --destinos <salas>` (exige a pasta da fase 1 — recusa sem ela),
-  que escreve o esqueleto do dado nos dois
-  lados (as dimensões, o fundo, as portas, os assets dos retratos), **sorteia o movimento** de cada
-  porta e corre os anéis, o giro, os buracos
-  do mundo real e o validador
+- Para acrescentar um **mundo**: **siga o [`docs/GUIA-NOVA-SALA.md`](docs/GUIA-NOVA-SALA.md)** — é o
+  caminho obrigatório, com os comandos por ordem e a frase que cada um tem de imprimir (a
+  [`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md) é a razão das coisas e abre-se quando o guia
+  remete para lá). O primeiro passo é `node tools/scene/new-world.mjs <slug>`, que cria a pasta e o
+  arranque (D31); depois `node tools/scene/new-room.mjs <slug> --destinos <salas>` — o atalho das fases
+  **3 a 7**, que exige a pasta da fase 1 e recusa sem ela — escreve o esqueleto do dado nos dois lados
+  (as dimensões, o fundo, as portas, os assets dos retratos), **sorteia o movimento** de cada porta e
+  corre os anéis, o giro, os buracos do mundo real e o validador. O que fica para o autor é o que não é
+  aritmética: as obras na folha, a composição no editor e os retratos (duas passagens)
 - As imagens têm de ser **2:1** e ficam melhor com 2048 de largura (lei L14); a ferramenta
   `tools/assets/normalize.mjs` corta e reduz sem ampliar
 - Valide antes de publicar: `node tools/scene/validate.mjs` (confere todos os mundos e o grafo)

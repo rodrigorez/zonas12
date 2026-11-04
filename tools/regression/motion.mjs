@@ -27,7 +27,9 @@
 //  12. a travessia é do **visitante**: com a porta a varrer, parado e a andar ao lado do plano ele não é
 //      levado (D91), e a atravessar o plano é — o controlo das duas de cima;
 //  13. e, numa página a sério (`scene1`), as cinco portas oscilam no ecrã: a L29 prova o dado, esta
-//      prova que o dado chega à cena.
+//      prova que o dado chega à cena;
+//  14. e **cada** porta das páginas da exposição tem `motion` — a porta que a `new-room.mjs` acrescenta
+//      a um mundo que já existia nasce parada, e nenhuma lei a julgava (D93).
 //
 // Uso, da raiz do projeto:
 //
@@ -36,6 +38,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { serveProject, openBrowser, checks, sleep, ROOT } from './harness.mjs';
+import { paginasDaExposicao } from './paginas.mjs';
 
 const PRONTO = `Boolean(window.portalDebug && window.portalDebug.state &&
   document.querySelector('a-scene') && document.querySelector('a-scene').renderer)`;
@@ -531,6 +534,29 @@ async function main() {
     result.check('as doze páginas · as ' + salaMovida.portas + ' portas da `scene1` oscilam no ecrã',
       movidas === salaMovida.portas,
       movidas + ' de ' + salaMovida.portas + ' portas saíram da pose assente em 2 s');
+
+    // A porta que **fica parada** (D93). O ecrã só prova as portas que alguém se lembrou de olhar: a
+    // porta que a `new-room.mjs` acrescenta ao portão nasceu sem `motion`, e nenhuma lei a julgava —
+    // a L29 mede o alcance de uma porta **que oscila**, e uma porta parada alcança-se sempre. Medido na
+    // sala 12: a porta do portão para a sala nova ficou parada, e só um olho a viu. Esta verificação lê
+    // o dado de todas as páginas da exposição e exige `motion: sway` em cada porta.
+    const { paginas } = paginasDaExposicao();
+    const semMovimento = [];
+    let portasDaExposicao = 0;
+    for (const pagina of paginas) {
+      if (pagina.cena) continue;
+      const ficheiro = join(ROOT, 'data', 'worlds', pagina.slug + '.json');
+      const cena = JSON.parse(readFileSync(ficheiro, 'utf8'));
+      for (const portal of cena.portals || []) {
+        portasDaExposicao++;
+        if (!portal.motion || portal.motion.kind !== 'sway') {
+          semMovimento.push(pagina.slug + ' ' + portal.id + ' → ' + ((portal.action || {}).target || '?'));
+        }
+      }
+    }
+    result.check('todas as ' + portasDaExposicao + ' portas da exposição oscilam (nenhuma nasce parada)',
+      semMovimento.length === 0,
+      semMovimento.length ? semMovimento.join(' · ') : portasDaExposicao + ' portas com `motion: sway`');
   } finally {
     await browser.close();
     await site.close();

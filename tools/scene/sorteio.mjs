@@ -15,7 +15,13 @@
 // para não haver dois números. Aqui lê-se o disco, imprime-se a tabela e, só com `--aplicar`,
 // escreve-se (como o `ring.mjs` e o `azimuths.mjs`).
 //
-// Uso: node tools/scene/sorteio.mjs <mundo> [--aplicar] [--semente N]
+// Uso: node tools/scene/sorteio.mjs <mundo...> [--aplicar] [--semente N] [--sem-movimento]
+//
+// `--sem-movimento` sorteia **só** as portas que ainda não têm `motion: sway` e deixa as outras como
+// estão. É o que uma sala nova precisa depois de a `new-room.mjs` acrescentar portas ao portão e a cada
+// destino: essas portas nascem paradas, e voltar a sortear a sala inteira mudaria o movimento de portas
+// que já foram vistas (e que os retratos e as baterias já mediram). Sem a opção, o sorteio é o da §10:
+// todas as portas do mundo, de novo.
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -27,13 +33,14 @@ const directory = join(root, 'data', 'worlds');
 
 const args = process.argv.slice(2);
 const apply = args.includes('--aplicar');
+const onlyMissing = args.includes('--sem-movimento');
 const sementeArg = args.indexOf('--semente');
 const semente = sementeArg >= 0 ? Number(args[sementeArg + 1]) : Date.now();
 const wanted = args.filter((arg, index) =>
   !arg.startsWith('--') && (sementeArg < 0 || index !== sementeArg + 1));
 
 if (!wanted.length) {
-  console.error('diz o mundo: node tools/scene/sorteio.mjs <mundo> [--aplicar] [--semente N]');
+  console.error('diz o mundo: node tools/scene/sorteio.mjs <mundo...> [--aplicar] [--semente N] [--sem-movimento]');
   process.exit(1);
 }
 
@@ -120,7 +127,15 @@ for (const slug of wanted) {
   }
   console.log('== ' + slug + ' · ' + portas.length + ' porta(s) · semente ' + semente + ' ==');
   let tentativas = 0;
+  let jaTinham = 0;
   for (const portal of portas) {
+    if (onlyMissing && portal.motion && portal.motion.kind === 'sway') {
+      jaTinham++;
+      console.log('  porta ' + pad(portal.id, 3) + ' -> ' +
+        (portal.action && portal.action.target ? portal.action.target : (portal.action || {}).kind) +
+        ' | já oscila — fica como está');
+      continue;
+    }
     const sorteio = sortear(aleatorio, portal);
     if (sorteio.erro) {
       console.error('  porta ' + portal.id + ': ' + sorteio.erro);
@@ -140,12 +155,14 @@ for (const slug of wanted) {
       (sorteio.tentativas > 1 ? ' | ' + sorteio.tentativas + ' tentativas' : ''));
     portal.motion = sorteio.motion;
   }
-  linhas.push({ slug, tentativas });
+  linhas.push({ slug, tentativas, jaTinham });
 }
 
 const rejeitados = linhas.reduce((soma, linha) => soma + linha.tentativas, 0) - aceites;
+const deixadas = linhas.reduce((soma, linha) => soma + linha.jaTinham, 0);
 console.log('\n' + aceites + ' portas · ' + aceites + ' aceites · ' + rejeitados + ' rejeitados' +
-  (aceites ? ' (' + (rejeitados / aceites).toFixed(2) + ' por porta)' : ''));
+  (aceites ? ' (' + (rejeitados / aceites).toFixed(2) + ' por porta)' : '') +
+  (deixadas ? ' · ' + deixadas + ' já oscilavam (intocadas)' : ''));
 
 if (!apply) {
   console.log('ensaio: nada foi escrito (corre com --aplicar para escrever)');

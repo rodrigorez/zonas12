@@ -28,6 +28,15 @@
 > nem os shaders. Um **shader novo** tem caminho próprio (`tools/shader/validate.mjs`,
 > `tools/regression/emenda.mjs`); esta spec só diz quando é que ele entra na ordem.
 
+> **Se quem está a abrir a sala é uma IA, o caminho é o [`GUIA-NOVA-SALA.md`](GUIA-NOVA-SALA.md).**
+> Não é uma sugestão nem um resumo: é o **mesmo roteiro, operacional** — os comandos por ordem e, em
+> cada passo, a **frase** que a ferramenta tem de imprimir e o que fazer quando não a imprime. A
+> divisão é esta: **esta spec lê-se para decidir e entender** (as leis, as medições, o porquê de cada
+> ordem, as decisões D-A a D-D); **o guia lê-se para executar**. Uma IA que esteja a criar uma página
+> nova, uma sala nova ou a mexer nos ficheiros que uma sala toca **começa pelo guia** e só volta aqui
+> quando um passo do guia remeter para uma secção desta spec. Saltar o guia não dá erro — dá uma
+> exposição que abre e está errada.
+
 ---
 
 ## 1. O que uma sala é, em seis objetos
@@ -147,8 +156,17 @@ créditos, do descritivo, da capa e do site.
 node tools/artwork/from-csv.mjs --check          # mostra o que mudaria, não escreve nada
 ```
 
-- **Tem de dizer:** ou «a folha não muda nada» (quando já está aplicada), ou a lista do que mudaria,
-  saída **0** no `--check`.
+- **Tem de dizer:** ou `a folha não muda nada: o dado já diz o mesmo` (quando já está aplicada, saída
+  **0**), ou a lista do que mudaria e, no fim, `mudaria: <mundos> (nada foi escrito: --check)` — que
+  **sai 1**.
+- **O código de saída do `--check`:** **1 quando há o que mudar, 0 quando não há.** Aqui o 1 quer dizer
+  «há trabalho», não «avaria» — a avaria diz-se pelo texto (`nada foi escrito:` com as linhas por
+  baixo: TAB a faltar, coluna a mais, URL inválida, mundo inexistente). É por isso que a fase 0 se lê
+  pela **frase**, e que a fase 3 confirma com um `--check` a sair **0** depois de aplicar.
+- **A conferência só vale depois de o mundo existir** (§3, fase 2): uma linha da folha para um mundo
+  que ainda não está no disco faz o importador responder `linha N: o mundo "<slug>" não existe`. Por
+  isso a folha **escreve-se** cedo (é a fonte da verdade) mas **aplica-se** depois da fase 2 — e é
+  assim que uma linha escrita cedo demais se reconhece.
 - **Se não disser:** a folha está mal formada (TAB a faltar, coluna a mais, URL inválida). O
   importador recusa e diz a linha.
 - `from-csv.mjs` **sem** `--check` só depois de as obras existirem no mundo com o `id` certo (§3, fase 2).
@@ -255,10 +273,19 @@ fundo ao vivo e o visitante veja a **mesma** câmara antes e depois de atravessa
 node tools/scene/sorteio.mjs <slug>                 # ensaio: diz o que sortearia, não escreve
 node tools/scene/sorteio.mjs <slug> --aplicar       # escreve no dado
 node tools/scene/sorteio.mjs <slug> --aplicar --semente 99   # o mesmo sorteio outra vez
+node tools/scene/sorteio.mjs <slug…> --aplicar --sem-movimento
+                                                    # só as portas que ainda não oscilam
 ```
 
 Aceita **vários mundos numa só chamada** (`gate scene1 … scene11`), e foi assim que as doze páginas da
 exposição foram sorteadas na D91 (§11) — uma semente, uma passagem, a mesma ordem de portas.
+
+`--sem-movimento` é para as portas **que a fase 3 acrescenta a mundos que já existiam** — a do portão e
+a de chegada em cada destino, que nascem paradas: ele sorteia só essas e deixa as outras como estão, com
+a linha `já oscila — fica como está`. Foi o que faltou na sala 12 (D93): a porta do portão para a sala
+nova ficou parada e **nenhuma lei a julgava** (a L29 mede o alcance de uma porta *que oscila*), e foi um
+olho humano a ver. Hoje o `new-room.mjs` chama esta ferramenta com os mundos que tocou e com esta opção,
+e a bateria do movimento exige `motion: sway` em **todas** as portas das páginas da exposição.
 
 Sorteia, **por porta**, o eixo e a amplitude da translação, o eixo e o ângulo da rotação e os dois
 períodos (a §10 tem as regras e o porquê), e **repete o sorteio enquanto o alcance do visitante (a
@@ -435,10 +462,13 @@ sorteado** de cada porta. O que fica para o autor é o que não é aritmética: 
 
 Uma sala está pronta quando **todas** estas linhas forem verdade, pela ordem em que se correm:
 
-- [ ] `node tools/artwork/from-csv.mjs --check` sai **0**
+- [ ] a folha `data/obras.tsv` já tem as linhas da sala, e o `node tools/artwork/from-csv.mjs --check`
+      diz `mudaria: <slug> (nada foi escrito: --check)` — sai **1**, e aqui o 1 é «há trabalho»
 - [ ] `node tools/scene/new-world.mjs` já correu e `<slug>/index.html` existe
 - [ ] `node tools/scene/new-room.mjs <slug> --destinos …` escreveu o esqueleto e as portas nos dois lados
       (ou as fases 2–3 foram feitas à mão no editor, com o mesmo resultado)
+- [ ] `node tools/artwork/from-csv.mjs` escreveu as obras nos mundos, e o `--check` seguinte sai **0**
+      (`a folha não muda nada: o dado já diz o mesmo`)
 - [ ] o `validate.mjs` diz **OK** no ficheiro novo **e** nos que ele tocou; a **única** coisa vermelha
       admitida aqui é a L9 dos retratos
 - [ ] o `laws-selftest.mjs` diz **31 de 31** e o controlo limpo
@@ -558,6 +588,18 @@ passos continuam a ser os que a spec não automatiza — e são os que a próxim
     não pode receber a chegada de mais ninguém. A §2 (D-B) passa a mandar contar as portas do destino
     **antes** de fixar os destinos. O resto do roteiro funcionou à letra: 13 mundos, 49 retratos em duas
     passagens, as leis **31 de 31** e os doze **106 de 106**.
+12. **E a prova visual apanhou o que nenhuma lei apanha** (D93, a mesma sessão). O autor percorreu as
+    páginas no servidor local e viu uma coisa que estava certa no dado e errada para o visitante: a
+    porta que o portão ganhou para a sala 12 **não oscilava**. A causa não era a sala — era o roteiro: a
+    fase 3 acrescenta portas a mundos que já existiam, e a fase 6b só sorteava o mundo **novo**. A L29
+    não podia ver isto (mede o alcance de uma porta que oscila; uma porta parada alcança-se sempre), e a
+    bateria do movimento media a `scene1` e a sala de ensaio, não «todas». Ficou fechado em três sítios:
+    o `sorteio.mjs` ganhou `--sem-movimento` (só as portas que ainda não oscilam, para não re-sortear o
+    que já foi visto), o `new-room.mjs` passou a correr o sorteio **também nos mundos que tocou**, e a
+    `motion.mjs` passou a exigir `motion: sway` em **cada** porta das páginas da exposição (**58 de 58**,
+    era **19 de 19** verificações na bateria, agora **20 de 20**). Medido depois do conserto: as quatro
+    portas novas oscilam (alcance **100%** nas quatro, a varrer a chegada entre **0 e 16,7%** do ciclo,
+    semente `1793824526884`) e **nenhuma** porta da exposição nasce parada.
 
 ---
 
@@ -934,7 +976,8 @@ sítio. O movimento mede-se na `motion.mjs`; aqui mede-se a geometria.
 
 ### 11.4 O que a bateria passou a medir
 
-A `motion.mjs` foi de **16** para **19** verificações. As três novas, e a que mudou de sentido:
+A `motion.mjs` foi de **16** para **19** verificações na D91, e para **20** na D93. As novas, e a que
+mudou de sentido:
 
 | # | verificação | o que ela prova |
 | --- | --- | --- |
@@ -942,5 +985,6 @@ A `motion.mjs` foi de **16** para **19** verificações. As três novas, e a que
 | 12 | **a andar ao lado do plano, a porta não o leva** | a câmara anda 24 cm ao lado enquanto a porta varre uma volta inteira: **0 navegações** |
 | 12b | **a atravessar o plano, a porta leva-o** (controlo) | com a porta assente: **1 navegação** — sem este controlo, as duas de cima passavam numa cena sem travessia |
 | 13 | **as doze páginas · as 5 portas da `scene1` oscilam no ecrã** | a L29 prova o dado; esta prova que o dado chega à cena |
+| 14 | **todas as portas da exposição oscilam** (D93) | lê o dado das páginas e exige `motion: sway` em cada porta — hoje **58 de 58**. A porta que a fase 3 acrescenta a um mundo que já existe nasce **parada**, e nenhuma lei a julgava: a L29 mede o alcance de uma porta que oscila, e uma porta parada alcança-se sempre |
 
 ---
