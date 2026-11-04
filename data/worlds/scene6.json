@@ -141,9 +141,9 @@
       "kind": "image",
       "asset": "capa-0",
       "position": [
-        23.51,
+        35.27,
         1.5,
-        -32.36
+        -48.54
       ],
       "rotation": [
         0,
@@ -170,9 +170,9 @@
       "kind": "image",
       "asset": "capa-1",
       "position": [
-        38.04,
+        57.06,
         1.5,
-        12.36
+        18.54
       ],
       "rotation": [
         0,
@@ -201,7 +201,7 @@
       "position": [
         0,
         1.5,
-        40
+        60
       ],
       "rotation": [
         0,
@@ -229,9 +229,9 @@
       "kind": "image",
       "asset": "capa-3",
       "position": [
-        -38.04,
+        -57.06,
         1.5,
-        12.36
+        18.54
       ],
       "rotation": [
         0,
@@ -259,9 +259,9 @@
       "kind": "site",
       "asset": "capa-4",
       "position": [
-        -23.51,
+        -35.27,
         1.5,
-        -32.36
+        -48.54
       ],
       "rotation": [
         0,
@@ -289,9 +289,9 @@
       "id": 15,
       "ownedBy": 0,
       "position": [
-        9.39,
+        14.08,
         0,
-        -59.26
+        -88.89
       ],
       "width": 10,
       "height": 12,
@@ -352,9 +352,9 @@
       "id": 16,
       "ownedBy": 0,
       "position": [
-        59.26,
+        88.89,
         0,
-        9.39
+        14.08
       ],
       "width": 10,
       "height": 12,
@@ -384,13 +384,13 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene1-de-scene6",
-        "azimuth": -125.2,
+        "azimuth": -104.2,
         "reality": [
           {
-            "az0": 10.63,
-            "el0": -0.82,
-            "az1": 15.45,
-            "el1": 5.32
+            "az0": 11.37,
+            "el0": -0.54,
+            "az1": 14.57,
+            "el1": 3.53
           }
         ]
       },
@@ -426,9 +426,9 @@
       "id": 41,
       "ownedBy": 0,
       "position": [
-        -9.39,
+        -14.08,
         0,
-        59.26
+        88.89
       ],
       "width": 10,
       "height": 12,
@@ -458,13 +458,13 @@
         "radius": 120,
         "shaderId": "ondas",
         "cutout": "recorte-scene5-de-scene6",
-        "azimuth": 180,
+        "azimuth": -129,
         "reality": [
           {
-            "az0": 27.25,
-            "el0": -0.91,
-            "az1": 32.08,
-            "el1": 5.9
+            "az0": 28.19,
+            "el0": -0.6,
+            "az1": 31.39,
+            "el1": 3.9
           }
         ]
       },
@@ -500,9 +500,9 @@
       "id": 0,
       "ownedBy": 0,
       "position": [
-        -59.26,
+        -88.89,
         0,
-        -9.39
+        -14.08
       ],
       "width": 10,
       "height": 12,
@@ -531,7 +531,16 @@
         "asset": "retrato-scene12",
         "radius": 120,
         "shaderId": "deposito",
-        "cutout": "recorte-scene12-de-scene6"
+        "cutout": "recorte-scene12-de-scene6",
+        "azimuth": -9,
+        "reality": [
+          {
+            "az0": -46.25,
+            "el0": -0.74,
+            "az1": -43.03,
+            "el1": 4.83
+          }
+        ]
       },
       "action": {
         "kind": "navigate",

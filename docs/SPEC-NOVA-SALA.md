@@ -41,11 +41,11 @@
 | as **portas de mundo** (janela, retrato, chegada, giro, mundo real) | o JSON da sala **e** o de cada destino | o editor + `azimuths.mjs` + `reality.mjs` + `portrait.mjs` | L11, L13, L16, L17, L19, L26, L28 |
 | o **movimento das portas** (oscilação) | o mesmo JSON, em cada porta | `tools/scene/sorteio.mjs --aplicar` (sorteado, nunca escolhido — §10) | L29 (o alcance) |
 
-O número de hoje, para se saber quando é que um passo ficou a meio: **12 páginas** (o portão e onze
-salas), **17 ficheiros de mundo** (as 12 e 5 fixtures, dos quais a sala de ensaio da §9), **50 portas**
-nas doze páginas — **todas em movimento desde a D91** (§11) —, **57 obras**, **42 retratos** (um par
-`.jpg` + `.png` por porta com janela de pré-visualização), **29 leis** (L1–L29) e **28 baterias** no
-`--full`.
+O número de hoje, para se saber quando é que um passo ficou a meio: **13 páginas** (o portão e doze
+salas), **18 ficheiros de mundo** (as 13 e 5 fixtures, dos quais a sala de ensaio da §9), **58 portas**
+nas treze páginas — **todas em movimento desde a D91** (§11) —, **61 obras**, **49 retratos** (um par
+`.jpg` + `.png` por porta com janela de pré-visualização, contando as três da sala de ensaio), **29 leis**
+(L1–L29) e **28 baterias** no `--full`.
 
 E o número que a §10 acrescenta, porque é ele que uma sala nova vai ter de cumprir: **cada porta da
 sala nova oscila**, e o sorteio do movimento é rejeitado uma vez em cada três (§10.3).
@@ -61,9 +61,11 @@ Nenhuma delas é reversível de graça, e as quatro mudam o que as fases seguint
 `emenda.mjs` depois.
 
 **D-B · Os destinos.** Três a cinco portas, **uma** ao portão (L24), e o conjunto de destinos
-**diferente do de todas as outras salas** (L25). Com onze salas e cinco destinos possíveis em cada
+**diferente do de todas as outras salas** (L25). Com doze salas e cinco destinos possíveis em cada
 uma, há combinações suficientes — mas a escolha tem de ser verificada, não presumida: `validate.mjs`
-recusa, e a mensagem diz qual é a repetida.
+recusa, e a mensagem diz qual é a repetida. E há uma segunda conta a fazer **antes**: a sala de destino
+ganha a porta de chegada, e se ela já tiver **cinco** portas (o máximo da L24) essa porta não cabe —
+foi o que aconteceu à `scene1` na sala 12 (D93).
 
 **D-C · Quem leva a chegada.** Por cada porta da sala nova que navega para `X`, a sala `X` passa a
 precisar de uma porta que se declare a chegada dessa origem (L19) — e **no máximo uma por origem**
@@ -85,8 +87,8 @@ tabela, é a tabela que está certa — não é a sala que abre uma excepção.
 
 | o quê | o que uma sala tem hoje | quem o mede |
 |---|---|---|
-| as obras | um anel de **40 m** de raio, à altura de 1,5 m, passo angular constante a partir do centro (onde o visitante entra) | `ring.mjs`, L22 |
-| as portas | um anel **concêntrico de 60 m**, passo constante, e a folga angular da L23 para nenhuma obra tapar uma porta | `ring.mjs`, L23 |
+| as obras | um anel de **60 m** de raio, à altura de 1,5 m, passo angular constante a partir do centro (onde o visitante entra) | `ring.mjs`, L22 |
+| as portas | um anel **concêntrico de 90 m**, passo constante, e a folga angular da L23 para nenhuma obra tapar uma porta | `ring.mjs`, L23 |
 | quantas portas | **3 a 5**, uma delas ao portão com `arrivalFrom` | L24 |
 | o fundo | raio **500** (muito acima dos 60 m), e 2:1 quando é panorama | L1, L14 |
 | o olho | **1,6 m** — é com ele que o alcance é medido | `reach.js` (`OLHO`) |
@@ -206,9 +208,9 @@ node tools/scene/ring.mjs --aplicar               # sem argumentos: **todos** os
 ```
 
 - **Tem de dizer:** a folga entre os anéis chega (L23), cada anel tem passos iguais (L22) e o desvio
-  ao raio fica dentro da tolerância de 0,5 m. As obras ficam a **40 m** e as portas a **60 m**. No fim:
-  `12 mundo(s) · 11 com anel de obras · 11 ok, 1 justo(s), 0 falha(s)` e `o dado: 12 de 12 em anel
-  (nada a fazer)` (é esta a frase de hoje; o «justo» é a margem de 0,28° da sala 1).
+  ao raio fica dentro da tolerância de 0,5 m. As obras ficam a **60 m** e as portas a **90 m** (D93; eram
+  40 e 60 até a sala 12). No fim: `13 mundo(s) · 12 com anel de obras · 13 ok, 0 justo(s), 0 falha(s)` e
+  `o dado: 13 de 13 em anel (nada a fazer)` — é esta a frase de hoje.
 - **Porque em todos e não só nos que a sala toca:** uma porta nova muda o número de lugares do anel
   dessa sala, e o anel distribui os lugares por igual (L22) — **todas** as portas dessa sala mudam de
   sítio. Medido no ensaio da spec: com os anéis a correr só nos mundos tocados, o validador acusou a
@@ -227,7 +229,7 @@ node tools/scene/azimuths.mjs --aplicar          # sem argumentos: todos
 Escreve `window.azimuth` em cada porta de mundo (L26): sem ele, o que se vê pela janela está girado em
 relação ao que se vê ao chegar (medido antes da correcção: **27,79** de salto, com a meta em 0,50).
 
-- **Tem de dizer:** `42 porta(s) de retrato, 0 sem porta de chegada, 3 de primeira visita` e
+- **Tem de dizer:** `49 porta(s) de retrato, 0 sem porta de chegada, 3 de primeira visita` e
   `o dado já diz o mesmo — nada a escrever` (é esta a frase do ensaio, e o mesmo vale com `--aplicar`:
   `nada a escrever`). As **3 de primeira visita** são as portas da sala de ensaio, que não têm porta de
   chegada porque navegam sem origem (D84/D89).
@@ -243,7 +245,7 @@ node tools/scene/reality.mjs --aplicar           # sem argumentos: todos
 Escreve `window.reality` (os retângulos onde o destino mostra a câmara — L28), para que a janela fure o
 fundo ao vivo e o visitante veja a **mesma** câmara antes e depois de atravessar.
 
-- **Tem de dizer:** `42 porta(s) de retrato, 28 com o mundo real à vista, 0 sem porta de chegada` e
+- **Tem de dizer:** `49 porta(s) de retrato, 34 com o mundo real à vista, 0 sem porta de chegada` e
   `o dado já diz o mesmo — nada a escrever` (é esta a frase do ensaio).
 - **Se não disser:** o destino não tem a dimensão `camera`, ou a porta de chegada não está posta.
 
@@ -304,8 +306,8 @@ node tools/scene/portrait.mjs --todos      # a segunda passagem, sempre
 - **Porquê duas vezes:** o retrato de uma sala contém as **janelas das portas dessa sala**, que são
   retratos deles próprios. A primeira passagem cozinha o que lá estava, a segunda o que ficou (medido:
   o mesmo retrato saiu com 438, 215 e 378 kB em passagens seguidas). Orçamento: **387 a 418 s** por
-  passagem com **39** retratos (medido a 2026-11-01); com os **42** de hoje são ~8% mais, e a passagem
-  passou a **assentar as portas** antes de desenhar (§10.5), o que não muda o tempo.
+  passagem com **39** retratos (medido a 2026-11-01); com os **49** de hoje (D93) são ~25% mais, e a
+  passagem passou a **assentar as portas** antes de desenhar (§10.5), o que não muda o tempo.
 - **O que mudou na D87:** o retrato é a imagem da **pose de repouso** — a que o visitante vê ao chegar.
   Se as portas do destino oscilarem e o `settleMotion` não for chamado, a fotografia sai num instante
   arbitrário e a janela deixa de mostrar o que a chegada mostra. O `portrait.mjs` chama-o sozinho; o
@@ -345,10 +347,24 @@ node tools/regression/all.mjs --full     # a mesma mais as arquivadas (as 28)
   (**D46**), vermelha desde antes do anel. O número dela tem de ser **comparado com o último registo**,
   não com zero, e o caso novo tem de ser explicado na documentação. Qualquer outra vermelha é uma
   paragem.
-- **O último registo (2026-11-03, D91):** **2 de 28** vermelhas em **2 757,8 s** — a costura (**125 de
-  128**, como antes) e a `shader.mjs`, que falhou por **um** quadro fora do orçamento (`late=1` em 158)
-  e passa **23 de 23** quando repetida sozinha. Um soluço da máquina não é um defeito do dado, mas
-  também não se escreve «28 de 28»: repete-se a bateria e diz-se o que ela deu.
+- **O último registo (2026-11-03, D93):** **3 de 28** vermelhas em **3 350,7 s** — a costura, a
+  `shader.mjs` e o **catálogo de assets** (`assets.mjs`). As duas últimas não são do dado. A
+  `shader.mjs` falhou por **dois** quadros fora do orçamento (`late=2` em 165, e o resumo deixa de casar
+  com a forma que a bateria exige) e passa **23 de 23** quando repetida sozinha. O `assets.mjs` decidia
+  por **relógio**: esperava **2,5 s** fixos pelo editor redesenhar os painéis, e a validação de um
+  mundo com 21 assets (sete deles remotos, um `fetch` por asset) leva **1 a 3 s** — ora passava, ora o
+  campo do asset novo ainda não existia e o passo seguinte rebentava com
+  `Cannot set properties of null`. A bateria passou a esperar pela **condição** (até 12 s), que é o que
+  ela queria medir; e passa **10 de 10**. A **costura** deu **140 de 150** numa passagem e **142 de 150**
+  na seguinte (eram **125 de 128**, com **3** vermelhos, no registo da D91): os vermelhos são da mesma
+  família de sempre — **cinco** saltos no corte acima de 0,50 (**0,72 · 1,06 · 1,44 · 1,49 · 2,44**, e
+  não «na casa dos 0,5» como antes), **dois** instantes de corte acima de um quadro e **um** fotograma
+  escuro intermitente —, e nenhum deles é um caso novo de comportamento: são as portas que a mudança de
+  raio moveu e que a costura já vigiava. O número de verificações subiu de **128 para 150** porque a
+  exposição passou de 50 para 58 portas. Um soluço da máquina não é um defeito do dado, mas também não
+  se escreve «28 de 28»: repete-se a bateria e diz-se o que ela deu. **A D46 continua aberta**, e o que
+  ela pede agora está escrito: perceber porque é que uma sala maior (60/90 m) agrava o salto, quando o
+  retrato e a chegada são cozidos da **mesma** pose.
 - **Se não disser:** a bateria vermelha diz qual é e porquê.
 
 ### Fase 11 · A documentação e a versão
@@ -533,6 +549,15 @@ passos continuam a ser os que a spec não automatiza — e são os que a próxim
     padrão de 10×12** (nas de 8×10 do portão saíram 4 em 50); e a **§10.4** foi reescrita, porque
     descrevia o primeiro fecho da travessia (D87) como se fosse o único — hoje há um segundo (D91), e é
     ele que fecha o caso de quem **anda**.
+11. **A sala 12 pôs a spec à prova outra vez, e a prova mudou um número da estética** (D93). Duas coisas
+    que a spec não previa aconteceram, e ficam escritas porque voltam a acontecer: (a) o **anel** pode
+    recusar a porta de uma sala nova — a `scene1` já estava no **teto** de `clearanceCeiling` (4,29° para
+    7 obras × 6 portas) e a folga pedida era 4,86°; a resposta não foi encolher obras, foi **subir os
+    dois raios** (40/60 → 60/90 m), o que desce a folga pedida a 3,91° e vale para as salas que ainda
+    não existem; (b) **o destino pode estar cheio** — a L24 limita a cinco portas, e uma sala com cinco
+    não pode receber a chegada de mais ninguém. A §2 (D-B) passa a mandar contar as portas do destino
+    **antes** de fixar os destinos. O resto do roteiro funcionou à letra: 13 mundos, 49 retratos em duas
+    passagens, as leis **31 de 31** e os doze **106 de 106**.
 
 ---
 

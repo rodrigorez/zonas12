@@ -14,13 +14,19 @@
 // ao centro com `rotation.y = −θ`. É a conta que mantém uma obra de `rotation: [0, 0, 0]` numa fila
 // a z < 0 virada ao visitante — o anel é a mesma regra, com a frente a rodar.
 
-// Os dois raios e a margem de oclusão (D77). Uma obra está entre o centro e as portas, por isso é
-// ela que decide o raio: com 7 obras e 5 portas a folga máxima possível entre um eixo de porta e um
-// eixo de obra é 5,14° (o teto de `clearanceCeiling`), e 40 m é o raio a partir do qual a
-// meia-largura de uma obra de 4 m — 2,86° — fica abaixo disso com a margem à vontade.
+// Os dois raios e a margem de oclusão (D77, revistos na D93). Uma obra está entre o centro e as
+// portas, por isso é ela que decide o raio — mas não é a largura dela que manda, é o **teto** da folga
+// entre dois anéis regulares (`clearanceCeiling`), que só depende do número de lugares: o pior caso da
+// exposição é o das **7 obras com 6 portas** (a sala 1, com a porta da sala 12), cujo teto é 4,29°.
+//
+// A 40 m a meia-largura de uma obra de 4 m é 2,86° e, com a margem de 2°, a folga pedida é 4,86° —
+// acima do teto, e por isso a sala 1 recusou a sexta porta (medido: 4,29° disponíveis para 4,86°
+// pedidos). A 60 m a mesma obra ocupa 1,91° e a folga pedida desce a 3,91°, abaixo do teto com 0,38° de
+// margem. O anel das portas cresce na mesma proporção (2:3) para as obras não ficarem encostadas às
+// portas, e o fundo (500 m, L1) continua muito acima dos dois.
 export const RING = {
-  artworks: { radius: 40, height: 1.5 },
-  portals: { radius: 60, height: 0 },
+  artworks: { radius: 60, height: 1.5 },
+  portals: { radius: 90, height: 0 },
   // Graus de folga além da meia-largura de uma obra: o que separa «a obra esconde a porta» de «a
   // obra passa ao lado da porta».
   occlusionMargin: 2,

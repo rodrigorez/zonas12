@@ -438,6 +438,35 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 > remedido ficheiro a ficheiro (§ «Estado atual do código»).
 > Decisão **D90** (§11 do roadmap).
 >
+> **Atualização (2026-11-03, a décima segunda sala e os anéis a 60 m — D93):** o autor entregou as
+> **quatro** pílulas da série «#TesorosdelArchivo» que faltavam (`Movimiento estudiantil de 1968`,
+> `Colección Rafael Carrasco y Puente`, `Revolución Mexicana` e `Fondo Rodolfo Brito Foucher`, todas de
+> **Cuikis · AHUNAM**) e a exposição passa a ter **doze salas**: `scene12` (**Tesouros 360º**, com o
+> shader **novo** `deposito`, o décimo segundo da lista interna — o depósito do arquivo: as prateleiras
+> de caixas de cartão com a etiqueta e a fenda do puxador, a lâmpada quente pendurada com o halo e o
+> pó, a faixa pintada do corredor e o varrimento da lanterna). O sorteio das portas ficou com a semente
+> **1793747954927** (**4 aceites, 3 rejeitados**, alcances **60,0% · 61,8% · 61,8% · 100%**). A sala
+> tem **três destinos** — `scene6`, `scene9`, `scene10` —, e não os quatro que se tentaram primeiro: a
+> `scene1` foi recusada por **duas** leis, e as duas medições dizem porquê. (1) A **L23** pedia **4,86°**
+> de folga e a sala 1 só tinha **4,29°** com sete obras de 4 m e uma sexta porta — e 4,29° é o **teto**
+> que `clearanceCeiling` dá para 7 obras × 6 portas, ou seja o óptimo de `bestPhase` já era curto. Daí
+> a decisão de autor que muda o projeto inteiro: os dois anéis passam de **40 m / 60 m** para **60 m /
+> 90 m** (a mesma proporção 2:3), e a folga pedida desce a **3,91°** — abaixo do teto com **0,38°** de
+> margem. Medido: `ring --aplicar` põe **121 objetos** nos anéis e dá **13 ok, 0 justo, 0 falhas**.
+> (2) Mesmo com a geometria resolvida, a **L24** limita a sala a **cinco portas** e a `scene1` já as
+> tinha: a sexta fazia dela um átrio. Ficaram **três destinos**, e a `scene1` volta às **cinco**.
+> Como o anel de todos os mundos se moveu, **nada ficou por refazer**: o giro (L26) e os buracos do
+> mundo real (L28) voltaram a correr sobre os **13 mundos**, e os **49 retratos** (46 nas treze páginas
+> e 3 na sala de ensaio) foram cozidos **duas passagens** — o número de portas com retrato subiu de
+> **42** para **49** por causa das quatro portas de chegada e das três da sala nova. O dado tem agora
+> **58 portas** nas treze páginas (o portão com **doze**), **61 obras**, **18** ficheiros de mundo e
+> **101** ficheiros em `assets/previews/` (49 retratos + 49 recortes + 3 panoramas). O `validate.mjs`
+> fecha **OK nos 18 ficheiros**, as leis **31 de 31** e os doze **106 de 106**. A verificação inteira,
+> `all.mjs --full`, deu **25 de 28** em **3 350,7 s**: a costura (**D46**, agora **142 de 150** — eram
+> **125 de 128** com 3 vermelhos —, com cinco saltos no corte entre **0,72 e 2,44**), a `shader.mjs`
+> (dois quadros tardios, **23 de 23** sozinha) e o `assets.mjs`, que passou a esperar pela condição em vez
+> de 2,5 s fixos e dá **10 de 10**. Decisão **D93** (§11 do roadmap).
+
 > **Atualização (2026-11-03, o movimento das portas entra nas doze páginas — D91):** o autor perguntou se
 > a spec, seguida, deixava trazer o movimento sorteado às **11 salas e ao portão**. A resposta foi medida
 > antes de se tocar em nada, e depois fez-se só o que a medição exigiu. As doze páginas têm **50 portas**
@@ -608,21 +637,26 @@ geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
 
-Resumo do que existe na v0.0.25 (medido em 2026-11-03): `index.html` (**93 linhas**) e as **onze**
-salas com o **mesmo** ficheiro (`scene1/` a `scene11/`, iguais fora da linha do `<base>` — D28),
+Resumo do que existe na v0.0.26 (medido em 2026-11-03): `index.html` (**92 linhas**) e as **doze**
+salas com o **mesmo** ficheiro (`scene1/` a `scene12/`, iguais fora da linha do `<base>` — D28),
 `editor.html` (**96**), `js/app.js` (**276**), `js/arrival-frame.js` (**204**, a ponte de imagem entre
 mundos — D43), `js/editor.js` (**15**, a entrada do editor — D36), `js/editor/` (**15** ficheiros,
 **3566** linhas com os painéis e a ponte com o servidor), `js/i18n.js` (**93**), `js/core/` (7 ficheiros,
-**234**), `js/modules/` (11 ficheiros, **3550**), `js/scene/` (14 ficheiros, **2587** — o `reach.js` é o
+**234**), `js/modules/` (11 ficheiros, **3541**), `js/scene/` (14 ficheiros, **2579** — o `reach.js` é o
 último, D87), `js/shaders/`
-(11 ficheiros, **604**), `css/` (**3** ficheiros: `style.css` **142**, `editor.css` **314** e
-`obra.css` **253**), **17** ficheiros em `data/worlds/` (o portão, as onze salas e os cinco fixtures,
-**8307 linhas** no total e **60 portas**, das quais **50** nas doze páginas da exposição),
-`i18n/pt.json` (**224** chaves), as **57 obras** na folha `data/obras.tsv`, os **87** ficheiros em
-`assets/previews/` (**42** retratos e **42** recortes, um par por porta, mais os três panoramas — D46) e
-**57** ficheiros em `tools/` (**13531** linhas). O que esta versão entregou:
+(12 ficheiros, **736** — o `deposito.js` é o último, D93), `css/` (**3** ficheiros: `style.css` **142**,
+`editor.css` **314** e `obra.css` **253**), **18** ficheiros em `data/worlds/` (o portão, as doze salas e
+os cinco fixtures, **9113 linhas** no total e **68 portas**, das quais **58** nas treze páginas da
+exposição), as **61 obras** na folha `data/obras.tsv`, os **101** ficheiros em `assets/previews/`
+(**49** retratos e **49** recortes, um par por porta, mais os três panoramas — D46) e **57** ficheiros em
+`tools/` (**13476** linhas). O que esta versão entregou:
 
-A **v0.0.25** leva o **movimento sorteado das portas às doze páginas da exposição** (D91): as **50**
+A **v0.0.26** leva a **décima segunda sala** (D93) — `scene12` (**Tesouros 360º**, com o shader novo
+**`deposito`**) — e, com ela, a decisão que muda a geometria de todas as páginas: os dois anéis passam de
+**40 m / 60 m** para **60 m / 90 m**, porque a única combinação que a tabela do `ring.mjs` não tinha (7
+obras × 6 portas) ficava acima do teto da L23. Como o anel de todos os mundos se moveu, o giro (L26) e os
+buracos do mundo real (L28) voltaram a correr nos **13 mundos** e os **49 retratos** foram cozidos duas
+passagens. A **v0.0.25** levou o **movimento sorteado das portas às doze páginas** (D91): as **50**
 portas do portão e das onze salas passaram a oscilar, com os eixos, as amplitudes, os ângulos e os dois
 períodos tirados do mesmo sorteio que serve uma sala nova (semente `20261103`). Duas correcções no
 runtime foram precisas para isso — a travessia passou a ser decidida pelo **segmento do visitante**
@@ -1075,6 +1109,19 @@ repetições (cerca de 6 minutos por celular para as três tecnologias nos dois 
 
 ### Verificado nesta versão (medido no browser)
 
+> **Atualização (2026-11-03, os números da v0.0.26, com a décima segunda sala e os anéis a 60 m — D93):**
+> o que esta versão mediu, com `node tools/regression/all.mjs --full`: o dado **0** (os 18 ficheiros de
+> mundo **OK**), as leis **31 de 31** com o controlo limpo, o importador da folha **21 de 21**, os doze
+> testes **106 de 106** com a cobertura em **13 páginas**, as portas e as chegadas **165 de 165**, os
+> portais em movimento **19 de 19**, o i18n **9 de 9**, a ordem da janela **22 de 22**, a emenda da
+> esfera **16 de 16** (o `deposito` entra com **0,13** de pior salto) e a costura das travessias
+> **142 de 150** — vermelha desde antes do anel (**D46**), com cinco saltos no corte entre **0,72 e
+> 2,44**. Na corrida de **28 baterias** ficaram **3 vermelhas** em **3 350,7 s**: a costura; a
+> `shader.mjs`, que falhou por **dois** quadros tardios e passa **23 de 23** repetida sozinha; e o
+> `assets.mjs`, que decidia por relógio (2,5 s fixos) e passou a esperar pela condição — **10 de 10**.
+> O detalhe por bateria está em §10 do [roadmap](docs/ROADMAP.md). O texto abaixo é o registo da
+> **v0.0.25** e ficou como estava.
+>
 > **Atualização (2026-11-03, os números da v0.0.25, com o movimento nas doze páginas — D91):** o que
 > esta versão mediu, com `node tools/regression/all.mjs --full`: o dado **0**, as leis **31 de 31** com o
 > controlo limpo, o importador da folha **21 de 21**, os doze testes **99 de 99** nas páginas que o dado

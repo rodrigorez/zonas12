@@ -47,8 +47,8 @@ const EYE_HEIGHT = 1.6;
 
 // Uma sala tem de três a cinco portas (D77): abaixo de três não há escolha nenhuma — duas portas são
 // um corredor —, e acima de cinco a sala deixa de ser uma sala e passa a ser um átrio, que é o que o
-// portão é. O limite é da regra, não do anel: a 60 m seis caixas de 12 m ainda ficam a 60 m umas das
-// outras.
+// portão é. O limite é da regra, não do anel: com as portas a 90 m (D93), seis caixas de 12 m ainda
+// ficam a 90 m umas das outras.
 const MIN_DOORS = 3;
 const MAX_DOORS = 5;
 
@@ -424,8 +424,8 @@ export function validateScene(scene, options = {}) {
   //
   // The gate is not a room: it is where the visitor comes in, and it has a door per world. The
   // minimum is choice (two doors is a corridor) and the maximum belongs to the rule, not to the
-  // ring: at 60 m, six doors would still be 60 m apart — what six doors lose is the room being a
-  // room (D77).
+  // ring: at 90 m (D93), six doors would still be 90 m apart — what six doors lose is the room being
+  // a room (D77).
   const worldSlug = scene.world && scene.world.slug;
   if (!fixture && worldSlug !== ENTRY_WORLD) {
     const roomDoors = scene.portals || [];

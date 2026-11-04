@@ -320,9 +320,11 @@ if (apply && writtenWorlds.length > 0) {
 }
 
 // As combinações que uma sala pode ter depois do grafo da D77 — 3 a 7 obras e 3 a 5 portas — medidas
-// uma a uma. É esta tabela que prova que R1 = 40 m serve para todas, e não só para as salas de hoje:
-// a folga de cada par é a maior que existe (é o que o `bestPhase` procura) e o teto é o que ela
-// poderia ser — se a busca ficasse abaixo dele, era a busca que estava errada, não a geometria.
+// uma a uma. É esta tabela que prova que o raio de `RING.artworks.radius` serve para todas, e não só
+// para as salas de hoje: a folga de cada par é a maior que existe (é o que o `bestPhase` procura) e o
+// teto é o que ela poderia ser — se a busca ficasse abaixo dele, era a busca que estava errada, não a
+// geometria. (Na D93 o raio subiu de 40 para 60 m por causa da única combinação que a tabela não tem:
+// 7 obras × 6 portas, que a sala 1 pediu ao receber a porta do portão da sala 12.)
 console.log('');
 console.log(`as combinações de uma sala (painel de 4 m, margem de ${decimal(RING.occlusionMargin)}°):`);
 console.log(

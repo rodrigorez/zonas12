@@ -125,9 +125,9 @@
       "kind": "site",
       "asset": "capa-0",
       "position": [
-        23.51,
+        35.27,
         1.5,
-        -32.36
+        -48.54
       ],
       "rotation": [
         0,
@@ -155,9 +155,9 @@
       "kind": "image",
       "asset": "capa-1",
       "position": [
-        38.04,
+        57.06,
         1.5,
-        12.36
+        18.54
       ],
       "rotation": [
         0,
@@ -186,7 +186,7 @@
       "position": [
         0,
         1.5,
-        40
+        60
       ],
       "rotation": [
         0,
@@ -213,9 +213,9 @@
       "kind": "image",
       "asset": "capa-3",
       "position": [
-        -38.04,
+        -57.06,
         1.5,
-        12.36
+        18.54
       ],
       "rotation": [
         0,
@@ -242,9 +242,9 @@
       "kind": "site",
       "asset": "capa-4",
       "position": [
-        -23.51,
+        -35.27,
         1.5,
-        -32.36
+        -48.54
       ],
       "rotation": [
         0,
@@ -274,7 +274,7 @@
       "position": [
         0,
         0,
-        -60
+        -90
       ],
       "width": 10,
       "height": 12,
@@ -335,9 +335,9 @@
       "id": 12,
       "ownedBy": 0,
       "position": [
-        51.96,
+        77.94,
         0,
-        30
+        45
       ],
       "width": 10,
       "height": 12,
@@ -370,10 +370,10 @@
         "azimuth": -105,
         "reality": [
           {
-            "az0": 12.59,
-            "el0": -0.77,
-            "az1": 17.41,
-            "el1": 4.99
+            "az0": 13.4,
+            "el0": -0.51,
+            "az1": 16.6,
+            "el1": 3.32
           }
         ]
       },
@@ -409,9 +409,9 @@
       "id": 40,
       "ownedBy": 0,
       "position": [
-        -51.96,
+        -77.94,
         0,
-        30
+        45
       ],
       "width": 10,
       "height": 12,
@@ -441,13 +441,13 @@
         "radius": 120,
         "shaderId": "becos",
         "cutout": "recorte-scene6-de-scene5",
-        "azimuth": 180,
+        "azimuth": 129,
         "reality": [
           {
-            "az0": 27.25,
-            "el0": -0.91,
-            "az1": 32.08,
-            "el1": 5.9
+            "az0": 7.4,
+            "el0": -0.51,
+            "az1": 10.6,
+            "el1": 3.32
           }
         ]
       },

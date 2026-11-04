@@ -134,9 +134,9 @@
       "kind": "site",
       "asset": "capa-0",
       "position": [
-        28.28,
+        42.43,
         1.5,
-        -28.28
+        -42.43
       ],
       "rotation": [
         0,
@@ -164,9 +164,9 @@
       "kind": "site",
       "asset": "capa-1",
       "position": [
-        28.28,
+        42.43,
         1.5,
-        28.28
+        42.43
       ],
       "rotation": [
         0,
@@ -194,9 +194,9 @@
       "kind": "site",
       "asset": "capa-2",
       "position": [
-        -28.28,
+        -42.43,
         1.5,
-        28.28
+        42.43
       ],
       "rotation": [
         0,
@@ -224,9 +224,9 @@
       "kind": "site",
       "asset": "capa-3",
       "position": [
-        -28.28,
+        -42.43,
         1.5,
-        -28.28
+        -42.43
       ],
       "rotation": [
         0,
@@ -256,7 +256,7 @@
       "position": [
         0,
         0,
-        -60
+        -90
       ],
       "width": 10,
       "height": 12,
@@ -317,7 +317,7 @@
       "id": 28,
       "ownedBy": 0,
       "position": [
-        60,
+        90,
         0,
         0
       ],
@@ -349,13 +349,13 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene1-de-scene9",
-        "azimuth": 18.9,
+        "azimuth": 48.9,
         "reality": [
           {
-            "az0": 81.6,
-            "el0": -1.39,
-            "az1": 86.5,
-            "el1": 8.95
+            "az0": 82.73,
+            "el0": -0.91,
+            "az1": 85.97,
+            "el1": 5.87
           }
         ]
       },
@@ -393,7 +393,7 @@
       "position": [
         0,
         0,
-        60
+        90
       ],
       "width": 10,
       "height": 12,
@@ -423,13 +423,13 @@
         "radius": 120,
         "shaderId": "nucleo",
         "cutout": "recorte-scene10-de-scene9",
-        "azimuth": 60,
+        "azimuth": 90,
         "reality": [
           {
-            "az0": -32.08,
-            "el0": -0.91,
-            "az1": -27.25,
-            "el1": 5.9
+            "az0": -46.25,
+            "el0": -0.74,
+            "az1": -43.03,
+            "el1": 4.83
           }
         ]
       },
@@ -465,7 +465,7 @@
       "id": 0,
       "ownedBy": 0,
       "position": [
-        -60,
+        -90,
         0,
         0
       ],
@@ -496,7 +496,16 @@
         "asset": "retrato-scene12",
         "radius": 120,
         "shaderId": "deposito",
-        "cutout": "recorte-scene12-de-scene9"
+        "cutout": "recorte-scene12-de-scene9",
+        "azimuth": 90,
+        "reality": [
+          {
+            "az0": -1.6,
+            "el0": -0.51,
+            "az1": 1.6,
+            "el1": 3.32
+          }
+        ]
       },
       "action": {
         "kind": "navigate",

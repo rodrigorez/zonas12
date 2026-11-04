@@ -45,7 +45,12 @@ async function main() {
       String(catalogo.texto));
 
     // 2. criar um asset cujo ficheiro não existe: a L9 tem de aparecer.
-    const criado = await browser.evaluate(`(async () => {
+    //
+    // A espera é por **condição** e não por relógio: depois do clique o editor valida o mundo inteiro
+    // (um `fetch` por asset, sete deles remotos) e só então redesenha os painéis, e essa conta leva
+    // **1 a 3 s** conforme a máquina — um `sleep` fixo de 2,5 s deixava a bateria a decidir no meio
+    // dela (medido: às vezes o campo ainda não existe e o passo seguinte rebenta).
+    await browser.evaluate(`(() => {
       const escrever = (nome, valor) => {
         const campo = document.querySelector('[name="' + nome + '"]');
         campo.value = valor;
@@ -55,14 +60,13 @@ async function main() {
       escrever('asset.new.id', 'ensaio-do-b4');
       escrever('asset.new.path', 'assets/artworks/nao-existe-ensaio.jpg');
       escrever('asset.new.alt.pt', 'Ensaio do B4');
-      const criar = document.querySelector('[name="asset.new.create"]');
-      criar.click();
-      await new Promise((done) => setTimeout(done, 2500));
-      return Object.prototype.hasOwnProperty.call(window.portalDebug.data().assets, 'ensaio-do-b4');
+      document.querySelector('[name="asset.new.create"]').click();
+      return true;
     })()`);
+    const criado = await esperar(browser, `Boolean(window.portalDebug.data().assets['ensaio-do-b4'])`);
     result.check('criar um asset acrescenta-o ao catálogo', criado === true, String(criado));
 
-    const comFalta = await problemas(browser);
+    const comFalta = await esperarTexto(browser, /law L9/);
     result.check('a L9 avisa que o ficheiro do asset novo não existe',
       /law L9/.test(comFalta), comFalta.slice(0, 200));
 
@@ -74,7 +78,7 @@ async function main() {
       await new Promise((done) => setTimeout(done, 3000));
       return true;
     })()`);
-    const semFalta = await problemas(browser);
+    const semFalta = await esperarTexto(browser, /law L9/, { negar: true });
     result.check('corrigir o caminho para um ficheiro que existe faz a L9 desaparecer',
       !/law L9/.test(semFalta), semFalta.slice(0, 200));
 
@@ -144,6 +148,34 @@ async function problemas(browser) {
     return painel ? painel.textContent : '';
   })()`).catch(() => '');
   return texto || '';
+}
+
+// Espera até `expressao` ser verdadeira (até 12 s), e devolve o último valor lido. O editor valida o
+// mundo inteiro e redesenha os painéis depois de cada mudança — o tempo dessa conta não é uma
+// constante, e uma bateria que decide por relógio mede a máquina, não o editor.
+async function esperar(browser, expressao, opcoes = {}) {
+  const limite = opcoes.limite === undefined ? 12000 : opcoes.limite;
+  const passo = opcoes.passo === undefined ? 250 : opcoes.passo;
+  let ultimo = null;
+  for (let decorrido = 0; decorrido <= limite; decorrido += passo) {
+    ultimo = await browser.evaluate(expressao).catch(() => null);
+    if (opcoes.negar ? !ultimo : Boolean(ultimo)) return ultimo;
+    await sleep(passo);
+  }
+  return ultimo;
+}
+
+// Espera até o painel dos problemas dizer (ou deixar de dizer) o que `padrao` procura.
+async function esperarTexto(browser, padrao, opcoes = {}) {
+  const limite = opcoes.limite === undefined ? 12000 : opcoes.limite;
+  const passo = opcoes.passo === undefined ? 250 : opcoes.passo;
+  let ultimo = '';
+  for (let decorrido = 0; decorrido <= limite; decorrido += passo) {
+    ultimo = await problemas(browser);
+    if (opcoes.negar ? !padrao.test(ultimo) : padrao.test(ultimo)) return ultimo;
+    await sleep(passo);
+  }
+  return ultimo;
 }
 
 main().catch((error) => { console.error('harness failed:', error.message); process.exit(1); });

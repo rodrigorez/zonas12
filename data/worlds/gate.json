@@ -232,7 +232,7 @@
       "position": [
         0,
         0,
-        -60
+        -90
       ],
       "width": 8,
       "height": 10,
@@ -262,7 +262,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene1-de-gate",
-        "azimuth": -149.1
+        "azimuth": -149.2
       },
       "action": {
         "kind": "navigate",
@@ -296,9 +296,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        30,
+        45,
         0,
-        -51.96
+        -77.94
       ],
       "width": 8,
       "height": 10,
@@ -328,7 +328,7 @@
         "radius": 120,
         "shaderId": "por-do-sol",
         "cutout": "recorte-scene2-de-gate",
-        "azimuth": 102.3
+        "azimuth": 105
       },
       "action": {
         "kind": "navigate",
@@ -362,9 +362,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
-        51.96,
+        77.94,
         0,
-        -30
+        -45
       ],
       "width": 8,
       "height": 10,
@@ -394,7 +394,7 @@
         "radius": 120,
         "shaderId": "noite-aurora",
         "cutout": "recorte-scene4-de-gate",
-        "azimuth": 129.5
+        "azimuth": 135
       },
       "action": {
         "kind": "navigate",
@@ -428,7 +428,7 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        60,
+        90,
         0,
         0
       ],
@@ -460,7 +460,7 @@
         "radius": 120,
         "shaderId": "ondas",
         "cutout": "recorte-scene5-de-gate",
-        "azimuth": 81.8
+        "azimuth": 90
       },
       "action": {
         "kind": "navigate",
@@ -494,9 +494,9 @@
       "id": 14,
       "ownedBy": 0,
       "position": [
-        51.96,
+        77.94,
         0,
-        30
+        45
       ],
       "width": 8,
       "height": 10,
@@ -526,7 +526,7 @@
         "radius": 120,
         "shaderId": "becos",
         "cutout": "recorte-scene6-de-gate",
-        "azimuth": 49.1
+        "azimuth": 69
       },
       "action": {
         "kind": "navigate",
@@ -560,9 +560,9 @@
       "id": 18,
       "ownedBy": 0,
       "position": [
-        30,
+        45,
         0,
-        51.96
+        77.94
       ],
       "width": 8,
       "height": 10,
@@ -592,7 +592,7 @@
         "radius": 120,
         "shaderId": "aguas",
         "cutout": "recorte-scene7-de-gate",
-        "azimuth": 16.4
+        "azimuth": 30
       },
       "action": {
         "kind": "navigate",
@@ -628,7 +628,7 @@
       "position": [
         0,
         0,
-        60
+        90
       ],
       "width": 8,
       "height": 10,
@@ -658,7 +658,7 @@
         "radius": 120,
         "shaderId": "holograma",
         "cutout": "recorte-scene8-de-gate",
-        "azimuth": -16.4
+        "azimuth": 0
       },
       "action": {
         "kind": "navigate",
@@ -692,9 +692,9 @@
       "id": 26,
       "ownedBy": 0,
       "position": [
-        -30,
+        -45,
         0,
-        51.96
+        77.94
       ],
       "width": 8,
       "height": 10,
@@ -724,7 +724,7 @@
         "radius": 120,
         "shaderId": "mangue",
         "cutout": "recorte-scene9-de-gate",
-        "azimuth": -49.1
+        "azimuth": -30
       },
       "action": {
         "kind": "navigate",
@@ -758,9 +758,9 @@
       "id": 30,
       "ownedBy": 0,
       "position": [
-        -51.96,
+        -77.94,
         0,
-        30
+        45
       ],
       "width": 8,
       "height": 10,
@@ -790,7 +790,7 @@
         "radius": 120,
         "shaderId": "nucleo",
         "cutout": "recorte-scene10-de-gate",
-        "azimuth": -81.8
+        "azimuth": -60
       },
       "action": {
         "kind": "navigate",
@@ -824,7 +824,7 @@
       "id": 34,
       "ownedBy": 0,
       "position": [
-        -60,
+        -90,
         0,
         0
       ],
@@ -856,7 +856,7 @@
         "radius": 120,
         "shaderId": "fichario",
         "cutout": "recorte-scene11-de-gate",
-        "azimuth": -105.5
+        "azimuth": -81
       },
       "action": {
         "kind": "navigate",
@@ -890,9 +890,9 @@
       "id": 46,
       "ownedBy": 0,
       "position": [
-        -51.96,
+        -77.94,
         0,
-        -30
+        -45
       ],
       "width": 8,
       "height": 10,
@@ -922,7 +922,7 @@
         "radius": 120,
         "shaderId": "nuvens",
         "cutout": "recorte-scene3-de-gate",
-        "azimuth": -132.3
+        "azimuth": -105
       },
       "action": {
         "kind": "navigate",
@@ -956,9 +956,9 @@
       "id": 4,
       "ownedBy": 0,
       "position": [
-        -30,
+        -45,
         0,
-        -51.96
+        -77.94
       ],
       "width": 8,
       "height": 10,
@@ -987,7 +987,8 @@
         "asset": "retrato-scene12",
         "radius": 120,
         "shaderId": "deposito",
-        "cutout": "recorte-scene12-de-gate"
+        "cutout": "recorte-scene12-de-gate",
+        "azimuth": -150
       },
       "action": {
         "kind": "navigate",

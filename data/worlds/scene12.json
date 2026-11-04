@@ -29,22 +29,6 @@
         "en": "360º panorama of the beach, used as the fallback for room 11"
       }
     },
-    "retrato-scene1": {
-      "path": "assets/previews/scene1-de-scene12.jpg",
-      "type": "image",
-      "alt": {
-        "pt": "Retrato do mundo Cidade 360º, visto da porta",
-        "en": "Portrait of the City 360º world, seen from the door"
-      }
-    },
-    "recorte-scene1-de-scene12": {
-      "path": "assets/previews/recorte-scene1-de-scene12.png",
-      "type": "image",
-      "alt": {
-        "pt": "Retrato do mundo Cidade 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the City 360º world, seen from the door (cutout, for the live window)"
-      }
-    },
     "retrato-scene6": {
       "path": "assets/previews/scene6-de-scene12.jpg",
       "type": "image",
@@ -92,6 +76,34 @@
         "pt": "Retrato do mundo Distopia 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Dystopia 360º world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/1exoDqpZuQAr6IEH06-Rbn_hHH2Vj5vmd",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Movimiento estudiantil de 1968"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1R4yPPwC3itDYJkSvgL0irGALC_58fkYO",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Colección Rafael Carrasco y Puente"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1rq0UsidHXp0d8WmiS-S2FYsGS4F55RKU",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Revolución Mexicana"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1Ihoa1vsO6f_Nex_FmnSUC58dx6HJBIyO",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Fondo Rodolfo Brito Foucher"
+      }
     }
   },
   "dimensions": [
@@ -119,12 +131,12 @@
     {
       "id": 0,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "capa-0",
       "position": [
-        28.28,
+        42.43,
         1.5,
-        -28.28
+        -42.43
       ],
       "rotation": [
         0,
@@ -136,17 +148,25 @@
         3,
         0.1
       ],
-      "interaction": "page"
+      "interaction": "page",
+      "title": {
+        "pt": "Movimiento estudiantil de 1968"
+      },
+      "authors": "Cuikis · AHUNAM",
+      "synopsis": {
+        "pt": "Conheça o movimento estudantil de 1968 a partir dos acervos e coleções do AHUNAM. Em “Tesouros do Arquivo”, com Oralia García Cárdenas, técnica acadêmica do Arquivo."
+      },
+      "site": "https://youtu.be/ACbqlxGKGi4?si=9by_wPW7y3iegaAD"
     },
     {
       "id": 1,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "capa-1",
       "position": [
-        28.28,
+        42.43,
         1.5,
-        28.28
+        42.43
       ],
       "rotation": [
         0,
@@ -158,17 +178,25 @@
         3,
         0.1
       ],
-      "interaction": "page"
+      "interaction": "page",
+      "title": {
+        "pt": "Colección Rafael Carrasco y Puente"
+      },
+      "authors": "Cuikis · AHUNAM",
+      "synopsis": {
+        "pt": "Desta vez, Tania Ocampo, técnica acadêmica do AHUNAM, nos apresenta a coleção de Rafael Carrasco — o primeiro diretor da Hemeroteca Nacional do México —, unindo-nos assim às comemorações dos 80 anos da Hemeroteca."
+      },
+      "site": "https://youtu.be/aEmwVYDvUFs?si=S89UNg81Gen8z9IA"
     },
     {
       "id": 2,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "capa-2",
       "position": [
-        -28.28,
+        -42.43,
         1.5,
-        28.28
+        42.43
       ],
       "rotation": [
         0,
@@ -180,17 +208,25 @@
         3,
         0.1
       ],
-      "interaction": "page"
+      "interaction": "page",
+      "title": {
+        "pt": "Revolución Mexicana"
+      },
+      "authors": "Cuikis · AHUNAM",
+      "synopsis": {
+        "pt": "Conheça os fundos e as coleções que temos sobre a Revolução Mexicana no Arquivo Histórico da UNAM, na voz de José Roberto Gallegos, técnico acadêmico do AHUNAM, em *Tesouros do Arquivo*."
+      },
+      "site": "https://youtu.be/Jkwi_FOy-dg?si=7ZBOB-Ivhn-vteh-"
     },
     {
       "id": 3,
       "dimension": 0,
-      "kind": "image",
+      "kind": "site",
       "asset": "capa-3",
       "position": [
-        -28.28,
+        -42.43,
         1.5,
-        -28.28
+        -42.43
       ],
       "rotation": [
         0,
@@ -202,7 +238,15 @@
         3,
         0.1
       ],
-      "interaction": "page"
+      "interaction": "page",
+      "title": {
+        "pt": "Fondo Rodolfo Brito Foucher"
+      },
+      "authors": "Cuikis · AHUNAM",
+      "synopsis": {
+        "pt": "Conheça mais um dos tesouros do Arquivo: o fundo Rodolfo Brito Foucher, apresentado por Gloria Carreño Alvarado, técnica acadêmica do AHUNAM."
+      },
+      "site": "https://youtu.be/1o4N_XmgLvA?si=MULfZGtXeSTT1SPZ"
     }
   ],
   "portals": [
@@ -212,7 +256,7 @@
       "position": [
         0,
         0,
-        -60
+        -90
       ],
       "width": 10,
       "height": 12,
@@ -250,63 +294,32 @@
         0,
         0,
         0
-      ]
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 6,
+        "period": 19.7,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 90,
+        "rotationPeriod": 11.1
+      }
     },
     {
       "id": 1,
       "ownedBy": 0,
       "position": [
-        57.06,
-        0,
-        -18.54
-      ],
-      "width": 10,
-      "height": 12,
-      "box": [
-        12,
-        16,
-        1
-      ],
-      "boxPosition": [
-        0,
-        8,
-        0
-      ],
-      "boxRotation": [
-        0,
+        90,
         0,
         0
-      ],
-      "trigger": "plane",
-      "frame": {
-        "color": "#ff0000",
-        "thickness": 0.3
-      },
-      "window": {
-        "kind": "preview",
-        "asset": "retrato-scene1",
-        "radius": 120,
-        "shaderId": "grade-neon",
-        "cutout": "recorte-scene1-de-scene12"
-      },
-      "action": {
-        "kind": "navigate",
-        "target": "scene1"
-      },
-      "arrivalFrom": "scene1",
-      "rotation": [
-        0,
-        -72,
-        0
-      ]
-    },
-    {
-      "id": 2,
-      "ownedBy": 0,
-      "position": [
-        35.27,
-        0,
-        48.54
       ],
       "width": 10,
       "height": 12,
@@ -335,7 +348,16 @@
         "asset": "retrato-scene6",
         "radius": 120,
         "shaderId": "becos",
-        "cutout": "recorte-scene6-de-scene12"
+        "cutout": "recorte-scene6-de-scene12",
+        "azimuth": 9,
+        "reality": [
+          {
+            "az0": 52.03,
+            "el0": -0.74,
+            "az1": 55.25,
+            "el1": 4.83
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
@@ -344,17 +366,34 @@
       "arrivalFrom": "scene6",
       "rotation": [
         0,
-        -144,
+        -90,
         0
-      ]
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 11.4,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 90,
+        "rotationPeriod": 18.3
+      }
     },
     {
-      "id": 3,
+      "id": 2,
       "ownedBy": 0,
       "position": [
-        -35.27,
         0,
-        48.54
+        0,
+        90
       ],
       "width": 10,
       "height": 12,
@@ -383,7 +422,16 @@
         "asset": "retrato-scene9",
         "radius": 120,
         "shaderId": "mangue",
-        "cutout": "recorte-scene9-de-scene12"
+        "cutout": "recorte-scene9-de-scene12",
+        "azimuth": -90,
+        "reality": [
+          {
+            "az0": 43.03,
+            "el0": -0.74,
+            "az1": 46.25,
+            "el1": 4.83
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
@@ -392,17 +440,34 @@
       "arrivalFrom": "scene9",
       "rotation": [
         0,
-        -216,
+        -180,
         0
-      ]
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 6,
+        "period": 17.9,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 17.4
+      }
     },
     {
-      "id": 4,
+      "id": 3,
       "ownedBy": 0,
       "position": [
-        -57.06,
+        -90,
         0,
-        -18.54
+        0
       ],
       "width": 10,
       "height": 12,
@@ -431,7 +496,16 @@
         "asset": "retrato-scene10",
         "radius": 120,
         "shaderId": "nucleo",
-        "cutout": "recorte-scene10-de-scene12"
+        "cutout": "recorte-scene10-de-scene12",
+        "azimuth": 180,
+        "reality": [
+          {
+            "az0": 43.03,
+            "el0": -0.74,
+            "az1": 46.25,
+            "el1": 4.83
+          }
+        ]
       },
       "action": {
         "kind": "navigate",
@@ -440,9 +514,26 @@
       "arrivalFrom": "scene10",
       "rotation": [
         0,
-        -288,
+        -270,
         0
-      ]
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 6,
+        "period": 10.6,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 90,
+        "rotationPeriod": 18
+      }
     }
   ]
 }
