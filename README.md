@@ -179,9 +179,10 @@ zonas12/
 - SEMPRE documente componentes novos no `README.md`
 - **SEMPRE que a tarefa for criar uma sala ou uma página nova, siga o
   [`docs/GUIA-NOVA-SALA.md`](docs/GUIA-NOVA-SALA.md) do princípio ao fim** — os comandos por ordem e,
-  em cada passo, a frase que a ferramenta tem de imprimir. A [`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md)
-  é a **razão** das coisas (as leis, as medições, as decisões D-A a D-D) e abre-se quando o guia remete
-  para uma secção dela. Saltar o guia não dá erro nenhum: dá uma exposição que abre e está errada
+  em cada passo, a frase que a ferramenta tem de imprimir. A
+  [`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md) é a **razão** das coisas (as leis, as medições, as
+  decisões D-A a D-D) e abre-se quando o guia remete para uma secção dela. Saltar o guia não dá erro
+  nenhum: dá uma exposição que abre e está errada
 - NUNCA ponha na raiz nada que não seja preciso para o projeto funcionar
 - NÃO modifique o material **histórico** de `.harness/` (`dev/`, `imagenTeste/`) — o
   `.harness/skills/` é ferramenta ativa e mantém-se atualizado (regra 5)
