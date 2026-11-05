@@ -313,31 +313,31 @@ e abra `http://127.0.0.1:8123/editor.html?world=<slug>`.
 
 ### 4.1 · Receber a folha do autor
 
-O autor manda uma folha por sala, com **uma linha por obra** e este cabeçalho:
+O autor manda a folha **no chat**, uma por sala, com **uma linha por obra** e este cabeçalho:
 
 ```
 id  nome da obra  nomeAutores  nomeCoautores  nomaColaboradores  Descritivo  endereço da imagem  endereço da obra
 ```
 
-**Cada sala já tem a sua folha em `data/obras/sceneNN.tsv`** — catorze ficheiros, um por sala nova, com o
-cabeçalho certo e o slug já na primeira coluna. O agente escreve **só a sua** e **não toca em
-`data/obras.tsv`**: é um ficheiro partilhado, e catorze processos a reescrevê-lo perdiam trabalho uns
-dos outros. A folha-mãe consolida-se no fim, com uma ferramenta.
+O agente **acrescenta essas linhas a `data/obras.tsv`**, e com três conversões — todas mecânicas:
 
-Três coisas mudam na passagem da folha do autor para a folha da sala — e todas são mecânicas:
-
-| # | o que a folha do autor traz | o que a folha da sala precisa | porquê |
+| # | o que a folha do autor traz | o que `data/obras.tsv` precisa | porquê |
 | --- | --- | --- | --- |
-| 1 | começa no `id` | **`mundo` como primeira coluna** — já lá está, não se tira | o `id` não é único no projeto (o `id 0` existe em quatro mundos); sem o `mundo` o importador não sabe de que sala fala |
-| 2 | `id` de **1** a N | `id` de **0** a N−1 | o `id` é o número da obra **no editor**, e é por ele que o importador encontra a obra. A 4.ª obra de uma sala é a `3` |
+| 1 | não tem a coluna do mundo | **`mundo` como primeira coluna**, com o slug da sala em todas as linhas | o `id` não é único no projeto (o `id 0` existe em quatro mundos); sem o `mundo` o importador não sabe de que sala fala. **A sala vem do chat**, não da folha |
+| 2 | `id` de **1** a N | `id` de **0** a N−1 | o `id` é o número da obra no editor, e é por ele que o importador encontra a obra. A 4.ª obra de uma sala é a `3` |
 | 3 | `https://drive.google.com/file/d/<ID>/view?usp=…` | `https://lh3.googleusercontent.com/d/<ID>` | o `/file/d/<ID>/view` é uma **página**, não uma imagem: não carrega. O endereço directo do Drive é o `lh3…/d/<ID>` |
 
 O `endereço da obra` (o YouTube) entra **como está** — é o site da obra, e a ficha embute-o.
 
 ```
-node tools/artwork/from-csv.mjs --file data/obras/scene14.tsv --check
-node tools/artwork/from-csv.mjs --file data/obras/scene14.tsv
+node tools/artwork/from-csv.mjs --check
+node tools/artwork/from-csv.mjs
 ```
+
+> **Não se cria uma pasta `obras/` debaixo de `data/`.** A L20 procura uma pasta com esse nome para
+> acusar as fichas antigas (D60), e `data/obras/` cai na regra: o validador responde
+> `data/obras/ ainda existe — a ficha antiga (D60) foi substituída por obra.html (D62)`. Isso foi
+> tentado na v0.0.35 e desfeito na v0.0.36 — uma folha por sala não vale uma lei vermelha.
 
 **A folha preenche, não cria.** Uma linha só encontra a obra se ela **já existir** no mundo com aquele
 `id`; numa sala acabada de nascer (`artworks: []`) todas as linhas falham com
@@ -350,32 +350,18 @@ composição (passo 3)  →  retratos (passo 7, ×2)  →  folha (este passo)  �
 
 Os retratos vêm **antes** da folha por uma razão prática: o importador valida o mundo que ia escrever e
 **recusa** gravar enquanto a L9 estiver vermelha (`o mundo <slug> ficaria inválido:`), por isso numa
-sala sem retratos a folha não passa. Não é preciso recozer nada depois, porque o texto e o `kind` não
-entram na imagem que o retrato guarda (D95).
-
-**No fim de uma ronda, uma vez:** consolide as folhas de sala na folha-mãe.
-
-```
-node tools/artwork/consolidar.mjs --check     # diz o que levaria para a mãe (sai 1 se houver)
-node tools/artwork/consolidar.mjs
-```
-
-Ela mantém a ordem das salas que já estavam (o `git diff` mostra só o que é novo), põe as novas no fim
-por ordem numérica, substitui a sala que tem folha, e **não apaga nada** com uma folha vazia.
+sala sem retratos a folha não passa.
 
 - **Se a folha for recusada:**
-  - `falta a coluna "mundo" — acrescente-a como PRIMEIRA coluna` — é o caso 1 da tabela acima. A
-    mensagem nomeia a coluna em falta (antes dizia só «falta o mundo ou o id», que obrigava a adivinhar);
+  - `falta a coluna "mundo" — acrescente-a como PRIMEIRA coluna` — é o caso 1 da tabela acima;
   - `obra <id> não existe no mundo <slug>` — os `id` da folha não são os do editor: é o caso 2, ou a
     obra ainda não foi composta (passo 3);
   - `o mundo <slug> ficaria inválido:` com `law L9` — faltam os retratos: passo 7 primeiro;
-  - `consolidar: data/obras/scene15.tsv fala de scene14` — o slug dentro da folha não é o do nome do
-    ficheiro; é o erro que evita consolidar na sala errada.
+  - `data/obras/ ainda existe` — alguém criou a pasta proibida; apague-a (L20).
 
 > **Uma célula vazia apaga.** A folha é a fonte da verdade: um crédito vazio **tira** o crédito que lá
 > estava (é assim desde a D62, e é o que permite desfazer). Por isso copie a linha inteira do autor — não
 > escreva só as colunas que mudaram.
-
 ---
 
 ## 5. Os anéis, o giro e os buracos — outra vez

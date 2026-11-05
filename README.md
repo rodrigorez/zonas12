@@ -271,7 +271,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.35)
+## Estado atual do código (v0.0.36)
 
 > **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
 > pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
@@ -691,6 +691,29 @@ geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
 
+A **v0.0.36** desfaz uma decisão da v0.0.35, e vale a pena dizer porquê: **o validador tinha razão e eu
+não.**
+
+A v0.0.35 deu a cada sala a sua folha de obras em `data/obras/`, para catorze agentes não reescreverem
+o mesmo ficheiro. A pasta colidia com a **L20**, que procura uma pasta chamada `obras` debaixo de cada
+pasta de topo para acusar as fichas antigas (D60):
+
+```
+error: data/obras/ ainda existe — a ficha antiga (D60) foi substituída por obra.html (D62);
+       duas fontes acabam por discordar (L20)
+```
+
+O `validate` passou a ter **um** erro que não era a L9. Não é um falso positivo da lei: é exatamente a
+lei a fazer o seu trabalho — duas fontes do mesmo conteúdo acabam por discordar. E a premissa também
+já não valia: o autor manda as folhas **uma a uma no chat**, e um agente de cada vez não tem com quem
+competir por `data/obras.tsv`.
+
+A pasta e o consolidador saíram. Do que ficou: a folha do autor entra pelo chat e vai direta para a
+mãe, com as três conversões que o guia já descrevia — o `mundo` à esquerda, o `id` de 0 a N−1, e os
+endereços do Drive de `/file/d/<ID>/view` (uma página) para `lh3…/d/<ID>` (uma imagem). E o
+importador continua a nomear a coluna em falta. O `validate` voltou aos **144** erros de L9 e a mais
+nenhum.
+
 A **v0.0.35** é a **D105**, e fecha o último ficheiro partilhado da linha de montagem: a folha das
 obras.
 
@@ -699,13 +722,14 @@ site — e essa folha virava **uma** `data/obras.tsv` com as 27 salas. Com cator
 ao mesmo tempo, isso era catorze processos a reescrever o mesmo ficheiro: exactamente o que a D96
 existe para impedir.
 
-**A saída.** Cada sala nova tem agora a **sua** folha, `data/obras/sceneNN.tsv` — catorze ficheiros,
-com o cabeçalho certo e o slug já na primeira coluna. O agente preenche só a sua e aplica com
-`from-csv.mjs --file data/obras/scene14.tsv`, que já existia para os exemplos. No fim de uma ronda, uma
-vez, `consolidar.mjs` leva as linhas de cada folha para a mãe. Medido: um teste levou duas obras
-novas para a mãe com um diff de **+2 linhas** (as treze salas antigas intactas), e a segunda passagem
-disse `nada a fazer`. As catorze folhas de hoje estão vazias e a mãe ficou nos seus 67 — uma folha
-vazia não apaga nada.
+**A saída (e o beco que ela tinha).** A primeira tentativa deu a cada sala a sua folha,
+`data/obras/sceneNN.tsv`, com um consolidador a levá-las para a mãe no fim — e o teste correu bem: um
+diff de **+2 linhas**, idempotente. Mas o validador recusou-a por outra razão, e tinha razão: a **L20**
+procura uma pasta chamada `obras` debaixo de cada pasta de topo para acusar as fichas antigas (D60), e
+`data/obras/` cai na regra — `data/obras/ ainda existe — a ficha antiga (D60) foi substituída por
+obra.html (D62)`. Uma folha por sala não vale uma lei vermelha. A v0.0.36 desfez a pasta e o
+consolidador: o autor manda a folha **no chat**, e o agente acrescenta as linhas a `data/obras.tsv`
+com as três conversões — um agente de cada vez não tem com quem competir pelo ficheiro.
 
 **E a folha do autor não entra como está.** Três conversões, todas mecânicas: o `mundo` como primeira
 coluna (a folha do autor é de uma sala só, e não repete o slug), o `id` de **0** a N−1 (o `id` é o
@@ -2563,7 +2587,6 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 | `tools/scene/construir.mjs` | o **orquestrador das ondas** (D104): abre as salas planeadas na ordem que o grafo permite, em paralelo dentro de cada onda, e fecha tudo com **um** `integrar`. `--seco`, `--todas`, `--ondas 1,2`. Só levanta esqueletos: as obras, a composição e os retratos são do autor |
 | `tools/scene/ondas.mjs` | a conta das ondas, numa casa só: a sala precisa de duas vizinhas construídas, e duas vizinhas **entre si** nunca caem na mesma onda (a porta entre elas é escrita pela que nasce depois) |
 | `tools/scene/abrir-mapa.mjs` | o que seria preciso para abrir mais frentes: `--seco` diz quantas arestas faltam, `--teto N` diz se um limite de portas por sala as faria caber. Não muda a L24 |
-| `tools/artwork/consolidar.mjs` | a **consolidação** das folhas por sala na folha-mãe (D105): mantém a ordem das salas que já lá estavam, põe as novas no fim e não apaga nada com uma folha vazia. `--check` diz o que faria |
 | `tools/scene/integrar.mjs` | o **fecho da ronda** (D102): põe as portas no portão e as chegadas que faltam em cada destino, corre os anéis, o giro, os buracos, o sorteio (só nas portas novas) e o validador **uma vez**. Idempotente: a segunda passagem diz `nada a fazer`. `--seco` diz o que faria |
 | `tools/coordination/status.mjs` | quem está a escrever nos mundos agora, e se o dono da trava está morto (o próximo a chegar reclama-a) |
 | `tools/server/selftest.mjs` | a **gravação do editor** por HTTP: origem, tipo, versão, validação, cópia de segurança e escrita atómica. Ficou de fora das baterias desde a D48 — e foi assim que a gravação passou meses a devolver 500. Entrou no `all.mjs` na v0.0.30 |
