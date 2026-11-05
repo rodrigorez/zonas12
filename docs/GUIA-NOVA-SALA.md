@@ -224,6 +224,20 @@ repetir depois de uma ronda interrompida. `--seco` diz o que faria sem escrever.
 Depois do fecho, a única vermelha possível é a **L9** — os retratos do passo 7. Qualquer outra é uma
 paragem.
 
+**Quantas salas cabem ao mesmo tempo.** Não é uma escolha: uma sala só nasce com **duas** vizinhas
+construídas (o `new-room` escreve a porta de chegada no destino, e a L24 exige três portas). O mapa
+das 27 salas é uma cadeia, por isso o plano tem **ondas** — e a primeira tem uma sala só:
+
+```
+node tools/scene/mapa.mjs --ondas          # o plano em ondas, e o paralelismo máximo
+node tools/scene/mapa.mjs --dossie scene14 # a folha de um agente, com o comando exato
+```
+
+O `--dossie` diz em que onda a sala cabe, que vizinhas existem **hoje** e quais faltam nascer. A uma
+sala bloqueada não dá comando nenhum — dar-lhe um obrigaria a inventar destinos que o mapa não tem.
+Dentro de uma onda, as salas correm **juntas** (`--so-a-sala`); o `integrar` corre **uma vez**, no fim
+da onda. Abrir mais frentes exige mais arestas em `data/mapa.json`, e isso é uma decisão da exposição.
+
 > **O que a ronda 1 não faz:** não deixa a sala visitável. Portão e chegadas só existem depois do
 > `integrar`. Se precisar de ver a sala no browser antes disso, use o caminho normal (sem
 > `--so-a-sala`) e aceite a espera.

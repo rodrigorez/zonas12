@@ -175,22 +175,38 @@ for (const slug of salas) {
 // A ordem de construção: o `new-room` acrescenta a porta de chegada ao destino, por isso uma sala só
 // pode nascer quando **dois** dos seus vizinhos já existem (o mínimo da L24). O resto das portas
 // chegam quando as salas seguintes nascerem — é a mesma operação vista do outro lado.
+//
+// A ordem vem em **ondas**: cada onda é o conjunto de salas que pode nascer ao mesmo tempo, e é isso
+// que decide quantos agentes conseguem trabalhar em paralelo. A onda não é uma escolha — é a altura do
+// grafo. Um mapa em cadeia dá uma sala por onda, por muito que se queira catorze.
 const ordem = [];
+const ondas = [];
 const prontas = new Set(construidas.keys());
 const porConstruir = salas.filter((slug) => !construidas.has(slug));
 let mudou = true;
 while (mudou) {
   mudou = false;
+  const onda = [];
+  // A onda inteira é decidida contra o mesmo retrato do disco: as salas que nascem **juntas** não se
+  // vêem umas às outras. Sem isto, a segunda sala da lista já contava com a primeira e todas cabiam na
+  // primeira onda — que é precisamente a ilusão que este relatório existe para desfazer.
   for (const slug of porConstruir) {
     if (prontas.has(slug)) continue;
-    const existentes = [...vizinhos.get(slug)].filter((alvo) => prontas.has(alvo));
-    if (existentes.length >= 2) {
-      ordem.push({ slug, destinos: existentes });
-      prontas.add(slug);
-      mudou = true;
+    const existentes = [...vizinhos.get(slug)].filter((alvo) => prontas.has(alvo) &&
+      !onda.some((passo) => passo.slug === alvo));
+    if (existentes.length >= 2) onda.push({ slug, destinos: existentes });
+  }
+  if (onda.length > 0) {
+    for (const passo of onda) {
+      prontas.add(passo.slug);
+      ordem.push(passo);
     }
+    ondas.push(onda);
+    mudou = true;
   }
 }
+const ondaDe = new Map();
+ondas.forEach((onda, indice) => { for (const passo of onda) ondaDe.set(passo.slug, indice + 1); });
 const bloqueadas = porConstruir.filter((slug) => !prontas.has(slug));
 if (bloqueadas.length > 0) {
   err(`não há ordem de construção para ${bloqueadas.join(', ')} — cada uma precisa de dois vizinhos já ` +
@@ -243,11 +259,46 @@ if (!passosOk) {
   }
 }
 
+// ---- o plano em ondas: quantos agentes cabem, e porquê -------------------------------------------
+//
+// O utilizador quer catorze agentes a abrir catorze salas ao mesmo tempo. A resposta não está na
+// ferramenta: está no grafo. Uma sala só nasce com dois vizinhos construídos (L24), e isso faz das
+// ondas uma propriedade do mapa — não uma escolha de quem orquestra. Este relatório diz, sem rodeios,
+// quantas salas cabem em cada onda e quantas são obrigatoriamente uma de cada vez.
+if (args.includes('--ondas')) {
+  const hoje = ondas[0] || [];
+  console.log('');
+  console.log('o plano em ' + ondas.length + ' onda(s) — cada onda é um grupo que pode nascer ao mesmo tempo');
+  console.log('');
+  for (let i = 0; i < ondas.length; i++) {
+    const onda = ondas[i];
+    console.log('onda ' + (i + 1) + ' (' + onda.length + ' sala' + (onda.length === 1 ? '' : 's') + '): ' +
+      onda.map((passo) => passo.slug).join(', '));
+    for (const passo of onda) {
+      console.log('    ' + passo.slug + ' <- ' + passo.destinos.join(', '));
+    }
+  }
+  const maior = ondas.reduce((n, onda) => Math.max(n, onda.length), 0);
+  console.log('');
+  console.log('paralelismo máximo: ' + maior + ' sala(s) por onda');
+  console.log('as que podem nascer agora: ' + (hoje.length === 0 ? 'nenhuma' : hoje.map((p) => p.slug).join(', ')));
+  if (hoje.length < ondas[0]?.length) console.log('  (o mapa mudou desde a última vez que correu)');
+  console.log('');
+  console.log('para abrir mais frentes é preciso mais arestas em `data/mapa.json` — cada aresta nova');
+  console.log('liga uma sala planeada a uma construída, e cada uma custa uma porta em cada ponta (L24: 5).');
+  console.log('');
+  if (erros.length > 0) {
+    for (const mensagem of erros) console.error(`  error: ${mensagem}`);
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
 // ---- o dossiê: o que cada agente recebe, e o que lhe é defeso ----
 
-// Com um agente por sala (o modo manual), o mapa não chega: cada agente precisa da sua folha — o que
-// constrói, o que já está decidido, e em que ficheiros a operação dele escreve. É esta folha que
-// substitui a trava que ainda não existe: em vez de impedir o conflito, diz onde ele aconteceria.
+// Com um agente por sala, o mapa não chega: cada agente precisa da sua folha — o que constrói, o que
+// já está decidido, e em que ficheiros a operação dele escreve. A folha diz também **em que onda** a
+// sala cabe, porque é isso que decide se ela pode nascer agora ou se tem de esperar por uma vizinha.
 const pedeDossie = args.includes('--dossie');
 const indiceDossie = args.indexOf('--dossie');
 const alvoDossie = indiceDossie !== -1 && args[indiceDossie + 1] && !args[indiceDossie + 1].startsWith('--')
@@ -261,28 +312,57 @@ if (pedeDossie) {
     process.exit(1);
   }
   for (const passo of escolhidas) {
-    const posicao = ordem.indexOf(passo) + 1;
-    const depois = [...vizinhos.get(passo.slug)].filter((alvo) => !passo.destinos.includes(alvo)).sort();
-    const toca = [...passo.destinos, ENTRY_WORLD].sort();
+    const onda = ondaDe.get(passo.slug);
+    const naMesmaOnda = (ondas[onda - 1] || []).filter((cada) => cada.slug !== passo.slug);
+    // Aqui fala-se do **disco de hoje**, e não da simulação: a simulação diz em que onda a sala cabe,
+    // mas o comando só pode usar vizinhas que já existem. Confundir as duas coisas dava folhas que
+    // mandavam um agente correr um `--destinos` com salas que ainda não nasceram (L11).
+    const hojeDisponiveis = [...vizinhos.get(passo.slug)].filter((alvo) => construidas.has(alvo)).sort();
+    const faltam = [...vizinhos.get(passo.slug)].filter((alvo) => !construidas.has(alvo)).sort();
+    const podeAgora = hojeDisponiveis.length >= 2;
     console.log('');
-    console.log(`═══ ${passo.slug} · ${posicao} de ${ordem.length} ═══`);
+    console.log(`═══ ${passo.slug} · onda ${onda} de ${ondas.length} ═══`);
     console.log(`  portas no mapa:  ${portas(passo.slug)} (1 ao portão + ${vizinhos.get(passo.slug).size} vizinhos)`);
-    console.log(`  destinos:        ${[...vizinhos.get(passo.slug)].sort().join(', ')}`);
-    console.log(`  já existem:      ${passo.destinos.join(', ')}`);
-    if (depois.length > 0) {
-      console.log(`  chegam depois:   ${depois.join(', ')} — a porta é escrita por elas quando nascerem`);
+    console.log(`  vizinhas no mapa:  ${[...vizinhos.get(passo.slug)].sort().join(', ')}`);
+    console.log(`  existem hoje:      ${hojeDisponiveis.join(', ') || '(nenhuma)'}`);
+    if (faltam.length > 0) {
+      console.log(`  faltam nascer:     ${faltam.join(', ')} — a porta é escrita por elas quando nascerem`);
+    }
+    if (podeAgora) {
+      console.log('  pode nascer agora: sim — tem duas vizinhas construídas (o mínimo da L24)');
+      if (naMesmaOnda.length > 0) {
+        console.log(`  nasce ao mesmo tempo que: ${naMesmaOnda.map((cada) => cada.slug).join(', ')}`);
+      } else {
+        console.log('  nasce sozinha nesta onda — é a única sala que pode nascer ao mesmo tempo que ela');
+      }
+      console.log('');
+      console.log(`  1. node tools/scene/new-world.mjs ${passo.slug}`);
+      console.log(`  2. node tools/scene/new-room.mjs ${passo.slug} --destinos ${hojeDisponiveis.join(',')} --so-a-sala`);
+      console.log('');
+      console.log('  escreve em:');
+      console.log(`    data/worlds/${passo.slug}.json   (novo — e SÓ este ficheiro)`);
+      console.log('');
+      console.log('  e o fecho, uma vez, quando a onda (ou a ronda) acabar:');
+      console.log('    node tools/scene/integrar.mjs');
+      console.log('      data/worlds/gate.json      (+1 porta)');
+      for (const alvo of hojeDisponiveis) console.log(`      data/worlds/${alvo}.json   (+1 porta, +2 assets de retrato)`);
+      console.log('      e, por baixo, o anel · o giro · o mundo real · o sorteio — sobre TODOS os mundos');
+      console.log('');
+      console.log('  em paralelo: as salas da mesma onda podem correr juntas — cada uma escreve só o seu');
+      console.log('    ficheiro (--so-a-sala). O fecho é que é um de cada vez (a oficina serializa-o).');
+    } else {
+      const precisas = ondas[onda - 2] || [];
+      const vizinhasQueFaltam = precisas.filter((cada) => vizinhos.get(passo.slug).has(cada.slug));
+      console.log('  pode nascer agora: NÃO — tem ' + hojeDisponiveis.length +
+        ' vizinha(s) construída(s) e a L24 exige duas.');
+      if (vizinhasQueFaltam.length > 0) {
+        console.log('    espera por: ' + vizinhasQueFaltam.map((cada) => cada.slug).join(', ') +
+          ` (onda ${onda - 1})`);
+      }
+      console.log('    não há comando para esta sala hoje — dar-lhe um obrigaria a inventar destinos');
+      console.log('    que o mapa não tem (a L25 recusaria, e a L11 também).');
     }
     console.log('');
-    console.log(`  1. node tools/scene/new-world.mjs ${passo.slug}`);
-    console.log(`  2. node tools/scene/new-room.mjs ${passo.slug} --destinos ${passo.destinos.join(',')}`);
-    console.log('');
-    console.log('  escreve em:');
-    console.log(`    data/worlds/${passo.slug}.json   (novo)`);
-    for (const alvo of passo.destinos) console.log(`    data/worlds/${alvo}.json   (+1 porta, +2 assets de retrato)`);
-    console.log('    data/worlds/gate.json      (+1 porta)');
-    console.log('    e, por baixo, o anel · o giro · o mundo real · o sorteio — sobre TODOS os mundos');
-    console.log('');
-    console.log('  um de cada vez: enquanto este comando corre, nenhum outro agente corre `new-room`.');
     console.log('  o que já está decidido: as portas acima — não se mudam (é o mapa, não o gosto).');
     console.log('  o que é do autor: o nome pt/en, o fundo, as obras, a composição e os retratos.');
   }
@@ -357,7 +437,10 @@ if (soSala) {
   console.log('hoje = portas que o dado tem · plano = portas que o mapa reserva');
   console.log('');
   console.log(`ordem de construção (${ordem.length} sala(s) nova(s)):`);
-  for (const passo of ordem) console.log(`  new-room ${passo.slug.padEnd(8)} --destinos ${passo.destinos.join(',')}`);
+  for (const passo of ordem) {
+    const onda = ondaDe.get(passo.slug);
+    console.log(`  onda ${String(onda).padEnd(2)} new-room ${passo.slug.padEnd(8)} --destinos ${passo.destinos.join(',')}`);
+  }
 }
 
 for (const aviso of avisos) console.log(`  warning: ${aviso}`);
@@ -365,5 +448,12 @@ if (erros.length > 0) {
   for (const mensagem of erros) console.error(`  error: ${mensagem}`);
   console.error(`mapa: ${erros.length} problema(s) — a topologia não serve`);
   process.exit(1);
+}
+// A linha das ondas fica **sob a bateria**: o `--check` do `all.mjs` corre este comando, e um mapa que
+// deixe de ter ordem de construção tem de aparecer, não de ficar bonito no relatório.
+if (ondas.length > 0) {
+  const maior = ondas.reduce((n, onda) => Math.max(n, onda.length), 0);
+  console.log(`ondas: ${ondas.length} · paralelismo máximo: ${maior} sala(s) · ` +
+    `pode nascer agora: ${(ondas[0] || []).map((passo) => passo.slug).join(', ')}`);
 }
 console.log('mapa: OK');

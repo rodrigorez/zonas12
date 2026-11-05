@@ -161,6 +161,12 @@ trabalho pendente — é a bateria do `all.mjs`). Entre as duas rondas a sala é
 **não visitável**: sem porta no portão não se chega lá. O corte é autoria → fecho, e não «salas →
 portais» — uma sala sem portas viola a L24, a L19 e a alcançabilidade.
 
+**Quantas salas cabem ao mesmo tempo não é uma escolha (D103).** Uma sala só nasce com **duas**
+vizinhas construídas, por isso a construção tem **ondas**: `node tools/scene/mapa.mjs --ondas` imprime
+o plano (hoje 9 ondas, no máximo 2 salas em paralelo, e só a `scene14` na primeira), e
+`node tools/scene/mapa.mjs --dossie <slug>` dá a folha de um agente com o comando exato — ou diz que a
+sala está bloqueada e por que onda espera.
+
 Cada fase diz **o comando**, **o que ele tem de dizer** e **o que fazer se não disser**. Só se avança
 com a fase anterior verde: a fase 8 (retratos) custa minutos de GPU e não se gasta a descobrir um erro
 que a fase 7 apanhava em segundos.
