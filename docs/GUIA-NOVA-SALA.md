@@ -127,6 +127,7 @@ node tools/scene/new-room.mjs <slug> --mapa --nome-pt "…" --nome-en "…" [--f
 | `--nome-pt` / `--nome-en` | o nome da sala nas duas línguas. **Sem isto a sala aparece com o slug.** |
 | `--fundo <salas>` | de que sala se copiam o fundo, a câmara e a imagem de reserva (por omissão `scene1`) |
 | `--sem-ferramentas` | só escreve o dado: não corre anéis, giro, buracos, sorteio nem validador |
+| `--so-a-sala` | **a ronda da autoria** (v0.0.31): escreve só `data/worlds/<slug>.json`. O portão, as chegadas, os anéis e o validador ficam para o `integrar` (§2.1). |
 
 - **Escreve:** o dado da sala, a porta no **portão** e a porta de **chegada em cada destino** — e
   corre por baixo os dois anéis, o giro dos retratos, os buracos do mundo real, o **sorteio do
@@ -179,6 +180,53 @@ node tools/scene/new-room.mjs <slug> --mapa --nome-pt "…" --nome-en "…" [--f
   - `<slug> é um fixture de ensaio, não uma sala` — a sala de ensaio (`scene100`) vive fora do grafo
     e pôr lá uma sala a sério é apagá-la das chegadas e das baterias;
   - `a pasta da sala não existe` — falta o passo 1 (a ferramenta recusa sem a página).
+
+### 2.1 Duas rondas: a autoria e o fecho
+
+O caminho acima funciona e continua a ser o de **uma** sala de cada vez. Quando há **vários agentes a
+abrir salas ao mesmo tempo**, o caminho certo é em duas rondas — porque o `new-room` normal escreve em
+**cinco** ficheiros partilhados (a sala, o portão, cada destino) e corre quatro derivadas que
+reescrevem **todos** os mundos. A oficina serializa isto, mas serializa tudo: catorze agentes passam a
+ser catorze esperas.
+
+O corte que se pode fazer sem perder nada é **autoria → fecho**, e não «salas → portais»: uma sala sem
+portas viola a L24, a L19 e a alcançabilidade, e a segunda ronda teria de fazer o mesmo trabalho de
+qualquer maneira.
+
+**Ronda 1 — a autoria (paralela, sem contenção).** Cada agente escreve **só o ficheiro da sua sala**:
+
+```
+node tools/scene/new-room.mjs <slug> --mapa --so-a-sala --nome-pt "…" --nome-en "…"
+```
+
+O ficheiro `data/worlds/<slug>.json` é exclusivo de quem o cria (a ferramenta recusa escrever por cima),
+e por isso não há nada para serializar: medido, dois agentes ao mesmo tempo mudaram **dois** ficheiros e
+mais nenhum. Só o movimento das portas é sorteado nesta ronda, porque é da própria porta e não muda com
+as vizinhas.
+
+A sala fica **de propósito** incompleta — é um esqueleto legal (4 portas), e o validador acusa L19,
+L26 e L9. É o esperado.
+
+**Ronda 2 — o fecho (uma vez, no fim).**
+
+```
+node tools/scene/integrar.mjs
+```
+
+Lê todos os mundos, calcula o que falta a cada um — a porta no portão de cada sala que não a tem, e a
+porta de chegada em cada destino que ainda não declara de onde o visitante vem —, escreve **só** os
+mundos que mudam, e corre os anéis, o giro, os buracos, o sorteio (só nas portas que esta ronda
+escreveu) e o validador, **uma vez** e não uma vez por sala.
+
+É **idempotente**: correr outra vez não muda nada e diz `nada a fazer`. É isso que a torna segura de
+repetir depois de uma ronda interrompida. `--seco` diz o que faria sem escrever.
+
+Depois do fecho, a única vermelha possível é a **L9** — os retratos do passo 7. Qualquer outra é uma
+paragem.
+
+> **O que a ronda 1 não faz:** não deixa a sala visitável. Portão e chegadas só existem depois do
+> `integrar`. Se precisar de ver a sala no browser antes disso, use o caminho normal (sem
+> `--so-a-sala`) e aceite a espera.
 
 ---
 

@@ -271,7 +271,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.30)
+## Estado atual do código (v0.0.31)
 
 > **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
 > pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
@@ -691,6 +691,40 @@ geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
 
+A **v0.0.31** é a **D102**: as **duas rondas** que tornam o paralelismo útil e não apenas seguro. A
+v0.0.30 provou que a oficina impede a perda; esta versão responde ao que faltava — *catorze agentes à
+espera uns dos outros não é catorze agentes a trabalhar.*
+
+**O corte é autoria → fecho, e não «salas → portais».** A ideia de deixar os portais para uma segunda
+ronda parece a certa e não é: uma sala sem portas viola a L24 (sem porta ao portão), a L19 (os destinos
+não declaram a chegada) e a alcançabilidade, e a segunda ronda teria de fazer exatamente o mesmo
+trabalho. O que se pode separar sem perder nada é o que é **exclusivo de um ficheiro** do que é
+**partilhado por todos**.
+
+**A ronda da autoria — `new-room --so-a-sala`.** Escreve **só** `data/worlds/<slug>.json`; não toca no
+portão, não toca nos destinos, não corre as derivadas que reescrevem todos os mundos, e nem sequer toma
+a oficina (não há nada para serializar: o ficheiro é exclusivo de quem o cria). Só o **movimento** das
+portas é sorteado aqui, porque é da própria porta e não muda com as vizinhas. Medido num `git worktree`:
+dois agentes em paralelo, com a `scene3` e a `scene6` em comum nos destinos, mudaram **dois ficheiros e
+mais nenhum** — o portão, a `scene3` e a `scene6` ficaram intactos. É contenção **zero**, e não
+«contenção curta».
+
+**A ronda do fecho — `integrar.mjs`.** Lê todos os mundos, calcula o que falta a cada um (a porta no
+portão de cada sala que não a tem; a porta de chegada em cada destino que ainda não declara de onde o
+visitante vem), escreve **só** os mundos que mudam, e corre os anéis, o giro, os buracos, o sorteio —
+agora só nas portas que esta ronda escreveu, para não mexer no movimento de salas já vistas — e o
+validador, **uma vez** e não uma vez por sala. A conta da L19 é feita sobre `arrivalFrom` e não sobre o
+par de portas: assim uma sala que já tem porta para a vizinha não ganha uma segunda ao lado da primeira.
+
+**É idempotente, e é isso que a torna segura.** Correr outra vez diz `nada a fazer`, e uma ronda
+interrompida é só repetir o comando. Medido: dois agentes em `--so-a-sala`, um `integrar`, 8 portas
+escritas, e **0 erros que não fossem a L9** (os retratos, que são o passo 7 do guia); a segunda
+passagem não mexeu em nada.
+
+**E a construção das portas saiu para uma casa só** (`tools/scene/portas.mjs`). Uma porta tem quatro
+bocados que têm de concordar — o `target`, o `arrivalFrom`, o retrato e o recorte —, e a partir do
+momento em que duas ferramentas os escrevem, duas cópias seriam duas verdades.
+
 A **v0.0.30** é o **M1 e o M2 da D96**, e existe para responder a uma pergunta só: *podem vários agentes
 criar salas ao mesmo tempo?* Medido antes desta versão, **não**: em três tentativas de dois `new-room` em
 paralelo, duas perderam uma porta inteira e a terceira deixou uma sala com seis. Agora pode.
@@ -724,9 +758,9 @@ espera e responde **503** com o motivo em vez de escrever por cima.
 sala existir) e o `selftest.mjs` do servidor — que estava vermelho **desde a L24** porque o mundo de
 ensaio dele tinha zero portas, e que ninguém via por não estar em bateria nenhuma. Passou a **34 de 34**.
 
-O que continua por fazer: o **integrador** (a fila da fase derivada, M3). A oficina serializa a escrita,
-que é o que impede a perda; a fila é o que evita que catorze agentes esperem uns pelos outros no momento
-errado.
+O que ficou por fazer nesta versão — e que a **v0.0.31** fechou — era o **integrador**. A oficina
+serializa a escrita, que é o que impede a perda; a fila é o que evita que catorze agentes esperem uns
+pelos outros no momento errado.
 
 A **v0.0.29** fechou a armadilha nº 1 do guia, encontrada numa auditoria da criação de salas: o
 `new-room` **nunca contava as portas do destino**. Levar a porta de chegada a uma sala já com cinco não
@@ -2422,6 +2456,7 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 | `tools/scene/validate.mjs` | os ficheiros de mundo (o portão, as treze salas e os cinco fixtures), as leis **L1–L30**, o grafo das portas e os arranques |
 | `tools/scene/laws-selftest.mjs` | **35** avarias injectadas, todas detectadas, com o controlo limpo — a L29 e a L30 entram com a avaria **e** com o seu controlo negativo |
 | `tools/scene/mapa.mjs` | o **mapa das portas** (D96): as 27 salas contra a L24 e a L25, o acordo com o disco e os 14 passos da obra, cada um julgado; `--grafo` e `--dossie` para o trabalho manual. Desde a v0.0.30 está no `all.mjs` |
+| `tools/scene/integrar.mjs` | o **fecho da ronda** (D102): põe as portas no portão e as chegadas que faltam em cada destino, corre os anéis, o giro, os buracos, o sorteio (só nas portas novas) e o validador **uma vez**. Idempotente: a segunda passagem diz `nada a fazer`. `--seco` diz o que faria |
 | `tools/coordination/status.mjs` | quem está a escrever nos mundos agora, e se o dono da trava está morto (o próximo a chegar reclama-a) |
 | `tools/server/selftest.mjs` | a **gravação do editor** por HTTP: origem, tipo, versão, validação, cópia de segurança e escrita atómica. Ficou de fora das baterias desde a D48 — e foi assim que a gravação passou meses a devolver 500. Entrou no `all.mjs` na v0.0.30 |
 | `tools/scene/sorteio.mjs` | o movimento **sorteado** das portas de uma sala nova (D87): ensaio por omissão, `--aplicar` para escrever, `--semente N` para repetir a mesma sala |

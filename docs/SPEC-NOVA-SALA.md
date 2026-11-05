@@ -139,6 +139,9 @@ node tools/scene/new-room.mjs <slug> --destinos scene3,scene6 [opções]
                       L24; o conjunto tem de ser diferente do de todas as outras (L25), e isso é
                       verificado **antes** de escrever
   --sem-ferramentas   só escreve o dado: não corre anéis, giro, buracos nem o validador
+  --mapa              os destinos vêm de `data/mapa.json` (só os vizinhos que já existem)
+  --so-a-sala         a ronda da **autoria** (D102): escreve só o ficheiro da própria sala; o portão,
+                      as chegadas e as derivadas ficam para o `integrar.mjs`
 ```
 
 Escreve o esqueleto do dado (as duas dimensões, o fundo com a reserva, as portas nos dois lados, os
@@ -147,6 +150,16 @@ mão —, **sorteia o movimento** de cada porta (fase 6b, e imprime a **semente*
 os anéis, o giro, os buracos e o validador. As fases abaixo continuam a ser a referência do que ele faz
 por baixo — e o que ele **não** faz: as obras, a composição no editor e os retratos continuam a ser
 passos à mão.
+
+**Quando há vários agentes ao mesmo tempo (D102), o mesmo roteiro faz-se em duas rondas.** Cada agente
+corre `new-room … --so-a-sala` — que escreve **só** `data/worlds/<slug>.json`, o ficheiro que é
+exclusivo de quem o cria —, e no fim uma só pessoa (ou um só agente) corre `node
+tools/scene/integrar.mjs`, que põe as portas no portão, escreve as chegadas que faltam em cada destino,
+corre os anéis/giro/buracos/sorteio **uma vez** e fecha com o validador. O `integrar` é idempotente: a
+segunda passagem diz `nada a fazer`, e `--seco` diz o que falta sem escrever (sai com **1** quando há
+trabalho pendente — é a bateria do `all.mjs`). Entre as duas rondas a sala é um esqueleto legal mas
+**não visitável**: sem porta no portão não se chega lá. O corte é autoria → fecho, e não «salas →
+portais» — uma sala sem portas viola a L24, a L19 e a alcançabilidade.
 
 Cada fase diz **o comando**, **o que ele tem de dizer** e **o que fazer se não disser**. Só se avança
 com a fase anterior verde: a fase 8 (retratos) custa minutos de GPU e não se gasta a descobrir um erro

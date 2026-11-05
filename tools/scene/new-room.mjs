@@ -28,6 +28,11 @@
 //   --mapa               os destinos vêm de `data/mapa.json` (o plano), não do que se escreve aqui:
 //                        só entram os que já existem, porque uma porta para uma sala que ainda não
 //                        nasceu é a L11. É a forma de o juiz ser também o porteiro (D96)
+//   --so-a-sala          a ronda da **autoria** (D102): escreve só `data/worlds/<slug>.json` e não
+//                        toca no portão, nos destinos nem nas derivadas que reescrevem todos os mundos.
+//                        É o que permite a vários agentes autorarem salas ao mesmo tempo, cada um no
+//                        seu ficheiro. O fecho — portão, chegadas, anéis, validador — é o
+//                        `node tools/scene/integrar.mjs`, uma vez, no fim.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { writeAtomic, writeJson } from '../coordination/atomic.mjs';
 import { OCUPADO, OFICINA, HERDADA, tomar } from '../coordination/locks.mjs';
@@ -36,36 +41,12 @@ import { spawnSync } from 'node:child_process';
 import { ROOT } from '../regression/harness.mjs';
 import { FIXTURES, isFixture } from '../../js/scene/fixtures.js';
 import { ENTRY_WORLD } from '../../js/modules/portal-kinds.js';
-import { RING } from '../../js/scene/ring.js';
+import {
+  proximoId, portaDeChegada, portaDeVoltaAoPortao, portaNoPortao, portaParaDestino, retrato, shaderDoFundo
+} from './portas.mjs';
 
 const MUNDOS = join(ROOT, 'data', 'worlds');
 const NOME = /^[a-z0-9-]+$/;
-
-// A caixa e a moldura de uma porta: as mesmas de todas as salas (12 m de caixa, 16 de altura, 1 de
-// espessura). A prova de que a caixa é 12 m está em `tools/scene/ring.mjs` — é a largura que a L23 usa
-// para medir a folga entre os dois anéis.
-const CAIXA = { box: [12, 16, 1], boxPosition: [0, 8, 0], boxRotation: [0, 0, 0] };
-
-// Uma porta na ordem em que o dado a guarda (a mesma dos ficheiros que o editor exporta, para o diff
-// de uma exportação futura ser só o que mudou).
-function porta({ id, position, width, height, window, target, arrivalFrom }) {
-  return {
-    id,
-    ownedBy: 0,
-    position,
-    width,
-    height,
-    box: CAIXA.box.slice(),
-    boxPosition: CAIXA.boxPosition.slice(),
-    boxRotation: CAIXA.boxRotation.slice(),
-    trigger: 'plane',
-    frame: { color: '#ff0000', thickness: 0.3 },
-    window,
-    action: { kind: 'navigate', target },
-    arrivalFrom,
-    rotation: [0, 0, 0]
-  };
-}
 
 function morrer(mensagem, detalhe) {
   console.error('new-room: ' + mensagem);
@@ -98,6 +79,7 @@ function lerArgumentos(argv) {
     else if (arg === '--sem-ferramentas') opcoes.ferramentas = false;
     else if (arg === '--esperar') opcoes.esperar = Number(argv[++i]);
     else if (arg === '--mapa') opcoes.mapa = true;
+    else if (arg === '--so-a-sala') opcoes.soASala = true;
     else if (!arg.startsWith('--') && !opcoes.slug) opcoes.slug = arg;
     else morrer('argumento desconhecido: ' + arg);
   }
@@ -122,6 +104,8 @@ function salas() {
 
 const opcoes = lerArgumentos(process.argv.slice(2));
 const slug = opcoes.slug;
+// A ronda da autoria (D102): só o ficheiro da própria sala, zero escritas partilhadas.
+const soASala = opcoes.soASala === true;
 if (!slug) morrer('falta o slug', ['uso: node tools/scene/new-room.mjs <slug> --destinos scene3,scene6']);
 if (!NOME.test(slug)) morrer('o slug tem de ser letras minúsculas, números e hífenes: ' + slug);
 if (slug === ENTRY_WORLD) morrer(ENTRY_WORLD + ' é o mundo de entrada e já existe');
@@ -147,7 +131,7 @@ if (existsSync(join(MUNDOS, slug + '.json'))) {
 //
 // O custo é a espera, e é pequena: a secção crítica inteira — ler, validar, escrever a sala, a porta do
 // portão, cada destino, e as quatro derivadas sobre todos os mundos — mede 0,1 a 0,2 s por derivada.
-const oficinaTomada = (() => {
+const oficinaTomada = soASala ? { soltar() {} } : (() => {
   try {
     return tomar(OFICINA, { motivo: 'new-room ' + slug, esperar: opcoes.esperar });
   } catch (error) {
@@ -160,8 +144,9 @@ const oficinaTomada = (() => {
     throw error;
   }
 })();
-// Os filhos desta ferramenta correm já dentro da secção crítica: não voltam a tomá-la.
-process.env[HERDADA] = '1';
+// Os filhos desta ferramenta correm já dentro da secção crítica: não voltam a tomá-la. Com
+// `--so-a-sala` não há secção crítica nenhuma para herdar — o `sorteio` toma a dele.
+if (!soASala) process.env[HERDADA] = '1';
 
 const existentes = salas();
 const porSlug = new Map(existentes.map((sala) => [sala.slug, sala]));
@@ -268,40 +253,6 @@ if (repetido) {
 
 // ---- o dado da sala nova ----
 
-const shaderDoFundo = (cena) => {
-  const dimensao = (cena.dimensions || []).find((cada) => cada.id === 0) || {};
-  return dimensao.kind === 'shader' ? dimensao.shaderId : null;
-};
-
-const retrato = (destino, origem) => ({
-  [`retrato-${destino}`]: {
-    path: 'assets/previews/' + destino + '-de-' + origem + '.jpg',
-    type: 'image',
-    alt: {
-      pt: 'Retrato do mundo ' + (porSlug.get(destino) ? nomePt(porSlug.get(destino).cena) : destino) + ', visto da porta',
-      en: 'Portrait of the ' + (porSlug.get(destino) ? nomeEn(porSlug.get(destino).cena) : destino) + ' world, seen from the door'
-    }
-  },
-  [`recorte-${destino}-de-${origem}`]: {
-    path: 'assets/previews/recorte-' + destino + '-de-' + origem + '.png',
-    type: 'image',
-    alt: {
-      pt: 'Retrato do mundo ' + (porSlug.get(destino) ? nomePt(porSlug.get(destino).cena) : destino) + ', visto da porta (recorte, para a janela ao vivo)',
-      en: 'Portrait of the ' + (porSlug.get(destino) ? nomeEn(porSlug.get(destino).cena) : destino) + ' world, seen from the door (cutout, for the live window)'
-    }
-  }
-});
-
-function nomePt(cena) { return (cena.world && cena.world.name && cena.world.name.pt) || 'mundo'; }
-function nomeEn(cena) { return (cena.world && cena.world.name && cena.world.name.en) || 'world'; }
-
-function proximoId(cena) {
-  const usados = (cena.portals || []).map((portal) => portal.id);
-  let id = 0;
-  while (usados.includes(id)) id++;
-  return id;
-}
-
 const fundoCena = fundo.cena;
 const dimensaoFundo = (fundoCena.dimensions || []).find((cada) => cada.id === 0) || {};
 const nomeDaDimensao = dimensaoFundo.name || { pt: 'Fundo', en: 'Background' };
@@ -312,7 +263,7 @@ if (dimensaoFundo.fallbackAsset && fundoCena.assets && fundoCena.assets[dimensao
   assetsDaSala[dimensaoFundo.fallbackAsset] =
     JSON.parse(JSON.stringify(fundoCena.assets[dimensaoFundo.fallbackAsset]));
 }
-for (const destino of destinos) Object.assign(assetsDaSala, retrato(destino, slug));
+for (const destino of destinos) Object.assign(assetsDaSala, retrato(destino, slug, porSlug.get(destino).cena));
 
 const salaNova = {
   version: 3,
@@ -344,87 +295,46 @@ const salaNova = {
 // A porta de volta ao portão: a única que mostra a **câmara** (dimensão 1) e a única que se declara
 // chegada do portão (L24 + L19). A janela `dimension-pair` é o que faz o visitante ver o mundo real
 // através dela; os buracos dessa janela são escritos depois pelo `reality.mjs` (L28).
-salaNova.portals.push(porta({
-  id: 0,
-  position: [0, 0, RING.portals.radius],
-  width: 10,
-  height: 12,
-  window: { kind: 'dimension-pair', dimensionA: 0, dimensionB: 1 },
-  target: ENTRY_WORLD,
-  arrivalFrom: ENTRY_WORLD
-}));
+salaNova.portals.push(portaDeVoltaAoPortao(0));
 
 // As outras portas: cada uma mostra o destino (retrato + recorte) e declara a chegada dessa origem.
 destinos.forEach((destino, indice) => {
-  const cenaDestino = porSlug.get(destino).cena;
-  salaNova.portals.push(porta({
+  salaNova.portals.push(portaParaDestino({
     id: indice + 1,
-    position: [0, 0, 0],
-    width: 10,
-    height: 12,
-    window: {
-      kind: 'preview',
-      asset: 'retrato-' + destino,
-      radius: 120,
-      ...(shaderDoFundo(cenaDestino) ? { shaderId: shaderDoFundo(cenaDestino) } : {}),
-      cutout: 'recorte-' + destino + '-de-' + slug
-    },
-    target: destino,
-    arrivalFrom: destino
+    destino,
+    cenaDoDestino: porSlug.get(destino).cena,
+    slug
   }));
 });
 
 // ---- as salas que a sala nova toca ----
-
+//
+// Com `--so-a-sala` (a ronda da autoria, D96), nada disto é escrito: a sala nasce sozinha, e as portas
+// do portão e dos destinos são a ronda do fecho (`integrar.mjs`). É o que faz a autoria de catorze
+// salas em paralelo não tocar num único ficheiro partilhado.
 const tocados = [];
 
-// O portão ganha a porta para a sala nova, com o retrato dela (é a porta por onde o visitante entra).
-const portao = lerMundo(ENTRY_WORLD);
-if (!portao) morrer('não encontrei ' + ENTRY_WORLD + '.json: sem a porta do portão a sala não é alcançável');
-const idPortao = proximoId(portao.cena);
-portao.cena.assets = portao.cena.assets || {};
-Object.assign(portao.cena.assets, retrato(slug, ENTRY_WORLD));
-portao.cena.portals = portao.cena.portals || [];
-portao.cena.portals.push(porta({
-  id: idPortao,
-  position: [0, 0, 0],
-  width: 8,
-  height: 10,
-  window: {
-    kind: 'preview',
-    asset: 'retrato-' + slug,
-    radius: 120,
-    ...(shaderDoFundo(salaNova) ? { shaderId: shaderDoFundo(salaNova) } : {}),
-    cutout: 'recorte-' + slug + '-de-' + ENTRY_WORLD
-  },
-  target: slug,
-  arrivalFrom: slug
-}));
-tocados.push(portao);
+if (!soASala) {
+  // O portão ganha a porta para a sala nova, com o retrato dela (é a porta por onde o visitante entra).
+  const portao = lerMundo(ENTRY_WORLD);
+  if (!portao) morrer('não encontrei ' + ENTRY_WORLD + '.json: sem a porta do portão a sala não é alcançável');
+  const idPortao = proximoId(portao.cena);
+  portao.cena.assets = portao.cena.assets || {};
+  Object.assign(portao.cena.assets, retrato(slug, ENTRY_WORLD, salaNova));
+  portao.cena.portals = portao.cena.portals || [];
+  portao.cena.portals.push(portaNoPortao({ slug, cenaDaSala: salaNova, id: idPortao }));
+  tocados.push(portao);
 
-// Cada destino ganha a porta de chegada da sala nova (L19).
-for (const destino of destinos) {
-  const mundo = lerMundo(destino);
-  const id = proximoId(mundo.cena);
-  mundo.cena.assets = mundo.cena.assets || {};
-  Object.assign(mundo.cena.assets, retrato(slug, destino));
-  mundo.cena.portals = mundo.cena.portals || [];
-  mundo.cena.portals.push(porta({
-    id,
-    position: [0, 0, 0],
-    width: 10,
-    height: 12,
-    window: {
-      kind: 'preview',
-      asset: 'retrato-' + slug,
-      radius: 120,
-      ...(shaderDoFundo(salaNova) ? { shaderId: shaderDoFundo(salaNova) } : {}),
-      cutout: 'recorte-' + slug + '-de-' + destino
-    },
-    target: slug,
-    arrivalFrom: slug
-  }));
-  tocados.push(mundo);
+  // Cada destino ganha a porta de chegada da sala nova (L19).
+  for (const destino of destinos) {
+    const mundo = lerMundo(destino);
+    const id = proximoId(mundo.cena);
+    mundo.cena.assets = mundo.cena.assets || {};
+    Object.assign(mundo.cena.assets, retrato(slug, destino, salaNova));
+    mundo.cena.portals = mundo.cena.portals || [];
+    mundo.cena.portals.push(portaDeChegada({ slug, cenaDaSala: salaNova, destino, id }));
+    tocados.push(mundo);
+  }
 }
 
 // ---- escrever (dentro da oficina, D96/M1) ----
@@ -475,7 +385,23 @@ for (const mundo of tocados) {
 // o que já estava certo.
 //
 // Ficam dentro da secção crítica de propósito: reescrevem **todos** os mundos.
-if (opcoes.ferramentas) {
+if (opcoes.ferramentas && soASala) {
+  // A ronda da autoria (D102) escreve **só** o ficheiro da própria sala: o portão e as chegadas ficam
+  // para o `integrar`. Só o movimento é desta ronda, porque é da própria porta e não muda com as
+  // vizinhas. As outras três derivadas mexem no anel da sala (e o anel muda com cada vizinha que nasce),
+  // por isso correriam duas vezes sem ganho.
+  //
+  // O validador fica vermelho por construção em L24/L25 (faltam portas), L19 (faltam chegadas nos
+  // destinos), L26 (o anel ainda não foi distribuído) e L9 (faltam retratos). É o esperado: quem fecha
+  // é o `integrar`.
+  const sorteio = correr('o movimento das portas (sorteio --aplicar)', 'tools/scene/sorteio.mjs',
+    [slug, '--aplicar', '--semente', String(Date.now() % 100000)], 8);
+  if (!sorteio) {
+    console.error('');
+    console.error('new-room: o sorteio falhou — o dado está escrito, corrija o que ele disse e volte a correr.');
+    process.exitCode = 1;
+  }
+} else if (opcoes.ferramentas) {
   const aneis = correr('os dois anéis (ring --aplicar)', 'tools/scene/ring.mjs', ['--aplicar']);
   const giro = correr('o giro dos retratos (azimuths --aplicar)', 'tools/scene/azimuths.mjs', ['--aplicar']);
   const buracos = correr('os buracos do mundo real (reality --aplicar)', 'tools/scene/reality.mjs', ['--aplicar']);
@@ -503,9 +429,17 @@ if (opcoes.ferramentas) {
 
 oficinaTomada.soltar();
 
-console.log('');
-console.log('próximos passos (a spec é `docs/SPEC-NOVA-SALA.md`):');
-console.log('  1. as obras: as linhas na folha `data/obras.tsv` e depois node tools/artwork/from-csv.mjs');
-console.log('  2. o editor: ?world=' + slug + ' — compor a sala e exportar (o esqueleto já traz as portas)');
-console.log('  3. os retratos, sempre duas passagens: node tools/scene/portrait.mjs --todos (×2)');
-console.log('  4. o validador outra vez (os retratos fecham a L9) e node tools/regression/all.mjs --full');
+if (soASala) {
+  console.log('');
+  console.log('--so-a-sala: esta ronda é só a autoria. O portão, as chegadas nos destinos, os anéis e o');
+  console.log('  validador completo ficam para o fecho: node tools/scene/integrar.mjs');
+  console.log('  Até lá a sala é um esqueleto legal (4 de 5 portas, L24/L25 verdes) e o validador acusa');
+  console.log('  L19, L24/L25, L26 e L9 — é o esperado.');
+} else {
+  console.log('');
+  console.log('próximos passos (a spec é `docs/SPEC-NOVA-SALA.md`):');
+  console.log('  1. as obras: as linhas na folha `data/obras.tsv` e depois node tools/artwork/from-csv.mjs');
+  console.log('  2. o editor: ?world=' + slug + ' — compor a sala e exportar (o esqueleto já traz as portas)');
+  console.log('  3. os retratos, sempre duas passagens: node tools/scene/portrait.mjs --todos (×2)');
+  console.log('  4. o validador outra vez (os retratos fecham a L9) e node tools/regression/all.mjs --full');
+}

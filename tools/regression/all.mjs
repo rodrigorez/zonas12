@@ -32,6 +32,11 @@ const NUCLEO = [
   // O mapa (D96): o plano das 27 salas contra a L24 e a L25, o acordo com o disco e os passos da obra.
   // Corre em menos de um segundo e é o único instrumento que julga a topologia **antes** de uma sala.
   { nome: 'o mapa das portas (o balcão)', script: 'tools/scene/mapa.mjs' },
+  // O fecho (D102): as portas e as chegadas que faltam a cada mundo, calculadas contra o disco. Corre a
+  // seco — não escreve nada — e tem de dizer `nada a fazer`: se disser outra coisa, há uma ronda de
+  // autoria por fechar, ou um ficheiro de mundo com uma porta que o destino não declara (L19).
+  { nome: 'o fecho da ronda (a seco: o que falta a cada mundo)', script: 'tools/scene/integrar.mjs',
+    argumentos: ['--seco', '--esperar', '0'] },
   // O servidor da ferramenta (Fase 5): a única bateria que grava por HTTP, que é por onde o editor grava.
   // Ficou de fora desde a D48 e foi assim que a gravação passou meses a devolver 500 (v0.0.29).
   { nome: 'o servidor da ferramenta (a gravação do editor)', script: 'tools/server/selftest.mjs' },
@@ -97,7 +102,7 @@ function correr(bateria) {
   console.log('── ' + bateria.nome + ' ──');
   // O limite é uma rede, não uma expectativa: a bateria mais lenta (os doze, nas 5 páginas) leva
   // uns 10 minutos nesta máquina. Sem ele, um Chrome que não fecha trava a verificação para sempre.
-  const processo = spawnSync(process.execPath, [join(ROOT, bateria.script)],
+  const processo = spawnSync(process.execPath, [join(ROOT, bateria.script), ...(bateria.argumentos || [])],
     { cwd: ROOT, stdio: 'inherit', timeout: LIMITE_MS });
   const expirou = processo.signal === 'SIGTERM' || processo.error !== undefined;
   if (expirou) console.log('  (sem fim depois de ' + Math.round(LIMITE_MS / 60000) + ' min: interrompida)');
