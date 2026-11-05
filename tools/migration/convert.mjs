@@ -34,7 +34,8 @@
 //
 // Usage: node tools/migration/convert.mjs
 
-import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { writeAtomic } from '../coordination/atomic.mjs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -367,10 +368,9 @@ const cena = {
 };
 
 const destino = join(root, 'data');
-mkdirSync(destino, { recursive: true });
 const texto = JSON.stringify(cena, null, 2) + '\n';
 for (const nome of ['scene.json', 'scene-example.json']) {
-  writeFileSync(join(destino, nome), texto, 'utf8');
+  writeAtomic(join(destino, nome), texto);
 }
 
 // ---------------------------------------------------------------- relatorio

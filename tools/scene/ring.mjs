@@ -14,7 +14,8 @@
 // Uso: node tools/scene/ring.mjs [--posicoes] [--aplicar] [mundo...]
 //      (--posicoes imprime também os lugares que a regra propõe, por mundo)
 //      (--aplicar põe as obras e as portas nos anéis, e é a única coisa que escreve)
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { writeAtomic } from '../coordination/atomic.mjs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -345,7 +346,7 @@ for (const world of worlds) {
 if (apply && writtenWorlds.length > 0) {
   for (const world of writtenWorlds) {
     const text = JSON.stringify(world.scene, null, 2).replace(/\n/g, world.eol) + world.eol;
-    writeFileSync(join(directory, world.file), text, 'utf8');
+    writeAtomic(join(directory, world.file), text);
   }
 }
 

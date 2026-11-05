@@ -28,7 +28,8 @@
 // porta de chegada. É o que uma porta da sala de ensaio mostra (D84), porque lá o `?from` não viaja.
 // Os pares vêm do dado (`preview` que navega, com o retrato na convenção `<destino>-de-<origem>`).
 import { join } from 'node:path';
-import { writeFileSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync } from 'node:fs';
+import { writeAtomic } from '../coordination/atomic.mjs';
 import { serveProject, openBrowser, ROOT, sleep } from '../regression/harness.mjs';
 import { DERIVED_DIMENSION_BASE } from '../../js/core/index.js';
 
@@ -332,7 +333,7 @@ async function gerar(mundo, origem, destino, opcoes = {}) {
     mkdirSync(join(ROOT, 'assets', 'previews'), { recursive: true });
     const escrever = (caminho, dadosUrl) => {
       const bytes = Buffer.from(dadosUrl.split(',')[1], 'base64');
-      writeFileSync(join(ROOT, caminho), bytes);
+      writeAtomic(join(ROOT, caminho), bytes);
       console.log('escrito ' + caminho + ': ' + tamanho.largura + 'x' + tamanho.altura + ', ' +
         Math.round(bytes.length / 1024) + ' kB');
       return bytes.length;

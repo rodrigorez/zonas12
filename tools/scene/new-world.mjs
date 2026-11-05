@@ -11,7 +11,8 @@
 // se confiar em que a cópia ficou bem.
 //
 // Uso: node tools/scene/new-world.mjs <slug>
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
+import { writeAtomic } from '../coordination/atomic.mjs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkArranques } from './arranques.mjs';
@@ -49,10 +50,9 @@ if (!BASE_ROOT.test(arranque)) {
 }
 
 mkdirSync(join(root, slug));
-writeFileSync(
+writeAtomic(
   join(root, slug, 'index.html'),
-  arranque.replace(BASE_ROOT, '<base href="../" />'),
-  'utf8'
+  arranque.replace(BASE_ROOT, '<base href="../" />')
 );
 
 // Os mundos que já têm ficheiro, mais o que acabou de ganhar arranque (ainda sem JSON, e é o editor que

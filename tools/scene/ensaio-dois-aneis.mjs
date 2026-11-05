@@ -17,7 +17,8 @@
 //   node tools/scene/ensaio-dois-aneis.mjs --aplicar       escreve a scene100
 //   ... --salas 27 --interior 90 --exterior 180 --desvio meia-passo|nenhum
 
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { writeAtomic } from '../coordination/atomic.mjs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -177,7 +178,7 @@ cena.assets = {
 };
 cena.portals = portas;
 
-writeFileSync(ficheiro, JSON.stringify(cena, null, 2).replace(/\n/g, eol) + eol, 'utf8');
+writeAtomic(ficheiro, JSON.stringify(cena, null, 2).replace(/\n/g, eol) + eol);
 
 console.log('');
 console.log(`escrito: data/worlds/scene100.json (${portas.length} portas, ${interior} + ${exterior})`);

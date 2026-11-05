@@ -6,6 +6,9 @@ node_modules/
 /*.png
 # Saidas de sondas guardadas a mao na raiz (o `tmp-1.txt` dos instrumentos)
 /tmp-*.txt
+# A escrita atomica deixa o temporario ao lado do destino quando o processo morre a meio (D96, M0).
+# Ele e inerte — o destino nunca e tocado antes do `rename` —, e some-se sozinho na escrita seguinte.
+*.tmp
 
 # Folhas em teste (rascunhos): o dado a serio e data/obras.tsv
 data/csv/*.csv

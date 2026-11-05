@@ -36,7 +36,8 @@
 //     a imagem que esse site já serve. Vazio deixa a obra
 //     como está; **`-` tira a capa do dado** (D65: a ficha e a sala passam a usar a cadeia — o
 //     thumbnail do YouTube, depois a imagem padrão).
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
+import { writeJson } from '../coordination/atomic.mjs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LANGUAGES, ORIGIN_LANGUAGE } from '../../js/scene/schema.js';
@@ -407,8 +408,7 @@ function main() {
     process.exit(1);
   }
   for (const slug of touched) {
-    writeFileSync(join(root, 'data', 'worlds', slug + '.json'),
-      JSON.stringify(worlds.get(slug), null, 2) + '\n', 'utf8');
+    writeJson(join(root, 'data', 'worlds', slug + '.json'), worlds.get(slug));
     console.log('escrito data/worlds/' + slug + '.json');
   }
 }

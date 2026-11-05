@@ -89,6 +89,9 @@ zonas12/
 │   ├── covers/         a capa de aviso, quando nenhuma das tentativas dá (D65)
 │   └── previews/       os retratos das portas de mundo (um por porta — D46)
 ├── tools/
+│   ├── coordination/        a **escrita atómica** (D96, M0): um temporário ao lado do destino, `fsync`
+│   │                        e `rename` — o destino é o antigo ou o novo, nunca um meio. É a casa única
+│   │                        que o `serve.mjs` já era desde a D51
 │   ├── scene/               validador dos ficheiros de cena (corre a mesma validação que o browser,
 │   │                        mais o grafo dos mundos e os arranques), o instrumento das leis
 │   │                        (avarias injetadas, uma por lei), o verificador dos arranques (D28), a
@@ -267,7 +270,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.27)
+## Estado atual do código (v0.0.28)
 
 > **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
 > pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
@@ -686,6 +689,29 @@ decisões **D69** a **D76**
 geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou de comportamento: as
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
+
+A **v0.0.28** é o **M0 da D96**: a escrita atómica deixa de ser uma excepção do `serve.mjs` e passa a ser
+a regra de **todas** as ferramentas que escrevem. O módulo novo é `tools/coordination/atomic.mjs` —
+um temporário **ao lado** do destino, `fsync`, e `rename` com três tentativas (o Windows falha
+transitoriamente com o ficheiro aberto pelo antivírus ou pelo indexador). O `pid` e um sufixo aleatório
+no nome do temporário fazem com que dois processos a escrever o mesmo ficheiro não partilhem o
+temporário — o caso que a D96 estuda. Dezasseis ferramentas passaram a usá-lo: `new-room`,
+`new-world`, `ring`, `azimuths`, `reality`, `sorteio`, `portrait`, `from-csv`, `ensaio-dois-aneis`,
+`install` dos shaders, as quatro da migração e o `serve.mjs` (que já fazia isto à mão desde a D51).
+
+**Medido, matando o processo a meio.** Dez execuções de `sorteio.mjs --aplicar` sobre a `scene100`,
+mortas com `SIGKILL` em instantes diferentes: **6 deixaram o original intacto, 4 completaram a escrita,
+0 corromperam**. O `.tmp` órfão que uma delas deixou é a prova de que a escrita estava a meio — e o
+destino não tinha sido tocado. Uma escrita forçada pelo `ring.mjs` sobre a `scene2` perturbada devolveu
+o ficheiro **byte a byte igual** ao commitado.
+
+> **O achado que esta versão trouxe, e que não era dela.** Ao passar o `serve.mjs` para o módulo,
+> descobriu-se que a **gravação do editor estava a devolver HTTP 500 desde que o `fixture:` foi
+> acrescentado**: o ficheiro usava `isFixture` sem o importar. O `tools/server/selftest.mjs` — o único
+> instrumento dessa rota — também está vermelho desde a **L24** (o mundo de ensaio dele chama-se
+> `teste` e tem zero portas, e uma sala precisa de três a cinco). Nenhum dos dois apareceu antes porque
+> **essa bateria não está no `all.mjs`**. O import foi corrigido aqui, porque estava no bloco que esta
+> versão altera; o auto-teste fica por acertar, e entra na bateria, na próxima iteração.
 
 Resumo do que existe na v0.0.27 (medido em 2026-11-04): `index.html` (**93 linhas**) e as **treze**
 salas com o **mesmo** ficheiro (`scene1/` a `scene13/`, iguais fora da linha do `<base>` — D28),

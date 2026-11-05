@@ -30,7 +30,8 @@
 // After the migration the file it read stops existing: the worlds are the scene from here on, and
 // the tool refuses to run twice (there is no data/scene.json any more).
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { writeAtomic, writeJson } from '../coordination/atomic.mjs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateScene, summarise } from '../../js/scene/validation.js';
@@ -350,8 +351,7 @@ if (failed) {
 }
 
 if (!checkOnly) {
-  mkdirSync(join(root, 'data', 'worlds'), { recursive: true });
-  for (const world of worlds) writeFileSync(resolve(root, world.file), JSON.stringify(world.scene, null, 2) + '\n', 'utf8');
+  for (const world of worlds) writeJson(resolve(root, world.file), world.scene);
   console.log(`written: ${worlds.map((world) => world.file).join(', ')}`);
 } else {
   console.log('--check: nothing was written');

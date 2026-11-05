@@ -11,7 +11,8 @@
 // dado. Aqui lê-se o disco, imprime-se a tabela e, só com `--aplicar`, escreve-se.
 //
 // Uso: node tools/scene/reality.mjs [--aplicar] [mundo...]
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { writeAtomic } from '../coordination/atomic.mjs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { realityHoles, sameHoles } from '../../js/scene/reality.js';
@@ -106,7 +107,7 @@ if (!apply) {
 for (const [slug, file] of files) {
   if (!file.written) continue;
   const text = JSON.stringify(worlds.get(slug), null, 2).replace(/\n/g, file.eol) + file.eol;
-  writeFileSync(join(directory, file.name), text, 'utf8');
+  writeAtomic(join(directory, file.name), text);
 }
 const written = [...files.entries()].filter(([, file]) => file.written).map(([slug]) => slug);
 console.log(written.length === 0 ? 'nada a escrever' : 'escrito: ' + written.join(', '));

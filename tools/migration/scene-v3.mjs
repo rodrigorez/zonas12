@@ -22,7 +22,8 @@
 // After this migration the files are the record of it: the tool refuses to run on a file that is
 // not format 2 — the same guard the HTML converter (convert.mjs) has since Fase 3.
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
+import { writeAtomic } from '../coordination/atomic.mjs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SCENE_VERSION } from '../../js/scene/schema.js';
@@ -138,7 +139,7 @@ for (const file of FILES) {
     failed++;
     continue;
   }
-  if (!checkOnly) writeFileSync(path, JSON.stringify(after, null, 2) + '\n', 'utf8');
+  if (!checkOnly) writeAtomic(path, JSON.stringify(after, null, 2) + '\n');
 }
 
 if (failed) {

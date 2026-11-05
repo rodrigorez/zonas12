@@ -18,7 +18,8 @@
 //
 // Uso: node tools/migration/graph-d77.mjs            (mostra o que mudava, não escreve)
 //      node tools/migration/graph-d77.mjs --aplicar  (escreve, preservando o fim de linha do ficheiro)
-import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
+import { writeAtomic } from '../coordination/atomic.mjs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FIXTURES } from '../../js/scene/fixtures.js';
@@ -252,7 +253,7 @@ if (!apply) {
 for (const slug of slugs) {
   const world = worlds.get(slug);
   const texto = JSON.stringify(world.scene, null, 2).replace(/\n/g, world.eol) + world.eol;
-  writeFileSync(join(root, 'data', 'worlds', world.file), texto, 'utf8');
+  writeAtomic(join(root, 'data', 'worlds', world.file), texto);
 }
 console.log('');
 console.log(`escrito: ${slugs.length} ficheiros de mundo em data/worlds/`);

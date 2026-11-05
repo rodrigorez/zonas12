@@ -26,18 +26,17 @@ import { createServer } from 'node:http';
 import {
   createReadStream,
   existsSync,
-  mkdirSync,
   readFileSync,
   readdirSync,
-  renameSync,
-  statSync,
-  writeFileSync
+  statSync
 } from 'node:fs';
 import { dirname, extname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SCENE_VERSION } from '../../js/scene/schema.js';
 import { validateScene } from '../../js/scene/validation.js';
 import { diskQuestions } from '../scene/disk.mjs';
+import { isFixture } from '../../js/scene/fixtures.js';
+import { backupTo, writeAtomic } from '../coordination/atomic.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const ROOT = resolve(here, '..', '..');
@@ -269,15 +268,12 @@ async function saveWorld(request, response, context, slug) {
     return;
   }
 
-  // A cópia de segurança **antes** de tocar no ficheiro (D51): o que se perde é o anterior.
+  // A cópia de segurança **antes** de tocar no ficheiro (D51): o que se perde é o anterior. E a escrita
+  // atómica (D96, M0) — a mesma de todas as ferramentas desde a v0.0.28: um mundo truncado é pior do que
+  // não gravar.
   const backup = join(backups, slug, stamp() + '.json');
-  mkdirSync(dirname(backup), { recursive: true });
-  writeFileSync(backup, readFileSync(file));
-
-  // A escrita atómica: a meio de um mundo truncado é pior do que não gravar.
-  const temporary = file + '.tmp';
-  writeFileSync(temporary, body);
-  renameSync(temporary, file);
+  backupTo(file, backup);
+  writeAtomic(file, body);
 
   sendJson(response, 200, {
     file: 'data/worlds/' + slug + '.json',

@@ -13,7 +13,8 @@
 // sempre), e o módulo fica com o aviso e o número medido — não é um aceite silencioso.
 //
 // O ficheiro instalado é a fonte de verdade a partir daí; o `.glsl` foi só o transporte.
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
+import { writeAtomic } from '../coordination/atomic.mjs';
 import { basename, extname, join } from 'node:path';
 import { ROOT } from '../regression/harness.mjs';
 import { checkSource, measure, verdict, readBody, LIMITS } from './measure.mjs';
@@ -87,7 +88,7 @@ function register(id) {
   const list = current.map((entry, index) => `  ${entry}${index === current.length - 1 ? '' : ','}`).join(eol);
   const updated = withImport.replace(listPattern,
     `$1${eol}${list}${eol}  $3`);
-  writeFileSync(REGISTRY, updated, 'utf8');
+  writeAtomic(REGISTRY, updated);
   return { changed: true, identifier };
 }
 
@@ -135,7 +136,7 @@ async function main() {
 
   const file = join(ROOT, 'js', 'shaders', id + '.js');
   const replaced = existsSync(file);
-  writeFileSync(file, moduleText(id, name, body, !result.ok), 'utf8');
+  writeAtomic(file, moduleText(id, name, body, !result.ok));
   const registry = register(id);
 
   console.log('');

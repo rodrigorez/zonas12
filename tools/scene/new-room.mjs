@@ -24,7 +24,8 @@
 //   --destinos a,b,c     as salas para onde as portas levam, **sem** o portão (que entra sempre, L24).
 //                        Obrigatório: é a decisão D-B da spec, e a L25 é verificada antes de escrever
 //   --sem-ferramentas    só escreve o dado; não corre anéis, giro, buracos nem o validador
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { writeAtomic, writeJson } from '../coordination/atomic.mjs';
 import { basename, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { ROOT } from '../regression/harness.mjs';
@@ -78,7 +79,7 @@ function escreverMundo(mundo) {
   // O mesmo que o editor exporta: 2 espaços e um `\n` no fim — e o EOL que o ficheiro já tinha (cinco
   // dos ficheiros de mundo são CRLF, e reescrevê-los a LF mudava o ficheiro inteiro num diff).
   const corpo = JSON.stringify(mundo.cena, null, 2).replace(/\n/g, mundo.eol) + mundo.eol;
-  writeFileSync(mundo.ficheiro, corpo, 'utf8');
+  writeAtomic(mundo.ficheiro, corpo);
 }
 
 function lerArgumentos(argv) {
@@ -333,7 +334,8 @@ for (const destino of destinos) {
 
 // ---- escrever ----
 
-writeFileSync(join(MUNDOS, slug + '.json'), JSON.stringify(salaNova, null, 2) + '\n', 'utf8');
+// Atómica: um `new-room` morto a meio não deixa a sala nova truncada (D96, M0).
+writeJson(join(MUNDOS, slug + '.json'), salaNova);
 for (const mundo of tocados) escreverMundo(mundo);
 
 console.log('escrito: data/worlds/' + slug + '.json (2 dimensões, ' + salaNova.portals.length + ' portas)');
