@@ -89,9 +89,10 @@ zonas12/
 │   ├── covers/         a capa de aviso, quando nenhuma das tentativas dá (D65)
 │   └── previews/       os retratos das portas de mundo (um por porta — D46)
 ├── tools/
-│   ├── coordination/        a **escrita atómica** (D96, M0): um temporário ao lado do destino, `fsync`
-│   │                        e `rename` — o destino é o antigo ou o novo, nunca um meio. É a casa única
-│   │                        que o `serve.mjs` já era desde a D51
+│   ├── coordination/        a **oficina** (D96): a escrita atómica (`atomic.mjs`), a trava que deixa
+│   │                        **vários agentes** trabalhar sem se apagarem (`locks.mjs`), quem está a
+│   │                        escrever agora (`status.mjs`) — estado em `<git-common-dir>/zonas-run/`,
+│   │                        que é o único sítio que todos os worktrees vêem
 │   ├── scene/               validador dos ficheiros de cena (corre a mesma validação que o browser,
 │   │                        mais o grafo dos mundos e os arranques), o instrumento das leis
 │   │                        (avarias injetadas, uma por lei), o verificador dos arranques (D28), a
@@ -270,7 +271,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.29)
+## Estado atual do código (v0.0.30)
 
 > **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
 > pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
@@ -690,7 +691,44 @@ geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
 
-A **v0.0.29** fecha a armadilha nº 1 do guia, encontrada numa auditoria da criação de salas: o
+A **v0.0.30** é o **M1 e o M2 da D96**, e existe para responder a uma pergunta só: *podem vários agentes
+criar salas ao mesmo tempo?* Medido antes desta versão, **não**: em três tentativas de dois `new-room` em
+paralelo, duas perderam uma porta inteira e a terceira deixou uma sala com seis. Agora pode.
+
+**A oficina** (`tools/coordination/locks.mjs`). Uma trava só — não uma por ficheiro — porque os
+escritores deste projeto não escrevem um ficheiro: escrevem o conjunto (a sala, o portão, cada destino e
+depois as quatro derivadas, que reescrevem todos os mundos). `mkdir` como primitiva, porque é atómico; o
+dono em `dono.json` com pid e motivo; e a pergunta certa para saber se a trava é de um morto é **«o dono
+ainda existe»** (`process.kill(pid, 0)`), não «há quanto tempo» — um `SIGKILL` não corre manipuladores de
+saída. O estado vive em `<git-common-dir>/zonas-run/` e não em `.harness/`: o `.harness/` é um directório
+diferente por *worktree*, e duas sessões em worktrees distintos não se veriam.
+
+**O detalhe que decidiu tudo: a trava tem de ser tomada antes de LER, não antes de escrever.** A primeira
+versão travava só a escrita e continuava a perder portas — dois processos liam a `scene10` com quatro
+portas, os dois concluíam que cabia, e o segundo escrevia por cima do primeiro. O que precisa de ser
+atómico é o par **ler→escrever**. Medido depois: três tentativas com destinos em conflito — **nenhuma
+perda**, o segundo processo é recusado pela L24 com a sala e o número; e duas tentativas com destinos
+independentes — **as duas entram**, o portão vai a 15 e as quatro chegadas ficam.
+
+**Os filhos herdam a secção crítica.** O `new-room` toma a oficina e *chama* o `ring`, o `azimuths`, o
+`reality` e o `sorteio`. Se cada um tentasse tomar a mesma trava, ficavam à espera de si próprios; o pai
+marca `ZONAS_TRAVA_OFICINA=1` e os filhos correm dentro dela. Todos os escritores a tomam: as cinco
+ferramentas de cena, a folha, os retratos, o instalador de shaders — e o **«Gravar» do editor**, que
+espera e responde **503** com o motivo em vez de escrever por cima.
+
+**O juiz passou a porteiro.** O `new-room --mapa` lê os destinos de `data/mapa.json` — só os vizinhos que
+**já existem**, porque uma porta para uma sala que ainda não nasceu é a L11 — e recusa `--mapa` junto de
+`--destinos` (duas fontes dariam duas verdades).
+
+**E dois instrumentos entraram no `all.mjs`:** o `mapa.mjs` (o único que julga a topologia antes de uma
+sala existir) e o `selftest.mjs` do servidor — que estava vermelho **desde a L24** porque o mundo de
+ensaio dele tinha zero portas, e que ninguém via por não estar em bateria nenhuma. Passou a **34 de 34**.
+
+O que continua por fazer: o **integrador** (a fila da fase derivada, M3). A oficina serializa a escrita,
+que é o que impede a perda; a fila é o que evita que catorze agentes esperem uns pelos outros no momento
+errado.
+
+A **v0.0.29** fechou a armadilha nº 1 do guia, encontrada numa auditoria da criação de salas: o
 `new-room` **nunca contava as portas do destino**. Levar a porta de chegada a uma sala já com cinco não
 era recusado — a ferramenta escrevia a sala nova, o portão e os destinos, corria as quatro derivadas
 sobre todos os mundos, e só no fim o validador dizia `the world has 6 door(s) — law L24`. Nove ficheiros
@@ -2383,7 +2421,9 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 | --- | --- |
 | `tools/scene/validate.mjs` | os ficheiros de mundo (o portão, as treze salas e os cinco fixtures), as leis **L1–L30**, o grafo das portas e os arranques |
 | `tools/scene/laws-selftest.mjs` | **35** avarias injectadas, todas detectadas, com o controlo limpo — a L29 e a L30 entram com a avaria **e** com o seu controlo negativo |
-| `tools/scene/mapa.mjs` | o **mapa das portas** (D96): as 27 salas contra a L24 e a L25, o acordo com o disco e os 14 passos da obra, cada um julgado; `--grafo` e `--dossie` para o trabalho manual |
+| `tools/scene/mapa.mjs` | o **mapa das portas** (D96): as 27 salas contra a L24 e a L25, o acordo com o disco e os 14 passos da obra, cada um julgado; `--grafo` e `--dossie` para o trabalho manual. Desde a v0.0.30 está no `all.mjs` |
+| `tools/coordination/status.mjs` | quem está a escrever nos mundos agora, e se o dono da trava está morto (o próximo a chegar reclama-a) |
+| `tools/server/selftest.mjs` | a **gravação do editor** por HTTP: origem, tipo, versão, validação, cópia de segurança e escrita atómica. Ficou de fora das baterias desde a D48 — e foi assim que a gravação passou meses a devolver 500. Entrou no `all.mjs` na v0.0.30 |
 | `tools/scene/sorteio.mjs` | o movimento **sorteado** das portas de uma sala nova (D87): ensaio por omissão, `--aplicar` para escrever, `--semente N` para repetir a mesma sala |
 | `tools/scene/ensaio-dois-aneis.mjs` | o ensaio dos **anéis do portão** (D97) na `scene100`: mede o passo, a corda e a folga de cada anel e, com `--aplicar`, escreve as 28 portas do ensaio |
 | `tools/regression/twelve-tests.mjs` | **T2–T12** nas páginas do **dado** — **113** verificações, uma delas a cobertura da lista (que cresce com as salas: 99 com doze, 113 com treze) |

@@ -54,7 +54,7 @@ O número de hoje, para se saber quando é que um passo ficou a meio: **14 pági
 salas), **19 ficheiros de mundo** (as 14 e 5 fixtures, dos quais a sala de ensaio da §9), **66 portas**
 nas catorze páginas — **todas em movimento desde a D91** (§11) —, **67 obras**, **56 retratos** (um par
 `.jpg` + `.png` por porta com janela de pré-visualização, contando as três da sala de ensaio), **31 leis**
-(L1–L31) e **28 baterias** no `--full`.
+(L1–L31) e **30 baterias** no `--full`.
 
 E o número que a §10 acrescenta, porque é ele que uma sala nova vai ter de cumprir: **cada porta da
 sala nova oscila**, e o sorteio do movimento é rejeitado uma vez em cada três (§10.3).
@@ -488,7 +488,7 @@ Uma sala está pronta quando **todas** estas linhas forem verdade, pela ordem em
 - [ ] o `twelve-tests.mjs` diz **«a lista cobre todas as salas do dado (N)»** com o N do validador
 - [ ] o `traversal-tests.mjs` prova que **parado o visitante não é levado** pela porta em movimento e
       que **a andar ao lado do plano também não** — e que a atravessar o plano é (o controlo, D91)
-- [ ] `node tools/regression/all.mjs --full` dá **28 de 28** (ou a única vermelha é a D46, com o
+- [ ] `node tools/regression/all.mjs --full` dá **30 de 30** (ou a única vermelha é a D46, com o
       número comparado com o último registo — e uma bateria que falhou por um quadro tardio repete-se
       antes de se escrever o resultado)
 - [ ] o `README.md` e o `ROADMAP.md` têm os números novos

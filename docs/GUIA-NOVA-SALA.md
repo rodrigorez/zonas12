@@ -15,7 +15,7 @@
 >
 > **Os números das frases crescem.** Hoje (**2026-11-04**, com a D94 no método e a D95 nos números):
 > **14 páginas** (o portão e treze salas), **19 ficheiros de mundo**, **66 portas**, **67 obras**,
-> **56 retratos**, **31 leis** (L1–L31) e **28 baterias** no `--full`. O `14 mundo(s)`, o `56 porta(s)`
+> **56 retratos**, **31 leis** (L1–L31) e **30 baterias** no `--full`. O `14 mundo(s)`, o `56 porta(s)`
 > e o `(14)` do «a lista cobre todas as salas do dado» sobem a cada sala — o que não muda é a **forma**
 > da frase.
 >
@@ -104,15 +104,26 @@ node tools/scene/new-world.mjs <slug>
 > **Os destinos não se escolhem: copiam-se.** O comando deste passo sai pronto de
 > `node tools/scene/mapa.mjs --dossie <slug>`, que já sabe quais dos vizinhos do mapa **existem hoje**
 > — uma sala não pode apontar para outra que ainda não nasceu (L11), e as portas que faltam chegam
-> quando as vizinhas nascerem. O `--destinos` abaixo é o que o dossiê imprime, não uma escolha.
+> quando as vizinhas nascerem. O `--destinos` abaixo é o que o dossiê imprime, não uma escolha. E desde
+> a v0.0.30 nem é preciso copiar: **`--mapa`** lê-os do próprio plano.
+>
+> **Vários agentes ao mesmo tempo: pode.** O `new-room` toma a **oficina** (a trava de
+> `tools/coordination/`), e toma-a **antes de ler** — é isso que impede que dois agentes leiam a mesma
+> sala de destino com quatro portas, concluam os dois que cabe, e o segundo escreva por cima do
+> primeiro. Se a oficina estiver ocupada, o comando **espera** (120 s por omissão, `--esperar N`); se a
+> espera acabar, sai com **75** — que não é erro, é «repete». E se o que mudou entretanto for a lotação
+> do destino, a resposta é a L24 a recusar, com a sala e o número. Quem está a escrever agora:
+> `node tools/coordination/status.mjs`.
 
 ```
-node tools/scene/new-room.mjs <slug> --destinos scene5,scene7 --nome-pt "…" --nome-en "…" [--fundo scene1]
+node tools/scene/new-room.mjs <slug> --mapa --nome-pt "…" --nome-en "…" [--fundo scene1] [--esperar 120]
 ```
 
 | opção | o que faz |
 | --- | --- |
-| `--destinos a,b` | **2 a 4** salas, **sem** o portão (ele entra sozinho). Obrigatório. |
+| `--mapa` | os destinos vêm de `data/mapa.json` — só os vizinhos que **já existem**. Não se mistura com `--destinos`. |
+| `--destinos a,b` | **2 a 4** salas, **sem** o portão (ele entra sozinho). A alternativa ao `--mapa`. |
+| `--esperar N` | segundos que aceita esperar pela oficina (por omissão 120; `0` = não espera, sai com 75) |
 | `--nome-pt` / `--nome-en` | o nome da sala nas duas línguas. **Sem isto a sala aparece com o slug.** |
 | `--fundo <salas>` | de que sala se copiam o fundo, a câmara e a imagem de reserva (por omissão `scene1`) |
 | `--sem-ferramentas` | só escreve o dado: não corre anéis, giro, buracos, sorteio nem validador |
@@ -341,7 +352,7 @@ node tools/scene/validate.mjs
 node tools/regression/all.mjs --full
 ```
 
-- **Tem de dizer:** `28 de 28 baterias passaram (X s)`.
+- **Tem de dizer:** `30 de 30 baterias passaram (X s)`.
 - **O que é admissível, e só isto:** o registo da D93 fechou com **3 de 28** vermelhas — a costura e
   duas que falharam por um quadro tardio (a `shader.mjs` e o `assets.mjs`) e passam sozinhas quando
   repetidas. Uma bateria que falha por um quadro tardio **repete-se**, e escreve-se o que deu: nunca se

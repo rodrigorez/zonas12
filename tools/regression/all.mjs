@@ -29,6 +29,12 @@ const NUCLEO = [
   // que as repete envelhece em silêncio (dizia «18 ficheiros» e «31 avarias» quando já eram outros).
   { nome: 'o dado: os ficheiros de mundo, as leis, o grafo e os arranques', script: 'tools/scene/validate.mjs' },
   { nome: 'as leis: as avarias injectadas e o controlo limpo', script: 'tools/scene/laws-selftest.mjs' },
+  // O mapa (D96): o plano das 27 salas contra a L24 e a L25, o acordo com o disco e os passos da obra.
+  // Corre em menos de um segundo e é o único instrumento que julga a topologia **antes** de uma sala.
+  { nome: 'o mapa das portas (o balcão)', script: 'tools/scene/mapa.mjs' },
+  // O servidor da ferramenta (Fase 5): a única bateria que grava por HTTP, que é por onde o editor grava.
+  // Ficou de fora desde a D48 e foi assim que a gravação passou meses a devolver 500 (v0.0.29).
+  { nome: 'o servidor da ferramenta (a gravação do editor)', script: 'tools/server/selftest.mjs' },
   // O importador da folha (D62/D67): rápido, sem browser, e é a única proteção entre uma folha e o dado.
   { nome: 'o importador da folha (D67)', script: 'tools/regression/csv.mjs' }
 ];

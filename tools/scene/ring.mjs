@@ -16,6 +16,7 @@
 //      (--aplicar põe as obras e as portas nos anéis, e é a única coisa que escreve)
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { writeAtomic } from '../coordination/atomic.mjs';
+import { oficina } from '../coordination/locks.mjs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -343,11 +344,14 @@ for (const world of worlds) {
 }
 
 // A escrita, com o fim de linha de cada ficheiro: o diff passa a ser só o que mudou.
+// Dentro da oficina (D96, M1): dois `ring` ao mesmo tempo reescrevem os mesmos mundos e um perde o outro.
 if (apply && writtenWorlds.length > 0) {
-  for (const world of writtenWorlds) {
-    const text = JSON.stringify(world.scene, null, 2).replace(/\n/g, world.eol) + world.eol;
-    writeAtomic(join(directory, world.file), text);
-  }
+  oficina('os anéis (ring --aplicar)', () => {
+    for (const world of writtenWorlds) {
+      const text = JSON.stringify(world.scene, null, 2).replace(/\n/g, world.eol) + world.eol;
+      writeAtomic(join(directory, world.file), text);
+    }
+  });
 }
 
 // As combinações que uma sala pode ter depois do grafo da D77 — 3 a 7 obras e 3 a 5 portas — medidas

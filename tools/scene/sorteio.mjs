@@ -24,6 +24,7 @@
 // todas as portas do mundo, de novo.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { writeAtomic } from '../coordination/atomic.mjs';
+import { oficina } from '../coordination/locks.mjs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { alcanceDaPorta, chegadaVarrida, ALCANCE_MINIMO } from '../../js/scene/reach.js';
@@ -176,8 +177,11 @@ if (!apply) {
 
 for (const slug of wanted) {
   const file = files.get(slug);
-  const texto = JSON.stringify(worlds.get(slug), null, 2).replace(/\n/g, file.eol) + file.eol;
-  writeAtomic(join(directory, file.name), texto);
+  // A oficina (D96, M1) — os mundos são os mesmos que o `new-room` e as outras derivadas escrevem.
+  oficina('o movimento das portas (sorteio --aplicar)', () => {
+    const texto = JSON.stringify(worlds.get(slug), null, 2).replace(/\n/g, file.eol) + file.eol;
+    writeAtomic(join(directory, file.name), texto);
+  });
   console.log('escrito data/worlds/' + file.name + ' (fim de linha ' +
     (file.eol === '\r\n' ? 'CRLF' : 'LF') + ')');
 }

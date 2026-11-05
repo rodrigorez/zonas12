@@ -13,6 +13,7 @@
 // Uso: node tools/scene/azimuths.mjs [--aplicar] [mundo...]
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { writeAtomic } from '../coordination/atomic.mjs';
+import { oficina } from '../coordination/locks.mjs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FIRST_VISIT_AZIMUTH, portraitTurn, ringCoordinates } from '../../js/scene/ring.js';
@@ -125,8 +126,11 @@ if (!apply) {
 
 for (const [slug, file] of files) {
   if (!file.written) continue;
-  const text = JSON.stringify(worlds.get(slug), null, 2).replace(/\n/g, file.eol) + file.eol;
-  writeAtomic(join(directory, file.name), text);
+  // A oficina (D96, M1): a escrita é curta, mas os ficheiros são os mesmos que o `new-room` escreve.
+  oficina('o giro dos retratos (azimuths --aplicar)', () => {
+    const text = JSON.stringify(worlds.get(slug), null, 2).replace(/\n/g, file.eol) + file.eol;
+    writeAtomic(join(directory, file.name), text);
+  });
 }
 const written = [...files.entries()].filter(([, file]) => file.written).map(([slug]) => slug);
 console.log(written.length === 0 ? 'nada a escrever' : 'escrito: ' + written.join(', '));

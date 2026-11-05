@@ -33,7 +33,7 @@ const SEGREDO = 'não se publica\n';
 // não há lei que se lhe aplique. É o mundo sobre o que as gravações são medidas.
 const MUNDO = {
   version: 3,
-  world: { slug: 'teste', name: { pt: 'Teste', en: 'Test' } },
+  world: { slug: 'exemplo-ficha', name: { pt: 'Teste', en: 'Test' } },
   cameras: { player: { position: [0, 1.6, 0], speed: 0.1 }, real: { enabled: false } },
   assets: {},
   dimensions: [{ id: 0, kind: 'camera', name: { pt: 'Realidade', en: 'Reality' } }],
@@ -60,7 +60,7 @@ function fixture() {
   mkdirSync(join(root, 'node_modules'), { recursive: true });
   writeFileSync(join(root, 'index.html'), '<!doctype html><title>raiz</title>\n');
   writeFileSync(join(root, 'scene1', 'index.html'), '<!doctype html><title>sala</title>\n');
-  writeFileSync(join(root, 'data', 'worlds', 'teste.json'), text(MUNDO));
+  writeFileSync(join(root, 'data', 'worlds', 'exemplo-ficha.json'), text(MUNDO));
   writeFileSync(join(root, '.harness', 'segredo.txt'), SEGREDO);
   writeFileSync(join(root, '.git', 'config'), '[core]\n');
   writeFileSync(join(root, 'node_modules', 'pacote.js'), 'module.exports = 1;\n');
@@ -109,7 +109,7 @@ async function main() {
     result.check('/scene1 sem a barra mudou de endereço para /scene1/',
       semBarra.status === 301 && semBarra.headers.location === '/scene1/',
       'HTTP ' + semBarra.status + ' → ' + semBarra.headers.location);
-    const mundo = await ask(port, '/data/worlds/teste.json');
+    const mundo = await ask(port, '/data/worlds/exemplo-ficha.json');
     result.check('o ficheiro de um mundo é servido como JSON',
       mundo.status === 200 && /application\/json/.test(mundo.headers['content-type'] || ''),
       'HTTP ' + mundo.status + ', ' + mundo.headers['content-type']);
@@ -144,10 +144,10 @@ async function main() {
       faltando.headers['x-zonas12-serve'] === '1', 'HTTP ' + faltando.status + ' com a marca');
 
     // ---- o que a mesma origem impede ----
-    const outroHost = await ask(port, '/api/worlds/teste', { method: 'PUT', headers: { Host: 'evil.example' } });
+    const outroHost = await ask(port, '/api/worlds/exemplo-ficha', { method: 'PUT', headers: { Host: 'evil.example' } });
     result.check('um Host que não é da máquina é recusado',
       outroHost.status === 403, 'HTTP ' + outroHost.status);
-    const outraOrigem = await ask(port, '/api/worlds/teste', {
+    const outraOrigem = await ask(port, '/api/worlds/exemplo-ficha', {
       method: 'PUT', headers: { Origin: 'http://evil.example' }, body: text(MUNDO)
     });
     result.check('um Origin de outro sítio é recusado',
@@ -161,7 +161,7 @@ async function main() {
       rota.status === 404 && /json/.test(rota.headers['content-type'] || ''), 'HTTP ' + rota.status);
 
     // ---- a escrita: o que ela recusa (D50) ----
-    const arquivo = join(root, 'data', 'worlds', 'teste.json');
+    const arquivo = join(root, 'data', 'worlds', 'exemplo-ficha.json');
     const antes = readFileSync(arquivo, 'utf8');
     const put = (slug, body, headers) => ask(port, '/api/worlds/' + slug, {
       method: 'PUT',
@@ -169,15 +169,15 @@ async function main() {
       body
     });
 
-    const naoJson = await put('teste', '{ isto não é json');
+    const naoJson = await put('exemplo-ficha', '{ isto não é json');
     result.check('um corpo que não é JSON é 400', naoJson.status === 400, 'HTTP ' + naoJson.status);
-    const versao = await put('teste', text(Object.assign({}, MUNDO, { version: 2 })));
+    const versao = await put('exemplo-ficha', text(Object.assign({}, MUNDO, { version: 2 })));
     result.check('uma versão que não é a do esquema é 400', versao.status === 400, 'HTTP ' + versao.status);
-    const trocado = await put('teste', text(Object.assign({}, MUNDO, {
+    const trocado = await put('exemplo-ficha', text(Object.assign({}, MUNDO, {
       world: Object.assign({}, MUNDO.world, { slug: 'outro' })
     })));
     result.check('um slug que não é o do ficheiro é 400', trocado.status === 400, 'HTTP ' + trocado.status);
-    const comErro = await put('teste', text(MUNDO_COM_ERRO));
+    const comErro = await put('exemplo-ficha', text(MUNDO_COM_ERRO));
     result.check('um mundo com erros é 422 (a mesma regra do exportar)', comErro.status === 422,
       'HTTP ' + comErro.status);
     const novo = await put('novo-mundo', text(Object.assign({}, MUNDO, {
@@ -186,14 +186,14 @@ async function main() {
     result.check('um mundo que não existe não é criado (404, D31)',
       novo.status === 404 && !existsSync(join(root, 'data', 'worlds', 'novo-mundo.json')),
       'HTTP ' + novo.status);
-    const comPontos = await put('..%2fteste', text(MUNDO));
+    const comPontos = await put('..%2fexemplo-ficha', text(MUNDO));
     result.check('um slug com .. não escreve nada (M2)', comPontos.status === 400,
       'HTTP ' + comPontos.status);
-    const deFora = await put('teste', text(MUNDO), { Origin: 'http://evil.example' });
+    const deFora = await put('exemplo-ficha', text(MUNDO), { Origin: 'http://evil.example' });
     result.check('gravar a partir de outro sítio é 403', deFora.status === 403, 'HTTP ' + deFora.status);
-    const semTipo = await ask(port, '/api/worlds/teste', { method: 'PUT', body: text(MUNDO) });
+    const semTipo = await ask(port, '/api/worlds/exemplo-ficha', { method: 'PUT', body: text(MUNDO) });
     result.check('gravar sem Content-Type JSON é 415', semTipo.status === 415, 'HTTP ' + semTipo.status);
-    const leitura = await ask(port, '/api/worlds/teste');
+    const leitura = await ask(port, '/api/worlds/exemplo-ficha');
     result.check('ler pela rota de escrita é 405 e diz que o método é PUT',
       leitura.status === 405 && /PUT/.test(String(leitura.headers.allow || '')),
       'HTTP ' + leitura.status + ', Allow: ' + leitura.headers.allow);
@@ -201,7 +201,7 @@ async function main() {
     result.check('nenhuma recusa tocou no ficheiro',
       readFileSync(arquivo, 'utf8') === antes, 'o ficheiro está como estava');
     result.check('nenhuma recusa deixou cópia de segurança',
-      !existsSync(join(root, '.harness', 'backups', 'worlds', 'teste')), 'sem pasta de cópias');
+      !existsSync(join(root, '.harness', 'backups', 'worlds', 'exemplo-ficha')), 'sem pasta de cópias');
 
     // ---- a escrita: o que ela faz (D51, M3 e M5) ----
     const mudado = Object.assign({}, MUNDO, {
@@ -210,13 +210,13 @@ async function main() {
       })
     });
     const enviado = text(mudado);
-    const bom = await put('teste', enviado);
+    const bom = await put('exemplo-ficha', enviado);
     let gravado = null;
     try { gravado = JSON.parse(bom.body); } catch { gravado = null; }
     result.check('gravar responde com o ficheiro, os bytes e a cópia',
-      bom.status === 200 && gravado !== null && gravado.file === 'data/worlds/teste.json' &&
+      bom.status === 200 && gravado !== null && gravado.file === 'data/worlds/exemplo-ficha.json' &&
       gravado.bytes === Buffer.byteLength(enviado) &&
-      /^\.harness\/backups\/worlds\/teste\/.+\.json$/.test(gravado.backup || ''),
+      /^\.harness\/backups\/worlds\/exemplo-ficha\/.+\.json$/.test(gravado.backup || ''),
       'HTTP ' + bom.status + ', ' + (gravado ? gravado.file + ' ← ' + gravado.backup : '?'));
     result.check('o ficheiro gravado é byte-idêntico ao que foi enviado (M3)',
       readFileSync(arquivo, 'utf8') === enviado, Buffer.byteLength(enviado) + ' bytes');
@@ -229,9 +229,9 @@ async function main() {
         player: Object.assign({}, mudado.cameras.player, { position: [0, 1.8, 0] })
       })
     }));
-    const segunda = await put('teste', outra);
-    const copias = existsSync(join(root, '.harness', 'backups', 'worlds', 'teste'))
-      ? readdirSync(join(root, '.harness', 'backups', 'worlds', 'teste'))
+    const segunda = await put('exemplo-ficha', outra);
+    const copias = existsSync(join(root, '.harness', 'backups', 'worlds', 'exemplo-ficha'))
+      ? readdirSync(join(root, '.harness', 'backups', 'worlds', 'exemplo-ficha'))
       : [];
     result.check('a segunda gravação deixa uma segunda cópia',
       segunda.status === 200 && copias.length === 2, copias.length + ' cópia(s)');

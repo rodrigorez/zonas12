@@ -37,6 +37,7 @@ import { validateScene } from '../../js/scene/validation.js';
 import { diskQuestions } from '../scene/disk.mjs';
 import { isFixture } from '../../js/scene/fixtures.js';
 import { backupTo, writeAtomic } from '../coordination/atomic.mjs';
+import { OCUPADO, oficina } from '../coordination/locks.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const ROOT = resolve(here, '..', '..');
@@ -271,9 +272,26 @@ async function saveWorld(request, response, context, slug) {
   // A cópia de segurança **antes** de tocar no ficheiro (D51): o que se perde é o anterior. E a escrita
   // atómica (D96, M0) — a mesma de todas as ferramentas desde a v0.0.28: um mundo truncado é pior do que
   // não gravar.
+  //
+  // A oficina (D96, M1): enquanto um agente corre o `new-room`, este mundo é reescrito pelas derivadas
+  // dele. Gravar por cima seria perder o trabalho de um dos dois. A gravação é curta, por isso espera —
+  // e se a espera acabar, responde 503 com o motivo em vez de escrever por cima.
   const backup = join(backups, slug, stamp() + '.json');
-  backupTo(file, backup);
-  writeAtomic(file, body);
+  try {
+    oficina('gravar ' + slug + ' pelo editor', () => {
+      backupTo(file, backup);
+      writeAtomic(file, body);
+    }, { esperar: 20, sairNoOcupado: false });
+  } catch (error) {
+    if (error.codigo === OCUPADO) {
+      sendJson(response, 503, {
+        error: 'another agent is writing to the worlds right now — try again in a moment',
+        detail: error.message
+      });
+      return;
+    }
+    throw error;
+  }
 
   sendJson(response, 200, {
     file: 'data/worlds/' + slug + '.json',

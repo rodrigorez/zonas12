@@ -24,8 +24,13 @@
 //   --destinos a,b,c     as salas para onde as portas levam, **sem** o portão (que entra sempre, L24).
 //                        Obrigatório: é a decisão D-B da spec, e a L25 é verificada antes de escrever
 //   --sem-ferramentas    só escreve o dado; não corre anéis, giro, buracos nem o validador
+//   --esperar N          segundos que aceita esperar pela oficina (por omissão 120; 0 = não espera)
+//   --mapa               os destinos vêm de `data/mapa.json` (o plano), não do que se escreve aqui:
+//                        só entram os que já existem, porque uma porta para uma sala que ainda não
+//                        nasceu é a L11. É a forma de o juiz ser também o porteiro (D96)
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { writeAtomic, writeJson } from '../coordination/atomic.mjs';
+import { OCUPADO, OFICINA, HERDADA, tomar } from '../coordination/locks.mjs';
 import { basename, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { ROOT } from '../regression/harness.mjs';
@@ -83,7 +88,7 @@ function escreverMundo(mundo) {
 }
 
 function lerArgumentos(argv) {
-  const opcoes = { slug: null, nomePt: null, nomeEn: null, fundo: 'scene1', destinos: null, ferramentas: true };
+  const opcoes = { slug: null, nomePt: null, nomeEn: null, fundo: 'scene1', destinos: null, ferramentas: true, esperar: 120 };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--nome-pt') opcoes.nomePt = argv[++i];
@@ -91,6 +96,8 @@ function lerArgumentos(argv) {
     else if (arg === '--fundo') opcoes.fundo = argv[++i];
     else if (arg === '--destinos') opcoes.destinos = String(argv[++i] || '').split(',').map((s) => s.trim()).filter(Boolean);
     else if (arg === '--sem-ferramentas') opcoes.ferramentas = false;
+    else if (arg === '--esperar') opcoes.esperar = Number(argv[++i]);
+    else if (arg === '--mapa') opcoes.mapa = true;
     else if (!arg.startsWith('--') && !opcoes.slug) opcoes.slug = arg;
     else morrer('argumento desconhecido: ' + arg);
   }
@@ -131,17 +138,88 @@ if (existsSync(join(MUNDOS, slug + '.json'))) {
   morrer('data/worlds/' + slug + '.json já existe: esta ferramenta não escreve por cima');
 }
 
+// ---- a oficina (D96, M1): toma-se **antes de ler**, e não antes de escrever ----
+//
+// A diferença foi medida. Travar só a escrita deixa a corrida toda de pé: dois processos leem a
+// `scene10` com quatro portas, os dois concluem que cabe, o primeiro escreve e o segundo escreve por
+// cima do primeiro com o que tinha lido — e uma porta desaparece (2 de 3 tentativas, e a `scene1` do
+// portão ficou com catorze em vez de quinze). O que precisa de ser atómico é o par ler→escrever.
+//
+// O custo é a espera, e é pequena: a secção crítica inteira — ler, validar, escrever a sala, a porta do
+// portão, cada destino, e as quatro derivadas sobre todos os mundos — mede 0,1 a 0,2 s por derivada.
+const oficinaTomada = (() => {
+  try {
+    return tomar(OFICINA, { motivo: 'new-room ' + slug, esperar: opcoes.esperar });
+  } catch (error) {
+    if (error.codigo === OCUPADO) {
+      console.error('ocupado: ' + error.message);
+      console.error('  outro agente está a criar ou a escrever uma sala — repete daqui a pouco (não é erro)');
+      console.error('  para ver quem: node tools/coordination/status.mjs');
+      process.exit(OCUPADO);
+    }
+    throw error;
+  }
+})();
+// Os filhos desta ferramenta correm já dentro da secção crítica: não voltam a tomá-la.
+process.env[HERDADA] = '1';
+
 const existentes = salas();
 const porSlug = new Map(existentes.map((sala) => [sala.slug, sala]));
 const fundo = porSlug.get(opcoes.fundo);
 if (!fundo) morrer('a sala de onde se copia o fundo não existe: ' + opcoes.fundo, ['salas: ' + existentes.map((s) => s.slug).join(', ')]);
 
+// ---- os destinos: do mapa, quando o mapa os tem (D96) ----
+//
+// O mapa é o plano de 27 salas. Ler os destinos dele *aqui* é o que faz dele um **porteiro** e não um
+// juiz que chega tarde: um `--destinos` copiado à mão pode ser legal (passa a L24 e a L25) e estar
+// errado em relação ao plano — e nesse caso o `mapa.mjs` só reclama depois de a sala estar escrita.
+//
+// Só entram os vizinhos que **já existem**: uma porta para uma sala que ainda não nasceu é a L11, e o
+// plano tem vizinhos que só nascem mais tarde. Esses chegam sozinhos, quando nascerem.
+if (opcoes.mapa) {
+  if (opcoes.destinos && opcoes.destinos.length > 0) {
+    morrer('--mapa e --destinos não se misturam', [
+      'ou os destinos vêm do plano (--mapa), ou são escritos aqui (--destinos) — as duas coisas dariam duas fontes'
+    ]);
+  }
+  const ficheiroDoMapa = join(ROOT, 'data', 'mapa.json');
+  if (!existsSync(ficheiroDoMapa)) {
+    morrer('não há data/mapa.json: sem o plano, os destinos têm de ser escritos com --destinos');
+  }
+  const plano = JSON.parse(readFileSync(ficheiroDoMapa, 'utf8'));
+  if (!Array.isArray(plano.salas) || !plano.salas.includes(slug)) {
+    morrer('a sala ' + slug + ' não está no mapa', [
+      'o plano tem ' + ((plano.salas || []).length) + ' salas; um plano que não cobre a exposição mente',
+      'acrescente-a a data/mapa.json primeiro (o `mapa.mjs` julga-a)'
+    ]);
+  }
+  const vizinhos = (plano.pares || [])
+    .filter((par) => par.includes(slug))
+    .map((par) => (par[0] === slug ? par[1] : par[0]))
+    .sort();
+  const existentesHoje = vizinhos.filter((alvo) => porSlug.has(alvo));
+  const porNascer = vizinhos.filter((alvo) => !porSlug.has(alvo));
+  if (existentesHoje.length < 2) {
+    morrer('o mapa dá menos de dois vizinhos que já existam para ' + slug, [
+      'o plano: ' + (vizinhos.join(', ') || '(nenhum)'),
+      'já existem: ' + (existentesHoje.join(', ') || '(nenhum)'),
+      'por nascer: ' + (porNascer.join(', ') || '(nenhum)'),
+      'a L24 precisa de três a cinco portas, e o portão conta: sem dois vizinhos, a sala não abre'
+    ]);
+  }
+  console.log('mapa: ' + slug + ' → ' + existentesHoje.join(', ') +
+    (porNascer.length > 0 ? ' (por nascer: ' + porNascer.join(', ') + ')' : ''));
+  opcoes.destinos = existentesHoje;
+}
+
 if (!opcoes.destinos || opcoes.destinos.length === 0) {
   // O conjunto de destinos é a decisão D-B da spec: a ferramenta não a inventa, mostra as que existem.
-  morrer('falta --destinos (a decisão D-B: três a cinco portas, uma delas ao portão)', [
-    'salas e os destinos que cada uma já tem (L25: o conjunto novo tem de ser diferente de todos):',
+  morrer('falta --destinos (ou --mapa, que os lê do plano)', [
+    'a decisão D-B: três a cinco portas, uma delas ao portão (L24), e o conjunto diferente de todos (L25)',
+    'salas e os destinos que cada uma já tem:',
     ...existentes.map((sala) => '  ' + sala.slug.padEnd(10) + (sala.destinos.join(', ') || '(nenhum)')),
-    'exemplo: --destinos scene3,scene6   (com o portão, dá três portas)'
+    'exemplo: --destinos scene3,scene6   (com o portão, dá três portas)',
+    'ou:      --mapa                    (os destinos do plano, data/mapa.json)'
   ]);
 }
 
@@ -349,6 +427,32 @@ for (const destino of destinos) {
   tocados.push(mundo);
 }
 
+// ---- escrever (dentro da oficina, D96/M1) ----
+//
+// Tudo o que esta ferramenta faz daqui para baixo escreve em ficheiros partilhados: a sala nova, o
+// portão, cada destino, e depois as quatro derivadas — que reescrevem **todos** os mundos. Dois
+// `new-room` ao mesmo tempo perdiam uma porta em duas de três tentativas (medido); a trava é o que
+// fecha isso. E custa segundos: medido, as quatro derivadas somam 0,1 a 0,2 s.
+//
+// Os filhos recebem `ZONAS_TRAVA_OFICINA=1`: já estão dentro da secção crítica do pai, e tentar tomá-la
+// outra vez seria ficarem à espera de si próprios.
+const correr = (rotulo, script, argumentos, mostrar = 4) => {
+  const inicio = Date.now();
+  const resultado = spawnSync(process.execPath, [join(ROOT, script), ...argumentos], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    env: Object.assign({}, process.env, { ZONAS_TRAVA_OFICINA: '1' })
+  });
+  const segundos = ((Date.now() - inicio) / 1000).toFixed(1);
+  const saida = (resultado.stdout || '') + (resultado.stderr || '');
+  const falhou = resultado.status !== 0;
+  console.log('');
+  console.log('── ' + rotulo + ' — ' + (falhou ? 'FALHOU' : 'ok') + ' (' + segundos + ' s) ──');
+  const linhas = saida.split(/\r?\n/).filter((linha) => linha.trim());
+  for (const linha of falhou ? linhas.slice(-12) : linhas.slice(-mostrar)) console.log('  ' + linha);
+  return !falhou;
+};
+
 // ---- escrever ----
 
 // Atómica: um `new-room` morto a meio não deixa a sala nova truncada (D96, M0).
@@ -369,19 +473,8 @@ for (const mundo of tocados) {
 // quatro salas que não tinham sido tocadas. Nas 12 páginas de hoje as três ferramentas são
 // **idempotentes** (correm e dizem «nada a fazer»), por isso correr sobre tudo não custa nada nem move
 // o que já estava certo.
-const correr = (rotulo, script, argumentos, mostrar = 4) => {
-  const inicio = Date.now();
-  const resultado = spawnSync(process.execPath, [join(ROOT, script), ...argumentos], { cwd: ROOT, encoding: 'utf8' });
-  const segundos = ((Date.now() - inicio) / 1000).toFixed(1);
-  const saida = (resultado.stdout || '') + (resultado.stderr || '');
-  const falhou = resultado.status !== 0;
-  console.log('');
-  console.log('── ' + rotulo + ' — ' + (falhou ? 'FALHOU' : 'ok') + ' (' + segundos + ' s) ──');
-  const linhas = saida.split(/\r?\n/).filter((linha) => linha.trim());
-  for (const linha of falhou ? linhas.slice(-12) : linhas.slice(-mostrar)) console.log('  ' + linha);
-  return !falhou;
-};
-
+//
+// Ficam dentro da secção crítica de propósito: reescrevem **todos** os mundos.
 if (opcoes.ferramentas) {
   const aneis = correr('os dois anéis (ring --aplicar)', 'tools/scene/ring.mjs', ['--aplicar']);
   const giro = correr('o giro dos retratos (azimuths --aplicar)', 'tools/scene/azimuths.mjs', ['--aplicar']);
@@ -407,6 +500,8 @@ if (opcoes.ferramentas) {
     process.exitCode = 1;
   }
 }
+
+oficinaTomada.soltar();
 
 console.log('');
 console.log('próximos passos (a spec é `docs/SPEC-NOVA-SALA.md`):');

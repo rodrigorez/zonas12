@@ -30,6 +30,7 @@
 import { join } from 'node:path';
 import { mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import { writeAtomic } from '../coordination/atomic.mjs';
+import { oficina } from '../coordination/locks.mjs';
 import { serveProject, openBrowser, ROOT, sleep } from '../regression/harness.mjs';
 import { DERIVED_DIMENSION_BASE } from '../../js/core/index.js';
 
@@ -333,7 +334,8 @@ async function gerar(mundo, origem, destino, opcoes = {}) {
     mkdirSync(join(ROOT, 'assets', 'previews'), { recursive: true });
     const escrever = (caminho, dadosUrl) => {
       const bytes = Buffer.from(dadosUrl.split(',')[1], 'base64');
-      writeAtomic(join(ROOT, caminho), bytes);
+      // A oficina (D96, M1): dois `portrait` ao mesmo tempo desenham os mesmos pares e um apaga o outro.
+      oficina('os retratos (portrait)', () => writeAtomic(join(ROOT, caminho), bytes));
       console.log('escrito ' + caminho + ': ' + tamanho.largura + 'x' + tamanho.altura + ', ' +
         Math.round(bytes.length / 1024) + ' kB');
       return bytes.length;

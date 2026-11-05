@@ -38,6 +38,7 @@
 //     thumbnail do YouTube, depois a imagem padrão).
 import { readFileSync, existsSync } from 'node:fs';
 import { writeJson } from '../coordination/atomic.mjs';
+import { oficina } from '../coordination/locks.mjs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LANGUAGES, ORIGIN_LANGUAGE } from '../../js/scene/schema.js';
@@ -408,7 +409,10 @@ function main() {
     process.exit(1);
   }
   for (const slug of touched) {
-    writeJson(join(root, 'data', 'worlds', slug + '.json'), worlds.get(slug));
+    // A oficina (D96, M1): a folha escreve nos mesmos mundos que o `new-room` e as derivadas.
+    oficina('a folha das obras (from-csv)', () => {
+      writeJson(join(root, 'data', 'worlds', slug + '.json'), worlds.get(slug));
+    });
     console.log('escrito data/worlds/' + slug + '.json');
   }
 }

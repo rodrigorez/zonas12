@@ -15,6 +15,7 @@
 // O ficheiro instalado é a fonte de verdade a partir daí; o `.glsl` foi só o transporte.
 import { readFileSync, existsSync } from 'node:fs';
 import { writeAtomic } from '../coordination/atomic.mjs';
+import { oficina } from '../coordination/locks.mjs';
 import { basename, extname, join } from 'node:path';
 import { ROOT } from '../regression/harness.mjs';
 import { checkSource, measure, verdict, readBody, LIMITS } from './measure.mjs';
@@ -88,7 +89,9 @@ function register(id) {
   const list = current.map((entry, index) => `  ${entry}${index === current.length - 1 ? '' : ','}`).join(eol);
   const updated = withImport.replace(listPattern,
     `$1${eol}${list}${eol}  $3`);
-  writeAtomic(REGISTRY, updated);
+  oficina('instalar o shader ' + id, () => {
+    writeAtomic(REGISTRY, updated);
+  });
   return { changed: true, identifier };
 }
 
@@ -136,7 +139,9 @@ async function main() {
 
   const file = join(ROOT, 'js', 'shaders', id + '.js');
   const replaced = existsSync(file);
-  writeAtomic(file, moduleText(id, name, body, !result.ok));
+  oficina('escrever o módulo do shader ' + id, () => {
+    writeAtomic(file, moduleText(id, name, body, !result.ok));
+  });
   const registry = register(id);
 
   console.log('');
