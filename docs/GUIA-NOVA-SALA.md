@@ -49,7 +49,9 @@ Duas contas, e ambas antes de escrever, porque as duas se pagam caro depois:
 1. **A sala nova** terá `destinos + 1` portas (o portão entra sempre) — e o `--destinos` leva **2 a
    4** salas.
 2. **Cada destino** ganha a porta de chegada, e uma sala **não passa de cinco portas** (L24). Se um
-   destino já tiver cinco, a porta não cabe — foi o que aconteceu à `scene1` na sala 12 (D93).
+   destino já tiver cinco, a porta não cabe — foi o que aconteceu à `scene1` na sala 12 (D93). O
+   `new-room` faz esta conta **antes de escrever** e recusa, nomeando a sala; a tabela dos lugares livres
+   de todas é `node tools/scene/mapa.mjs --grafo`.
 
 Como se lê o número de portas de um destino, com o validador:
 
@@ -405,7 +407,7 @@ Na ordem em que se correm. Uma linha sem a sua frase é uma linha que não passo
 
 | # | a armadilha | como se vê | o que fazer |
 | --- | --- | --- | --- |
-| 1 | **Um destino já com cinco portas** | o `new-room` **escreve** e só no fim o validador diz `6 door(s) — law L24` | desfazer: `git checkout -- data/worlds` repõe os ficheiros que já existiam, e o ficheiro e a pasta da sala nova apagam-se à mão (são novos). Depois escolher outro destino — a conta faz-se antes, com a tabela da §0 |
+| 1 | ~~**Um destino já com cinco portas**~~ — **fechada na v0.0.29** | o `new-room` verifica **antes de escrever** e recusa: `a L24 recusa: o destino já tem cinco portas`, com a sala e o número. Antes escrevia, mexia em nove ficheiros e só no fim o validador dizia `6 door(s) — law L24` | escolher outro destino. A conta já não é sua: `node tools/scene/mapa.mjs --grafo` mostra os lugares livres de todas as salas |
 | 2 | **Os retratos esquecidos** | nada: o validador mede a **existência** do retrato, não a idade dele; a janela mostra a sala de ontem | os dois `--todos` do passo 7. É o que se esquece mais vezes |
 | 3 | **Exportar do editor depois da folha** | os textos, os créditos e as capas da folha desaparecem do ficheiro | exportar **antes** do passo 4; se voltar ao editor, Ctrl+F5 primeiro |
 | 4 | **Sem `--nome-pt`/`--nome-en`** | nada: a bateria das duas línguas passa, porque o slug é o mesmo nas duas | a sala aparece com o slug nos rótulos. Escrever os dois nomes |

@@ -161,6 +161,23 @@ for (const destino of destinos) {
   if (destino === slug) morrer('uma sala não tem uma porta para si própria');
 }
 
+// L24 no destino, antes de escrever: a porta de chegada tem de **caber**. Cada destino ganha uma porta,
+// e uma sala não passa de cinco — foi o que travou a `scene1` na sala 12 (D93). A conta faz-se aqui e não
+// no fim: o validador só corre depois de a sala nova e as vizinhas estarem escritas, e a esta altura
+// "não cabe" já custou nove ficheiros mexidos e uma sala a violar uma lei.
+const MAX_PORTAS = 5;
+const cheias = destinos
+  .map((destino) => ({ slug: destino, portas: (porSlug.get(destino).cena.portals || []).length }))
+  .filter((cada) => cada.portas >= MAX_PORTAS);
+if (cheias.length > 0) {
+  morrer('a L24 recusa: ' + (cheias.length === 1 ? 'o destino já tem' : 'estes destinos já têm') +
+    ' cinco portas, e a chegada desta sala não cabe', [
+    ...cheias.map((cada) => '  ' + cada.slug + ': ' + cada.portas + ' portas'),
+    'escolha outro destino, ou liberte uma porta dessas salas primeiro (L24: uma sala tem três a cinco)',
+    'o mapa sabe os lugares livres: node tools/scene/mapa.mjs --grafo'
+  ]);
+}
+
 // L25 antes de escrever: o conjunto {portão + destinos} não pode ser o de outra sala.
 const conjunto = [ENTRY_WORLD, ...destinos].sort();
 const repetido = existentes.find((sala) => sala.destinos.length === conjunto.length &&

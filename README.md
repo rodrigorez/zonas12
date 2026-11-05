@@ -270,7 +270,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.28)
+## Estado atual do código (v0.0.29)
 
 > **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
 > pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
@@ -689,6 +689,23 @@ decisões **D69** a **D76**
 geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou de comportamento: as
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
+
+A **v0.0.29** fecha a armadilha nº 1 do guia, encontrada numa auditoria da criação de salas: o
+`new-room` **nunca contava as portas do destino**. Levar a porta de chegada a uma sala já com cinco não
+era recusado — a ferramenta escrevia a sala nova, o portão e os destinos, corria as quatro derivadas
+sobre todos os mundos, e só no fim o validador dizia `the world has 6 door(s) — law L24`. Nove ficheiros
+mexidos, uma sala a violar uma lei, e a causa enterrada no meio dos erros da L9 (os retratos que ainda
+não existem). Agora a conta faz-se **antes de escrever**, com a sala e o número no aviso, e o caminho
+para os lugares livres (`mapa.mjs --grafo`).
+
+A mesma auditoria mediu o resto, num `git worktree` isolado: **8 das 9 recusas certas** (slug, fixture,
+portão, pasta, dado existente, contagem de destinos, destino inexistente, L25 com a sala culpada
+nomeada) e o caminho de sucesso a produzir uma sala estruturalmente correta — 10 erros, **todos L9**,
+zero estruturais. E mediu o que ainda **não** está resolvido: dois `new-room` em paralelo. Em **três**
+tentativas, **duas perderam uma porta inteira** (o portão ficou sem a porta da sala nova, e a sala
+tornou-se inalcançável) e a terceira deixou a `scene10` com **seis** portas. A escrita atómica impediu o
+pior — nenhum ficheiro truncado, nenhum `.tmp` órfão — mas a perda de trabalho é real, e é o que o
+**M1/M2 da D96** existe para fechar. **Até lá: um `new-room` de cada vez.**
 
 A **v0.0.28** é o **M0 da D96**: a escrita atómica deixa de ser uma excepção do `serve.mjs` e passa a ser
 a regra de **todas** as ferramentas que escrevem. O módulo novo é `tools/coordination/atomic.mjs` —
