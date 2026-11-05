@@ -340,3 +340,113 @@ export function ringDeviation(objects, radius, phase, count) {
   }
   return { radius: round(deviation.radius), angle: round(deviation.angle) };
 }
+
+// ---- a medida de um mundo, e a colocação no anel (D106) ----
+//
+// Viviam dentro de `tools/scene/ring.mjs`, que só as sabia imprimir. A partir do momento em que a folha
+// das obras **cria** obras, há uma segunda ferramenta que precisa de as sentar no anel — e duas cópias
+// da mesma aritmética seriam duas verdades. Aqui são puras: recebem a cena, devolvem a medida, e não
+// tocam no disco.
+
+export function measureRing(scene) {
+  const artworks = scene.artworks || [];
+  const portals = scene.portals || [];
+
+  const widths = artworks
+    .map((artwork) => (artwork.size && Number(artwork.size[0])) || 0)
+    .filter((width) => width > 0);
+  const boxWidths = portals
+    .map((portal) => (portal.box && Number(portal.box[0])) || 12)
+    .filter((width) => width > 0);
+
+  const artworkPhase = artworks.length > 0 ? gapPhase(artworks.length) : 0;
+  const artworksRing = ringPositions(artworks.length, RING.artworks.radius, artworkPhase, RING.artworks.height);
+  const doors = bestPhase(portals.length, artworksRing.map((spot) => spot.angle));
+  // L31 (D97): acima de vinte portas um anel só é uma vedação, e o lugar de cada porta passa a vir do
+  // plano de anéis — o mesmo que o validador confere.
+  const plano = portals.length > SINGLE_RING_MAX ? ringPlan(portals.length) : null;
+  const portalsRing = plano
+    ? ringPlanPositions(portals.length, RING.portals.height)
+    : ringPositions(portals.length, RING.portals.radius, doors.phase, RING.portals.height);
+
+  const workWidth = widths.length > 0 ? Math.max.apply(null, widths) : 4;
+  const boxWidth = boxWidths.length > 0 ? Math.max.apply(null, boxWidths) : 12;
+  const round = (value) => Math.round(value * 100) / 100;
+
+  return {
+    artworks,
+    portals,
+    artworkPhase,
+    portalsPhase: doors.phase,
+    clearance: doors.clearance,
+    needed: artworks.length > 0 ? requiredClearance(workWidth, RING.artworks.radius) : 0,
+    workWidth,
+    boxWidth,
+    artworksChord: chord(RING.artworks.radius, artworks.length),
+    portalsChord: chord(RING.portals.radius, portals.length),
+    artworksRing,
+    portalsRing,
+    artworkDeviation: ringDeviation(artworks, RING.artworks.radius, artworkPhase, artworks.length),
+    portalsDeviation: ringDeviation(portals, RING.portals.radius, doors.phase, portals.length),
+    plan: plano,
+    planOk: plano
+      ? Math.min(...plano.rings.map((anel) => chord(anel.radius, anel.count))) >= MIN_RING_CHORD
+      : true,
+    planNote: plano
+      ? plano.rings.map((anel) => anel.count + ' a ' + anel.radius + ' m').join(' + ') +
+        ' · folga ' + (plano.clearance === Infinity ? '—' : plano.clearance) + '° para ' + plano.needed + '°'
+      : '',
+    onRing: (deviation) => deviation.radius <= RING.radiusTolerance && deviation.angle <= RING.angleTolerance,
+    round
+  };
+}
+
+// A obra i fica no lugar i do seu anel; as portas ficam nos lugares por ordem do ficheiro, com uma
+// excepção: a porta do portão (a que se declara chegada do portão) fica no lugar mais próximo de 0°,
+// para quem atravessa o portão ver a sala de frente. A altura é a que o dado já tinha: o anel decide o
+// plano, não a altura.
+export function assignRing(scene, measured) {
+  const round = measured.round || ((value) => Math.round(value * 100) / 100);
+  let moved = 0;
+  const place = (object, seat, height) => {
+    const before = Array.isArray(object.position) ? object.position : [0, 0, 0];
+    if (Math.abs(before[0] - seat.position[0]) > 0.01 || Math.abs(before[2] - seat.position[2]) > 0.01) {
+      moved++;
+    }
+    object.position = [seat.position[0], height, seat.position[2]];
+    object.rotation = [0, seat.rotation[1], 0];
+  };
+
+  (scene.artworks || []).forEach((artwork, index) => {
+    const seat = measured.artworksRing[index];
+    if (!seat) return;
+    const height = Array.isArray(artwork.position) && typeof artwork.position[1] === 'number'
+      ? artwork.position[1]
+      : RING.artworks.height;
+    place(artwork, seat, round(height));
+  });
+
+  const portals = scene.portals || [];
+  const seats = measured.portalsRing;
+  if (portals.length > 0 && seats.length > 0) {
+    const door = portals.findIndex((portal) => portal.arrivalFrom === 'gate');
+    const order = door >= 0 ? [door] : [];
+    for (let index = 0; index < portals.length; index++) {
+      if (index !== door) order.push(index);
+    }
+    let anchor = 0;
+    if (door >= 0) {
+      anchor = seats.reduce((best, seat, index) =>
+        (angularGap(seat.angle, 0) < angularGap(seats[best].angle, 0) ? index : best), 0);
+    }
+    const ringSeats = seats.slice(anchor).concat(seats.slice(0, anchor));
+    order.forEach((portalIndex, position) => {
+      const portal = portals[portalIndex];
+      const height = Array.isArray(portal.position) && typeof portal.position[1] === 'number'
+        ? portal.position[1]
+        : RING.portals.height;
+      place(portal, ringSeats[position], round(height));
+    });
+  }
+  return moved;
+}

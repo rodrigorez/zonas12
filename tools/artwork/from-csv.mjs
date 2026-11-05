@@ -43,6 +43,7 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LANGUAGES, ORIGIN_LANGUAGE } from '../../js/scene/schema.js';
 import { validateScene } from '../../js/scene/validation.js';
+import { assignRing, measureRing } from '../../js/scene/ring.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..');
@@ -220,11 +221,36 @@ const LABEL = { authors: 'autor', coAuthors: 'coautor', collaborators: 'colabora
 
 // Aplica uma linha a um mundo, devolvendo a lista do que mudou (para o relatório, e para um `--check`
 // poder dizer o que faria sem tocar em nada).
-export function applyRow(world, row, { exists }) {
+// A **criação** de uma obra que ainda não existe (D106). Um sala acabada de nascer tem `artworks: []`,
+// e a folha só sabia preencher. A forma é a canónica das 55 obras `site` do projeto — dimensão 0,
+// `kind` que a linha decide depois, `capa-<id>`, 4 × 3, e `interaction: page` (a obra abre numa página;
+// é o que todas as obras do projeto têm). A posição nasce no centro e é posta no anel a seguir: um
+// mundo com uma obra em [0, 1.5, 0] seria recusado pela L22.
+function novaObra(row) {
+  const id = Number(row.id);
+  return {
+    id,
+    dimension: 0,
+    kind: 'image',
+    asset: 'capa-' + id,
+    position: [0, 1.5, 0],
+    rotation: [0, 0, 0],
+    size: [4, 3, 0.1],
+    interaction: 'page'
+  };
+}
+
+export function applyRow(world, row, { exists, criar = false }) {
   const changes = [];
-  const artworks = Array.isArray(world.artworks) ? world.artworks : [];
-  const artwork = artworks.find((item) => String(item.id) === String(row.id));
-  if (!artwork) return { error: `obra ${row.id} não existe no mundo ${row.world}` };
+  const artworks = Array.isArray(world.artworks) ? world.artworks : (world.artworks = []);
+  let artwork = artworks.find((item) => String(item.id) === String(row.id));
+  if (!artwork) {
+    if (!criar) return { error: `obra ${row.id} não existe no mundo ${row.world}` };
+    artwork = novaObra(row);
+    artworks.push(artwork);
+    artworks.sort((a, b) => Number(a.id) - Number(b.id));
+    changes.push(`obra ${row.id}: criada`);
+  }
 
   if (row.title) {
     const title = originText(row.title);
@@ -297,14 +323,23 @@ export function applyRow(world, row, { exists }) {
       changes.push(`obra ${row.id}: catálogo sem "${key}"`);
     }
   } else if (row.cover) {
-    const remota = /^https?:\/\//i.test(row.cover);
+    // O autor cola o endereço que o Drive lhe dá — `…/file/d/<ID>/view?usp=…` —, e esse é uma **página**,
+    // não uma imagem: num `<img>` não carrega. O endereço directo do mesmo ficheiro é o
+    // `lh3.googleusercontent.com/d/<ID>`, e é esse que o dado guarda (D106). Converter aqui, em vez de
+    // pedir ao autor, é a diferença entre «a capa aparece» e «a capa aparece em branco».
+    const capa = (() => {
+      const drive = /^https?:\/\/(?:drive|docs)\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/.exec(row.cover);
+      return drive ? 'https://lh3.googleusercontent.com/d/' + drive[1] : row.cover;
+    })();
+    if (capa !== row.cover) changes.push(`obra ${row.id}: endereço do Drive convertido para ${capa}`);
+    const remota = /^https?:\/\//i.test(capa);
     // A extensão decide o tipo; **um endereço remoto sem extensão é uma imagem** (2026-10-27). É o caso
     // das capas no Google Drive, que se servem do endereço directo `https://lh3.googleusercontent.com/d/<ID>`
     // — uma imagem sem `.jpg` nenhum no caminho. Recusá-la obrigava o autor a alojar as capas noutro
     // sítio por causa de um nome; um caminho do projeto sem extensão continua a ser recusado, porque aí
     // o ficheiro existe (ou não) e sabe-se o que é.
-    const type = IMAGE_EXTENSIONS.test(row.cover) ? 'image'
-      : VIDEO_EXTENSIONS.test(row.cover) ? 'video'
+    const type = IMAGE_EXTENSIONS.test(capa) ? 'image'
+      : VIDEO_EXTENSIONS.test(capa) ? 'video'
         : (remota ? 'image' : null);
     if (!type) return { error: `obra ${row.id}: a capa "${row.cover}" não é uma imagem nem um vídeo conhecido` };
     // A capa manda no tipo de uma obra que **deixa** de ser um site nesta mesma linha: a célula `site`
@@ -315,26 +350,26 @@ export function applyRow(world, row, { exists }) {
       return { error: `obra ${row.id}: uma obra com site tem de ter uma imagem de capa (a que fica por baixo do iframe)` };
     }
     // Uma capa remota (D64) não se pergunta ao disco: quem a serve é outro servidor.
-    if (!remota && exists(row.cover) === false) {
-      return { error: `obra ${row.id}: a capa "${row.cover}" não existe no projeto` };
+    if (!remota && exists(capa) === false) {
+      return { error: `obra ${row.id}: a capa "${capa}" não existe no projeto` };
     }
     // A capa que já é a da obra não é uma mudança: é o CSV a dizer o que o dado já diz, e reescrever
     // o catálogo por causa disso daria um asset novo em cada corrida.
     world.assets = world.assets || {};
     const current = artwork.asset ? world.assets[artwork.asset] : null;
-    if (!(current && current.path === row.cover && current.type === type)) {
+    if (!(current && current.path === capa && current.type === type)) {
       const key = `capa-${row.id}`;
       const previous = world.assets[key];
       const titulo = artwork.title && artwork.title[ORIGIN_LANGUAGE];
       const entry = {
-        path: row.cover,
+        path: capa,
         type,
         alt: (previous && previous.alt) ||
           { [ORIGIN_LANGUAGE]: 'Capa da obra ' + (titulo || row.id) }
       };
       if (!same(previous, entry)) {
         world.assets[key] = entry;
-        changes.push(`obra ${row.id}: capa (${row.cover})`);
+        changes.push(`obra ${row.id}: capa (${capa})`);
       }
       if (artwork.asset !== key) {
         artwork.asset = key;
@@ -373,7 +408,38 @@ function main() {
   const sheet = decodeSheet(readFileSync(CSV));
   const rows = readRows(sheet.text);
   const faltam = colunasEmFalta(sheet.text);
+  // A folha do autor não tem a coluna `mundo` — a sala vem de fora, do chat. `--mundo` diz qual é, e é
+  // isso que faz o formato do autor entrar sem ser editado à mão.
+  const mundoPedido = (() => {
+    const indice = process.argv.indexOf('--mundo');
+    return indice > 0 && process.argv[indice + 1] && !process.argv[indice + 1].startsWith('--')
+      ? String(process.argv[indice + 1]).trim()
+      : null;
+  })();
+  const criar = process.argv.includes('--criar');
+  if (faltam.includes('mundo')) {
+    if (!mundoPedido) {
+      console.error('nada foi escrito:');
+      console.error('  a folha não tem a coluna "mundo" — diga de que sala é com --mundo <slug>');
+      console.error('  (ex.: node tools/artwork/from-csv.mjs --file folha.tsv --mundo scene14 --check)');
+      process.exit(1);
+    }
+    for (const row of rows) row.world = mundoPedido;
+  } else if (mundoPedido) {
+    const outras = rows.filter((row) => row.world && row.world !== mundoPedido);
+    if (outras.length > 0) {
+      console.error('nada foi escrito:');
+      console.error(`  --mundo ${mundoPedido} contradiz a folha, que fala de ` +
+        `${[...new Set(outras.map((row) => row.world))].join(', ')}`);
+      process.exit(1);
+    }
+  }
   const worlds = new Map();
+  // O que já estava vermelho em cada mundo **antes** de a folha lhe tocar. A folha recusa-se a
+  // **introduzir** uma violação, e não a escrever num mundo que já tinha uma: com os retratos em falta
+  // (L9), qualquer gravação era recusada — e os retratos são imagens da sala, por isso têm de vir
+  // **depois** das obras, não antes. Sem esta linha de base, o ciclo fechava-se.
+  const baseline = new Map();
   const problems = [];
   const touched = new Set();
   // Mundos com uma linha em erro ficam marcados: uma linha que já mutou o objecto antes de desistir
@@ -403,23 +469,45 @@ function main() {
     }
     const file = join(root, 'data', 'worlds', row.world + '.json');
     if (!existsSync(file)) { problems.push(`linha ${row.line}: o mundo "${row.world}" não existe`); continue; }
-    if (!worlds.has(row.world)) worlds.set(row.world, JSON.parse(readFileSync(file, 'utf8')));
-    const result = applyRow(worlds.get(row.world), row, { exists: (path) => existsSync(join(root, path)) });
-    if (result.error) { comErro.add(row.world); problems.push(`linha ${row.line}: ${result.error}`); }
-    else if (result.changes.length) {
+    if (!worlds.has(row.world)) {
+      const cena = JSON.parse(readFileSync(file, 'utf8'));
+      worlds.set(row.world, cena);
+      baseline.set(row.world,
+        new Set(validateScene(cena, { exists: (path) => existsSync(join(root, path)) }).errors));
+    }
+    const result = applyRow(worlds.get(row.world), row, { exists: (path) => existsSync(join(root, path)), criar });
+    if (result.error) {
+      comErro.add(row.world);
+      // Uma obra que não existe é o caso da sala nova: dizer o que fazer vale mais do que o nome da
+      // falta. Sem `--criar`, o agente não sabe que a ferramenta a pode criar.
+      problems.push(`linha ${row.line}: ${result.error}` +
+        (criar ? '' : ' — use --criar para a criar (a sala nova nasce sem obras)'));
+    } else if (result.changes.length) {
       touched.add(row.world);
       for (const change of result.changes) console.log('  ' + change);
     }
   }
 
+  // Uma obra criada nasce no centro da sala, e o anel é que a senta (L22) — como as portas. Fazer isto
+  // aqui, antes de validar, é o que faz «criar as obras» ser **um** passo e não dois: sem ele o
+  // validador recusaria o mundo que a folha acabou de escrever.
+  for (const [slug, world] of worlds) {
+    if (comErro.has(slug) || !touched.has(slug)) continue;
+    const moved = assignRing(world, measureRing(world));
+    if (moved > 0) console.log(`  ${slug}: ${moved} objeto(s) postos no anel`);
+  }
+
   // O dado que sai daqui tem de passar as mesmas leis que o resto: escrever primeiro e validar depois
-  // seria gravar um mundo que a exposição recusa.
+  // seria gravar um mundo que a exposição recusa. Mas só contam as violações **novas** — as que já lá
+  // estavam (a L9 dos retratos, enquanto não forem cozinhados) não são desta linha.
   for (const [slug, world] of worlds) {
     if (comErro.has(slug)) continue;
     const report = validateScene(world, { exists: (path) => existsSync(join(root, path)) });
-    if (!report.ok) {
+    const antes = baseline.get(slug) || new Set();
+    const novas = report.errors.filter((error) => !antes.has(error));
+    if (novas.length > 0) {
       problems.push(`o mundo ${slug} ficaria inválido:`);
-      for (const error of report.errors) problems.push('  ' + error);
+      for (const error of novas) problems.push('  ' + error);
     }
   }
 

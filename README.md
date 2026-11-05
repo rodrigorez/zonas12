@@ -271,7 +271,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.36)
+## Estado atual do código (v0.0.37)
 
 > **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
 > pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
@@ -690,6 +690,31 @@ decisões **D69** a **D76**
 geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou de comportamento: as
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
+
+A **v0.0.37** é a **D106**, e fecha o fluxo que o autor pediu: **colar o TSV no chat e a sala nascer
+com as obras.**
+
+**Três coisas deixaram de ser trabalho de quem escreve a folha.** `--mundo <slug>` diz de que sala é
+(a folha do autor não tem a coluna `mundo` — a sala vem do chat). `--criar` **cria** a obra que ainda
+não existe, com a forma canónica das 55 obras `site` do projeto, e o anel senta-a na mesma passagem —
+criar as obras é um passo, não dois. E os endereços do Drive, que o autor cola como
+`…/file/d/<ID>/view` e que são **páginas** e não carregam num `<img>`, passam a
+`lh3.googleusercontent.com/d/<ID>` no próprio importador, com a conversão dita no relatório.
+
+**E a validação passou a ser por linha de base.** O importador recusava gravar um mundo que não
+ficasse limpo — e nenhum dos 27 fica, por causa da L9 dos retratos. Mas os retratos são **imagens da
+sala**: têm de vir **depois** das obras, senão fotografam a sala vazia. Com a regra antiga o ciclo
+fechava-se. Agora recusa só as violações **novas**, e a bateria da folha voltou a **21 de 21**.
+
+Medido num `git worktree` com o TSV da sala 12 colado tal e qual: 4 obras criadas, 4 capas
+convertidas, sentadas a 45°, e o `validate` da sala **sem um erro que não fosse a L9**.
+
+**Duas notas que valem mais do que a versão.** A primeira é o custo real dos retratos: **185 s por
+par**, medidos duas vezes seguidas nesta máquina sem GPU — os 72 pares em falta seriam ~3 h 40 por
+passagem, e não os 11 min do registo de 2026-11-03. O guia passou a mandar medir **um** par antes de
+planear uma ronda. A segunda é um dano que eu próprio fiz e reparei: a v0.0.36 truncou esta
+`docs/SPEC-NOVA-SALA.md` de 1053 para 202 linhas, porque um `replace` meu apanhou o parágrafo errado.
+Está restaurada, e a lição ficou no commit: cirurgia em documentos precisa de contar linhas.
 
 A **v0.0.36** desfaz uma decisão da v0.0.35, e vale a pena dizer porquê: **o validador tinha razão e eu
 não.**

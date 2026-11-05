@@ -319,49 +319,45 @@ O autor manda a folha **no chat**, uma por sala, com **uma linha por obra** e es
 id  nome da obra  nomeAutores  nomeCoautores  nomaColaboradores  Descritivo  endereço da imagem  endereço da obra
 ```
 
-O agente **acrescenta essas linhas a `data/obras.tsv`**, e com três conversões — todas mecânicas:
+Ela entra **como está** — três coisas que davam trabalho passaram a ser do importador (D106):
 
-| # | o que a folha do autor traz | o que `data/obras.tsv` precisa | porquê |
-| --- | --- | --- | --- |
-| 1 | não tem a coluna do mundo | **`mundo` como primeira coluna**, com o slug da sala em todas as linhas | o `id` não é único no projeto (o `id 0` existe em quatro mundos); sem o `mundo` o importador não sabe de que sala fala. **A sala vem do chat**, não da folha |
-| 2 | `id` de **1** a N | `id` de **0** a N−1 | o `id` é o número da obra no editor, e é por ele que o importador encontra a obra. A 4.ª obra de uma sala é a `3` |
-| 3 | `https://drive.google.com/file/d/<ID>/view?usp=…` | `https://lh3.googleusercontent.com/d/<ID>` | o `/file/d/<ID>/view` é uma **página**, não uma imagem: não carrega. O endereço directo do Drive é o `lh3…/d/<ID>` |
-
-O `endereço da obra` (o YouTube) entra **como está** — é o site da obra, e a ficha embute-o.
+| o que a folha traz | o que acontece | porquê |
+| --- | --- | --- |
+| não tem a coluna do mundo | `--mundo <slug>` diz de que sala é | o `id` não é único no projeto (o `id 0` existe em quatro mundos). A sala vem do chat, não da folha |
+| capas em `…/file/d/<ID>/view?usp=…` | convertidas para `https://lh3.googleusercontent.com/d/<ID>` | o `/view` é uma **página**, não uma imagem: num `<img>` não carrega. O importador diz que converteu |
+| as obras ainda não existem na sala | `--criar` cria-as com a forma canónica | uma sala nova nasce com `artworks: []`, e a folha só sabia preencher |
 
 ```
-node tools/artwork/from-csv.mjs --check
-node tools/artwork/from-csv.mjs
+(save a folha colada como data/folha-<slug>.tsv — um ficheiro, não uma pasta)
+node tools/artwork/from-csv.mjs --file data/folha-<slug>.tsv --mundo <slug> --criar --check
+node tools/artwork/from-csv.mjs --file data/folha-<slug>.tsv --mundo <slug> --criar
 ```
+
+- O `id` fica **como o autor o escreveu** (1 para a primeira obra). Não se converte: o número é dele, e
+  o importador encontra a obra por ele.
+- As obras criadas nascem no centro da sala e o **anel senta-as** na mesma passagem (L22) — é por isso
+  que criar as obras é **um** passo e não dois. O `ring.mjs` a seguir diz `0 objeto(s) postos no anel`.
+- **Tem de dizer:** `obra N: criada`, `obra N: título`, `obra N: autor`, `obra N: descritivo`,
+  `obra N: site`, `obra N: capa (https://lh3…)`, `sceneNN: 4 objeto(s) postos no anel` e, no fim,
+  `mudaria: <slug>` (com `--check`) ou `escrito data/worlds/<slug>.json`.
+- **Se não disser:**
+  - `a folha não tem a coluna "mundo" — diga de que sala é com --mundo <slug>` — falta o `--mundo`;
+  - `obra 0 não existe no mundo <slug> — use --criar para a criar` — a sala não tem essa obra e não se
+    mandou criar;
+  - `--mundo scene14 contradiz a folha, que fala de scene2` — a folha tem a coluna `mundo` **e** um
+    valor diferente do argumento; uma das duas coisas está errada;
+  - `o mundo <slug> ficaria inválido:` — o importador recusa **introduzir** uma violação nova. As que
+    já lá estavam (a L9 dos retratos que ainda não foram cozinhados) não bloqueiam.
+
+> **A ordem é obras → retratos → validador.** Os retratos são **imagens da sala**: uma sala com as obras
+> no anel fotografa-se de outra maneira, e um retrato cozinhado antes das obras fica a mostrar a sala
+> vazia. Por isso o passo 7 vem **depois** deste, e não antes (foi o contrário enquanto a folha só
+> preenchia o que o editor tinha composto).
 
 > **Não se cria uma pasta `obras/` debaixo de `data/`.** A L20 procura uma pasta com esse nome para
-> acusar as fichas antigas (D60), e `data/obras/` cai na regra: o validador responde
-> `data/obras/ ainda existe — a ficha antiga (D60) foi substituída por obra.html (D62)`. Isso foi
-> tentado na v0.0.35 e desfeito na v0.0.36 — uma folha por sala não vale uma lei vermelha.
+> acusar as fichas antigas (D60), e `data/obras/` cai na regra. Foi tentado na v0.0.35 e desfeito na
+> v0.0.36; a folha da sala é um **ficheiro** — `data/folha-scene14.tsv` — e não uma pasta.
 
-**A folha preenche, não cria.** Uma linha só encontra a obra se ela **já existir** no mundo com aquele
-`id`; numa sala acabada de nascer (`artworks: []`) todas as linhas falham com
-`obra 0 não existe no mundo scene14`. As obras nascem no **passo 3** (o painel Obra do editor), com os
-`id` que a folha vai usar. A ordem da linha de montagem é, por isso, esta:
-
-```
-composição (passo 3)  →  retratos (passo 7, ×2)  →  folha (este passo)  →  validate (passo 8)
-```
-
-Os retratos vêm **antes** da folha por uma razão prática: o importador valida o mundo que ia escrever e
-**recusa** gravar enquanto a L9 estiver vermelha (`o mundo <slug> ficaria inválido:`), por isso numa
-sala sem retratos a folha não passa.
-
-- **Se a folha for recusada:**
-  - `falta a coluna "mundo" — acrescente-a como PRIMEIRA coluna` — é o caso 1 da tabela acima;
-  - `obra <id> não existe no mundo <slug>` — os `id` da folha não são os do editor: é o caso 2, ou a
-    obra ainda não foi composta (passo 3);
-  - `o mundo <slug> ficaria inválido:` com `law L9` — faltam os retratos: passo 7 primeiro;
-  - `data/obras/ ainda existe` — alguém criou a pasta proibida; apague-a (L20).
-
-> **Uma célula vazia apaga.** A folha é a fonte da verdade: um crédito vazio **tira** o crédito que lá
-> estava (é assim desde a D62, e é o que permite desfazer). Por isso copie a linha inteira do autor — não
-> escreva só as colunas que mudaram.
 ---
 
 ## 5. Os anéis, o giro e os buracos — outra vez
@@ -560,13 +556,16 @@ Medido a **2026-11-03**, nesta máquina (o tempo do autor — os passos 3 e 11 �
 | 1–2 — a pasta, o dado, as portas, os anéis, o giro, os buracos, o sorteio, o validador | **~5 s** |
 | 4 — a folha | ~2 s |
 | 5 — os três (idempotentes) | < 1 s |
-| 7 — os retratos, duas passagens (54 pares com dois destinos) | **~11 min** (a spec orça ~20 min: 387–418 s por passagem de 39) |
+| 7 — os retratos, duas passagens | **~11 min** (a spec orça ~20 min: 387–418 s por passagem de 39) — mas ver a nota abaixo: **medido a 2026-11-05, 185 s por PAR** |
 | 9 — `all.mjs --full` | **56 min** (registo da D93: 3 350,7 s) |
 | | **~1 h, quase toda em dois passos** |
 
 O que o passo 9 mede, por bateria (as seis do gate núcleo, medidas aqui: 1 160 s no total): o dado
 0,4 s · as leis 0,7 s · a folha 1,6 s · a cena (T2–T12) 119 s · **as portas (T1 e T7/T11) 969 s** · as
 duas línguas 69 s. As outras 22 abrem um Chrome cada uma e são o resto do `--full`.
+
+> **Medido a 2026-11-05, num ambiente sem GPU:** um par de retratos levou **185 s**, duas vezes seguidas (não é o arranque do Chrome). Os 72 pares que faltam nas salas novas seriam **~3 h 40 por passagem**, e não 11 min. A diferença é o `WebGL` em software — o número do autor, na máquina dele, continua a ser o da tabela. Antes de planear uma ronda inteira, meça **um** par:
+> `node tools/scene/portrait.mjs <mundo> <origem>`.
 
 Os dois passos caros (7 e 9) são os únicos onde há tempo a recuperar sem perder uma verificação — mas
 não com os comandos que existem hoje, e este guia não inventa comandos.
