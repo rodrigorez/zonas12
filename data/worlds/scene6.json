@@ -458,13 +458,13 @@
         "radius": 120,
         "shaderId": "ondas",
         "cutout": "recorte-scene5-de-scene6",
-        "azimuth": -129,
+        "azimuth": 180,
         "reality": [
           {
-            "az0": 28.19,
-            "el0": -0.6,
-            "az1": 31.39,
-            "el1": 3.9
+            "az0": 7.4,
+            "el0": -0.51,
+            "az1": 10.6,
+            "el1": 3.32
           }
         ]
       },

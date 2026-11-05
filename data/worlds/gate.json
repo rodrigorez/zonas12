@@ -212,6 +212,22 @@
         "pt": "Retrato do mundo scene12, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene12 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "retrato-scene13": {
+      "path": "assets/previews/scene13-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Realidades 360º, visto da porta",
+        "en": "Portrait of the Realities 360º world, seen from the door"
+      }
+    },
+    "recorte-scene13-de-gate": {
+      "path": "assets/previews/recorte-scene13-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Realidades 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Realities 360º world, seen from the door (cutout, for the live window)"
+      }
     }
   },
   "dimensions": [
@@ -296,9 +312,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        45,
+        41.83,
         0,
-        -77.94
+        -79.69
       ],
       "width": 8,
       "height": 10,
@@ -328,7 +344,7 @@
         "radius": 120,
         "shaderId": "por-do-sol",
         "cutout": "recorte-scene2-de-gate",
-        "azimuth": 105
+        "azimuth": 107.3
       },
       "action": {
         "kind": "navigate",
@@ -337,7 +353,7 @@
       "arrivalFrom": "scene2",
       "rotation": [
         0,
-        -30,
+        -27.69,
         0
       ],
       "motion": {
@@ -362,9 +378,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
-        77.94,
+        74.07,
         0,
-        -45
+        -51.13
       ],
       "width": 8,
       "height": 10,
@@ -394,7 +410,7 @@
         "radius": 120,
         "shaderId": "noite-aurora",
         "cutout": "recorte-scene4-de-gate",
-        "azimuth": 135
+        "azimuth": 139.6
       },
       "action": {
         "kind": "navigate",
@@ -403,7 +419,7 @@
       "arrivalFrom": "scene4",
       "rotation": [
         0,
-        -60,
+        -55.38,
         0
       ],
       "motion": {
@@ -428,9 +444,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        90,
+        89.34,
         0,
-        0
+        -10.85
       ],
       "width": 8,
       "height": 10,
@@ -460,7 +476,7 @@
         "radius": 120,
         "shaderId": "ondas",
         "cutout": "recorte-scene5-de-gate",
-        "azimuth": 90
+        "azimuth": 105.9
       },
       "action": {
         "kind": "navigate",
@@ -469,7 +485,7 @@
       "arrivalFrom": "scene5",
       "rotation": [
         0,
-        -90,
+        -83.08,
         0
       ],
       "motion": {
@@ -494,9 +510,9 @@
       "id": 14,
       "ownedBy": 0,
       "position": [
-        77.94,
+        84.15,
         0,
-        45
+        31.91
       ],
       "width": 8,
       "height": 10,
@@ -526,7 +542,7 @@
         "radius": 120,
         "shaderId": "becos",
         "cutout": "recorte-scene6-de-gate",
-        "azimuth": 69
+        "azimuth": 78.2
       },
       "action": {
         "kind": "navigate",
@@ -535,7 +551,7 @@
       "arrivalFrom": "scene6",
       "rotation": [
         0,
-        -120,
+        -110.77,
         0
       ],
       "motion": {
@@ -560,9 +576,9 @@
       "id": 18,
       "ownedBy": 0,
       "position": [
-        45,
+        59.68,
         0,
-        77.94
+        67.37
       ],
       "width": 8,
       "height": 10,
@@ -592,7 +608,7 @@
         "radius": 120,
         "shaderId": "aguas",
         "cutout": "recorte-scene7-de-gate",
-        "azimuth": 30
+        "azimuth": 56.5
       },
       "action": {
         "kind": "navigate",
@@ -601,7 +617,7 @@
       "arrivalFrom": "scene7",
       "rotation": [
         0,
-        -150,
+        -138.46,
         0
       ],
       "motion": {
@@ -626,9 +642,9 @@
       "id": 22,
       "ownedBy": 0,
       "position": [
+        21.54,
         0,
-        0,
-        90
+        87.38
       ],
       "width": 8,
       "height": 10,
@@ -658,7 +674,7 @@
         "radius": 120,
         "shaderId": "holograma",
         "cutout": "recorte-scene8-de-gate",
-        "azimuth": 0
+        "azimuth": 22.8
       },
       "action": {
         "kind": "navigate",
@@ -667,7 +683,7 @@
       "arrivalFrom": "scene8",
       "rotation": [
         0,
-        -180,
+        -166.15,
         0
       ],
       "motion": {
@@ -692,9 +708,9 @@
       "id": 26,
       "ownedBy": 0,
       "position": [
-        -45,
+        -21.54,
         0,
-        77.94
+        87.38
       ],
       "width": 8,
       "height": 10,
@@ -724,7 +740,7 @@
         "radius": 120,
         "shaderId": "mangue",
         "cutout": "recorte-scene9-de-gate",
-        "azimuth": -30
+        "azimuth": -13.8
       },
       "action": {
         "kind": "navigate",
@@ -733,7 +749,7 @@
       "arrivalFrom": "scene9",
       "rotation": [
         0,
-        -210,
+        -193.85,
         0
       ],
       "motion": {
@@ -758,9 +774,9 @@
       "id": 30,
       "ownedBy": 0,
       "position": [
-        -77.94,
+        -59.68,
         0,
-        45
+        67.37
       ],
       "width": 8,
       "height": 10,
@@ -790,7 +806,7 @@
         "radius": 120,
         "shaderId": "nucleo",
         "cutout": "recorte-scene10-de-gate",
-        "azimuth": -60
+        "azimuth": -41.5
       },
       "action": {
         "kind": "navigate",
@@ -799,7 +815,7 @@
       "arrivalFrom": "scene10",
       "rotation": [
         0,
-        -240,
+        -221.54,
         0
       ],
       "motion": {
@@ -824,9 +840,9 @@
       "id": 34,
       "ownedBy": 0,
       "position": [
-        -90,
+        -84.15,
         0,
-        0
+        31.91
       ],
       "width": 8,
       "height": 10,
@@ -856,7 +872,7 @@
         "radius": 120,
         "shaderId": "fichario",
         "cutout": "recorte-scene11-de-gate",
-        "azimuth": -81
+        "azimuth": -60.2
       },
       "action": {
         "kind": "navigate",
@@ -865,7 +881,7 @@
       "arrivalFrom": "scene11",
       "rotation": [
         0,
-        -270,
+        -249.23,
         0
       ],
       "motion": {
@@ -890,9 +906,9 @@
       "id": 46,
       "ownedBy": 0,
       "position": [
-        -77.94,
+        -89.34,
         0,
-        -45
+        -10.85
       ],
       "width": 8,
       "height": 10,
@@ -922,7 +938,7 @@
         "radius": 120,
         "shaderId": "nuvens",
         "cutout": "recorte-scene3-de-gate",
-        "azimuth": -105
+        "azimuth": -81.9
       },
       "action": {
         "kind": "navigate",
@@ -931,7 +947,7 @@
       "arrivalFrom": "scene3",
       "rotation": [
         0,
-        -300,
+        -276.92,
         0
       ],
       "motion": {
@@ -956,9 +972,9 @@
       "id": 4,
       "ownedBy": 0,
       "position": [
-        -45,
+        -74.07,
         0,
-        -77.94
+        -51.13
       ],
       "width": 8,
       "height": 10,
@@ -988,7 +1004,7 @@
         "radius": 120,
         "shaderId": "deposito",
         "cutout": "recorte-scene12-de-gate",
-        "azimuth": -150
+        "azimuth": -124.6
       },
       "action": {
         "kind": "navigate",
@@ -997,7 +1013,7 @@
       "arrivalFrom": "scene12",
       "rotation": [
         0,
-        -330,
+        -304.62,
         0
       ],
       "motion": {
@@ -1016,6 +1032,72 @@
         ],
         "angle": 45,
         "rotationPeriod": 16.5
+      }
+    },
+    {
+      "id": 5,
+      "ownedBy": 0,
+      "position": [
+        -41.83,
+        0,
+        -79.69
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene13",
+        "radius": 120,
+        "shaderId": "projecao",
+        "cutout": "recorte-scene13-de-gate",
+        "azimuth": -137.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene13"
+      },
+      "arrivalFrom": "scene13",
+      "rotation": [
+        0,
+        -332.31,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "period": 18.2,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 90,
+        "rotationPeriod": 13.9
       }
     }
   ]

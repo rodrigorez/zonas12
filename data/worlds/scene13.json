@@ -1,0 +1,617 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "scene13",
+    "name": {
+      "pt": "Realidades 360º",
+      "en": "Realities 360º"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "praia": {
+      "path": "assets/panoramas/praia-d0-praia.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da praia, usado como reserva do fundo da sala 13",
+        "en": "360º panorama of the beach, used as the fallback for room 13"
+      }
+    },
+    "retrato-scene5": {
+      "path": "assets/previews/scene5-de-scene13.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Ondas 360º, visto da porta",
+        "en": "Portrait of the Waves 360º world, seen from the door"
+      }
+    },
+    "recorte-scene5-de-scene13": {
+      "path": "assets/previews/recorte-scene5-de-scene13.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Ondas 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Waves 360º world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene7": {
+      "path": "assets/previews/scene7-de-scene13.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Presenças 360º, visto da porta",
+        "en": "Portrait of the Presences 360º world, seen from the door"
+      }
+    },
+    "recorte-scene7-de-scene13": {
+      "path": "assets/previews/recorte-scene7-de-scene13.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Presenças 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Presences 360º world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene8": {
+      "path": "assets/previews/scene8-de-scene13.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Imersões 360º, visto da porta",
+        "en": "Portrait of the Immersions 360º world, seen from the door"
+      }
+    },
+    "recorte-scene8-de-scene13": {
+      "path": "assets/previews/recorte-scene8-de-scene13.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Imersões 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Immersions 360º world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "capa-0": {
+      "path": "https://lh3.googleusercontent.com/d/1uoKyIKQKUXNast3R8ds31VIBOA7P_J9J",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Mapping Aniversario Bafcor"
+      }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1ng6wpqzdEUo53twF7ZGMEVpSBRLdXUQR",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Mapping Fiofio"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1cxUURPBxVJpUsBPUgnXTRiZwui0e7bU7",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Humedal Lenga"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/18WwI1pRf1etnha0sr8tIHS40Tkcb9PX7",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra CaperucitAR"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1Uhl0REdYmJIj-sbFL3QZI_oD8VhIWbOL",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Musico de breme AR"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1NO86RHhMydAcUhDPeoDdUxMigWvgBJGc",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Codex del Cosmos"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "projecao",
+      "fallbackAsset": "praia",
+      "name": {
+        "pt": "Realidades 360º",
+        "en": "Realities 360º"
+      },
+      "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": 0,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-0",
+      "position": [
+        30,
+        1.5,
+        -51.96
+      ],
+      "rotation": [
+        0,
+        -30,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Mapping Aniversario Bafcor"
+      },
+      "authors": "Javiera Rios",
+      "coAuthors": "Gabriel Villagra, Inger Sperberg",
+      "synopsis": {
+        "pt": "El proyecto Video Mapping FABCOR acompañó los 20 años del Ballet Folclórico de Coronel en el Teatro Biobío, integrando animación digital y proyecciones sincronizadas con las coreografías para destacar la riqueza del folclore latinoamericano, la cultura mapuche y la identidad minera de la región."
+      },
+      "site": "https://drive.google.com/file/d/1zlLlntgZGTYeIhDhMfNPoTwl3veEzFKn1dLD8Io_HwE/preview"
+    },
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        60,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Mapping Fiofio"
+      },
+      "authors": "Raúl Sánchez M",
+      "coAuthors": "Ariela Rocha, Victor Diaz, Inger Sperberg, Ignacio Aguayo, Javiera Rios",
+      "collaborators": "Catalina Asencio, Cristobal Martinez",
+      "synopsis": {
+        "pt": "Mapping en el Teatro Biobío por alumnos de Animación Digital USS para el 6° Festival Fío-Fío. Usando registros históricos del teatro regional, la obra rescata la memoria visual e identidad local mediante animación y composición digital, uniendo arte y comunidad para “Compartir el presente”."
+      },
+      "site": "https://drive.google.com/file/d/1jkGh9jIOcZFAMK9l9JzObBIeCp2JhrnL/preview"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        30,
+        1.5,
+        51.96
+      ],
+      "rotation": [
+        0,
+        -150,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Humedal Lenga"
+      },
+      "authors": "Melian Julio",
+      "synopsis": {
+        "pt": "Obra de video mapping interactivo desarrollada en TouchDesigner, protagonizada por un mirlo y una gaviota. Mediante el análisis de audio en tiempo real, modifica los patrones de movimiento de las aves, promoviendo la conciencia ambiental y la valoración de la fauna local a través del arte y la tecnología."
+      },
+      "site": "https://drive.google.com/file/d/1Mz4yZRj4TrrXhfOdEKgFbE35vwlgBZBg/preview"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        -30,
+        1.5,
+        51.96
+      ],
+      "rotation": [
+        0,
+        -210,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "CaperucitAR"
+      },
+      "authors": "Inger Sperberg",
+      "synopsis": {
+        "pt": "Adaptação de Chapeuzinho Vermelho para realidade aumentada usando Unity para Android. Com ilustrações animadas em estilo papercraft, permite explorar cenas-chave e interagir com a história, integrando tecnologia e leitura tradicional para fomentar a imaginação e o vínculo entre pais e filhos."
+      },
+      "site": "https://drive.google.com/file/d/1MFOhlZrNssQxaDs6fnnzohOUokCBAuSJ/preview"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        -60,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        -270,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Musico de breme AR"
+      },
+      "authors": "Javiera Vivanco",
+      "coAuthors": "Constanza Orrego, Laura Garrido",
+      "synopsis": {
+        "pt": "Projeto que adapta “Os Músicos de Bremen” para realidade aumentada no Unity para Android. Por meio de dioramas 3D e personagens 2D interativos, recria as cenas principais para oferecer uma experiência visual inovadora, permitindo que as crianças aproveitem a história sem perder a experiência da leitura."
+      },
+      "site": "https://drive.google.com/file/d/1e86bGWoAf4h_GO5ycEQLBbpDW-mcIaQb/preview"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -30,
+        1.5,
+        -51.96
+      ],
+      "rotation": [
+        0,
+        -330,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Codex del Cosmos"
+      },
+      "authors": "Ignacio Aguayo",
+      "synopsis": {
+        "pt": "Codex do Cosmos é uma jornada em VR para Meta Quest onde você é um Crononauta. Guiado pela IA K-PLER, você viaja do Sol à origem do universo usando apenas hand tracking."
+      },
+      "site": "https://drive.google.com/file/d/1ezsf6hQhcY_HJ6y00ns56U2kYftLthsc/preview"
+    }
+  ],
+  "portals": [
+    {
+      "id": 0,
+      "ownedBy": 0,
+      "position": [
+        23.29,
+        0,
+        -86.93
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "arrivalFrom": "gate",
+      "rotation": [
+        0,
+        -15,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 6,
+        "period": 12.5,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 45,
+        "rotationPeriod": 14.5
+      }
+    },
+    {
+      "id": 1,
+      "ownedBy": 0,
+      "position": [
+        86.93,
+        0,
+        23.29
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene5",
+        "radius": 120,
+        "shaderId": "ondas",
+        "cutout": "recorte-scene5-de-scene13",
+        "azimuth": -6,
+        "reality": [
+          {
+            "az0": 52.03,
+            "el0": -0.74,
+            "az1": 55.25,
+            "el1": 4.83
+          }
+        ]
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene5"
+      },
+      "arrivalFrom": "scene5",
+      "rotation": [
+        0,
+        -105,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 11.3,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 45,
+        "rotationPeriod": 19.8
+      }
+    },
+    {
+      "id": 2,
+      "ownedBy": 0,
+      "position": [
+        -23.29,
+        0,
+        86.93
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene7",
+        "radius": 120,
+        "shaderId": "aguas",
+        "cutout": "recorte-scene7-de-scene13",
+        "azimuth": -90,
+        "reality": [
+          {
+            "az0": 58.02,
+            "el0": -0.74,
+            "az1": 61.24,
+            "el1": 4.83
+          }
+        ]
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene7"
+      },
+      "arrivalFrom": "scene7",
+      "rotation": [
+        0,
+        -195,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 6,
+        "period": 17.1,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 45,
+        "rotationPeriod": 17.9
+      }
+    },
+    {
+      "id": 3,
+      "ownedBy": 0,
+      "position": [
+        -86.93,
+        0,
+        -23.29
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene8",
+        "radius": 120,
+        "shaderId": "holograma",
+        "cutout": "recorte-scene8-de-scene13",
+        "azimuth": 174,
+        "reality": [
+          {
+            "az0": 52.03,
+            "el0": -0.74,
+            "az1": 55.25,
+            "el1": 4.83
+          }
+        ]
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene8"
+      },
+      "arrivalFrom": "scene8",
+      "rotation": [
+        0,
+        -285,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 14.8,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 11.9
+      }
+    }
+  ]
+}

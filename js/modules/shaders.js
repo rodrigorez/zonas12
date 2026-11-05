@@ -27,6 +27,7 @@ import { shader as mangue } from '../shaders/mangue.js';
 import { shader as nucleo } from '../shaders/nucleo.js';
 import { shader as fichario } from '../shaders/fichario.js';
 import { shader as deposito } from '../shaders/deposito.js';
+import { shader as projecao } from '../shaders/projecao.js';
 // shaders:imports end
 
 export const VERTEX = `
@@ -111,7 +112,8 @@ const INSTALLED = [
   mangue,
   nucleo,
   fichario,
-  deposito
+  deposito,
+  projecao
   // shaders:list end
 ];
 

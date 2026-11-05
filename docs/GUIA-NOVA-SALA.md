@@ -13,10 +13,10 @@
 > abre e está errada, ou uma bateria verde que não olhou para a sala. Por isso cada passo abaixo tem
 > uma frase de sucesso — **um passo sem a sua frase é um passo que não aconteceu**.
 >
-> **Os números das frases crescem.** Hoje (**2026-11-04**, com a D93 nos números e a D94 no método):
-> **13 páginas** (o portão e doze salas), **18 ficheiros de mundo**, **58 portas**, **61 obras**,
-> **49 retratos**, **29 leis** (L1–L29) e **28 baterias** no `--full`. O `13 mundo(s)`, o `49 porta(s)`
-> e o `(13)` do «a lista cobre todas as salas do dado» sobem a cada sala — o que não muda é a **forma**
+> **Os números das frases crescem.** Hoje (**2026-11-04**, com a D94 no método e a D95 nos números):
+> **14 páginas** (o portão e treze salas), **19 ficheiros de mundo**, **66 portas**, **67 obras**,
+> **56 retratos**, **30 leis** (L1–L30) e **28 baterias** no `--full`. O `14 mundo(s)`, o `56 porta(s)`
+> e o `(14)` do «a lista cobre todas as salas do dado» sobem a cada sala — o que não muda é a **forma**
 > da frase.
 >
 > **Nada aqui é novo.** Todos os comandos deste guia existem no repositório e são os que a spec manda
@@ -60,8 +60,8 @@ node tools/scene/validate.mjs
 e, em cada linha, o terceiro número:
 
 ```
-data/worlds/scene5.json: OK (2 dimensions, 5 artworks, 3 portals, 10 assets, 3 distinct windows)
-                                                  ^^^^^^^^^ 3 portas → cabe mais uma
+data/worlds/scene5.json: OK (2 dimensions, 5 artworks, 4 portals, 12 assets, 4 distinct windows)
+                                                  ^^^^^^^^^ 4 portas → cabe mais uma
 ```
 
 O retrato deste dia (reconte com o comando acima antes de decidir — isto envelhece):
@@ -69,12 +69,12 @@ O retrato deste dia (reconte com o comando acima antes de decidir — isto envel
 | sala | portas | lugares livres |
 | --- | --- | --- |
 | `scene1` | **5** | **0 — não pode receber nenhuma porta de chegada** |
-| `scene2`, `scene3`, `scene4`, `scene6`, `scene9`, `scene10`, `scene11`, `scene12` | 4 | 1 |
-| `scene5`, `scene7`, `scene8` | 3 | 2 |
+| `scene2`, `scene3`, `scene4`, `scene5`, `scene6`, `scene7`, `scene8`, `scene9`, `scene10`, `scene11`, `scene12`, `scene13` | 4 | 1 |
 
-E a L25: o conjunto `{portão + destinos}` tem de ser diferente do de todas as salas. Há **769**
-conjuntos ainda livres (de 781 possíveis) — mas a escolha verifica-se, não se presume: o `new-room`
-recusa antes de escrever e diz qual é a sala repetida.
+E a L25: o conjunto `{portão + destinos}` tem de ser diferente do de todas as salas. Há **1 066**
+conjuntos ainda livres (de **1 079** possíveis — dois, três ou quatro destinos entre as treze salas) —
+mas a escolha verifica-se, não se presume: o `new-room` recusa antes de escrever e diz qual é a sala
+repetida.
 
 ---
 
@@ -215,7 +215,15 @@ e abra `http://127.0.0.1:8123/editor.html?world=<slug>`.
     se aplica depois do passo 2;
   - `<n> células para <m> colunas` — falta uma TAB dentro de um texto (use aspas nesse texto);
   - `o mundo <slug> ficaria inválido:` — o importador valida o que ia escrever; a lista abaixo é a
-    mesma lei que o validador daria.
+    mesma lei que o validador daria. **A L9 cai sempre aqui** enquanto os retratos do passo 7 não
+    existirem, e o importador recusa escrever: nesse caso a ordem inverte-se — os dois `--todos` do
+    passo 7 primeiro, a folha depois. Nada precisa de ser recozido por causa disso, porque o texto e o
+    `kind` não entram na imagem que o retrato guarda (D95).
+
+> **A folha vem antes do passo 5, e os retratos podem vir antes da folha.** Depois de a folha escrever,
+> o anel e o giro são recalculados no passo 5 e é isso que os retratos do passo 7 cozem. Se a L9
+> obrigar a inverter (retratos antes da folha), confirme no fim que o passo 5 diz `nada a escrever` —
+> se ele escrever, os retratos são de antes da mudança e voltam a cozer-se.
 
 ---
 
@@ -233,7 +241,7 @@ node tools/scene/reality.mjs --aplicar
 - **Tem de dizer:**
 
   ```
-  13 mundo(s) · 12 com anel de obras · 13 ok, 0 justo(s), 0 falha(s)
+  14 mundo(s) · 13 com anel de obras · 14 ok, 0 justo(s), 0 falha(s)
   o dado: 13 de 13 em anel (nada a fazer)
 
   N porta(s) de retrato, 0 sem porta de chegada, 3 de primeira visita
@@ -297,7 +305,7 @@ node tools/scene/portrait.mjs --todos      # a segunda, sempre
   `recorte-…png`.
 - **Porquê duas vezes:** o retrato de uma sala contém as **janelas das portas dessa sala**, que são
   retratos deles próprios. A primeira passagem cozinha o que lá estava, a segunda o que ficou.
-- **Quantos são:** os 49 de hoje mais **`2N + 1`** para uma sala com `N` destinos — a sala nova mostra
+- **Quantos são:** os 56 de hoje mais **`2N + 1`** para uma sala com `N` destinos — a sala nova mostra
   os `N` destinos, o portão ganha um e cada destino ganha um (com dois destinos, 54 pares; com
   quatro, 58).
 - **Quanto custa:** ~10 s por retrato na máquina da spec (medido: **387 a 418 s** por passagem com
@@ -378,7 +386,7 @@ Na ordem em que se correm. Uma linha sem a sua frase é uma linha que não passo
 - [ ] `node tools/scene/reality.mjs --aplicar` — `… 0 sem porta de chegada` e `nada a escrever`
 - [ ] `node tools/scene/validate.mjs` — **OK** no ficheiro novo e nos tocados; a L9 é a única vermelha
       admissível **aqui**
-- [ ] `node tools/scene/laws-selftest.mjs` — `31 of 31 faults detected` e `control … clean`
+- [ ] `node tools/scene/laws-selftest.mjs` — `33 of 33 faults detected` e `control … clean`
 - [ ] `node tools/scene/portrait.mjs --todos` **duas vezes** — um par por porta com janela
 - [ ] `node tools/scene/validate.mjs` — **OK em todos, sem L9 nenhuma**
 - [ ] `node tools/regression/all.mjs --full` — `28 de 28` (ou a vermelha repetida e explicada)
@@ -402,6 +410,7 @@ Na ordem em que se correm. Uma linha sem a sua frase é uma linha que não passo
 | 8 | **Correr os anéis só nos mundos tocados** | a L26 rebenta em portas de salas que ninguém tocou (medido: 7 portas de 4 salas) | sem argumentos: as três ferramentas correm sobre tudo e são idempotentes |
 | 9 | **A porta de chegada em duas salas para a mesma origem** | a L17 recusa | uma só porta por origem em cada destino |
 | 10 | **Uma porta acrescentada à mão fica parada** | **nada** — a L29 mede o alcance de uma porta *que oscila*, e uma porta parada alcança-se sempre (100%) | `sorteio.mjs <mundo> --aplicar --sem-movimento`. Foi o que aconteceu à porta do portão para a sala 12 (D94): foi um olho humano a ver, não uma lei |
+| 11 | **O fundo trocado *depois* do `new-room`** (o shader novo da sala) | `error: gate portas[N]: a janela desenha "holograma" e "scene13" desenha "projecao"` — as janelas de quem aponta para a sala ficaram com o `shaderId` que ela tinha quando a porta nasceu | pôr o `shaderId` novo em cada janela que aponta para a sala (o portão **e** cada destino), **antes** do passo 7: o retrato compõe a janela com o fundo que ela declara |
 
 ---
 

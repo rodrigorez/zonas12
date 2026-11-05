@@ -44,17 +44,17 @@
 | objeto | onde vive | quem o escreve | o que o guarda |
 | --- | --- | --- | --- |
 | a **página** | `<slug>/index.html` | `tools/scene/new-world.mjs` | `arranques.mjs` — o mesmo ficheiro da raiz, só com `<base href="../">` (D28) |
-| o **dado da sala** | `data/worlds/<slug>.json` | o editor (exporta) | `validate.mjs` + as leis L1–L29 |
+| o **dado da sala** | `data/worlds/<slug>.json` | o editor (exporta) | `validate.mjs` + as leis L1–L30 |
 | as **obras** (texto, capa, site) | `data/obras.tsv` → os mundos | `tools/artwork/from-csv.mjs` | `from-csv --check`, a lei L20 e a ficha |
 | as **posições** (dois anéis) | o mesmo JSON | `tools/scene/ring.mjs --aplicar` | L22 e L23 |
 | as **portas de mundo** (janela, retrato, chegada, giro, mundo real) | o JSON da sala **e** o de cada destino | o editor + `azimuths.mjs` + `reality.mjs` + `portrait.mjs` | L11, L13, L16, L17, L19, L26, L28 |
 | o **movimento das portas** (oscilação) | o mesmo JSON, em cada porta | `tools/scene/sorteio.mjs --aplicar` (sorteado, nunca escolhido — §10) | L29 (o alcance) |
 
-O número de hoje, para se saber quando é que um passo ficou a meio: **13 páginas** (o portão e doze
-salas), **18 ficheiros de mundo** (as 13 e 5 fixtures, dos quais a sala de ensaio da §9), **58 portas**
-nas treze páginas — **todas em movimento desde a D91** (§11) —, **61 obras**, **49 retratos** (um par
-`.jpg` + `.png` por porta com janela de pré-visualização, contando as três da sala de ensaio), **29 leis**
-(L1–L29) e **28 baterias** no `--full`.
+O número de hoje, para se saber quando é que um passo ficou a meio: **14 páginas** (o portão e treze
+salas), **19 ficheiros de mundo** (as 14 e 5 fixtures, dos quais a sala de ensaio da §9), **66 portas**
+nas catorze páginas — **todas em movimento desde a D91** (§11) —, **67 obras**, **56 retratos** (um par
+`.jpg` + `.png` por porta com janela de pré-visualização, contando as três da sala de ensaio), **30 leis**
+(L1–L30) e **28 baterias** no `--full`.
 
 E o número que a §10 acrescenta, porque é ele que uma sala nova vai ter de cumprir: **cada porta da
 sala nova oscila**, e o sorteio do movimento é rejeitado uma vez em cada três (§10.3).
@@ -312,7 +312,7 @@ node tools/scene/validate.mjs
 node tools/scene/laws-selftest.mjs
 ```
 
-- **Tem de dizer:** `data/worlds/<slug>.json: OK (…)` para cada ficheiro, e as **31 de 31** avarias
+- **Tem de dizer:** `data/worlds/<slug>.json: OK (…)` para cada ficheiro, e as **33 de 33** avarias
   injectadas detectadas com o controlo limpo.
 - **O que ainda pode estar vermelho aqui, e só isto:** a **L9**, nos retratos da sala nova — os
   ficheiros são derivados e só nascem na fase 8. Tudo o resto (L19, L22, L24, L25, L26, L28 e a **L29**,
@@ -471,7 +471,7 @@ Uma sala está pronta quando **todas** estas linhas forem verdade, pela ordem em
       (`a folha não muda nada: o dado já diz o mesmo`)
 - [ ] o `validate.mjs` diz **OK** no ficheiro novo **e** nos que ele tocou; a **única** coisa vermelha
       admitida aqui é a L9 dos retratos
-- [ ] o `laws-selftest.mjs` diz **31 de 31** e o controlo limpo
+- [ ] o `laws-selftest.mjs` diz **33 de 33** e o controlo limpo
 - [ ] o `ring.mjs` não tem desvios acima de **0,5 m** e a folga L23 passa
 - [ ] o `azimuths.mjs` e o `reality.mjs` dizem `nada a escrever` (e, na primeira vez, escrevem e voltam
       a dizer o mesmo) — a frase de cada um está na fase 5 e na fase 6
@@ -498,6 +498,18 @@ chegada, o giro e o retrato ao mesmo tempo.
 > olhar em volta, sair pela porta de volta, voltar a entrar) —, e o resultado foi **sucesso**. É a
 > primeira vez que a estética da §2.1 e o movimento da §10/§11 passam por um olho humano em todas as
 > salas ao mesmo tempo; as baterias medem o que sabem medir, isto mede o resto.
+>
+> **Feita (2026-11-04, a sala 13 — D95):** a `scene13` foi aberta no servidor local
+> (`node tools/server/serve.mjs`) e percorrida pelo caminho do visitante. O que se viu: a **cúpula de
+> painéis** do `projecao` — vinte colunas com moldura escura, o tom a mudar de painel para painel, o
+> chão da grelha a apanhar a poça de luz e o pó fino a acender-se —, **seis obras** pequenas ao longe
+> (os 4 m a 60 m) e as **quatro portas** de 10 m a 90 m, com a moldura vermelha; ao rodar a vista, a
+> esfera **fecha sem costura visível**. As duas fotografias a **quatro segundos** de distância mostram a
+> mesma porta **rodada** (oscila). A porta do portão tem a janela de duas dimensões e mostra a câmara
+> (esta máquina tem o sensor ligado, e é o que se vê dentro da moldura); a de `scene7` mostra o fundo
+> `aguas` ao vivo, e as outras duas os retratos dos destinos. Ao atravessar para `/?from=scene13`
+> vê-se o **portão com treze portas** — e a travessia das quatro portas da sala está medida pelo T1
+> (**8 de 8**, o giro e a chegada incluídos).
 
 ---
 

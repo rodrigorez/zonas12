@@ -102,6 +102,22 @@
         "pt": "Retrato do mundo Imersões 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Immersions 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-scene13": {
+      "path": "assets/previews/scene13-de-scene7.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Realidades 360º, visto da porta",
+        "en": "Portrait of the Realities 360º world, seen from the door"
+      }
+    },
+    "recorte-scene13-de-scene7": {
+      "path": "assets/previews/recorte-scene13-de-scene7.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Realidades 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Realities 360º world, seen from the door (cutout, for the live window)"
+      }
     }
   },
   "dimensions": [
@@ -311,9 +327,9 @@
       "id": 21,
       "ownedBy": 0,
       "position": [
+        23.29,
         0,
-        0,
-        -90
+        -86.93
       ],
       "width": 10,
       "height": 12,
@@ -349,7 +365,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        0,
+        -15,
         0
       ],
       "motion": {
@@ -374,9 +390,9 @@
       "id": 19,
       "ownedBy": 0,
       "position": [
-        77.94,
+        86.93,
         0,
-        45
+        23.29
       ],
       "width": 10,
       "height": 12,
@@ -406,7 +422,7 @@
         "radius": 120,
         "shaderId": "nuvens",
         "cutout": "recorte-scene3-de-scene7",
-        "azimuth": -15,
+        "azimuth": 0,
         "reality": [
           {
             "az0": 58.02,
@@ -423,7 +439,7 @@
       "arrivalFrom": "scene3",
       "rotation": [
         0,
-        -120,
+        -105,
         0
       ],
       "motion": {
@@ -448,9 +464,9 @@
       "id": 42,
       "ownedBy": 0,
       "position": [
-        -77.94,
+        -23.29,
         0,
-        45
+        86.93
       ],
       "width": 10,
       "height": 12,
@@ -480,13 +496,13 @@
         "radius": 120,
         "shaderId": "holograma",
         "cutout": "recorte-scene8-de-scene7",
-        "azimuth": 180,
+        "azimuth": 174,
         "reality": [
           {
-            "az0": 28.19,
-            "el0": -0.6,
-            "az1": 31.39,
-            "el1": 3.9
+            "az0": 7.4,
+            "el0": -0.51,
+            "az1": 10.6,
+            "el1": 3.32
           }
         ]
       },
@@ -497,7 +513,7 @@
       "arrivalFrom": "scene8",
       "rotation": [
         0,
-        -240,
+        -195,
         0
       ],
       "motion": {
@@ -516,6 +532,80 @@
         ],
         "angle": 90,
         "rotationPeriod": 19.9
+      }
+    },
+    {
+      "id": 0,
+      "ownedBy": 0,
+      "position": [
+        -86.93,
+        0,
+        -23.29
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene13",
+        "radius": 120,
+        "shaderId": "projecao",
+        "cutout": "recorte-scene13-de-scene7",
+        "azimuth": 90,
+        "reality": [
+          {
+            "az0": 13.4,
+            "el0": -0.51,
+            "az1": 16.6,
+            "el1": 3.32
+          }
+        ]
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene13"
+      },
+      "arrivalFrom": "scene13",
+      "rotation": [
+        0,
+        -285,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 6,
+        "period": 12.2,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 17.1
       }
     }
   ]

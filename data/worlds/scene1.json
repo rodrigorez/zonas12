@@ -665,13 +665,13 @@
         "radius": 120,
         "shaderId": "holograma",
         "cutout": "recorte-scene8-de-scene1",
-        "azimuth": 53.1,
+        "azimuth": 32.2,
         "reality": [
           {
-            "az0": -31.39,
-            "el0": -0.6,
-            "az1": -28.19,
-            "el1": 3.9
+            "az0": -37.24,
+            "el0": -0.74,
+            "az1": -34.02,
+            "el1": 4.83
           }
         ]
       },

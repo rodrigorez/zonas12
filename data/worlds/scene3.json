@@ -416,13 +416,13 @@
         "radius": 120,
         "shaderId": "aguas",
         "cutout": "recorte-scene7-de-scene3",
-        "azimuth": 15,
+        "azimuth": 0,
         "reality": [
           {
-            "az0": -31.39,
-            "el0": -0.6,
-            "az1": -28.19,
-            "el1": 3.9
+            "az0": -31.25,
+            "el0": -0.74,
+            "az1": -28.03,
+            "el1": 4.83
           }
         ]
       },
