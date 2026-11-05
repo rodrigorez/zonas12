@@ -92,9 +92,12 @@ const ARQUIVADAS = [
   { nome: 'a transição (D42)', script: 'tools/regression/transition.mjs' }
 ];
 
-// 25 minutos por bateria: nesta máquina a mais lenta (os doze) leva ~10, e uma bateria que não
-// termina em 25 não está a medir — está pendurada.
-const LIMITE_MS = 25 * 60 * 1000;
+// O limite é uma **rede**, não uma expectativa — e tem de crescer com a exposição. A bateria mais lenta
+// (o T1 e a chegada) abre um Chrome por sala e mede cada porta, por isso o tempo é proporcional ao
+// número de salas: medido, **970 s com 14 salas** e **1 833 s com 27** (≈68 s por sala). O limite
+// antigo, de 25 min, cortava a exposição completa a meio — a bateria "falhava" com 474 verificações
+// aprovadas e zero erros. 45 min dá margem para as 27 e para a máquina estar lenta.
+const LIMITE_MS = 45 * 60 * 1000;
 
 function correr(bateria) {
   const inicio = Date.now();
