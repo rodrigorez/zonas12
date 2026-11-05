@@ -92,6 +92,41 @@
         "pt": "Retrato do mundo scene25, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene25 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1S64xKKI1YjSxFoZBUx3AnA42aJWMXTGn",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra What Reaches the Listener"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1xnBIduC8R-8KY34enf9qLVZ8imU2Kz8n",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Cançó de nodrir i destrossa a 4 veus"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1fNFEsfZIHe0XwOWOKGtpTBGI0e5q5pSM",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra dissonància/solitud"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1u6SBgCTovdNMsmTLIYBh3VFVmnjcBwvU",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Bestias de carga"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1OLhAs8XVJ1b0UG8BNwvdK17DJq7ms8Gk",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra En-tierra"
+      }
     }
   },
   "dimensions": [
@@ -115,7 +150,159 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        35.27,
+        1.5,
+        -48.54
+      ],
+      "rotation": [
+        0,
+        -36,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "What Reaches the Listener"
+      },
+      "authors": "Gerard Ryan",
+      "synopsis": {
+        "pt": "Composição sonora criada a partir de atividade eletromagnética captada em infraestruturas tecnológicas do quotidiano. A obra transforma sinais inaudíveis em música, explorando a escuta mediada e a vida sonora oculta das máquinas."
+      },
+      "site": "https://www.dropbox.com/scl/fi/83px3cl2fu0ae2v3r5ida/What-Reaches-the-Listener.wav?rlkey=f2r3zignd96wb7y1ndzgn309r&st=ddw28k5b&dl=0"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        57.06,
+        1.5,
+        18.54
+      ],
+      "rotation": [
+        0,
+        -108,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Cançó de nodrir i destrossa a 4 veus"
+      },
+      "authors": "Flor Paulics",
+      "synopsis": {
+        "pt": "Colagem sonora onde interagem: As máquinas de mineração extrativista As maritacas que vivem na mesma cidade que eu As músicas remanescentes dos vissungos E os cantos sincréticos dos territórios evangelizados da Amazônia"
+      },
+      "site": "https://drive.google.com/file/d/1tug1Rq95OCFGyOalf9z2fidPRL8O_bxX/preview"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        0,
+        1.5,
+        60
+      ],
+      "rotation": [
+        0,
+        -180,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "dissonància/solitud"
+      },
+      "authors": "atlas de haan bosch",
+      "synopsis": {
+        "pt": "Os poemas, em catalão, procuram aproximar-se da solidão através do imaginário do seu texto poético, da repetição e da sobreposição deste. Pretendem que te deixes envolver pela sua frustração e pelo seu ritmo incessante e que compreendas não só o que cada poema te quer dizer, mas também que acontece quando te podes deixar envolver por os três poemas"
+      },
+      "site": "https://drive.google.com/file/d/1tswaxZWT_F_BfNO6XBBEKMY8Cd4O2N8c/preview"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        -57.06,
+        1.5,
+        18.54
+      ],
+      "rotation": [
+        0,
+        -252,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Bestias de carga"
+      },
+      "authors": "Hugo Moreno Camín",
+      "collaborators": "Manuel Moreno Sánchez",
+      "synopsis": {
+        "pt": "Bestias de carga (Bestas de carga) é um dispositivo de sonificação que registra em tempo real a respiração e o pulso cardíaco e os transforma em vibração e som através de um estrado de cama. Situada entre a instalação e a performance, a peça busca propiciar uma experiência de atenção e escuta corporal afastada da lógica da produtividade."
+      },
+      "site": "https://drive.google.com/file/d/13vX4BvB3ro-mazPCXkQ6WLNYM4ExNrja/preview"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -35.27,
+        1.5,
+        -48.54
+      ],
+      "rotation": [
+        0,
+        -324,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "En-tierra"
+      },
+      "authors": "Berta Asensio Casasús",
+      "synopsis": {
+        "pt": "O projeto investiga o luto e a mutação, explorando como a perda pode transformar-se numa oportunidade de ligação com o invisível e o mágico. Articula-se através de uma série de peças em torno do sino, objeto sagrado historicamente ligado à morte, à comunicação coletiva e à ligação entre a comunidade e o divino."
+      },
+      "site": "https://youtu.be/6fhv8vQhFT4"
+    }
+  ],
   "portals": [
     {
       "id": 0,

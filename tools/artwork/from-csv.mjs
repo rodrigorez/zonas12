@@ -289,8 +289,17 @@ export function applyRow(world, row, { exists, criar = false }) {
 
   if (row.site) {
     if (!/^https?:\/\//i.test(row.site)) return { error: `obra ${row.id}: o site "${row.site}" não é um endereço http(s)` };
-    if (artwork.site !== row.site) {
-      artwork.site = row.site;
+    // O site de uma obra do Drive é `/file/d/<ID>/preview`, e não `/view` (D62): o `/view` é a **página**
+    // do Drive, que se recusa a ser embutida, e a ficha mostra a obra num iframe. As 18 obras do projeto
+    // que vivem no Drive usam `preview`; converter aqui é o que faz a diferença entre «a obra abre» e
+    // «o iframe fica em branco».
+    const site = (() => {
+      const drive = /^https?:\/\/(?:drive|docs)\.google\.com\/file\/d\/([A-Za-z0-9_-]+)(?:\/[^?#]*)?/.exec(row.site);
+      return drive ? 'https://drive.google.com/file/d/' + drive[1] + '/preview' : row.site;
+    })();
+    if (site !== row.site) changes.push(`obra ${row.id}: site do Drive convertido para ${site}`);
+    if (artwork.site !== site) {
+      artwork.site = site;
       changes.push(`obra ${row.id}: site`);
     }
     if (artwork.kind !== 'site') {
