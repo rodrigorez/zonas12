@@ -62,21 +62,21 @@
       }
     },
     "capa-0": {
-      "path": "https://lh3.googleusercontent.com/d/11aOVugiI2OLbr-ostwyBsOh3L1pCjdv9",
+      "path": "assets/artworks/capa-scene3-0.jpg",
       "type": "image",
       "alt": {
         "pt": "Capa da obra GALÁXIAS"
       }
     },
     "capa-1": {
-      "path": "https://lh3.googleusercontent.com/d/1m0TxSD3VrDjn87728J-mV1JDAhx3UW7v",
+      "path": "assets/artworks/capa-scene3-1.jpg",
       "type": "image",
       "alt": {
         "pt": "Capa da obra PARANGOLÉS ELETRÔNICOS"
       }
     },
     "capa-2": {
-      "path": "https://lh3.googleusercontent.com/d/1bBvmWgfl5-rLBOesJ8fAo7bVqNXmEugM",
+      "path": "assets/artworks/capa-scene3-2.jpg",
       "type": "image",
       "alt": {
         "pt": "Capa da obra UAKTI CORPOS SONOROS"

@@ -78,42 +78,35 @@
       }
     },
     "capa-1": {
-      "path": "https://lh3.googleusercontent.com/d/1LvY7c4kX5rIvseUNiPZIrBSAXOm-VAzT",
+      "path": "assets/artworks/capa-scene23-1.jpg",
       "type": "image",
       "alt": {
         "pt": "Capa da obra PERFILADORA DE EXCLUSIÓN"
       }
     },
-    "capa-2": {
-      "path": "https://imgur.com/a/CYQ8tFk",
-      "type": "image",
-      "alt": {
-        "pt": "Capa da obra Stoned"
-      }
-    },
     "capa-3": {
-      "path": "https://lh3.googleusercontent.com/d/11kRl755zKbfdKK3MHHFS5Vm4hfIuQanY",
+      "path": "assets/artworks/capa-scene23-3.jpg",
       "type": "image",
       "alt": {
         "pt": "Capa da obra Un dato cualquiera"
       }
     },
     "capa-4": {
-      "path": "https://lh3.googleusercontent.com/d/1c6zFi5Z2LeOmkj9jMN-_bIDJl_I8AjhV",
+      "path": "assets/artworks/capa-scene23-4.jpg",
       "type": "image",
       "alt": {
         "pt": "Capa da obra Alientos"
       }
     },
     "capa-5": {
-      "path": "https://lh3.googleusercontent.com/d/1Ny5ZSBA_J2Gx77gN4kxv5WL06d9AW7dc",
+      "path": "assets/artworks/capa-scene23-5.jpg",
       "type": "image",
       "alt": {
         "pt": "Capa da obra Nacer, 2025"
       }
     },
     "capa-6": {
-      "path": "https://lh3.googleusercontent.com/d/1UlK7rc69_zCy6ztdBgFkOguRwBnv-Icz",
+      "path": "assets/artworks/capa-scene23-6.jpg",
       "type": "image",
       "alt": {
         "pt": "Capa da obra Despiezar al depredante, 2018"
@@ -176,7 +169,6 @@
       "id": 2,
       "dimension": 0,
       "kind": "site",
-      "asset": "capa-2",
       "position": [
         60,
         1.5,
