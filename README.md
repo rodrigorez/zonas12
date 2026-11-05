@@ -271,7 +271,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.33)
+## Estado atual do código (v0.0.34)
 
 > **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
 > pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
@@ -690,6 +690,22 @@ decisões **D69** a **D76**
 geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou de comportamento: as
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
+
+A **v0.0.34** é o **primeiro marco da exposição completa**: as **27 salas existem** no dado. O
+`construir.mjs --todas` correu em **5 segundos** e o juiz fechou em `mapa: OK` — 27 salas, 49 arestas,
+**152 portas**, 0 arestas pendentes, nenhuma sala em obra.
+
+**E é um marco honesto, não uma exposição pronta.** O que existe são os **esqueletos**: as duas
+dimensões, o fundo copiado, as portas nos dois lados, os assets dos retratos que ainda não foram
+cozinhados e o movimento sorteado. Falta, sala a sala, o que é do autor — as obras, a composição e os
+retratos. Por isso o `validate` está **vermelho**, e por uma só razão: a **L9**, os retratos que ainda
+não existem (28 ficheiros). É o mesmo estado que o guia descreve entre a ronda do fecho e o passo 7,
+agora nas catorze salas de uma vez. **Nenhuma outra lei está vermelha.**
+
+E ficou uma decisão por tomar, registada para não se perder: com a L24 no teto de cinco portas, o
+plano são **10 ondas** e no máximo duas salas em paralelo. Subir a lei para sete portas por sala poria
+as catorze na primeira onda — mas sete portas é um átrio, não uma sala, e o autor ainda não decidiu se
+quer trocar a exposição por velocidade. `abrir-mapa.mjs --teto 7` mostra o que mudaria.
 
 A **v0.0.33** é a **D104**: o plano das ondas passa a ser **executável**. A v0.0.32 disse quantas salas
 cabem em paralelo; esta diz como se abrem, e prova-o.

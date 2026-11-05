@@ -228,6 +228,230 @@
         "pt": "Retrato do mundo Realidades 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Realities 360º world, seen from the door (cutout, for the live window)"
       }
+    },
+    "retrato-scene14": {
+      "path": "assets/previews/scene14-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene14, visto da porta",
+        "en": "Portrait of the scene14 world, seen from the door"
+      }
+    },
+    "recorte-scene14-de-gate": {
+      "path": "assets/previews/recorte-scene14-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene14, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene14 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene15": {
+      "path": "assets/previews/scene15-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene15, visto da porta",
+        "en": "Portrait of the scene15 world, seen from the door"
+      }
+    },
+    "recorte-scene15-de-gate": {
+      "path": "assets/previews/recorte-scene15-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene15, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene15 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene16": {
+      "path": "assets/previews/scene16-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene16, visto da porta",
+        "en": "Portrait of the scene16 world, seen from the door"
+      }
+    },
+    "recorte-scene16-de-gate": {
+      "path": "assets/previews/recorte-scene16-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene16, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene16 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene17": {
+      "path": "assets/previews/scene17-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene17, visto da porta",
+        "en": "Portrait of the scene17 world, seen from the door"
+      }
+    },
+    "recorte-scene17-de-gate": {
+      "path": "assets/previews/recorte-scene17-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene17, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene17 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene18": {
+      "path": "assets/previews/scene18-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene18, visto da porta",
+        "en": "Portrait of the scene18 world, seen from the door"
+      }
+    },
+    "recorte-scene18-de-gate": {
+      "path": "assets/previews/recorte-scene18-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene18, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene18 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene19": {
+      "path": "assets/previews/scene19-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene19, visto da porta",
+        "en": "Portrait of the scene19 world, seen from the door"
+      }
+    },
+    "recorte-scene19-de-gate": {
+      "path": "assets/previews/recorte-scene19-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene19, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene19 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene20": {
+      "path": "assets/previews/scene20-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene20, visto da porta",
+        "en": "Portrait of the scene20 world, seen from the door"
+      }
+    },
+    "recorte-scene20-de-gate": {
+      "path": "assets/previews/recorte-scene20-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene20, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene20 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene21": {
+      "path": "assets/previews/scene21-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene21, visto da porta",
+        "en": "Portrait of the scene21 world, seen from the door"
+      }
+    },
+    "recorte-scene21-de-gate": {
+      "path": "assets/previews/recorte-scene21-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene21, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene21 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene22": {
+      "path": "assets/previews/scene22-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene22, visto da porta",
+        "en": "Portrait of the scene22 world, seen from the door"
+      }
+    },
+    "recorte-scene22-de-gate": {
+      "path": "assets/previews/recorte-scene22-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene22, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene22 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene23": {
+      "path": "assets/previews/scene23-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene23, visto da porta",
+        "en": "Portrait of the scene23 world, seen from the door"
+      }
+    },
+    "recorte-scene23-de-gate": {
+      "path": "assets/previews/recorte-scene23-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene23, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene23 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene24": {
+      "path": "assets/previews/scene24-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene24, visto da porta",
+        "en": "Portrait of the scene24 world, seen from the door"
+      }
+    },
+    "recorte-scene24-de-gate": {
+      "path": "assets/previews/recorte-scene24-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene24, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene24 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene25": {
+      "path": "assets/previews/scene25-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene25, visto da porta",
+        "en": "Portrait of the scene25 world, seen from the door"
+      }
+    },
+    "recorte-scene25-de-gate": {
+      "path": "assets/previews/recorte-scene25-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene25, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene25 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene26": {
+      "path": "assets/previews/scene26-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene26, visto da porta",
+        "en": "Portrait of the scene26 world, seen from the door"
+      }
+    },
+    "recorte-scene26-de-gate": {
+      "path": "assets/previews/recorte-scene26-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene26, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene26 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene27": {
+      "path": "assets/previews/scene27-de-gate.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene27, visto da porta",
+        "en": "Portrait of the scene27 world, seen from the door"
+      }
+    },
+    "recorte-scene27-de-gate": {
+      "path": "assets/previews/recorte-scene27-de-gate.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene27, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene27 world, seen from the door (cutout, for the live window)"
+      }
     }
   },
   "dimensions": [
@@ -312,9 +536,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        41.83,
+        57.85,
         0,
-        -79.69
+        -68.94
       ],
       "width": 8,
       "height": 10,
@@ -344,7 +568,7 @@
         "radius": 120,
         "shaderId": "por-do-sol",
         "cutout": "recorte-scene2-de-gate",
-        "azimuth": 107.3
+        "azimuth": 170.8
       },
       "action": {
         "kind": "navigate",
@@ -353,7 +577,7 @@
       "arrivalFrom": "scene2",
       "rotation": [
         0,
-        -27.69,
+        -40,
         0
       ],
       "motion": {
@@ -378,9 +602,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
-        74.07,
+        88.63,
         0,
-        -51.13
+        -15.63
       ],
       "width": 8,
       "height": 10,
@@ -410,7 +634,7 @@
         "radius": 120,
         "shaderId": "noite-aurora",
         "cutout": "recorte-scene4-de-gate",
-        "azimuth": 139.6
+        "azimuth": 100
       },
       "action": {
         "kind": "navigate",
@@ -419,7 +643,7 @@
       "arrivalFrom": "scene4",
       "rotation": [
         0,
-        -55.38,
+        -80,
         0
       ],
       "motion": {
@@ -444,9 +668,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        89.34,
+        77.94,
         0,
-        -10.85
+        45
       ],
       "width": 8,
       "height": 10,
@@ -476,7 +700,7 @@
         "radius": 120,
         "shaderId": "ondas",
         "cutout": "recorte-scene5-de-gate",
-        "azimuth": 105.9
+        "azimuth": 60
       },
       "action": {
         "kind": "navigate",
@@ -485,7 +709,7 @@
       "arrivalFrom": "scene5",
       "rotation": [
         0,
-        -83.08,
+        -120,
         0
       ],
       "motion": {
@@ -510,9 +734,9 @@
       "id": 14,
       "ownedBy": 0,
       "position": [
-        84.15,
+        30.78,
         0,
-        31.91
+        84.57
       ],
       "width": 8,
       "height": 10,
@@ -542,7 +766,7 @@
         "radius": 120,
         "shaderId": "becos",
         "cutout": "recorte-scene6-de-gate",
-        "azimuth": 78.2
+        "azimuth": 20
       },
       "action": {
         "kind": "navigate",
@@ -551,7 +775,7 @@
       "arrivalFrom": "scene6",
       "rotation": [
         0,
-        -110.77,
+        -160,
         0
       ],
       "motion": {
@@ -576,9 +800,9 @@
       "id": 18,
       "ownedBy": 0,
       "position": [
-        59.68,
+        -30.78,
         0,
-        67.37
+        84.57
       ],
       "width": 8,
       "height": 10,
@@ -608,7 +832,7 @@
         "radius": 120,
         "shaderId": "aguas",
         "cutout": "recorte-scene7-de-gate",
-        "azimuth": 56.5
+        "azimuth": -20
       },
       "action": {
         "kind": "navigate",
@@ -617,7 +841,7 @@
       "arrivalFrom": "scene7",
       "rotation": [
         0,
-        -138.46,
+        -200,
         0
       ],
       "motion": {
@@ -642,9 +866,9 @@
       "id": 22,
       "ownedBy": 0,
       "position": [
-        21.54,
+        -77.94,
         0,
-        87.38
+        45
       ],
       "width": 8,
       "height": 10,
@@ -674,7 +898,7 @@
         "radius": 120,
         "shaderId": "holograma",
         "cutout": "recorte-scene8-de-gate",
-        "azimuth": 22.8
+        "azimuth": -60
       },
       "action": {
         "kind": "navigate",
@@ -683,7 +907,7 @@
       "arrivalFrom": "scene8",
       "rotation": [
         0,
-        -166.15,
+        -240,
         0
       ],
       "motion": {
@@ -708,9 +932,9 @@
       "id": 26,
       "ownedBy": 0,
       "position": [
-        -21.54,
+        -88.63,
         0,
-        87.38
+        -15.63
       ],
       "width": 8,
       "height": 10,
@@ -740,7 +964,7 @@
         "radius": 120,
         "shaderId": "mangue",
         "cutout": "recorte-scene9-de-gate",
-        "azimuth": -13.8
+        "azimuth": -100
       },
       "action": {
         "kind": "navigate",
@@ -749,7 +973,7 @@
       "arrivalFrom": "scene9",
       "rotation": [
         0,
-        -193.85,
+        -280,
         0
       ],
       "motion": {
@@ -774,9 +998,9 @@
       "id": 30,
       "ownedBy": 0,
       "position": [
-        -59.68,
+        -57.85,
         0,
-        67.37
+        -68.94
       ],
       "width": 8,
       "height": 10,
@@ -806,7 +1030,7 @@
         "radius": 120,
         "shaderId": "nucleo",
         "cutout": "recorte-scene10-de-gate",
-        "azimuth": -41.5
+        "azimuth": -140
       },
       "action": {
         "kind": "navigate",
@@ -815,7 +1039,7 @@
       "arrivalFrom": "scene10",
       "rotation": [
         0,
-        -221.54,
+        -320,
         0
       ],
       "motion": {
@@ -840,9 +1064,9 @@
       "id": 34,
       "ownedBy": 0,
       "position": [
-        -84.15,
+        41.5,
         0,
-        31.91
+        -175.15
       ],
       "width": 8,
       "height": 10,
@@ -872,7 +1096,7 @@
         "radius": 120,
         "shaderId": "fichario",
         "cutout": "recorte-scene11-de-gate",
-        "azimuth": -60.2
+        "azimuth": 166.7
       },
       "action": {
         "kind": "navigate",
@@ -881,7 +1105,7 @@
       "arrivalFrom": "scene11",
       "rotation": [
         0,
-        -249.23,
+        -13.33,
         0
       ],
       "motion": {
@@ -906,9 +1130,9 @@
       "id": 46,
       "ownedBy": 0,
       "position": [
-        -89.34,
+        144.38,
         0,
-        -10.85
+        -107.5
       ],
       "width": 8,
       "height": 10,
@@ -938,7 +1162,7 @@
         "radius": 120,
         "shaderId": "nuvens",
         "cutout": "recorte-scene3-de-gate",
-        "azimuth": -81.9
+        "azimuth": 126.7
       },
       "action": {
         "kind": "navigate",
@@ -947,7 +1171,7 @@
       "arrivalFrom": "scene3",
       "rotation": [
         0,
-        -276.92,
+        -53.33,
         0
       ],
       "motion": {
@@ -972,9 +1196,9 @@
       "id": 4,
       "ownedBy": 0,
       "position": [
-        -74.07,
+        179.7,
         0,
-        -51.13
+        10.46
       ],
       "width": 8,
       "height": 10,
@@ -1004,7 +1228,7 @@
         "radius": 120,
         "shaderId": "deposito",
         "cutout": "recorte-scene12-de-gate",
-        "azimuth": -124.6
+        "azimuth": 86.7
       },
       "action": {
         "kind": "navigate",
@@ -1013,7 +1237,7 @@
       "arrivalFrom": "scene12",
       "rotation": [
         0,
-        -304.62,
+        -93.33,
         0
       ],
       "motion": {
@@ -1038,9 +1262,9 @@
       "id": 5,
       "ownedBy": 0,
       "position": [
-        -41.83,
+        130.93,
         0,
-        -79.69
+        123.52
       ],
       "width": 8,
       "height": 10,
@@ -1070,7 +1294,7 @@
         "radius": 120,
         "shaderId": "projecao",
         "cutout": "recorte-scene13-de-gate",
-        "azimuth": -137.3
+        "azimuth": 46.7
       },
       "action": {
         "kind": "navigate",
@@ -1079,7 +1303,7 @@
       "arrivalFrom": "scene13",
       "rotation": [
         0,
-        -332.31,
+        -133.33,
         0
       ],
       "motion": {
@@ -1098,6 +1322,930 @@
         ],
         "angle": 90,
         "rotationPeriod": 13.9
+      }
+    },
+    {
+      "id": 6,
+      "ownedBy": 0,
+      "position": [
+        20.91,
+        0,
+        178.78
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene14",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene14-de-gate",
+        "azimuth": 6.7
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene14"
+      },
+      "arrivalFrom": "scene14",
+      "rotation": [
+        0,
+        -173.33,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 12.7,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 17.1
+      }
+    },
+    {
+      "id": 7,
+      "ownedBy": 0,
+      "position": [
+        -98.9,
+        0,
+        150.39
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene15",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene15-de-gate",
+        "azimuth": -33.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene15"
+      },
+      "arrivalFrom": "scene15",
+      "rotation": [
+        0,
+        -213.33,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "period": 15.8,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 10.8
+      }
+    },
+    {
+      "id": 8,
+      "ownedBy": 0,
+      "position": [
+        -172.44,
+        0,
+        51.63
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene16",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene16-de-gate",
+        "azimuth": -73.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene16"
+      },
+      "arrivalFrom": "scene16",
+      "rotation": [
+        0,
+        -253.33,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "period": 12.8,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 16.3
+      }
+    },
+    {
+      "id": 9,
+      "ownedBy": 0,
+      "position": [
+        -165.28,
+        0,
+        -71.28
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene17",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene17-de-gate",
+        "azimuth": -113.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene17"
+      },
+      "arrivalFrom": "scene17",
+      "rotation": [
+        0,
+        -293.33,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "period": 16.8,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 11.6
+      }
+    },
+    {
+      "id": 10,
+      "ownedBy": 0,
+      "position": [
+        -80.79,
+        0,
+        -160.85
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene18",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene18-de-gate",
+        "azimuth": -153.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene18"
+      },
+      "arrivalFrom": "scene18",
+      "rotation": [
+        0,
+        -333.33,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 11.3,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 18.2
+      }
+    },
+    {
+      "id": 11,
+      "ownedBy": 0,
+      "position": [
+        121.19,
+        0,
+        -241.27
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene19",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene19-de-gate",
+        "azimuth": 153.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene19"
+      },
+      "arrivalFrom": "scene19",
+      "rotation": [
+        0,
+        -26.67,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 18.7,
+        "rotationAxis": [
+          1,
+          0,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 17.2
+      }
+    },
+    {
+      "id": 12,
+      "ownedBy": 0,
+      "position": [
+        247.92,
+        0,
+        -106.93
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene20",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene20-de-gate",
+        "azimuth": 113.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene20"
+      },
+      "arrivalFrom": "scene20",
+      "rotation": [
+        0,
+        -66.67,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 13.9,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 45,
+        "rotationPeriod": 19
+      }
+    },
+    {
+      "id": 13,
+      "ownedBy": 0,
+      "position": [
+        258.65,
+        0,
+        77.45
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene21",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene21-de-gate",
+        "azimuth": 73.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene21"
+      },
+      "arrivalFrom": "scene21",
+      "rotation": [
+        0,
+        -106.67,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "period": 11.4,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 45,
+        "rotationPeriod": 14
+      }
+    },
+    {
+      "id": 15,
+      "ownedBy": 0,
+      "position": [
+        148.35,
+        0,
+        225.59
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene22",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene22-de-gate",
+        "azimuth": 33.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene22"
+      },
+      "arrivalFrom": "scene22",
+      "rotation": [
+        0,
+        -146.67,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "period": 19.7,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 45,
+        "rotationPeriod": 14.3
+      }
+    },
+    {
+      "id": 16,
+      "ownedBy": 0,
+      "position": [
+        -31.36,
+        0,
+        268.17
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene23",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene23-de-gate",
+        "azimuth": -6.7
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene23"
+      },
+      "arrivalFrom": "scene23",
+      "rotation": [
+        0,
+        -186.67,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 17.1,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 45,
+        "rotationPeriod": 12.1
+      }
+    },
+    {
+      "id": 17,
+      "ownedBy": 0,
+      "position": [
+        -196.4,
+        0,
+        185.27
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene24",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene24-de-gate",
+        "azimuth": -46.7
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene24"
+      },
+      "arrivalFrom": "scene24",
+      "rotation": [
+        0,
+        -226.67,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "period": 17.5,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 11.1
+      }
+    },
+    {
+      "id": 19,
+      "ownedBy": 0,
+      "position": [
+        -269.54,
+        0,
+        15.68
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene25",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene25-de-gate",
+        "azimuth": -86.7
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene25"
+      },
+      "arrivalFrom": "scene25",
+      "rotation": [
+        0,
+        -266.67,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "period": 18.2,
+        "rotationAxis": [
+          1,
+          0,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 17
+      }
+    },
+    {
+      "id": 20,
+      "ownedBy": 0,
+      "position": [
+        -216.56,
+        0,
+        -161.25
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene26",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene26-de-gate",
+        "azimuth": -126.7
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene26"
+      },
+      "arrivalFrom": "scene26",
+      "rotation": [
+        0,
+        -306.67,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 16.7,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 45,
+        "rotationPeriod": 19.4
+      }
+    },
+    {
+      "id": 21,
+      "ownedBy": 0,
+      "position": [
+        -62.25,
+        0,
+        -262.73
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene27",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene27-de-gate",
+        "azimuth": -166.7
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene27"
+      },
+      "arrivalFrom": "scene27",
+      "rotation": [
+        0,
+        -346.67,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 18.8,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 90,
+        "rotationPeriod": 10.5
       }
     }
   ]

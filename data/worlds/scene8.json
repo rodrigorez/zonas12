@@ -111,6 +111,22 @@
         "pt": "Retrato do mundo Realidades 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Realities 360º world, seen from the door (cutout, for the live window)"
       }
+    },
+    "retrato-scene23": {
+      "path": "assets/previews/scene23-de-scene8.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene23, visto da porta",
+        "en": "Portrait of the scene23 world, seen from the door"
+      }
+    },
+    "recorte-scene23-de-scene8": {
+      "path": "assets/previews/recorte-scene23-de-scene8.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene23, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene23 world, seen from the door (cutout, for the live window)"
+      }
     }
   },
   "dimensions": [
@@ -291,9 +307,9 @@
       "id": 23,
       "ownedBy": 0,
       "position": [
-        14.08,
         0,
-        -88.89
+        0,
+        -90
       ],
       "width": 10,
       "height": 12,
@@ -329,7 +345,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        -9,
+        0,
         0
       ],
       "motion": {
@@ -354,9 +370,9 @@
       "id": 24,
       "ownedBy": 0,
       "position": [
-        88.89,
+        85.6,
         0,
-        14.08
+        -27.81
       ],
       "width": 10,
       "height": 12,
@@ -386,7 +402,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene1-de-scene8",
-        "azimuth": -32.2,
+        "azimuth": -5.2,
         "reality": [
           {
             "az0": 47.13,
@@ -403,7 +419,7 @@
       "arrivalFrom": "scene1",
       "rotation": [
         0,
-        -99,
+        -72,
         0
       ],
       "motion": {
@@ -428,9 +444,9 @@
       "id": 43,
       "ownedBy": 0,
       "position": [
-        -14.08,
+        52.9,
         0,
-        88.89
+        72.81
       ],
       "width": 10,
       "height": 12,
@@ -460,13 +476,13 @@
         "radius": 120,
         "shaderId": "aguas",
         "cutout": "recorte-scene7-de-scene8",
-        "azimuth": -174,
+        "azimuth": 180,
         "reality": [
           {
-            "az0": 13.4,
-            "el0": -0.51,
-            "az1": 16.6,
-            "el1": 3.32
+            "az0": -19.48,
+            "el0": -0.54,
+            "az1": -16.28,
+            "el1": 3.53
           }
         ]
       },
@@ -477,7 +493,7 @@
       "arrivalFrom": "scene7",
       "rotation": [
         0,
-        -189,
+        -144,
         0
       ],
       "motion": {
@@ -502,9 +518,9 @@
       "id": 0,
       "ownedBy": 0,
       "position": [
-        -88.89,
+        -52.9,
         0,
-        -14.08
+        72.81
       ],
       "width": 10,
       "height": 12,
@@ -534,13 +550,13 @@
         "radius": 120,
         "shaderId": "projecao",
         "cutout": "recorte-scene13-de-scene8",
-        "azimuth": -174,
+        "azimuth": -180,
         "reality": [
           {
-            "az0": 58.02,
-            "el0": -0.74,
-            "az1": 61.24,
-            "el1": 4.83
+            "az0": 16.28,
+            "el0": -0.54,
+            "az1": 19.48,
+            "el1": 3.53
           }
         ]
       },
@@ -551,7 +567,7 @@
       "arrivalFrom": "scene13",
       "rotation": [
         0,
-        -279,
+        -216,
         0
       ],
       "motion": {
@@ -570,6 +586,80 @@
         ],
         "angle": 90,
         "rotationPeriod": 13.2
+      }
+    },
+    {
+      "id": 1,
+      "ownedBy": 0,
+      "position": [
+        -85.6,
+        0,
+        -27.81
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene23",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene23-de-scene8",
+        "azimuth": 162,
+        "reality": [
+          {
+            "az0": 43.03,
+            "el0": -0.74,
+            "az1": 46.25,
+            "el1": 4.83
+          }
+        ]
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene23"
+      },
+      "arrivalFrom": "scene23",
+      "rotation": [
+        0,
+        -288,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 10.8,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 10.8
       }
     }
   ]

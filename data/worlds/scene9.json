@@ -104,6 +104,22 @@
         "pt": "Retrato do mundo scene12, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene12 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "retrato-scene24": {
+      "path": "assets/previews/scene24-de-scene9.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene24, visto da porta",
+        "en": "Portrait of the scene24 world, seen from the door"
+      }
+    },
+    "recorte-scene24-de-scene9": {
+      "path": "assets/previews/recorte-scene24-de-scene9.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene24, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene24 world, seen from the door (cutout, for the live window)"
+      }
     }
   },
   "dimensions": [
@@ -317,9 +333,9 @@
       "id": 28,
       "ownedBy": 0,
       "position": [
-        90,
+        85.6,
         0,
-        0
+        -27.81
       ],
       "width": 10,
       "height": 12,
@@ -349,7 +365,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene1-de-scene9",
-        "azimuth": 48.9,
+        "azimuth": 66.8,
         "reality": [
           {
             "az0": 82.73,
@@ -366,7 +382,7 @@
       "arrivalFrom": "scene1",
       "rotation": [
         0,
-        -90,
+        -72,
         0
       ],
       "motion": {
@@ -391,9 +407,9 @@
       "id": 39,
       "ownedBy": 0,
       "position": [
+        52.9,
         0,
-        0,
-        90
+        72.81
       ],
       "width": 10,
       "height": 12,
@@ -423,13 +439,13 @@
         "radius": 120,
         "shaderId": "nucleo",
         "cutout": "recorte-scene10-de-scene9",
-        "azimuth": 90,
+        "azimuth": 108,
         "reality": [
           {
-            "az0": -46.25,
-            "el0": -0.74,
-            "az1": -43.03,
-            "el1": 4.83
+            "az0": -55.12,
+            "el0": -0.91,
+            "az1": -51.88,
+            "el1": 5.87
           }
         ]
       },
@@ -440,7 +456,7 @@
       "arrivalFrom": "scene10",
       "rotation": [
         0,
-        -180,
+        -144,
         0
       ],
       "motion": {
@@ -465,9 +481,9 @@
       "id": 0,
       "ownedBy": 0,
       "position": [
-        -90,
+        -52.9,
         0,
-        0
+        72.81
       ],
       "width": 10,
       "height": 12,
@@ -497,13 +513,13 @@
         "radius": 120,
         "shaderId": "deposito",
         "cutout": "recorte-scene12-de-scene9",
-        "azimuth": 90,
+        "azimuth": 108,
         "reality": [
           {
-            "az0": -1.6,
-            "el0": -0.51,
-            "az1": 1.6,
-            "el1": 3.32
+            "az0": -19.48,
+            "el0": -0.54,
+            "az1": -16.28,
+            "el1": 3.53
           }
         ]
       },
@@ -514,7 +530,7 @@
       "arrivalFrom": "scene12",
       "rotation": [
         0,
-        -270,
+        -216,
         0
       ],
       "motion": {
@@ -533,6 +549,80 @@
         ],
         "angle": 45,
         "rotationPeriod": 12.3
+      }
+    },
+    {
+      "id": 1,
+      "ownedBy": 0,
+      "position": [
+        -85.6,
+        0,
+        -27.81
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene24",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene24-de-scene9",
+        "azimuth": 72,
+        "reality": [
+          {
+            "az0": -1.6,
+            "el0": -0.51,
+            "az1": 1.6,
+            "el1": 3.32
+          }
+        ]
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene24"
+      },
+      "arrivalFrom": "scene24",
+      "rotation": [
+        0,
+        -288,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 17.7,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 11.9
       }
     }
   ]

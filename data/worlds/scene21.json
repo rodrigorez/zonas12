@@ -1,0 +1,390 @@
+{
+  "version": 3,
+  "world": {
+    "slug": "scene21",
+    "name": {
+      "pt": "scene21",
+      "en": "scene21"
+    }
+  },
+  "cameras": {
+    "player": {
+      "position": [
+        0,
+        1.6,
+        0
+      ],
+      "speed": 0.1
+    },
+    "real": {
+      "enabled": true
+    }
+  },
+  "assets": {
+    "cidade-360": {
+      "path": "assets/panoramas/cidade-d0-forest.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Panorama 360º da dimensão 1 (cidade)",
+        "en": "360º panorama of dimension 1 (city)"
+      }
+    },
+    "retrato-scene20": {
+      "path": "assets/previews/scene20-de-scene21.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene20, visto da porta",
+        "en": "Portrait of the scene20 world, seen from the door"
+      }
+    },
+    "recorte-scene20-de-scene21": {
+      "path": "assets/previews/recorte-scene20-de-scene21.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene20, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene20 world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene6": {
+      "path": "assets/previews/scene6-de-scene21.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Becos 360º, visto da porta",
+        "en": "Portrait of the Alleys 360º world, seen from the door"
+      }
+    },
+    "recorte-scene6-de-scene21": {
+      "path": "assets/previews/recorte-scene6-de-scene21.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo Becos 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Alleys 360º world, seen from the door (cutout, for the live window)"
+      }
+    },
+    "retrato-scene22": {
+      "path": "assets/previews/scene22-de-scene21.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene22, visto da porta",
+        "en": "Portrait of the scene22 world, seen from the door"
+      }
+    },
+    "recorte-scene22-de-scene21": {
+      "path": "assets/previews/recorte-scene22-de-scene21.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene22, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene22 world, seen from the door (cutout, for the live window)"
+      }
+    }
+  },
+  "dimensions": [
+    {
+      "id": 0,
+      "kind": "shader",
+      "shaderId": "grade-neon",
+      "fallbackAsset": "cidade-360",
+      "name": {
+        "pt": "Cidade 360º",
+        "en": "City 360º"
+      },
+      "radius": 500
+    },
+    {
+      "id": 1,
+      "kind": "camera",
+      "name": {
+        "pt": "Realidade",
+        "en": "Reality"
+      }
+    }
+  ],
+  "artworks": [],
+  "portals": [
+    {
+      "id": 0,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        -90
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "gate"
+      },
+      "arrivalFrom": "gate",
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 17.2,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 16.5
+      }
+    },
+    {
+      "id": 1,
+      "ownedBy": 0,
+      "position": [
+        90,
+        0,
+        0
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene20",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene20-de-scene21",
+        "azimuth": 0,
+        "reality": [
+          {
+            "az0": 43.03,
+            "el0": -0.74,
+            "az1": 46.25,
+            "el1": 4.83
+          }
+        ]
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene20"
+      },
+      "arrivalFrom": "scene20",
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 18,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 18.4
+      }
+    },
+    {
+      "id": 2,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        90
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene6",
+        "radius": 120,
+        "shaderId": "becos",
+        "cutout": "recorte-scene6-de-scene21",
+        "azimuth": -72,
+        "reality": [
+          {
+            "az0": 51.88,
+            "el0": -0.91,
+            "az1": 55.12,
+            "el1": 5.87
+          }
+        ]
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene6"
+      },
+      "arrivalFrom": "scene6",
+      "rotation": [
+        0,
+        -180,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 18.4,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 19.3
+      }
+    },
+    {
+      "id": 3,
+      "ownedBy": 0,
+      "position": [
+        -90,
+        0,
+        0
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene22",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene22-de-scene21",
+        "azimuth": 0,
+        "reality": [
+          {
+            "az0": -46.25,
+            "el0": -0.74,
+            "az1": -43.03,
+            "el1": 4.83
+          }
+        ]
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene22"
+      },
+      "arrivalFrom": "scene22",
+      "rotation": [
+        0,
+        -270,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 6,
+        "period": 14.7,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 90,
+        "rotationPeriod": 14.3
+      }
+    }
+  ]
+}

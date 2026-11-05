@@ -118,6 +118,22 @@
         "pt": "Retrato do mundo Memória 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Memory 360º world, seen from the door (recorte, para a janela ao vivo)"
       }
+    },
+    "retrato-scene19": {
+      "path": "assets/previews/scene19-de-scene4.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene19, visto da porta",
+        "en": "Portrait of the scene19 world, seen from the door"
+      }
+    },
+    "recorte-scene19-de-scene4": {
+      "path": "assets/previews/recorte-scene19-de-scene4.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene19, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene19 world, seen from the door (cutout, for the live window)"
+      }
     }
   },
   "dimensions": [
@@ -328,9 +344,9 @@
       "id": 8,
       "ownedBy": 0,
       "position": [
-        23.29,
         0,
-        -86.93
+        0,
+        -90
       ],
       "width": 10,
       "height": 12,
@@ -366,7 +382,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        -15,
+        0,
         0
       ],
       "motion": {
@@ -391,9 +407,9 @@
       "id": 9,
       "ownedBy": 0,
       "position": [
-        86.93,
+        85.6,
         0,
-        23.29
+        -27.81
       ],
       "width": 10,
       "height": 12,
@@ -423,13 +439,13 @@
         "radius": 120,
         "shaderId": "nuvens",
         "cutout": "recorte-scene3-de-scene4",
-        "azimuth": -90,
+        "azimuth": -108,
         "reality": [
           {
-            "az0": 13.4,
-            "el0": -0.51,
-            "az1": 16.6,
-            "el1": 3.32
+            "az0": -19.48,
+            "el0": -0.54,
+            "az1": -16.28,
+            "el1": 3.53
           }
         ]
       },
@@ -440,7 +456,7 @@
       "arrivalFrom": "scene3",
       "rotation": [
         0,
-        -105,
+        -72,
         0
       ],
       "motion": {
@@ -465,9 +481,9 @@
       "id": 13,
       "ownedBy": 0,
       "position": [
-        -23.29,
+        52.9,
         0,
-        86.93
+        72.81
       ],
       "width": 10,
       "height": 12,
@@ -497,13 +513,13 @@
         "radius": 120,
         "shaderId": "ondas",
         "cutout": "recorte-scene5-de-scene4",
-        "azimuth": 84,
+        "azimuth": 108,
         "reality": [
           {
-            "az0": -37.24,
-            "el0": -0.74,
-            "az1": -34.02,
-            "el1": 4.83
+            "az0": -55.12,
+            "el0": -0.91,
+            "az1": -51.88,
+            "el1": 5.87
           }
         ]
       },
@@ -514,7 +530,7 @@
       "arrivalFrom": "scene5",
       "rotation": [
         0,
-        -195,
+        -144,
         0
       ],
       "motion": {
@@ -539,9 +555,9 @@
       "id": 37,
       "ownedBy": 0,
       "position": [
-        -86.93,
+        -52.9,
         0,
-        -23.29
+        72.81
       ],
       "width": 10,
       "height": 12,
@@ -571,13 +587,13 @@
         "radius": 120,
         "shaderId": "fichario",
         "cutout": "recorte-scene11-de-scene4",
-        "azimuth": -6,
+        "azimuth": 36,
         "reality": [
           {
-            "az0": -37.24,
-            "el0": -0.74,
-            "az1": -34.02,
-            "el1": 4.83
+            "az0": -55.12,
+            "el0": -0.91,
+            "az1": -51.88,
+            "el1": 5.87
           }
         ]
       },
@@ -588,7 +604,7 @@
       "arrivalFrom": "scene11",
       "rotation": [
         0,
-        -285,
+        -216,
         0
       ],
       "motion": {
@@ -607,6 +623,80 @@
         ],
         "angle": 90,
         "rotationPeriod": 16.7
+      }
+    },
+    {
+      "id": 0,
+      "ownedBy": 0,
+      "position": [
+        -85.6,
+        0,
+        -27.81
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene19",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene19-de-scene4",
+        "azimuth": 72,
+        "reality": [
+          {
+            "az0": -1.6,
+            "el0": -0.51,
+            "az1": 1.6,
+            "el1": 3.32
+          }
+        ]
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene19"
+      },
+      "arrivalFrom": "scene19",
+      "rotation": [
+        0,
+        -288,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 6,
+        "period": 17,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 13.7
       }
     }
   ]

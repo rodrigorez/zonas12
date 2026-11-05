@@ -104,6 +104,22 @@
       "alt": {
         "pt": "Capa da obra Fondo Rodolfo Brito Foucher"
       }
+    },
+    "retrato-scene15": {
+      "path": "assets/previews/scene15-de-scene12.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene15, visto da porta",
+        "en": "Portrait of the scene15 world, seen from the door"
+      }
+    },
+    "recorte-scene15-de-scene12": {
+      "path": "assets/previews/recorte-scene15-de-scene12.png",
+      "type": "image",
+      "alt": {
+        "pt": "Retrato do mundo scene15, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the scene15 world, seen from the door (cutout, for the live window)"
+      }
     }
   },
   "dimensions": [
@@ -317,9 +333,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        90,
+        85.6,
         0,
-        0
+        -27.81
       ],
       "width": 10,
       "height": 12,
@@ -349,13 +365,13 @@
         "radius": 120,
         "shaderId": "becos",
         "cutout": "recorte-scene6-de-scene12",
-        "azimuth": 9,
+        "azimuth": -36,
         "reality": [
           {
-            "az0": 52.03,
-            "el0": -0.74,
-            "az1": 55.25,
-            "el1": 4.83
+            "az0": 16.28,
+            "el0": -0.54,
+            "az1": 19.48,
+            "el1": 3.53
           }
         ]
       },
@@ -366,7 +382,7 @@
       "arrivalFrom": "scene6",
       "rotation": [
         0,
-        -90,
+        -72,
         0
       ],
       "motion": {
@@ -391,9 +407,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
+        52.9,
         0,
-        0,
-        90
+        72.81
       ],
       "width": 10,
       "height": 12,
@@ -423,13 +439,13 @@
         "radius": 120,
         "shaderId": "mangue",
         "cutout": "recorte-scene9-de-scene12",
-        "azimuth": -90,
+        "azimuth": -108,
         "reality": [
           {
-            "az0": 43.03,
-            "el0": -0.74,
-            "az1": 46.25,
-            "el1": 4.83
+            "az0": 16.28,
+            "el0": -0.54,
+            "az1": 19.48,
+            "el1": 3.53
           }
         ]
       },
@@ -440,7 +456,7 @@
       "arrivalFrom": "scene9",
       "rotation": [
         0,
-        -180,
+        -144,
         0
       ],
       "motion": {
@@ -465,9 +481,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        -90,
+        -52.9,
         0,
-        0
+        72.81
       ],
       "width": 10,
       "height": 12,
@@ -497,13 +513,13 @@
         "radius": 120,
         "shaderId": "nucleo",
         "cutout": "recorte-scene10-de-scene12",
-        "azimuth": 180,
+        "azimuth": -180,
         "reality": [
           {
-            "az0": 43.03,
-            "el0": -0.74,
-            "az1": 46.25,
-            "el1": 4.83
+            "az0": 16.28,
+            "el0": -0.54,
+            "az1": 19.48,
+            "el1": 3.53
           }
         ]
       },
@@ -514,7 +530,7 @@
       "arrivalFrom": "scene10",
       "rotation": [
         0,
-        -270,
+        -216,
         0
       ],
       "motion": {
@@ -533,6 +549,80 @@
         ],
         "angle": 90,
         "rotationPeriod": 18
+      }
+    },
+    {
+      "id": 4,
+      "ownedBy": 0,
+      "position": [
+        -85.6,
+        0,
+        -27.81
+      ],
+      "width": 10,
+      "height": 12,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene15",
+        "radius": 120,
+        "shaderId": "grade-neon",
+        "cutout": "recorte-scene15-de-scene12",
+        "azimuth": -36,
+        "reality": [
+          {
+            "az0": -55.12,
+            "el0": -0.91,
+            "az1": -51.88,
+            "el1": 5.87
+          }
+        ]
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene15"
+      },
+      "arrivalFrom": "scene15",
+      "rotation": [
+        0,
+        -288,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 11.6,
+        "rotationAxis": [
+          0,
+          0,
+          1
+        ],
+        "angle": 45,
+        "rotationPeriod": 15.3
       }
     }
   ]
