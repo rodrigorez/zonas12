@@ -358,7 +358,43 @@ node tools/artwork/from-csv.mjs --file data/folha-<slug>.tsv --mundo <slug> --cr
 > acusar as fichas antigas (D60), e `data/obras/` cai na regra. Foi tentado na v0.0.35 e desfeito na
 > v0.0.36; a folha da sala é um **ficheiro** — `data/folha-scene14.tsv` — e não uma pasta.
 
+### 4.2 · A ronda das obras em paralelo (várias salas ao mesmo tempo)
+
+Com a folha de cada sala no seu chat, **as obras de várias salas podem correr ao mesmo tempo** — desde
+que cada agente faça só isto:
+
+```
+node tools/artwork/from-csv.mjs --file data/folha-<slug>.tsv --mundo <slug> --criar --check
+node tools/artwork/from-csv.mjs --file data/folha-<slug>.tsv --mundo <slug> --criar
+```
+
+**A regra que não se quebra: nesta ronda, `ring`, `azimuths`, `reality`, `sorteio`, `integrar` e
+`construir` não correm.** Nenhum deles. Todas essas ferramentas leem os 27 mundos, calculam, e
+reescrevem os 27 — e um `ring --aplicar` escreve **28 ficheiros** mesmo quando não move nada (`0
+objeto(s) postos no anel` e 28 ficheiros escritos). Se ele ler a `scene18` antes de outro agente lá
+escrever as obras, a escrita do `ring` repõe a versão antiga e **as obras desaparecem sem um erro**.
+É a mesma corrida ler→escrever que a D96 fechou no `new-room`; aqui ela continua aberta nas ferramentas
+globais, e a defesa é não as correr.
+
+| | ronda das obras (paralela) | ronda do fecho (uma só) |
+| --- | --- | --- |
+| quem | um agente por sala | **um** agente, no fim |
+| ferramenta | só `from-csv --mundo --criar` | `ring`, `azimuths`, `reality`, `sorteio` |
+| escreve | **só** `data/worlds/<a sua sala>.json` | os 27 mundos |
+| medido | duas salas em paralelo: as duas ficaram com as suas obras, sem perda | — |
+
+**E os retratos vêm depois de todas as obras.** Um retrato é a imagem de uma sala: se a sala ainda não
+tem as obras, o retrato fotografa o vazio. Com as obras de várias salas a nascer em paralelo, os
+retratos de **todas** elas têm de ser a última coisa — uma vez, e duas passagens.
+
+> **Se a sala tiver mais de 6 obras, avise antes.** Com 7 ou mais, o anel das obras muda a fase das
+> portas, as portas mudam de sítio e o giro de todos os mundos que apontam para ela também. Medido: 2 a
+> 6 obras não movem as portas (0 de 5); 7 movem as 5. Nessa caso a ronda deixa de ser local.
 ---
+
+> **Este passo é o fecho, e é de um só agente.** Se houver obras a nascer em paralelo noutras
+> salas, espere que acabem: estas ferramentas leem e reescrevem os 27 mundos, e correr uma delas no
+> meio de outra escrita apaga as obras do vizinho sem um erro (§4.2).
 
 ## 5. Os anéis, o giro e os buracos — outra vez
 
