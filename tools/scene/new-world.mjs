@@ -16,7 +16,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkArranques } from './arranques.mjs';
 import { ENTRY_WORLD } from '../../js/modules/portal-kinds.js';
-import { FIXTURES } from '../../js/scene/fixtures.js';
+import { FIXTURES, isFixture } from '../../js/scene/fixtures.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
@@ -29,6 +29,11 @@ if (!WORLD_NAME.test(slug)) {
 }
 if (slug === ENTRY_WORLD) {
   console.error(`${slug} é o mundo de entrada: vive na raiz, não numa pasta (D24).`);
+  process.exit(1);
+}
+// Um mundo de ensaio não é sala: não tem pasta (D9) e a exposição nunca entra nele (L30).
+if (isFixture(slug)) {
+  console.error(`${slug} é um mundo de ensaio: abre-se pelo endereço, não ganha pasta nem arranque (D9, L30).`);
   process.exit(1);
 }
 if (existsSync(join(root, slug))) {

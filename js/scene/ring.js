@@ -140,6 +140,148 @@ export function ringPositions(count, radius, phase, height) {
   return places;
 }
 
+// ---- L31: o plano dos anéis do portão, quando as portas deixam de caber num ----
+//
+// O portão tem **uma porta por sala** (L24), por isso cresce com a exposição. Num anel só, a 90 m, o
+// passo é 360/n e a corda é 2R·sin(π/n): medido, 13 portas dão **27,69°** e **43,1 m** de corda (35,1 m
+// entre bordas de 8 m) e 27 dão **13,33°** e **20,9 m** (12,9 m entre bordas) — com as portas a oscilar
+// 4 a 5 m, o anel deixa de ser um átrio e passa a ser uma vedação.
+//
+// O limite de **vinte** é o ponto em que a corda cai abaixo de **28 m** (20 m entre bordas): daí para
+// cima o passo é menor que 18° e a porta lê-se como um selo.
+//
+// Daí para cima, anéis concêntricos a R, 2R, 3R… com as portas repartidas o mais igualmente possível e
+// as fases intercaladas (o anel *i* desfasado de `i · 360/(c·k)`), que é o que põe cada porta no vão da
+// de dentro.
+//
+// **Dois anéis não chegam para vinte e sete, e o número que o decide é aritmético.** A folga entre duas
+// grelhas regulares de *a* e *b* pontos tem teto `360 / (2·mmc(a, b))`. Com 27 portas, qualquer reparto
+// em dois dá números coprimos — 12 + 15 tem mmc 60 e um teto de **3,00°**, abaixo dos **3,82°** de que
+// as janelas precisam, e isso **não depende do raio** (medido de 120 a 200 m: o teto é o mesmo). **Três
+// anéis de nove** a 90 / 180 / 270 m dão **13,33°** e passam com folga. Foi medido no ensaio da sala de
+// ensaio (`tools/scene/ensaio-dois-aneis.mjs`, D97).
+export const SINGLE_RING_MAX = 20;
+
+// A corda mínima entre dois centros vizinhos dentro do mesmo anel (portas de 8 m → 20 m entre bordas).
+export const MIN_RING_CHORD = 28;
+
+// O número máximo de anéis que o plano procura. Quatro chega para qualquer exposição que caiba no
+// fundo de 500 m (4 × 90 = 360 m).
+export const MAX_RINGS = 4;
+
+// O anel onde cada porta se senta, e a fase de cada anel — ou `null` quando nem quatro anéis servem
+// (aí o problema é o número de portas, e quem chama tem de dizer isso).
+//
+// Puro e determinístico: a mesma contagem dá sempre o mesmo plano, que é o que o dado gravado precisa.
+export function ringPlan(count, width) {
+  const doorWidth = width === undefined ? 8 : width;
+  const base = RING.portals.radius;
+  const planos = [];
+
+  // Repartir `count` por `rings` anéis **sem exigir partes iguais**. A igualdade é o caso bonito, mas
+  // não serve para os números ímpares: 23 portas em partes iguais dão 6+6+6+5, e o anel de 5 contra a
+  // grelha de 15° que os três de 6 formam tem um tecto de 3,00° — abaixo dos 3,18° pedidos. Com uma
+  // parte de 8 e três de 5 (8 + 5 + 5 + 5 = 23) o tecto sobe a 4,50° e passa. Por isso a busca é sobre
+  // repartos, e não sobre metades.
+  for (let rings = 1; rings <= MAX_RINGS; rings++) {
+    const candidates = [];
+    const iguais = Math.floor(count / rings);
+    if (iguais * rings === count) candidates.push(Array.from({ length: rings }, () => iguais));
+    for (let distintos = 1; distintos < rings; distintos++) {
+      for (let grande = 2; grande <= SINGLE_RING_MAX; grande++) {
+        const resto = count - distintos * grande;
+        const pequeno = resto / (rings - distintos);
+        if (!Number.isInteger(pequeno) || pequeno < 2 || pequeno > grande) continue;
+        const reparto = [];
+        for (let i = 0; i < rings - distintos; i++) reparto.push(pequeno);
+        for (let i = 0; i < distintos; i++) reparto.push(grande);
+        // Menor por dentro: acrescentar uma porta ao fim nunca mexe nas de dentro.
+        reparto.sort((a, b) => a - b);
+        const chave = reparto.join('+');
+        if (!candidates.some((cada) => cada.join('+') === chave)) candidates.push(reparto);
+      }
+    }
+
+    for (const counts of candidates) {
+      const radii = counts.map((_, index) => base * (index + 1));
+      const chords = counts.map((cada, index) => chord(radii[index], cada));
+      if (Math.min(...chords) < MIN_RING_CHORD) continue;
+
+      const needed = round(halfWidth(doorWidth, radii[0]) + halfWidth(doorWidth, radii[rings - 1]));
+      if (rings === 1) {
+        return { rings: [{ count: count, radius: base, phase: 0 }], clearance: Infinity, needed: needed };
+      }
+
+      // As fases: os anéis intercalam-se pela fórmula; e o anel que quebra a igualdade leva uma busca
+      // de meio grau, que é a única parte que precisa de ser procurada.
+      const phases = counts.map((cada, index) => (index === 0 ? 0 : round((index * 360) / (cada * rings))));
+      const aneis = counts.map((cada, index) => {
+        const angles = [];
+        for (let slot = 0; slot < cada; slot++) angles.push(normaliseAngle(phases[index] + (slot * 360) / cada));
+        return angles;
+      });
+      const folga = () => {
+        let smallest = Infinity;
+        for (let left = 0; left < rings; left++) {
+          for (let right = left + 1; right < rings; right++) {
+            smallest = Math.min(smallest, angularClearance(aneis[left], aneis[right]));
+          }
+        }
+        return smallest;
+      };
+      const todosIguais = counts.every((cada) => cada === counts[0]);
+      let melhor = { phases: phases.slice(), clearance: round(folga()) };
+      if (!todosIguais) {
+        const ultimo = rings - 1;
+        for (let step = 0; step < 720; step++) {
+          const phase = step * 0.5;
+          aneis[ultimo] = [];
+          for (let slot = 0; slot < counts[ultimo]; slot++) {
+            aneis[ultimo].push(normaliseAngle(phase + (slot * 360) / counts[ultimo]));
+          }
+          const clearance = folga();
+          if (clearance > melhor.clearance) {
+            melhor = { phases: phases.slice(0, ultimo).concat([round(phase)]), clearance: round(clearance) };
+          }
+        }
+      }
+      if (melhor.clearance < needed) continue;
+
+      const ringsOut = counts.map((cada, index) => ({
+        count: cada,
+        radius: radii[index],
+        phase: melhor.phases[index]
+      }));
+      const spread = Math.max(...counts) - Math.min(...counts);
+      planos.push({ rings: ringsOut, clearance: melhor.clearance, needed: needed, spread: spread });
+    }
+  }
+
+  // A escolha: primeiro o reparto mais **equilibrado** (é o que a estética e o ensaio aprovaram — 27
+  // portas dão três anéis de nove, não dois de nove e dezoito), depois o menor número de anéis, e só
+  // então a maior folga.
+  if (planos.length === 0) return null;
+  planos.sort((left, right) => left.spread - right.spread ||
+    left.rings.length - right.rings.length ||
+    right.clearance - left.clearance);
+  const escolhido = planos[0];
+  return { rings: escolhido.rings, clearance: escolhido.clearance, needed: escolhido.needed };
+}
+
+// Os lugares de cada anel do plano, na forma de `ringPositions` (com `ring` a dizer de qual veio).
+export function ringPlanPositions(count, height, width) {
+  const plan = ringPlan(count, width);
+  const y = height === undefined ? 0 : height;
+  const places = [];
+  if (!plan) return places;
+  plan.rings.forEach((anel, ring) => {
+    for (const spot of ringPositions(anel.count, anel.radius, anel.phase, y)) {
+      places.push(Object.assign({}, spot, { index: places.length, ring: ring, radius: anel.radius }));
+    }
+  });
+  return places;
+}
+
 // A distância em linha recta entre dois lugares vizinhos: é ela que diz se duas caixas de 12 m (ou
 // dois painéis de 4 m) cabem no anel sem se tocarem.
 export function chord(radius, count) {

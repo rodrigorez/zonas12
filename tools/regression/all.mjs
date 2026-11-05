@@ -25,8 +25,10 @@ import { join } from 'node:path';
 import { ROOT } from './harness.mjs';
 
 const NUCLEO = [
-  { nome: 'o dado: os 18 ficheiros de mundo (13 salas + 5 fixtures), as leis, o grafo e os arranques', script: 'tools/scene/validate.mjs' },
-  { nome: 'as leis: 31 avarias injectadas e o controlo limpo', script: 'tools/scene/laws-selftest.mjs' },
+  // Sem números nos rótulos: as contagens vivem no `skills_index.md` e no guia da sala nova, e um rótulo
+  // que as repete envelhece em silêncio (dizia «18 ficheiros» e «31 avarias» quando já eram outros).
+  { nome: 'o dado: os ficheiros de mundo, as leis, o grafo e os arranques', script: 'tools/scene/validate.mjs' },
+  { nome: 'as leis: as avarias injectadas e o controlo limpo', script: 'tools/scene/laws-selftest.mjs' },
   // O importador da folha (D62/D67): rápido, sem browser, e é a única proteção entre uma folha e o dado.
   { nome: 'o importador da folha (D67)', script: 'tools/regression/csv.mjs' }
 ];

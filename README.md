@@ -59,6 +59,9 @@ zonas12/
 │                       controlos partilhados, as respostas que a página pode dar sobre os
 │                       ficheiros e a ponte com o servidor da ferramenta (Fase 5)
 ├── data/
+│   ├── mapa.json       o mapa das portas da galeria (D96): as **27 salas** e as **49 arestas**, julgadas
+│   │                   pela L24 e pela L25 **antes** de existir uma sala. É a fonte da decisão D-B —
+│   │                   os destinos de uma sala nova leem-se, não se escolhem (`tools/scene/mapa.mjs`)
 │   └── worlds/         uma cena por mundo (D24): gate, scene1, scene2, scene3, scene4, scene5,
 │                       scene6, scene7, scene8, scene9, scene10, scene11, scene12 e scene13, mais os
 │                       fixtures (`example`,
@@ -70,7 +73,7 @@ zonas12/
 │   └── en.json         as mesmas 222 chaves em inglês (?lang=en); um teste compara as duas
 ├── docs/
 │   ├── ROADMAP.md      plano de desenvolvimento (módulos, mundos e página de edição), com as
-│   │                   decisões (D1…) e as leis (L1…L30)
+│   │                   decisões (D1…) e as leis (L1…L31)
 │   ├── SPEC-NOVA-SALA.md  o roteiro para abrir uma sala nova (D83): doze fases, doze armadilhas e
 │   │                   a lista de aceitação
 │   ├── GUIA-DE-TESTES.md  a ficha da obra e o ensaio A/B do shader nos três aparelhos
@@ -93,7 +96,9 @@ zonas12/
 │   │                        escreve o esqueleto de uma sala dos dois lados (D83), o que **sorteia o
 │   │                        movimento** das portas de uma sala nova (D87), as que põem as
 │   │                        obras e as portas nos anéis (D77), o giro dos retratos (D78) e os buracos
-│   │                        do mundo real (D81), a que desenha os retratos das portas (D46) e as
+│   │                        do mundo real (D81), a que desenha os retratos das portas (D46), o
+│   │                        **mapa das portas** — o balcão que julga as 27 salas e imprime o dossiê de
+│   │                        cada uma (D96) —, o ensaio dos **anéis do portão** (D97) e as
 │   │                        perguntas ao disco (`disk.mjs`): o asset existe e a imagem mede 2:1
 │   ├── server/              o servidor da ferramenta (Fase 5, D48): serve a publicação **e** grava
 │   │                        `data/worlds/<slug>.json`, com cópia de segurança; e o seu instrumento
@@ -262,7 +267,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.25)
+## Estado atual do código (v0.0.27)
 
 > **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
 > pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
@@ -682,6 +687,54 @@ geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
 
+Resumo do que existe na v0.0.27 (medido em 2026-11-04): `index.html` (**93 linhas**) e as **treze**
+salas com o **mesmo** ficheiro (`scene1/` a `scene13/`, iguais fora da linha do `<base>` — D28),
+`editor.html` (**96**), `js/app.js` (**276**), `js/arrival-frame.js` (**204**, a ponte de imagem entre
+mundos — D43), `js/editor.js` (**15**, a entrada do editor — D36), `js/editor/` (**15** ficheiros,
+**3566** linhas), `js/i18n.js` (**93**), `js/core/` (7 ficheiros, **234**), `js/modules/` (11
+ficheiros, **3554**), `js/scene/` (14 ficheiros, **2614**), `js/shaders/` (13 ficheiros, **865**),
+`css/` (3 ficheiros: **142** + **314** + **253**), **19** ficheiros em `data/worlds/` (**11697** linhas,
+**76 portas**, das quais **66** nas catorze páginas), o **mapa** `data/mapa.json` (**27** salas e **49**
+arestas — D96), as **67 obras** na folha, os **115** ficheiros em `assets/previews/` (**59** retratos e
+**56** recortes) e **59** ficheiros em `tools/` (**14212** linhas).
+
+A **v0.0.27** não constrói uma sala: fecha a **engenharia da galeria**. Quatro coisas, e nenhuma delas
+se vê na exposição.
+
+**A L30** — um mundo de ensaio nunca é usado pela exposição: nenhuma porta navega para um fixture e
+nenhuma se declara chegada dele. A lista é a de `js/scene/fixtures.js` (uma casa só), e as duas
+ferramentas que a podiam contornar passaram a recusá-la **com o motivo certo** (o `new-world` já não
+cria pasta a um fixture, o `new-room` já não diz «o destino não existe» de um mundo que está no disco).
+
+**O mapa** (`data/mapa.json`) — as **27 salas** e as **49 arestas**, decididas uma vez em vez de sala a
+sala, com as duas contas da D-B feitas em conjunto. O `tools/scene/mapa.mjs` julga-o (L24, L25, L11,
+acordo com o disco, ordem de construção) e **simula os 14 passos da obra**, cada um julgado — o mapa podia
+estar certo no fim e errado pelo caminho. As treze salas prontas entram como **restrição fixa**: a
+`scene1` já estava cheia e as outras doze tinham exactamente **um** lugar cada, que é onde entram as
+doze arestas novas. O comando `--dossie` imprime a folha de cada agente (o que constrói, o que já está
+decidido, em que ficheiros escreve) — é ele que substitui, no trabalho manual, a trava que ainda não
+existe.
+
+**O ensaio dos anéis** (`tools/scene/ensaio-dois-aneis.mjs` + `scene100` com **28 portas**) — a prova de
+que o portão aguenta o crescimento, e um resultado que **contrariou** a proposta. Com 28 portas (14 + 14)
+a folga entre dois anéis é **12,86°** e passa; com **27** não há reparto de dois anéis que chegue — o
+melhor (12 + 15) tem m.m.c. 60, logo um teto de **3,00°** contra os **3,82°** de que as janelas precisam,
+**qualquer que seja o raio exterior** (medido de 120 a 200 m). Três anéis de nove a 90/180/270 m dão
+**13,33°**. Daí nasceu a **L31**, com uma busca sobre os repartos (`ringPlan`) porque a igualdade também
+falha nos números ímpares: 23 portas em 6+6+6+5 dão 3,00°, e em 8+5+5+5 dão 4,50°.
+
+O que esta versão **não** tem: o protocolo de escrita concorrente (D96) está **desenhado e não
+construído** — zero linhas de travas, admissão, integrador ou escrita atómica. E foi a falta dele que
+produziu o incidente registado abaixo.
+
+> **O incidente que a v0.0.27 registou (2026-11-04, 21:38).** O commit `8f1ba97` («A sala 13 entra…»)
+> foi feito **por caminhos** enquanto outro agente trabalhava no mesmo *working tree*: levou o
+> `README.md` e o `docs/ROADMAP.md` **com a documentação da L30** e deixou de fora o **código** dela
+> (`js/scene/validation.js`, `tools/scene/laws-selftest.mjs`, `new-room.mjs`, `new-world.mjs`). Quem
+> fizesse checkout daquele commit ficaria com a documentação a prometer 30 leis, o validador a verificar
+> 29 e o auto-teste a reportar 31 — três números para o mesmo facto. Não se perdeu trabalho; ficou
+> **mal atribuído**. É a justificação datada do **M0** da D96, e não se apaga.
+
 Resumo do que existe na v0.0.26 (medido em 2026-11-04): `index.html` (**92 linhas**) e as **treze**
 salas com o **mesmo** ficheiro (`scene1/` a `scene13/`, iguais fora da linha do `<base>` — D28),
 `editor.html` (**96**), `js/app.js` (**276**), `js/arrival-frame.js` (**204**, a ponte de imagem entre
@@ -789,8 +842,8 @@ O **`js/scene/`** é onde a cena em dados vive, e tem **treze** ficheiros:
 | Ficheiro | O que é |
 | --- | --- |
 | `schema.js` | A **forma do formato** (v3): campos, tipos, enumerações, as regras dos dois eixos da porta e o catálogo de assets. Puro — não conhece o DOM nem o A-Frame |
-| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L10, L11, L12, L13, L14, L15, L16, L17, L18, L20, L21, L22 (os dois anéis), L23 (a folga entre eles), L24 (três a cinco portas, uma ao portão) e L28 (os buracos do mundo real, `realityWindows`); e, sobre o **grafo** dos mundos, a L19 (`missingArrivals`), a L25 (`repeatedDestinations`) e a L26 (`portraitTurns`, o giro do retrato de cada porta). A **L27** (a chegada põe a câmara no ponto e na direcção) não é do dado: prova-se na bateria T7/T11. Um fixture (D9) é dispensado das leis da disposição por uma opção — e pelo próprio slug, que é como a bateria do shader o valida. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor corre a cada tecla |
-| `ring.js` | A **disposição em dois anéis** (D77): os lugares das obras e das portas a partir de um raio e de uma fase, a folga entre os dois anéis e o teto que a mede (`bestPhase`, `clearanceCeiling`); o **giro do retrato** de uma porta de mundo (`portraitTurn`, D78), que é a conta que o dado guarda e a L26 prova; e o azimute de uma **primeira visita** (`FIRST_VISIT_AZIMUTH`, D89) — 0 por construção, para a L26 poder julgar uma porta que não tem chegada. Puro; é a mesma conta que escreve o dado (`tools/scene/ring.mjs --aplicar`, `tools/scene/azimuths.mjs --aplicar`) e a que as leis L22, L23 e L26 verificam |
+| `validation.js` | A forma (lida do schema) e as **leis** que o dado sozinho prova: L1, L4, L5, L9, L10, L11, L12, L13, L14, L15, L16, L17, L18, L20, L21, L22 (os dois anéis), L23 (a folga entre eles), L24 (três a cinco portas, uma ao portão), L28 (os buracos do mundo real, `realityWindows`), **L30** (um mundo de ensaio nunca é usado pela exposição — D96) e **L31** (acima de vinte portas, anéis concêntricos com o reparto procurado — D97); e, sobre o **grafo** dos mundos, a L19 (`missingArrivals`), a L25 (`repeatedDestinations`) e a L26 (`portraitTurns`, o giro do retrato de cada porta). A **L27** (a chegada põe a câmara no ponto e na direcção) não é do dado: prova-se na bateria T7/T11 e a **L29** (o alcance de uma porta que oscila) no `reach.js`. Um fixture (D9) é dispensado das leis da disposição por uma opção — e pelo próprio slug, que é como a bateria do shader o valida. É o mesmo módulo que a consola da exposição corre ao arrancar, que `tools/scene/validate.mjs` corre na linha de comando e que o editor corre a cada tecla |
+| `ring.js` | A **disposição em anéis** (D77) e o **plano de anéis do portão** (L31, D97 — o `ringPlan`, com a busca do reparto mais equilibrado): os lugares das obras e das portas a partir de um raio e de uma fase, a folga entre os dois anéis e o teto que a mede (`bestPhase`, `clearanceCeiling`); o **giro do retrato** de uma porta de mundo (`portraitTurn`, D78), que é a conta que o dado guarda e a L26 prova; e o azimute de uma **primeira visita** (`FIRST_VISIT_AZIMUTH`, D89) — 0 por construção, para a L26 poder julgar uma porta que não tem chegada. Puro; é a mesma conta que escreve o dado (`tools/scene/ring.mjs --aplicar`, `tools/scene/azimuths.mjs --aplicar`) e a que as leis L22, L23 e L26 verificam |
 | `reality.js` | Onde a janela de uma porta tem de deixar passar o **mundo real** (D81): os retângulos (azimute e elevação) em que o destino mostra a dimensão `camera` — os que o preâmbulo dos shaders descarta e a L28 recalcula. Puro; é a conta que escreve o dado (`tools/scene/reality.mjs --aplicar`) |
 | `fixtures.js` | Os **mundos que não são salas** (D9): a lista que a página, a linha de comando e o editor leem para não pedirem anéis nem três a cinco portas a um banco de ensaio. A **sala de ensaio** `scene100` é o quinto (D84) — é esta lista que a põe fora do grafo |
 | `arrival.js` | Onde o visitante aparece ao chegar de outro mundo (**L16**): puro e partilhado, para o construtor e o validador não discordarem da geometria |
@@ -2285,11 +2338,13 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 
 | Bateria | O que responde |
 | --- | --- |
-| `tools/scene/validate.mjs` | os 17 ficheiros de mundo (12 salas e 5 fixtures), as leis, o grafo das portas e os arranques |
-| `tools/scene/laws-selftest.mjs` | **31** avarias injectadas, todas detectadas, com o controlo limpo — a L29 entra com a avaria **e** com o seu controlo negativo |
+| `tools/scene/validate.mjs` | os ficheiros de mundo (o portão, as treze salas e os cinco fixtures), as leis **L1–L30**, o grafo das portas e os arranques |
+| `tools/scene/laws-selftest.mjs` | **35** avarias injectadas, todas detectadas, com o controlo limpo — a L29 e a L30 entram com a avaria **e** com o seu controlo negativo |
+| `tools/scene/mapa.mjs` | o **mapa das portas** (D96): as 27 salas contra a L24 e a L25, o acordo com o disco e os 14 passos da obra, cada um julgado; `--grafo` e `--dossie` para o trabalho manual |
 | `tools/scene/sorteio.mjs` | o movimento **sorteado** das portas de uma sala nova (D87): ensaio por omissão, `--aplicar` para escrever, `--semente N` para repetir a mesma sala |
-| `tools/regression/twelve-tests.mjs` | **T2–T12** nas páginas do **dado** (hoje 14: portão, salas e os dois fixtures abertos) — **99** verificações, uma delas a cobertura da lista |
-| `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) — as 54 portas das catorze páginas, **165** verificações |
+| `tools/scene/ensaio-dois-aneis.mjs` | o ensaio dos **anéis do portão** (D97) na `scene100`: mede o passo, a corda e a folga de cada anel e, com `--aplicar`, escreve as 28 portas do ensaio |
+| `tools/regression/twelve-tests.mjs` | **T2–T12** nas páginas do **dado** — **113** verificações, uma delas a cobertura da lista (que cresce com as salas: 99 com doze, 113 com treze) |
+| `tools/regression/traversal-tests.mjs` | **T1** (as portas) e **T7/T11** (as chegadas) — as 66 portas das catorze páginas, **261** verificações; aceita mundos no argumento (`traversal-tests.mjs scene13` mede 67 s em vez de 1210 s) |
 | `tools/regression/i18n.mjs` | as duas línguas: chaves, marcadores e `?lang=en` nas duas páginas |
 
 `--full` acrescenta as baterias arquivadas das Fases 4, 5, 7 e 8 — a costura das travessias, a ponte

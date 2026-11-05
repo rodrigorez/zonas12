@@ -18,6 +18,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateScene, unreachableWorlds, missingArrivals, portraitTurns, repeatedDestinations, realityWindows } from '../../js/scene/validation.js';
 import { checkArranques } from './arranques.mjs';
+import { ringPlanPositions } from '../../js/scene/ring.js';
 import {
   WINDOW_KINDS,
   ACTION_KINDS,
@@ -340,6 +341,67 @@ const cases = [
         kind: 'sway', axis: [0, 1, 0], amplitude: 6, period: 15,
         rotationAxis: [0, 1, 0], angle: 45, rotationPeriod: 15
       };
+    }
+  },
+  {
+    // L30 (D9): a sala de ensaio não se usa. A avaria aponta uma porta da sala 1 à `scene100` — que
+    // existe em disco, por isso a L11 não tem nada a dizer; o que está errado é a exposição a entrar
+    // num mundo de ensaio. A porta que muda de destino não é a do portão, para a L24 ficar de fora.
+    law: 'L30',
+    what: 'uma porta que navega para a sala de ensaio (scene100)',
+    expect: 'law L30',
+    inject: (copy) => {
+      const porta = copy.portals.find((portal) => (portal.action || {}).target &&
+        portal.action.target !== 'gate');
+      porta.action.target = 'scene100';
+    }
+  },
+  {
+    // A outra metade da L30: ninguém chega de um mundo de ensaio. A avaria dá à porta do portão a
+    // chegada da sala de ensaio — continua a ser uma origem só, para a L17 ficar de fora.
+    law: 'L30',
+    what: 'uma porta que se declara chegada da sala de ensaio',
+    expect: 'law L30',
+    inject: (copy) => {
+      copy.portals[0].arrivalFrom = 'scene100';
+    }
+  },
+  {
+    // L31 (D97): acima de vinte portas, um anel só é uma vedação. A avaria põe vinte e sete portas
+    // todas a 90 m, que é exactamente o portão com a exposição inteira. A L24 também vai disparar — e
+    // é honesto que dispare, porque a sala deixou de ser uma sala.
+    law: 'L31',
+    what: 'vinte e sete portas todas no mesmo anel',
+    expect: 'law L31',
+    inject: (copy) => {
+      copy.portals = [];
+      for (let i = 0; i < 27; i++) {
+        const radianos = ((i * 360) / 27) * Math.PI / 180;
+        copy.portals.push(navigatingDoor({
+          id: i,
+          position: [Math.round(90 * Math.sin(radianos) * 100) / 100, 0,
+            Math.round(-90 * Math.cos(radianos) * 100) / 100]
+        }));
+      }
+    }
+  },
+  {
+    // O controlo da L31: as mesmas vinte e sete portas, nos três anéis de nove que o plano dá. Sem este
+    // caso, uma lei que recusasse **tudo** passaria o de cima — foi assim que se descobriu que dois
+    // anéis não servem para 27 (m.m.c. de 12 e 15 é 60).
+    law: 'L31',
+    what: 'vinte e sete portas nos três anéis de nove (o plano que passa)',
+    expect: 'law L31',
+    expectNone: true,
+    inject: (copy) => {
+      // O portão é que cresce (uma porta por sala, L24) — por isso é ele que se injeta, senão a L24
+      // dispararia pelos vinte e sete portas e o controlo não provava nada sobre a L31.
+      copy.world = { slug: 'gate', name: { pt: 'Portão', en: 'Gate' } };
+      copy.artworks = [];
+      copy.portals = [];
+      for (const lugar of ringPlanPositions(27, 0)) {
+        copy.portals.push(navigatingDoor({ id: lugar.index, position: lugar.position }));
+      }
     }
   }
 ];

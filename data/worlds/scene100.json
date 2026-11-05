@@ -45,38 +45,6 @@
         "pt": "Retrato do mundo de destino, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the destination world, seen from the door (cutout, for the live window)"
       }
-    },
-    "retrato-scene6": {
-      "path": "assets/previews/scene6-de-scene100.jpg",
-      "type": "image",
-      "alt": {
-        "pt": "Retrato do mundo de destino, visto da porta da sala de ensaio",
-        "en": "Portrait of the destination world, seen from the rehearsal room door"
-      }
-    },
-    "recorte-scene6-de-scene100": {
-      "path": "assets/previews/recorte-scene6-de-scene100.png",
-      "type": "image",
-      "alt": {
-        "pt": "Retrato do mundo de destino, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the destination world, seen from the door (cutout, for the live window)"
-      }
-    },
-    "retrato-scene9": {
-      "path": "assets/previews/scene9-de-scene100.jpg",
-      "type": "image",
-      "alt": {
-        "pt": "Retrato do mundo de destino, visto da porta da sala de ensaio",
-        "en": "Portrait of the destination world, seen from the rehearsal room door"
-      }
-    },
-    "recorte-scene9-de-scene100": {
-      "path": "assets/previews/recorte-scene9-de-scene100.png",
-      "type": "image",
-      "alt": {
-        "pt": "Retrato do mundo de destino, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the destination world, seen from the door (cutout, for the live window)"
-      }
     }
   },
   "dimensions": [
@@ -108,10 +76,10 @@
       "position": [
         0,
         0,
-        -16
+        -90
       ],
-      "width": 10,
-      "height": 12,
+      "width": 8,
+      "height": 10,
       "box": [
         12,
         16,
@@ -129,8 +97,13 @@
       ],
       "trigger": "plane",
       "frame": {
-        "color": "#ff0000",
+        "color": "#33cc99",
         "thickness": 0.3
+      },
+      "window": {
+        "kind": "dimension-pair",
+        "dimensionA": 0,
+        "dimensionB": 1
       },
       "action": {
         "kind": "navigate",
@@ -141,11 +114,6 @@
         0,
         0
       ],
-      "window": {
-        "kind": "dimension-pair",
-        "dimensionA": 0,
-        "dimensionB": 1
-      },
       "motion": {
         "kind": "sway",
         "axis": [
@@ -153,27 +121,27 @@
           0,
           0
         ],
-        "amplitude": 5,
-        "period": 16.9,
+        "amplitude": 4,
+        "period": 14.5,
         "rotationAxis": [
           0,
-          0,
-          1
+          1,
+          0
         ],
         "angle": 90,
-        "rotationPeriod": 10
+        "rotationPeriod": 12.1
       }
     },
     {
       "id": 1,
       "ownedBy": 0,
       "position": [
-        16,
+        39.05,
         0,
-        0
+        -81.09
       ],
-      "width": 10,
-      "height": 12,
+      "width": 8,
+      "height": 10,
       "box": [
         12,
         16,
@@ -193,6 +161,1054 @@
       "frame": {
         "color": "#ff0000",
         "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 154.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -25.71,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "period": 15.4,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 14.2
+      }
+    },
+    {
+      "id": 2,
+      "ownedBy": 0,
+      "position": [
+        70.36,
+        0,
+        -56.11
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 128.6
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -51.43,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 16.3,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 16.3
+      }
+    },
+    {
+      "id": 3,
+      "ownedBy": 0,
+      "position": [
+        87.74,
+        0,
+        -20.03
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 102.9
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -77.14,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 17.2,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 12.1
+      }
+    },
+    {
+      "id": 4,
+      "ownedBy": 0,
+      "position": [
+        87.74,
+        0,
+        20.03
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 77.1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -102.86,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 4,
+        "period": 18.1,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 14.2
+      }
+    },
+    {
+      "id": 5,
+      "ownedBy": 0,
+      "position": [
+        70.36,
+        0,
+        56.11
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 51.4
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -128.57,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 14.5,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 16.3
+      }
+    },
+    {
+      "id": 6,
+      "ownedBy": 0,
+      "position": [
+        39.05,
+        0,
+        81.09
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 25.7
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -154.29,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 15.4,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 12.1
+      }
+    },
+    {
+      "id": 7,
+      "ownedBy": 0,
+      "position": [
+        0,
+        0,
+        90
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 0
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -180,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "period": 16.3,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 14.2
+      }
+    },
+    {
+      "id": 8,
+      "ownedBy": 0,
+      "position": [
+        -39.05,
+        0,
+        81.09
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -25.7
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -205.71,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 17.2,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 16.3
+      }
+    },
+    {
+      "id": 9,
+      "ownedBy": 0,
+      "position": [
+        -70.36,
+        0,
+        56.11
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -51.4
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -231.43,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 18.1,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 12.1
+      }
+    },
+    {
+      "id": 10,
+      "ownedBy": 0,
+      "position": [
+        -87.74,
+        0,
+        20.03
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -77.1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -257.14,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 4,
+        "period": 14.5,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 14.2
+      }
+    },
+    {
+      "id": 11,
+      "ownedBy": 0,
+      "position": [
+        -87.74,
+        0,
+        -20.03
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -102.9
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -282.86,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 15.4,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 16.3
+      }
+    },
+    {
+      "id": 12,
+      "ownedBy": 0,
+      "position": [
+        -70.36,
+        0,
+        -56.11
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -128.6
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -308.57,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 16.3,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 12.1
+      }
+    },
+    {
+      "id": 13,
+      "ownedBy": 0,
+      "position": [
+        -39.05,
+        0,
+        -81.09
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -154.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -334.29,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "period": 17.2,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 14.2
+      }
+    },
+    {
+      "id": 14,
+      "ownedBy": 0,
+      "position": [
+        40.05,
+        0,
+        -175.49
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 167.1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -12.86,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 18.1,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 16.3
+      }
+    },
+    {
+      "id": 15,
+      "ownedBy": 0,
+      "position": [
+        112.23,
+        0,
+        -140.73
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 141.4
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -38.57,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 14.5,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 12.1
+      }
+    },
+    {
+      "id": 16,
+      "ownedBy": 0,
+      "position": [
+        162.17,
+        0,
+        -78.1
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 115.7
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -64.29,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 4,
+        "period": 15.4,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 14.2
+      }
+    },
+    {
+      "id": 17,
+      "ownedBy": 0,
+      "position": [
+        180,
+        0,
+        0
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 90
       },
       "action": {
         "kind": "navigate",
@@ -203,14 +1219,6 @@
         -90,
         0
       ],
-      "window": {
-        "kind": "preview",
-        "asset": "retrato-scene3",
-        "radius": 120,
-        "shaderId": "nuvens",
-        "cutout": "recorte-scene3-de-scene100",
-        "azimuth": 90
-      },
       "motion": {
         "kind": "sway",
         "axis": [
@@ -219,26 +1227,221 @@
           0
         ],
         "amplitude": 5,
-        "period": 14.9,
+        "period": 16.3,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 16.3
+      }
+    },
+    {
+      "id": 18,
+      "ownedBy": 0,
+      "position": [
+        162.17,
+        0,
+        78.1
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 64.3
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -115.71,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 17.2,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 12.1
+      }
+    },
+    {
+      "id": 19,
+      "ownedBy": 0,
+      "position": [
+        112.23,
+        0,
+        140.73
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 38.6
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -141.43,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "amplitude": 5,
+        "period": 18.1,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 14.2
+      }
+    },
+    {
+      "id": 20,
+      "ownedBy": 0,
+      "position": [
+        40.05,
+        0,
+        175.49
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": 12.9
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -167.14,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 14.5,
         "rotationAxis": [
           0,
           1,
           0
         ],
         "angle": 90,
-        "rotationPeriod": 12.7
+        "rotationPeriod": 16.3
       }
     },
     {
-      "id": 2,
+      "id": 21,
       "ownedBy": 0,
       "position": [
+        -40.05,
         0,
-        0,
-        16
+        175.49
       ],
-      "width": 10,
-      "height": 12,
+      "width": 8,
+      "height": 10,
       "box": [
         12,
         16,
@@ -259,23 +1462,88 @@
         "color": "#ff0000",
         "thickness": 0.3
       },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -12.9
+      },
       "action": {
         "kind": "navigate",
-        "target": "scene6"
+        "target": "scene3"
       },
       "rotation": [
         0,
-        -180,
+        -192.86,
         0
       ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 15.4,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 12.1
+      }
+    },
+    {
+      "id": 22,
+      "ownedBy": 0,
+      "position": [
+        -112.23,
+        0,
+        140.73
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
       "window": {
         "kind": "preview",
-        "asset": "retrato-scene6",
+        "asset": "retrato-scene3",
         "radius": 120,
-        "shaderId": "becos",
-        "cutout": "recorte-scene6-de-scene100",
-        "azimuth": 0
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -38.6
       },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -218.57,
+        0
+      ],
       "motion": {
         "kind": "sway",
         "axis": [
@@ -283,27 +1551,27 @@
           1,
           0
         ],
-        "amplitude": 6,
-        "period": 17.7,
+        "amplitude": 4,
+        "period": 16.3,
         "rotationAxis": [
           0,
-          0,
-          1
+          1,
+          0
         ],
         "angle": 45,
-        "rotationPeriod": 19.7
+        "rotationPeriod": 14.2
       }
     },
     {
-      "id": 3,
+      "id": 23,
       "ownedBy": 0,
       "position": [
-        -16,
+        -162.17,
         0,
-        0
+        78.1
       ],
-      "width": 10,
-      "height": 12,
+      "width": 8,
+      "height": 10,
       "box": [
         12,
         16,
@@ -324,23 +1592,153 @@
         "color": "#ff0000",
         "thickness": 0.3
       },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -64.3
+      },
       "action": {
         "kind": "navigate",
-        "target": "scene9"
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -244.29,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 17.2,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 16.3
+      }
+    },
+    {
+      "id": 24,
+      "ownedBy": 0,
+      "position": [
+        -180,
+        0,
+        0
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -90
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
       },
       "rotation": [
         0,
         -270,
         0
       ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 18.1,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 90,
+        "rotationPeriod": 12.1
+      }
+    },
+    {
+      "id": 25,
+      "ownedBy": 0,
+      "position": [
+        -162.17,
+        0,
+        -78.1
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
       "window": {
         "kind": "preview",
-        "asset": "retrato-scene9",
+        "asset": "retrato-scene3",
         "radius": 120,
-        "shaderId": "mangue",
-        "cutout": "recorte-scene9-de-scene100",
-        "azimuth": -90
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -115.7
       },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -295.71,
+        0
+      ],
       "motion": {
         "kind": "sway",
         "axis": [
@@ -348,15 +1746,145 @@
           1,
           0
         ],
-        "amplitude": 6,
-        "period": 12.4,
+        "amplitude": 5,
+        "period": 14.5,
         "rotationAxis": [
           0,
           1,
           0
         ],
         "angle": 45,
-        "rotationPeriod": 16.9
+        "rotationPeriod": 14.2
+      }
+    },
+    {
+      "id": 26,
+      "ownedBy": 0,
+      "position": [
+        -112.23,
+        0,
+        -140.73
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -141.4
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -321.43,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 4,
+        "period": 15.4,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 16.3
+      }
+    },
+    {
+      "id": 27,
+      "ownedBy": 0,
+      "position": [
+        -40.05,
+        0,
+        -175.49
+      ],
+      "width": 8,
+      "height": 10,
+      "box": [
+        12,
+        16,
+        1
+      ],
+      "boxPosition": [
+        0,
+        8,
+        0
+      ],
+      "boxRotation": [
+        0,
+        0,
+        0
+      ],
+      "trigger": "plane",
+      "frame": {
+        "color": "#ff0000",
+        "thickness": 0.3
+      },
+      "window": {
+        "kind": "preview",
+        "asset": "retrato-scene3",
+        "radius": 120,
+        "shaderId": "nuvens",
+        "cutout": "recorte-scene3-de-scene100",
+        "azimuth": -167.1
+      },
+      "action": {
+        "kind": "navigate",
+        "target": "scene3"
+      },
+      "rotation": [
+        0,
+        -347.14,
+        0
+      ],
+      "motion": {
+        "kind": "sway",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "amplitude": 5,
+        "period": 16.3,
+        "rotationAxis": [
+          0,
+          1,
+          0
+        ],
+        "angle": 45,
+        "rotationPeriod": 12.1
       }
     }
   ]

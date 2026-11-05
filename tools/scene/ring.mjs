@@ -18,7 +18,8 @@ import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  RING, angularGap, bestPhase, chord, clearanceCeiling, gapPhase, requiredClearance, ringDeviation,
+  RING, MIN_RING_CHORD, SINGLE_RING_MAX, angularGap, bestPhase, chord, clearanceCeiling, gapPhase,
+  requiredClearance, ringDeviation, ringPlan, ringPlanPositions,
   ringPositions
 } from '../../js/scene/ring.js';
 import { FIXTURES } from '../../js/scene/fixtures.js';
@@ -87,7 +88,12 @@ function measure(scene) {
   const artworkPhase = artworks.length > 0 ? gapPhase(artworks.length) : 0;
   const artworksRing = ringPositions(artworks.length, RING.artworks.radius, artworkPhase, RING.artworks.height);
   const doors = bestPhase(portals.length, artworksRing.map((spot) => spot.angle));
-  const portalsRing = ringPositions(portals.length, RING.portals.radius, doors.phase, RING.portals.height);
+  // L31 (D97): acima de vinte portas um anel só é uma vedação, e o lugar de cada porta passa a vir do
+  // plano de anéis — o mesmo que o validador confere.
+  const plano = portals.length > SINGLE_RING_MAX ? ringPlan(portals.length) : null;
+  const portalsRing = plano
+    ? ringPlanPositions(portals.length, RING.portals.height)
+    : ringPositions(portals.length, RING.portals.radius, doors.phase, RING.portals.height);
 
   const workWidth = widths.length > 0 ? Math.max.apply(null, widths) : 4;
   const boxWidth = boxWidths.length > 0 ? Math.max.apply(null, boxWidths) : 12;
@@ -107,6 +113,15 @@ function measure(scene) {
     portalsRing: portalsRing,
     artworkDeviation: ringDeviation(artworks, RING.artworks.radius, artworkPhase, artworks.length),
     portalsDeviation: ringDeviation(portals, RING.portals.radius, doors.phase, portals.length),
+    // O plano de anéis (L31), quando existe: diz quantos anéis são e onde cada porta se senta.
+    plan: plano,
+    planOk: plano
+      ? Math.min(...plano.rings.map((anel) => chord(anel.radius, anel.count))) >= MIN_RING_CHORD
+      : true,
+    planNote: plano
+      ? plano.rings.map((anel) => `${anel.count} a ${anel.radius} m`).join(' + ') +
+        ` · folga ${plano.clearance === Infinity ? '—' : plano.clearance}° para ${plano.needed}°`
+      : '',
     onRing: (deviation) => deviation.radius <= RING.radiusTolerance && deviation.angle <= RING.angleTolerance
   };
 }
@@ -250,6 +265,9 @@ for (const world of worlds) {
     fail(`as portas estão a ${decimal(measured.portalsChord)} m umas das outras e uma caixa de ` +
       `${decimal(measured.boxWidth)} m não cabe no anel (R2 = ${RING.portals.radius} m)`);
   }
+  if (measured.plan && !measured.planOk) {
+    fail(`o plano de ${measured.plan.rings.length} anéis não cabe (${measured.planNote}) — law L31`);
+  }
 
   for (const dimension of smallBackgrounds(world.scene)) {
     fail(`dimensões[${dimension.id}]: o raio ${dimension.radius} não é maior do que o anel ` +
@@ -259,8 +277,20 @@ for (const world of worlds) {
   for (const problem of checkRing(measured.artworksRing, RING.artworks.radius)) {
     fail(`anel das obras: ${problem}`);
   }
-  for (const problem of checkRing(measured.portalsRing, RING.portals.radius)) {
-    fail(`anel das portas: ${problem}`);
+  if (measured.plan) {
+    // L31: com mais de um anel, cada um é conferido com o seu raio e o seu número de lugares.
+    const porAnel = new Map();
+    for (const spot of measured.portalsRing) {
+      if (!porAnel.has(spot.radius)) porAnel.set(spot.radius, []);
+      porAnel.get(spot.radius).push(spot);
+    }
+    for (const [radius, lugares] of porAnel) {
+      for (const problem of checkRing(lugares, radius)) fail(`anel das portas (${radius} m): ${problem}`);
+    }
+  } else {
+    for (const problem of checkRing(measured.portalsRing, RING.portals.radius)) {
+      fail(`anel das portas: ${problem}`);
+    }
   }
 
   // O `--aplicar` é a única coisa que escreve, e escreve depois de todos os veredictos: um anel que

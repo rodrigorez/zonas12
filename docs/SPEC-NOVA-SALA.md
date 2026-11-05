@@ -44,7 +44,7 @@
 | objeto | onde vive | quem o escreve | o que o guarda |
 | --- | --- | --- | --- |
 | a **página** | `<slug>/index.html` | `tools/scene/new-world.mjs` | `arranques.mjs` — o mesmo ficheiro da raiz, só com `<base href="../">` (D28) |
-| o **dado da sala** | `data/worlds/<slug>.json` | o editor (exporta) | `validate.mjs` + as leis L1–L30 |
+| o **dado da sala** | `data/worlds/<slug>.json` | o editor (exporta) | `validate.mjs` + as leis L1–L31 |
 | as **obras** (texto, capa, site) | `data/obras.tsv` → os mundos | `tools/artwork/from-csv.mjs` | `from-csv --check`, a lei L20 e a ficha |
 | as **posições** (dois anéis) | o mesmo JSON | `tools/scene/ring.mjs --aplicar` | L22 e L23 |
 | as **portas de mundo** (janela, retrato, chegada, giro, mundo real) | o JSON da sala **e** o de cada destino | o editor + `azimuths.mjs` + `reality.mjs` + `portrait.mjs` | L11, L13, L16, L17, L19, L26, L28 |
@@ -53,8 +53,8 @@
 O número de hoje, para se saber quando é que um passo ficou a meio: **14 páginas** (o portão e treze
 salas), **19 ficheiros de mundo** (as 14 e 5 fixtures, dos quais a sala de ensaio da §9), **66 portas**
 nas catorze páginas — **todas em movimento desde a D91** (§11) —, **67 obras**, **56 retratos** (um par
-`.jpg` + `.png` por porta com janela de pré-visualização, contando as três da sala de ensaio), **30 leis**
-(L1–L30) e **28 baterias** no `--full`.
+`.jpg` + `.png` por porta com janela de pré-visualização, contando as três da sala de ensaio), **31 leis**
+(L1–L31) e **28 baterias** no `--full`.
 
 E o número que a §10 acrescenta, porque é ele que uma sala nova vai ter de cumprir: **cada porta da
 sala nova oscila**, e o sorteio do movimento é rejeitado uma vez em cada três (§10.3).
@@ -75,6 +75,12 @@ uma, há combinações suficientes — mas a escolha tem de ser verificada, não
 recusa, e a mensagem diz qual é a repetida. E há uma segunda conta a fazer **antes**: a sala de destino
 ganha a porta de chegada, e se ela já tiver **cinco** portas (o máximo da L24) essa porta não cabe —
 foi o que aconteceu à `scene1` na sala 12 (D93).
+
+> **Desde o mapa (D96), esta decisão não se toma por sala — lê-se.** As vinte e sete salas já têm os
+> seus destinos escritos em `data/mapa.json`, decididos uma vez com as duas contas acima e testados
+> passo a passo. O comando exato sai de `node tools/scene/mapa.mjs --dossie <slug>`, e o que resta ao
+> autor é **verificar** (`--sala <slug>`), não escolher. Escolher por conta própria é a única forma de
+> uma sala nova contrariar o mapa — e o `mapa.mjs --check` apanha-a depois, quando já custou uma sala.
 
 **D-C · Quem leva a chegada.** Por cada porta da sala nova que navega para `X`, a sala `X` passa a
 precisar de uma porta que se declare a chegada dessa origem (L19) — e **no máximo uma por origem**
@@ -312,7 +318,7 @@ node tools/scene/validate.mjs
 node tools/scene/laws-selftest.mjs
 ```
 
-- **Tem de dizer:** `data/worlds/<slug>.json: OK (…)` para cada ficheiro, e as **33 de 33** avarias
+- **Tem de dizer:** `data/worlds/<slug>.json: OK (…)` para cada ficheiro, e as **35 de 35** avarias
   injectadas detectadas com o controlo limpo.
 - **O que ainda pode estar vermelho aqui, e só isto:** a **L9**, nos retratos da sala nova — os
   ficheiros são derivados e só nascem na fase 8. Tudo o resto (L19, L22, L24, L25, L26, L28 e a **L29**,
@@ -471,7 +477,7 @@ Uma sala está pronta quando **todas** estas linhas forem verdade, pela ordem em
       (`a folha não muda nada: o dado já diz o mesmo`)
 - [ ] o `validate.mjs` diz **OK** no ficheiro novo **e** nos que ele tocou; a **única** coisa vermelha
       admitida aqui é a L9 dos retratos
-- [ ] o `laws-selftest.mjs` diz **33 de 33** e o controlo limpo
+- [ ] o `laws-selftest.mjs` diz **35 de 35** e o controlo limpo
 - [ ] o `ring.mjs` não tem desvios acima de **0,5 m** e a folga L23 passa
 - [ ] o `azimuths.mjs` e o `reality.mjs` dizem `nada a escrever` (e, na primeira vez, escrevem e voltam
       a dizer o mesmo) — a frase de cada um está na fase 5 e na fase 6

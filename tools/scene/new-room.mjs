@@ -148,6 +148,14 @@ const destinos = [...new Set(opcoes.destinos)];
 if (destinos.includes(ENTRY_WORLD)) morrer('o portão entra sozinho (é a porta de volta, L24): tire-o de --destinos');
 if (destinos.length < 2 || destinos.length > 4) morrer('com a porta do portão, uma sala tem três a cinco portas (L24): --destinos leva 2 a 4 salas');
 for (const destino of destinos) {
+  // L30: um mundo de ensaio existe em disco, por isso não é "um destino que não existe" — é um
+  // destino que a exposição não usa. Dizer a mesma frase para os dois casos manda o autor procurar
+  // um ficheiro que lá está.
+  if (isFixture(destino)) {
+    morrer('o destino é um mundo de ensaio, não uma sala: ' + destino, [
+      'a L30 recusa: um mundo de ensaio abre-se pelo endereço e nunca se entra nele pela exposição'
+    ]);
+  }
   if (!porSlug.has(destino)) morrer('o destino não existe: ' + destino);
   if (destino === slug) morrer('uma sala não tem uma porta para si própria');
 }

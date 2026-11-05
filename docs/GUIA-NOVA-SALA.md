@@ -15,7 +15,7 @@
 >
 > **Os números das frases crescem.** Hoje (**2026-11-04**, com a D94 no método e a D95 nos números):
 > **14 páginas** (o portão e treze salas), **19 ficheiros de mundo**, **66 portas**, **67 obras**,
-> **56 retratos**, **30 leis** (L1–L30) e **28 baterias** no `--full`. O `14 mundo(s)`, o `56 porta(s)`
+> **56 retratos**, **31 leis** (L1–L31) e **28 baterias** no `--full`. O `14 mundo(s)`, o `56 porta(s)`
 > e o `(14)` do «a lista cobre todas as salas do dado» sobem a cada sala — o que não muda é a **forma**
 > da frase.
 >
@@ -35,8 +35,8 @@
 | | a decisão | o que fixa | a lei que a julga |
 | --- | --- | --- | --- |
 | **D-A** | **o fundo** | um shader dos que existem (nada a instalar) ou um panorama (`kind: "image"`, 2:1, ≤ 2048×1024) | L1, L14 |
-| **D-B** | **os destinos** | três a cinco portas, **uma** ao portão, e o conjunto diferente do de todas as outras salas | L24, L25 |
-| **D-C** | **quem leva a chegada** | cada destino ganha a porta que se declara a chegada desta sala — no máximo uma por origem | L19, L17 |
+| **D-B** | **os destinos** — mas **já estão decididos**: vêm de `data/mapa.json` (`--dossie`) | três a cinco portas, **uma** ao portão, e o conjunto diferente do de todas as outras salas | L24, L25 |
+| **D-C** | **quem leva a chegada** — também vem do mapa: o destino ganha a porta sozinho | cada destino ganha a porta que se declara a chegada desta sala — no máximo uma por origem | L19, L17 |
 | **D-D** | o movimento | **não é uma decisão**: sorteia-se, e a única escolha é voltar a sortear | L29 |
 
 Um shader **novo** tem caminho próprio (`tools/shader/install.mjs` antes, `tools/regression/emenda.mjs`
@@ -98,6 +98,11 @@ node tools/scene/new-world.mjs <slug>
 ---
 
 ## 2. O dado, as portas e o movimento (o atalho das fases 3 a 7)
+
+> **Os destinos não se escolhem: copiam-se.** O comando deste passo sai pronto de
+> `node tools/scene/mapa.mjs --dossie <slug>`, que já sabe quais dos vizinhos do mapa **existem hoje**
+> — uma sala não pode apontar para outra que ainda não nasceu (L11), e as portas que faltam chegam
+> quando as vizinhas nascerem. O `--destinos` abaixo é o que o dossiê imprime, não uma escolha.
 
 ```
 node tools/scene/new-room.mjs <slug> --destinos scene5,scene7 --nome-pt "…" --nome-en "…" [--fundo scene1]
@@ -386,7 +391,7 @@ Na ordem em que se correm. Uma linha sem a sua frase é uma linha que não passo
 - [ ] `node tools/scene/reality.mjs --aplicar` — `… 0 sem porta de chegada` e `nada a escrever`
 - [ ] `node tools/scene/validate.mjs` — **OK** no ficheiro novo e nos tocados; a L9 é a única vermelha
       admissível **aqui**
-- [ ] `node tools/scene/laws-selftest.mjs` — `33 of 33 faults detected` e `control … clean`
+- [ ] `node tools/scene/laws-selftest.mjs` — `35 of 35 faults detected` e `control … clean`
 - [ ] `node tools/scene/portrait.mjs --todos` **duas vezes** — um par por porta com janela
 - [ ] `node tools/scene/validate.mjs` — **OK em todos, sem L9 nenhuma**
 - [ ] `node tools/regression/all.mjs --full` — `28 de 28` (ou a vermelha repetida e explicada)

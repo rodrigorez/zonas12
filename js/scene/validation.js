@@ -16,8 +16,9 @@
 //     above the standard), L15 (the reserved band of ids), L16 and L17 (the arrival point, and one
 //     arrival door per origin), L18 (the two axes combine legally), L20 (the ficha of a work is one
 //     page, D62), L21 (the measurement id of a room, when there is one, is a GA4 id), L22 and L23
-//     (the two rings, and the clearance between them — D77) and L24 (three to five doors per room,
-//     one of them to the gate — D77).
+//     (the two rings, and the clearance between them — D77), L24 (three to five doors per room,
+//     one of them to the gate — D77), L30 (a rehearsal world is never used by the exhibition —
+//     D9) and L31 (above twenty doors a world needs concentric rings — D97).
 //   - the graph of the worlds, when the caller has all of them: the rooms nobody can reach
 //     (`unreachableWorlds`) and the doors whose destination says nothing about where the visitor
 //     comes from (`missingArrivals`, law L19).
@@ -40,7 +41,7 @@ import { validateDoor, ENTRY_WORLD } from '../modules/portal-kinds.js';
 import { arrivalPoint } from './arrival.js';
 import { alcanceDaPorta, ALCANCE_MINIMO } from './reach.js';
 import { realityHoles, sameHoles } from './reality.js';
-import { RING, FIRST_VISIT_AZIMUTH, angularGap, portraitTurn, requiredClearance, ringCoordinates } from './ring.js';
+import { RING, FIRST_VISIT_AZIMUTH, MIN_RING_CHORD, SINGLE_RING_MAX, angularGap, portraitTurn, requiredClearance, ringCoordinates, ringPlan } from './ring.js';
 import { isFixture } from './fixtures.js';
 
 const EYE_HEIGHT = 1.6;
@@ -220,9 +221,57 @@ export function validateScene(scene, options = {}) {
   // no doors.
   const fixture = options.fixture === true || isFixture(scene.world && scene.world.slug);
   if (!fixture) {
-    ringErrors(scene.artworks || [], RING.artworks.radius, 'artworks', err);
-    ringErrors(scene.portals || [], RING.portals.radius, 'portals', err);
-    clearanceErrors(scene.artworks || [], scene.portals || [], err);
+    const portas = scene.portals || [];
+    const plano = portas.length > SINGLE_RING_MAX ? ringPlan(portas.length) : null;
+    if (portas.length > SINGLE_RING_MAX && !plano) {
+      err(`o mundo tem ${portas.length} portas — law L31 (não há plano de anéis que as sente com ` +
+        `${MIN_RING_CHORD} m de corda e sem uma porta esconder outra; é a exposição que passou do que ` +
+        `o portão aguenta)`);
+    } else if (plano) {
+      // L31: mais portas do que um anel aguenta — repartem-se por anéis concêntricos, e é isso que se
+      // confere. Primeiro o **reparto** (uma porta por lugar, e no anel certo); só depois, e por porta,
+      // o lugar — senão vinte e sete portas num anel só davam vinte e sete erros a dizer o mesmo.
+      const porRaio = plano.rings.map(() => []);
+      const foraDosAneis = [];
+      for (const portal of portas) {
+        const at = ringCoordinates(portal.position);
+        const ring = plano.rings.findIndex((anel) => Math.abs(at.radius - anel.radius) <= RING.radiusTolerance);
+        if (ring === -1) foraDosAneis.push({ portal: portal, raio: at.radius });
+        else porRaio[ring].push(portal);
+      }
+      const raios = plano.rings.map((anel) => anel.radius).join(', ');
+      for (const cada of foraDosAneis) {
+        err(`portals[${cada.portal.id}]: está a ${cada.raio.toFixed(1)} m do centro, e com ` +
+          `${portas.length} portas tem de estar num dos anéis (${raios} m) — law L31 (acima de ` +
+          `${SINGLE_RING_MAX} portas um só anel é uma vedação)`);
+      }
+      const esperado = plano.rings.map((anel) => anel.count);
+      const encontrado = porRaio.map((lista) => lista.length);
+      const repartoErrado = esperado.some((cada, ring) => encontrado[ring] !== cada);
+      if (repartoErrado) {
+        err(`${portas.length} portas repartidas ${encontrado.join(' + ')}, e o plano pede ` +
+          `${esperado.join(' + ')} (${raios} m) — law L31 (é o reparto mais equilibrado que cabe: ` +
+          `com ${SINGLE_RING_MAX} portas num anel só, nenhuma porta esconde outra)`);
+      } else {
+        plano.rings.forEach((anel, ring) => {
+          const passo = 360 / anel.count;
+          for (const portal of porRaio[ring]) {
+            const at = ringCoordinates(portal.position);
+            const desvio = Math.min(...Array.from({ length: anel.count },
+              (_, slot) => angularGap(at.angle, anel.phase + slot * passo)));
+            if (desvio > RING.angleTolerance) {
+              err(`portals[${portal.id}]: no anel de ${anel.radius} m está a ${desvio.toFixed(2)}° do ` +
+                `lugar que lhe cabe — law L31 (o plano põe ${anel.count} portas com ` +
+                `${passo.toFixed(2)}° de passo, desfasadas ${anel.phase}°)`);
+            }
+          }
+        });
+      }
+    } else {
+      ringErrors(scene.artworks || [], RING.artworks.radius, 'artworks', err);
+      ringErrors(portas, RING.portals.radius, 'portals', err);
+      clearanceErrors(scene.artworks || [], portas, err);
+    }
   }
 
   // ---- artworks: what they show, and how they open ----
@@ -323,6 +372,26 @@ export function validateScene(scene, options = {}) {
           `and the doors of the destination would be missing (D53)`);
       } else if (!assets[windowAxis.cutout]) {
         err(`${where}: the cutout "${windowAxis.cutout}" is not in the assets catalogue (D20)`);
+      }
+    }
+  }
+
+  // ---- L30: a rehearsal world is never used by the exhibition (D9) ----
+  //
+  // `scene100` (D84) and the other fixtures exist to be opened by address, never to be visited from
+  // the exhibition: nothing points at them, and nobody arrives from one. The list is the one
+  // `fixtures.js` owns — a second copy is how "the room that must not be used" ends up used. A
+  // fixture itself is exempt: its doors leave to the exhibition, and that is what it is for.
+  if (!fixture) {
+    for (const portal of scene.portals || []) {
+      const target = (portal.action || {}).target;
+      if (typeof target === 'string' && isFixture(target)) {
+        err(`portals[${portal.id}]: it navigates to "${target}", a rehearsal world — law L30 (a ` +
+          `rehearsal world is opened by address, never entered from the exhibition)`);
+      }
+      if (typeof portal.arrivalFrom === 'string' && isFixture(portal.arrivalFrom)) {
+        err(`portals[${portal.id}]: it declares the arrival of "${portal.arrivalFrom}", a rehearsal ` +
+          `world — law L30 (the visitor never comes from a world that is not in the exhibition)`);
       }
     }
   }
