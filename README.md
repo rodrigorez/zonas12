@@ -271,7 +271,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.37)
+## Estado atual do código (v0.0.45)
 
 > **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
 > pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
@@ -690,6 +690,33 @@ decisões **D69** a **D76**
 geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou de comportamento: as
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
+
+A **v0.0.45** é a **D107**, e nasceu de uma prova visual que contradisse o validador: o `validate`
+dizia **zero** e a sala 24 mostrava **5 de 8 painéis pretos**.
+
+**Quatro causas, todas invisíveis ao validador** — porque, por desenho, ele não pergunta nada a um
+endereço de fora. A primeira é **CORS**: a janela da obra é um material WebGL e o builder pede a
+imagem com `crossorigin="anonymous"`; o Bandcamp não manda esse cabeçalho e recusa. A segunda é
+**rate limiting**: o builder pede **todas** as capas ao mesmo tempo e o `lh3.googleusercontent.com`
+responde **429** a partir de certo número — os mesmos endereços, um a um, dão 200. A terceira são
+servidores de terceiros que caem. A quarta são endereços que não são imagens: `imgur.com/a/…` é a
+página de um álbum, `drive.google.com/drive/folders/…` é uma pasta.
+
+**A correção é guardar as capas dentro do projeto.** O `capas-locais.mjs` descarrega uma a uma,
+reduz a 1200 px com um só Chrome e reescreve o caminho. Medido: **150 → 141 guardadas**, **71,8 MB →
+15,3 MB**, e a sala 24 passou de 3 para **8 de 8**. Fecha as quatro causas de uma vez, e as capas
+deixam de depender de um servidor alheio — que este README já dizia ser um objetivo.
+
+**O que não se apaga, e porquê.** Nove capas não vieram, e oito não são ficheiros inválidos: são
+ficheiros do Drive **não partilhados**. O Google devolve a página `Sign in - Google Accounts`,
+900 kB de HTML. Distinguir isso de «imagem partida» é o que impede a ferramenta de apagar uma capa
+que se resolve em dois cliques — ficam no dado, com o recado: *partilhe como «qualquer pessoa com o
+link»*. Só a do imgur foi tirada, a pedido: não há imagem nenhuma para vir a ter.
+
+O que fica por fazer, e é teu: as **sete capas privadas** (`scene5` «A CASA», `scene16` «Keep
+Scrolling» e «Compatibilidad Telepática», `scene19` «Sin Colgar» e «El Castillo», `scene20`
+«Paseo la Pechina», `scene25` «Rock Skulls») e a **pasta do Drive** de `scene18` «Aguja
+inversa». Corra outra vez o `capas-locais.mjs` depois de as partilhar.
 
 A **v0.0.37** é a **D106**, e fecha o fluxo que o autor pediu: **colar o TSV no chat e a sala nascer
 com as obras.**
@@ -2632,7 +2659,7 @@ juntas somam minutos, por isso não são o `default`. Com `--full` são **28** b
 Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
 repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.tsv` e escreve nos mundos o dado das
 obras (nome, créditos, descritivo, imagem e site) — com `--file` corre outra folha, e é assim que se vê
-o exemplo (`data/obras.exemplo.tsv`) sem tocar na definitiva —, `node tools/scene/new-world.mjs
+o exemplo (`data/obras.exemplo.tsv`) sem tocar na definitiva —, `node tools/artwork/capas-locais.mjs` guarda as capas remotas dentro do projeto (D107: reduz a 1200 px e reescreve o caminho; uma capa que não venha fica no dado, reportada), `node tools/scene/new-world.mjs
 <slug>` cria a pasta e o arranque de um mundo, `node tools/scene/new-room.mjs <slug> --destinos …`
 escreve o esqueleto de uma sala nova, as portas que ela pede **e o movimento sorteado de cada porta**
 (ver [`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md)), `node tools/scene/ring.mjs --aplicar` põe as obras

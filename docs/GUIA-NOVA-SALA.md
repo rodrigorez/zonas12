@@ -390,6 +390,48 @@ retratos de **todas** elas têm de ser a última coisa — uma vez, e duas passa
 > **Se a sala tiver mais de 6 obras, avise antes.** Com 7 ou mais, o anel das obras muda a fase das
 > portas, as portas mudam de sítio e o giro de todos os mundos que apontam para ela também. Medido: 2 a
 > 6 obras não movem as portas (0 de 5); 7 movem as 5. Nessa caso a ronda deixa de ser local.
+### 4.3 · As capas passam a viver no projeto
+
+Depois da folha, e **uma vez para todas as salas**, as capas remotas descem para dentro do projeto:
+
+```
+node tools/artwork/capas-locais.mjs --check
+node tools/artwork/capas-locais.mjs
+```
+
+**Porquê.** Uma capa remota tem quatro problemas que o `validate` não vê — por desenho, não pergunta
+nada a um endereço de fora:
+
+| problema | o que se vê | medido |
+| --- | --- | --- |
+| **CORS** | o painel fica preto, sem erro no dado | a obra «SoundRide 3» (Bandcamp) recusa o `crossorigin="anonymous"` que o builder usa |
+| **rate limiting** | alguns painéis pretos, outros não | sala 24: **5 de 8** capas falharam com HTTP 429 — os mesmos endereços, um a um, dão 200 |
+| **servidores que caem** | painel preto, intermitente | um WordPress de terceiro fecha a ligação |
+| **endereços que não são imagens** | painel preto, sempre | `imgur.com/a/…` é a página do álbum; `drive.google.com/drive/folders/…` é uma pasta |
+
+A ferramenta descarrega as capas **uma a uma** (é o rate limiting que está a fechar), reduz a 1200 px
+com um só Chrome e grava em `assets/artworks/capa-<sala>-<id>.jpg`.
+
+**Tem de dizer:** `descarregadas: N · não guardadas: M`, a lista do que foi reduzido, e no fim
+`escrito: N capa(s) em assets/artworks/ e 27 mundo(s)`.
+
+- **Medido:** 150 capas → 141 guardadas. **71,8 MB de origem → 15,3 MB no disco** (o painel de uma obra
+  tem 4 × 3 m; 1600 px era desperdício). Na sala 24: **8 de 8 a carregar**, contra 3 de 8 antes.
+
+- **As que não vieram ficam no dado, e é de propósito.** Oito das nove não são ficheiros inválidos: são
+  ficheiros do Drive **não partilhados** — o Google devolve a página `Sign in - Google Accounts`. Apagar
+  a capa seria perdê-la para sempre por causa de uma permissão. O relatório diz o que fazer:
+
+  - `[privado]` — *partilhe o ficheiro no Drive como «qualquer pessoa com o link» e corra outra vez*;
+  - `[pasta]` — o endereço é uma pasta do Drive, não um ficheiro;
+  - `[album]` — o endereço é a página de um álbum, não uma imagem.
+
+  A única que não tem imagem nenhuma para vir a ter tira-se à mão: `--tirar <slug>:<id>` (a obra fica
+  com o site, e a ficha usa a cadeia do D65).
+
+> **Corra isto depois da folha e antes dos retratos.** Uma capa que muda muda a imagem que a porta
+> mostra, e o retrato de uma sala com as capas trocadas é um retrato de ontem.
+
 ---
 
 > **Este passo é o fecho, e é de um só agente.** Se houver obras a nascer em paralelo noutras
