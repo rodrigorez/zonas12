@@ -224,6 +224,12 @@ repetir depois de uma ronda interrompida. `--seco` diz o que faria sem escrever.
 Depois do fecho, a única vermelha possível é a **L9** — os retratos do passo 7. Qualquer outra é uma
 paragem.
 
+**As ondas fazem-se sozinhas.** `node tools/scene/construir.mjs` abre as salas que o grafo já permite (a
+próxima onda), `--todas` percorre o plano até ao fim, e `--seco` diz o que faria. Dentro de cada onda as
+salas correm em paralelo; no fim há **um** `integrar`. Medido: as catorze salas em **4 s**, e o juiz
+fecha em `mapa: OK`. Isto levanta os **esqueletos** — o que sobra é o passo 3 (editor), o 4 (obras) e o
+7 (retratos), sala a sala.
+
 **Quantas salas cabem ao mesmo tempo.** Não é uma escolha: uma sala só nasce com **duas** vizinhas
 construídas (o `new-room` escreve a porta de chegada no destino, e a L24 exige três portas). O mapa
 das 27 salas é uma cadeia, por isso o plano tem **ondas** — e a primeira tem uma sala só:

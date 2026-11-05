@@ -163,9 +163,15 @@ portais» — uma sala sem portas viola a L24, a L19 e a alcançabilidade.
 
 **Quantas salas cabem ao mesmo tempo não é uma escolha (D103).** Uma sala só nasce com **duas**
 vizinhas construídas, por isso a construção tem **ondas**: `node tools/scene/mapa.mjs --ondas` imprime
-o plano (hoje 9 ondas, no máximo 2 salas em paralelo, e só a `scene14` na primeira), e
+o plano (hoje 10 ondas, no máximo 2 salas em paralelo, e só a `scene14` na primeira), e
 `node tools/scene/mapa.mjs --dossie <slug>` dá a folha de um agente com o comando exato — ou diz que a
 sala está bloqueada e por que onda espera.
+
+**E as ondas fazem-se sozinhas (D104).** `node tools/scene/construir.mjs` abre a próxima onda,
+`--todas` percorre o plano até ao fim, `--seco` diz o que faria. Dentro de cada onda as salas correm em
+paralelo e no fim há **um** `integrar`; medido, as catorze salas em **4 s**. Isto levanta os
+**esqueletos** — o que fica por fazer é o que é do autor: as obras, a composição no editor e os
+retratos, sala a sala.
 
 Cada fase diz **o comando**, **o que ele tem de dizer** e **o que fazer se não disser**. Só se avança
 com a fase anterior verde: a fase 8 (retratos) custa minutos de GPU e não se gasta a descobrir um erro

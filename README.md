@@ -271,7 +271,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.32)
+## Estado atual do código (v0.0.33)
 
 > **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
 > pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
@@ -690,6 +690,36 @@ decisões **D69** a **D76**
 geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou de comportamento: as
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
+
+A **v0.0.33** é a **D104**: o plano das ondas passa a ser **executável**. A v0.0.32 disse quantas salas
+cabem em paralelo; esta diz como se abrem, e prova-o.
+
+**A pergunta do autor era «dá para manter o mapa e abrir só o bloco 14–27?».** A resposta medida é
+**não** — e o motivo não é o protocolo, é a L24. No plano final as treze salas construídas ficam
+**todas** com cinco portas, que é o teto: `abrir-mapa.mjs --teto` mostra 0 lugares livres com teto 5,
+13 com teto 6 (faltam 3) e 26 com teto 7 (aí cabia). Abrir o mapa obrigaria a subir a lei ou a tirar
+portas já construídas no disco — e as arestas que ligariam as salas novas umas às outras não ajudam,
+porque nenhuma dessas salas existe ainda.
+
+**A cadeia, então, faz-se sozinha.** `tools/scene/construir.mjs` lê o mapa, calcula as ondas e, dentro de
+cada uma, abre as salas em paralelo (`new-world` + `new-room --so-a-sala`) e faz **um** `integrar` no
+fim. Medido num `git worktree`: as **catorze** salas nasceram em **4 segundos**, o fecho fez 43
+escritas, e o resultado passou o juiz — `mapa: OK`, 27 salas completas, **152 portas** como o plano
+previa, 0 arestas pendentes, e nenhum erro que não fosse a **L9** (os retratos, que são trabalho do
+autor, sala a sala).
+
+**Um bug real, apanhado pelo próprio juiz.** A primeira versão punha `scene22` e `scene23` na mesma
+onda — e elas são **vizinhas**. A porta entre as duas é escrita pela que nasce depois, e nenhuma das
+duas "via" a outra a tempo: o mapa declarava uma aresta que ninguém criava, e o `--check` acusou
+`o mapa declara "scene23" e o dado não tem essa porta`. A correção é a regra que faltava — uma onda é
+um **conjunto independente** —, e vive em `tools/scene/ondas.mjs`, para o juiz e o orquestrador não
+terem duas cópias da mesma conta. O `--check` ganhou também a verificação de **cobertura**: toda a
+aresta do mapa tem de ser escrita por alguma onda.
+
+**O plano real não são catorze em paralelo: são dez ondas.** 1, 1, 1, 1, 2, 2, 2, 2, 1, 1 — no máximo
+duas salas ao mesmo tempo. Hoje pode nascer só a `scene14`. Mas o tempo de máquina deixa de ser o
+problema: são 4 segundos. O que resta é o trabalho do autor — as obras, a composição e os retratos,
+sala a sala.
 
 A **v0.0.32** é a **D103**, e nasceu de uma pergunta que parecia de engenharia e era de topologia:
 *quantos agentes cabem, de facto, a abrir as catorze salas que faltam?*
@@ -2484,7 +2514,10 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 | --- | --- |
 | `tools/scene/validate.mjs` | os ficheiros de mundo (o portão, as treze salas e os cinco fixtures), as leis **L1–L30**, o grafo das portas e os arranques |
 | `tools/scene/laws-selftest.mjs` | **35** avarias injectadas, todas detectadas, com o controlo limpo — a L29 e a L30 entram com a avaria **e** com o seu controlo negativo |
-| `tools/scene/mapa.mjs` | o **mapa das portas** (D96): as 27 salas contra a L24 e a L25, o acordo com o disco e os 14 passos da obra, cada um julgado; `--grafo`, `--dossie` (a folha de um agente) e `--ondas` (quantas salas cabem em paralelo, e porquê — D103). Desde a v0.0.30 está no `all.mjs` |
+| `tools/scene/mapa.mjs` | o **mapa das portas** (D96): as 27 salas contra a L24 e a L25, o acordo com o disco e os 14 passos da obra, cada um julgado; `--grafo`, `--dossie` (a folha de um agente) e `--ondas` (quantas salas cabem em paralelo, e porquê — D103/D104). Desde a v0.0.30 está no `all.mjs` |
+| `tools/scene/construir.mjs` | o **orquestrador das ondas** (D104): abre as salas planeadas na ordem que o grafo permite, em paralelo dentro de cada onda, e fecha tudo com **um** `integrar`. `--seco`, `--todas`, `--ondas 1,2`. Só levanta esqueletos: as obras, a composição e os retratos são do autor |
+| `tools/scene/ondas.mjs` | a conta das ondas, numa casa só: a sala precisa de duas vizinhas construídas, e duas vizinhas **entre si** nunca caem na mesma onda (a porta entre elas é escrita pela que nasce depois) |
+| `tools/scene/abrir-mapa.mjs` | o que seria preciso para abrir mais frentes: `--seco` diz quantas arestas faltam, `--teto N` diz se um limite de portas por sala as faria caber. Não muda a L24 |
 | `tools/scene/integrar.mjs` | o **fecho da ronda** (D102): põe as portas no portão e as chegadas que faltam em cada destino, corre os anéis, o giro, os buracos, o sorteio (só nas portas novas) e o validador **uma vez**. Idempotente: a segunda passagem diz `nada a fazer`. `--seco` diz o que faria |
 | `tools/coordination/status.mjs` | quem está a escrever nos mundos agora, e se o dono da trava está morto (o próximo a chegar reclama-a) |
 | `tools/server/selftest.mjs` | a **gravação do editor** por HTTP: origem, tipo, versão, validação, cópia de segurança e escrita atómica. Ficou de fora das baterias desde a D48 — e foi assim que a gravação passou meses a devolver 500. Entrou no `all.mjs` na v0.0.30 |

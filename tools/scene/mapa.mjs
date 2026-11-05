@@ -19,6 +19,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ENTRY_WORLD } from '../../js/modules/portal-kinds.js';
+import { arestasCobertas, calcularOndas } from './ondas.mjs';
 import { FIXTURES } from '../../js/scene/fixtures.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -172,45 +173,31 @@ for (const slug of salas) {
   if (!construidas.has(slug) && !vizinhos.has(slug)) err(`${slug}: planeada e sem lugar no mapa`);
 }
 
-// A ordem de construção: o `new-room` acrescenta a porta de chegada ao destino, por isso uma sala só
-// pode nascer quando **dois** dos seus vizinhos já existem (o mínimo da L24). O resto das portas
-// chegam quando as salas seguintes nascerem — é a mesma operação vista do outro lado.
-//
-// A ordem vem em **ondas**: cada onda é o conjunto de salas que pode nascer ao mesmo tempo, e é isso
-// que decide quantos agentes conseguem trabalhar em paralelo. A onda não é uma escolha — é a altura do
-// grafo. Um mapa em cadeia dá uma sala por onda, por muito que se queira catorze.
-const ordem = [];
-const ondas = [];
-const prontas = new Set(construidas.keys());
-const porConstruir = salas.filter((slug) => !construidas.has(slug));
-let mudou = true;
-while (mudou) {
-  mudou = false;
-  const onda = [];
-  // A onda inteira é decidida contra o mesmo retrato do disco: as salas que nascem **juntas** não se
-  // vêem umas às outras. Sem isto, a segunda sala da lista já contava com a primeira e todas cabiam na
-  // primeira onda — que é precisamente a ilusão que este relatório existe para desfazer.
-  for (const slug of porConstruir) {
-    if (prontas.has(slug)) continue;
-    const existentes = [...vizinhos.get(slug)].filter((alvo) => prontas.has(alvo) &&
-      !onda.some((passo) => passo.slug === alvo));
-    if (existentes.length >= 2) onda.push({ slug, destinos: existentes });
-  }
-  if (onda.length > 0) {
-    for (const passo of onda) {
-      prontas.add(passo.slug);
-      ordem.push(passo);
-    }
-    ondas.push(onda);
-    mudou = true;
-  }
-}
+// A ordem de construção — em **ondas** — vive em `ondas.mjs`, porque o `obra.mjs` executa a mesma
+// conta. Cada onda é o conjunto de salas que pode nascer ao mesmo tempo: duas vizinhas entre si não
+// cabem na mesma (a porta entre elas é escrita pela que nasce depois). A onda não é uma escolha — é a
+// altura do grafo. Um mapa em cadeia dá uma sala por onda, por muito que se queira catorze.
+const { ondas, bloqueadas } = calcularOndas({ salas, pares, construidas });
+const ordem = ondas.flat();
 const ondaDe = new Map();
 ondas.forEach((onda, indice) => { for (const passo of onda) ondaDe.set(passo.slug, indice + 1); });
-const bloqueadas = porConstruir.filter((slug) => !prontas.has(slug));
 if (bloqueadas.length > 0) {
   err(`não há ordem de construção para ${bloqueadas.join(', ')} — cada uma precisa de dois vizinhos já ` +
     `construídos, e nenhum deles existe (o \`new-room\` escreve a porta de chegada no destino)`);
+}
+
+// E a cobertura: uma aresta do mapa entre duas salas planeadas só é escrita pela que nasce em segundo
+// lugar. Se as duas caírem na **mesma** onda, ninguém a escreve e a porta fica por criar — o mapa
+// estaria certo no fim e a obra parava a meio. Foi uma onda que juntou a `scene22` e a `scene23`
+// (vizinhas) que ensinou isto.
+if (bloqueadas.length === 0) {
+  const { cobertas, chave } = arestasCobertas(ondas);
+  for (const [a, b] of pares) {
+    if (construidas.has(a) && construidas.has(b)) continue;
+    if (cobertas.has(chave(a, b))) continue;
+    err(`${a} e ${b}: são vizinhas e nenhuma das duas escreve a porta — a construção por ondas não as ` +
+      `separa (a aresta chega quando a segunda nascer, e nenhuma nasce depois da outra)`);
+  }
 }
 
 // A simulação: o mapa pode estar certo no fim e errado **pelo caminho**. Cada passo da ordem tem de
@@ -382,7 +369,7 @@ const aMudar = salas.filter((slug) => construidas.has(slug) &&
   [...vizinhos.get(slug)].some((alvo) => !construidas.has(alvo)));
 
 console.log(`mapa: data/mapa.json — ${salas.length} sala(s), ${pares.length} aresta(s)`);
-console.log(`construídas: ${construidas.size} · planeadas: ${porConstruir.length}`);
+console.log(`construídas: ${construidas.size} · planeadas: ${salas.length - construidas.size}`);
 console.log(`portas: ${salas.reduce((n, slug) => n + portas(slug), 0)} nas salas + ${salas.length} no portão ` +
   `= ${totalPortas} · retratos (par .jpg + .png): ${totalPortas * 2}`);
 console.log(`lugares livres no mapa: ${livres}`);
