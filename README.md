@@ -271,7 +271,7 @@ A mesma informação vive em `docs/ROADMAP.md` (§3, decisões **D15** e **D17**
 **sem se repetirem**: `README.md` (a regra) → `docs/ROADMAP.md` (o porquê) →
 `skills_index.md` (o inventário, único dono dos números) + `HARNESS_LOG.md` (a história).
 
-## Estado atual do código (v0.0.34)
+## Estado atual do código (v0.0.35)
 
 > **Atualização (2026-11-01, a costura das travessias — D78):** a costura (D46) estava vermelha e o autor
 > pediu para a fechar. Apareceram **quatro** causas. A primeira era um defeito de sempre: a **chegada
@@ -690,6 +690,35 @@ decisões **D69** a **D76**
 geometria e o que cada bateria mediu. Nada do que o visitante já conhecia mudou de comportamento: as
 obras das salas 1 a 10 são as mesmas, a sala 2 tem as mesmas portas e as salas 4 a 10 ganham só a porta
 nova da noite, e as notas abaixo continuam a valer.
+
+A **v0.0.35** é a **D105**, e fecha o último ficheiro partilhado da linha de montagem: a folha das
+obras.
+
+**O problema.** O autor entrega as obras numa folha — `id`, nome, autores, descritivo, a capa e o
+site — e essa folha virava **uma** `data/obras.tsv` com as 27 salas. Com catorze agentes a trabalhar
+ao mesmo tempo, isso era catorze processos a reescrever o mesmo ficheiro: exactamente o que a D96
+existe para impedir.
+
+**A saída.** Cada sala nova tem agora a **sua** folha, `data/obras/sceneNN.tsv` — catorze ficheiros,
+com o cabeçalho certo e o slug já na primeira coluna. O agente preenche só a sua e aplica com
+`from-csv.mjs --file data/obras/scene14.tsv`, que já existia para os exemplos. No fim de uma ronda, uma
+vez, `consolidar.mjs` leva as linhas de cada folha para a mãe. Medido: um teste levou duas obras
+novas para a mãe com um diff de **+2 linhas** (as treze salas antigas intactas), e a segunda passagem
+disse `nada a fazer`. As catorze folhas de hoje estão vazias e a mãe ficou nos seus 67 — uma folha
+vazia não apaga nada.
+
+**E a folha do autor não entra como está.** Três conversões, todas mecânicas: o `mundo` como primeira
+coluna (a folha do autor é de uma sala só, e não repete o slug), o `id` de **0** a N−1 (o `id` é o
+número da obra no editor, e a quarta obra é a `3`), e os endereços do Drive de
+`/file/d/<ID>/view` — que é uma **página** e não carrega — para `lh3.googleusercontent.com/d/<ID>`.
+A tabela está no guia (§4.1), com o erro exacto de cada uma.
+
+**Duas correcções que a folha de exemplo revelou.** O importador dizia `falta o mundo ou o id` quando
+a coluna `mundo` não existia; passou a dizer **qual** é: `falta a coluna "mundo" — acrescente-a como
+PRIMEIRA coluna`. E a SPEC afirmava que «as obras entram pela folha, não pelo editor» — falso: a folha
+**preenche** a ficha de uma obra que o editor criou, e uma linha para uma obra inexistente responde
+`obra 0 não existe no mundo scene14`. Agora diz isso, e diz a ordem da linha de montagem:
+**composição → retratos → folha → validate** (a folha não grava enquanto a L9 estiver vermelha).
 
 A **v0.0.34** é o **primeiro marco da exposição completa**: as **27 salas existem** no dado. O
 `construir.mjs --todas` correu em **5 segundos** e o juiz fechou em `mapa: OK` — 27 salas, 49 arestas,
@@ -2534,6 +2563,7 @@ Corre, por esta ordem, as baterias que decidem uma alteração e devolve **um** 
 | `tools/scene/construir.mjs` | o **orquestrador das ondas** (D104): abre as salas planeadas na ordem que o grafo permite, em paralelo dentro de cada onda, e fecha tudo com **um** `integrar`. `--seco`, `--todas`, `--ondas 1,2`. Só levanta esqueletos: as obras, a composição e os retratos são do autor |
 | `tools/scene/ondas.mjs` | a conta das ondas, numa casa só: a sala precisa de duas vizinhas construídas, e duas vizinhas **entre si** nunca caem na mesma onda (a porta entre elas é escrita pela que nasce depois) |
 | `tools/scene/abrir-mapa.mjs` | o que seria preciso para abrir mais frentes: `--seco` diz quantas arestas faltam, `--teto N` diz se um limite de portas por sala as faria caber. Não muda a L24 |
+| `tools/artwork/consolidar.mjs` | a **consolidação** das folhas por sala na folha-mãe (D105): mantém a ordem das salas que já lá estavam, põe as novas no fim e não apaga nada com uma folha vazia. `--check` diz o que faria |
 | `tools/scene/integrar.mjs` | o **fecho da ronda** (D102): põe as portas no portão e as chegadas que faltam em cada destino, corre os anéis, o giro, os buracos, o sorteio (só nas portas novas) e o validador **uma vez**. Idempotente: a segunda passagem diz `nada a fazer`. `--seco` diz o que faria |
 | `tools/coordination/status.mjs` | quem está a escrever nos mundos agora, e se o dono da trava está morto (o próximo a chegar reclama-a) |
 | `tools/server/selftest.mjs` | a **gravação do editor** por HTTP: origem, tipo, versão, validação, cópia de segurança e escrita atómica. Ficou de fora das baterias desde a D48 — e foi assim que a gravação passou meses a devolver 500. Entrou no `all.mjs` na v0.0.30 |

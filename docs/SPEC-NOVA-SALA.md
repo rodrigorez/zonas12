@@ -179,13 +179,32 @@ que a fase 7 apanhava em segundos.
 
 ### Fase 0 · A folha das obras (antes de tudo o resto)
 
-As obras entram pela folha, não pelo editor: `data/obras.tsv` é a **fonte da verdade** do nome, dos
-créditos, do descritivo, da capa e do site.
+A **ficha** de cada obra entra pela folha, não pelo editor: `data/obras.tsv` é a **fonte da verdade** do
+nome, dos créditos, do descritivo, da capa e do site. As **obras em si** — quantas, e com que `id` —
+nascem no editor (fase 2, painel Obra): a folha **preenche** uma obra que já exista com aquele `id`, e
+uma linha para uma obra que não existe responde `obra <id> não existe no mundo <slug>`.
 
 ```
 (editar data/obras.tsv: uma linha por obra, colunas por TABULAÇÃO, `mundo` = o slug novo)
 node tools/artwork/from-csv.mjs --check          # mostra o que mudaria, não escreve nada
 ```
+
+A folha que o autor manda **não** tem a coluna `mundo` (a sala é uma só, e ele não repete o slug em cada
+linha) nem o `id` a começar no zero, e os endereços do Drive vêm na forma `/file/d/<ID>/view`, que é uma
+**página** e não carrega. As três conversões — `mundo` à esquerda, `id` de 0 a N−1, e
+`lh3.googleusercontent.com/d/<ID>` — estão no guia (§4.1), com a mensagem exata que o importador dá
+quando a primeira falta: `falta a coluna "mundo" — acrescente-a como PRIMEIRA coluna`.
+
+**Uma folha por sala, e a mãe no fim (D105).** Cada sala nova tem a sua folha em `data/obras/sceneNN.tsv`
+— e é essa que o agente preenche, sem tocar em `data/obras.tsv`:
+
+```
+node tools/artwork/from-csv.mjs --file data/obras/scene14.tsv --check
+node tools/artwork/from-csv.mjs --file data/obras/scene14.tsv
+```
+
+No fim de uma ronda, uma vez: `node tools/artwork/consolidar.mjs` leva as linhas de cada folha de sala
+para a folha-mãe, mantendo a ordem das salas que já lá estavam e sem apagar nada com uma folha vazia.
 
 - **Tem de dizer:** ou `a folha não muda nada: o dado já diz o mesmo` (quando já está aplicada, saída
   **0**), ou a lista do que mudaria e, no fim, `mudaria: <mundos> (nada foi escrito: --check)` — que

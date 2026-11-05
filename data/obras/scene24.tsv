@@ -1,0 +1,30 @@
+# data/obras/scene24.tsv — as obras da sala scene24, para preencher e importar.
+#
+# A folha da sala existe para o trabalho correr em paralelo: cada agente escreve SÓ a sua, e
+# ninguém toca em `data/obras.tsv` (a folha-mãe, que é a fonte da verdade e onde tudo se consolida
+# no fim). O importador aceita uma folha à parte sem tocar na definitiva:
+#
+#   node tools/artwork/from-csv.mjs --file data/obras/scene24.tsv --check
+#   node tools/artwork/from-csv.mjs --file data/obras/scene24.tsv
+#
+# Regras (as mesmas da folha-mãe): colunas separadas por TABULAÇÃO e **sem aspas** — a vírgula e o
+# ponto e vírgula são texto, não separadores. Uma linha que começa por # é ignorada. O ficheiro tem
+# de ser UTF-8.
+#
+# As nove colunas, por ordem:
+#   mundo ................. scene24 (não se muda: é por ela que o importador sabe de que sala se fala)
+#   id .................... o número da obra dentro da sala (0, 1, 2…). **Não se muda.**
+#   nome da obra .......... o nome que aparece na ficha e no rótulo da sala.
+#   nomeAutores ........... quem fez a obra. Vários nomes na MESMA célula, separados por vírgula.
+#   nomeCoautores ......... co-autoria, mesma regra. Vazio = a ficha não mostra a linha.
+#   nomaColaboradores ..... colaborações, mesma regra. Vazio = a ficha não mostra a linha.
+#   Descritivo ............ o texto da ficha (a sinopse). Uma frase ou duas.
+#   endereço da imagem .... a capa: um caminho do projeto (assets/artworks/x.jpg) ou um endereço.
+#   endereço da obra ...... o site da obra, se for um jogo ou uma escultura. Um só por obra.
+#
+# Abaixo, uma linha de exemplo **comentada**: copie, tire o # e preencha. Enquanto estiver
+# comentada, esta folha não importa nada — e é isso que se quer numa folha por preencher.
+#
+# scene24	0	Nome da obra 1	Autoria			Uma ou duas frases sobre a obra.	assets/artworks/exemplo.jpg	
+
+mundo	id	nome da obra	nomeAutores	nomeCoautores	nomaColaboradores	Descritivo	endereço da imagem	endereço da obra

@@ -146,26 +146,44 @@ export function detectSeparator(text) {
   return semicolons > commas ? ';' : ',';
 }
 
-// As linhas com conteúdo, já em objectos: os comentários e a linha de cabeçalho ficam de fora. O
-// cabeçalho é procurado pela forma comparável (`key`), e uma coluna que não esteja no ficheiro vale a
-// sua posição no padrão — é o que faz uma folha sem o `mundo` falhar na primeira linha em vez de
-// escrever em todos os mundos.
+// O cabeçalho de uma linha, pelas formas comparáveis dos nomes das colunas (D62). Uma coluna que não
+// esteja no ficheiro fica a `-1` — é o que faz uma folha sem o `mundo` falhar na primeira linha em vez
+// de escrever em todos os mundos.
+function mapaDoCabecalho(row) {
+  const header = row.map(key);
+  const index = {};
+  for (const name of COLUMNS) {
+    const candidatos = [name, ...(SYNONYMS[name] || [])].map(key);
+    const encontrado = candidatos.map((cada) => header.indexOf(cada)).find((at) => at >= 0);
+    index[name] = encontrado === undefined ? -1 : encontrado;
+  }
+  return index;
+}
+
+// Que colunas do padrão a folha **não** tem. Existe por causa da folha que o autor manda: ela nasce
+// numa folha de cálculo sem a coluna `mundo` (a sala é uma só, e o autor não tem por que a repetir em
+// todas as linhas), e o erro que dava — «falta o mundo ou o id» — não dizia qual das duas coisas era.
+export function colunasEmFalta(text) {
+  for (const row of parseCsv(text, detectSeparator(text))) {
+    if ((row[0] || '').trim().startsWith('#')) continue;
+    const index = mapaDoCabecalho(row);
+    return COLUMNS.filter((name) => index[name] < 0);
+  }
+  return COLUMNS.slice();
+}
+
+// As linhas com conteúdo, já em objectos: os comentários e a linha de cabeçalho ficam de fora.
 export function readRows(text) {
   const rows = parseCsv(text, detectSeparator(text));
   const index = {};
   const lines = [];
   let seenHeader = false;
-  const wanted = (name) => [name, ...(SYNONYMS[name] || [])].map(key);
   for (const row of rows) {
     const first = (row[0] || '').trim();
     if (first.startsWith('#')) continue;
     if (!seenHeader) {
       seenHeader = true;
-      const header = row.map(key);
-      COLUMNS.forEach((name) => {
-        const match = wanted(name).map((candidate) => header.indexOf(candidate)).find((at) => at >= 0);
-        index[name] = match === undefined ? -1 : match;
-      });
+      Object.assign(index, mapaDoCabecalho(row));
       continue;
     }
     const value = (name) => {
@@ -354,6 +372,7 @@ function main() {
   }
   const sheet = decodeSheet(readFileSync(CSV));
   const rows = readRows(sheet.text);
+  const faltam = colunasEmFalta(sheet.text);
   const worlds = new Map();
   const problems = [];
   const touched = new Set();
@@ -362,7 +381,17 @@ function main() {
   const comErro = new Set();
 
   for (const row of rows) {
-    if (!row.world || !row.id) { problems.push(`linha ${row.line}: falta o mundo ou o id`); continue; }
+    if (!row.world || !row.id) {
+      // A folha do autor chega sem o `mundo` (a sala é uma só, e não se repete a coluna em cada linha).
+      // Dizer «falta o mundo» é dizer o que fazer; «falta o mundo ou o id» obrigava a adivinhar.
+      problems.push(faltam.includes('mundo')
+        ? `linha ${row.line}: falta a coluna "mundo" — acrescente-a como PRIMEIRA coluna, com o slug ` +
+          `da sala em todas as linhas (a folha do autor costuma começar no "id")`
+        : faltam.includes('id')
+          ? `linha ${row.line}: falta a coluna "id" — é o número da obra no editor (0, 1, 2…)`
+          : `linha ${row.line}: falta o mundo ou o id`);
+      continue;
+    }
     // Uma linha com mais células do que colunas tem um separador a mais lá dentro — o caso clássico é
     // uma descrição com vírgula numa folha separada por vírgulas. Dizer isto é melhor do que deixar os
     // campos escorregar uma coluna e falhar «obra tal não existe».
