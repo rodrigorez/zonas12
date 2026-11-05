@@ -76,6 +76,41 @@
         "pt": "Retrato do mundo scene25, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene25 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1Su5ejwbHbNwgq8jip-i_pXOJhqCWf7Fo",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Conexión Perdida"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1V94r-LiCYVNE8wK9mbA97nW-RxvnDJm9",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra ¿Quieres?"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1T6Vnb8fdOjotieYni0M8S5rOVdNXd58w",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Vivienda a la fuga / Habitação em fuga"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/18lvXoyCxSqsuihmk_o5faCf3AfpLrfi0",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Anesthesia For the Scrolling Mind"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1MzBbEkIc_orISoKcfAge1rA5CJwrJj8n",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Face to Face"
+      }
     }
   },
   "dimensions": [
@@ -99,15 +134,166 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        35.27,
+        1.5,
+        -48.54
+      ],
+      "rotation": [
+        0,
+        -36,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Conexión Perdida"
+      },
+      "authors": "Cristina Marín",
+      "synopsis": {
+        "pt": "Conexão Perdida explora a fragilidade dos relacionamentos. Dois pontos de luz representam um laço que se enfraquece à medida que nos distanciamos, refletindo nosso desejo de nos agarrarmos à conexão e a aceitação de que algumas relações são temporárias."
+      },
+      "site": "https://editor.p5js.org/criistinamaring/full/My0Xapkkx"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        57.06,
+        1.5,
+        18.54
+      ],
+      "rotation": [
+        0,
+        -108,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "¿Quieres?"
+      },
+      "authors": "Alehoney",
+      "synopsis": {
+        "pt": "Encontro casual na porta de uma boate onde o tabaco serve de pretexto para romper a frieza das relações humanas na cidade. Uma simulação web interativa que aborda conversas constrangedoras e a necessidade mútua de atenuar a solidão na noite."
+      },
+      "site": "https://editor.p5js.org/alejandrogg100/full/pgvU-208E"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        0,
+        1.5,
+        60
+      ],
+      "rotation": [
+        0,
+        -180,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Vivienda a la fuga / Habitação em fuga"
+      },
+      "authors": "Eneas Samuel Linares Cabeza",
+      "synopsis": {
+        "pt": "Obra interativa sobre o afastamento de uma habitação própria. Um túnel infinito cheio de cabos prende o espectador, materializando os problemas de acesso ao lar."
+      },
+      "site": "https://editor.p5js.org/eneassamuel/full/gliifchXM"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        -57.06,
+        1.5,
+        18.54
+      ],
+      "rotation": [
+        0,
+        -252,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Anesthesia For the Scrolling Mind"
+      },
+      "authors": "Raúl Ramos",
+      "synopsis": {
+        "pt": "Esta obra explora a evasão digital e a hipersexualização. Ao clicar num telemóvel flutuante, um cenário cinzento e chuvoso transforma-se num universo néon. O utilizador controla a personagem entre figuras flutuantes, expondo a sobreestimulação virtual como um anestésico temporário perante a realidade."
+      },
+      "site": "https://editor.p5js.org/raul160101/full/UY802cCy_"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -35.27,
+        1.5,
+        -48.54
+      ],
+      "rotation": [
+        0,
+        -324,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Face to Face"
+      },
+      "authors": "Candela ; Ashley",
+      "synopsis": {
+        "pt": "Face to Face reinterpreta Pong, tornando os jogadores parte da interface. Cada jogador tira uma fotografia que se transforma numa raquete. A obra explora como a identidade muda ao passar do espaço físico para o digital e como nos representamos nele."
+      },
+      "site": "https://editor.p5js.org/ashligroj/full/BPx1OFsJg"
+    }
+  ],
   "portals": [
     {
       "id": 0,
       "ownedBy": 0,
       "position": [
+        14.08,
         0,
-        0,
-        -90
+        -88.89
       ],
       "width": 10,
       "height": 12,
@@ -143,7 +329,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        0,
+        -9,
         0
       ],
       "motion": {
@@ -168,9 +354,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        90,
+        88.89,
         0,
-        0
+        14.08
       ],
       "width": 10,
       "height": 12,
@@ -200,7 +386,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene15-de-scene26",
-        "azimuth": 18,
+        "azimuth": 9,
         "reality": [
           {
             "az0": 51.88,
@@ -217,7 +403,7 @@
       "arrivalFrom": "scene15",
       "rotation": [
         0,
-        -90,
+        -99,
         0
       ],
       "motion": {
@@ -242,9 +428,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
+        -14.08,
         0,
-        0,
-        90
+        88.89
       ],
       "width": 10,
       "height": 12,
@@ -277,9 +463,9 @@
         "azimuth": -90,
         "reality": [
           {
-            "az0": 43.03,
+            "az0": 52.03,
             "el0": -0.74,
-            "az1": 46.25,
+            "az1": 55.25,
             "el1": 4.83
           }
         ]
@@ -291,7 +477,7 @@
       "arrivalFrom": "scene27",
       "rotation": [
         0,
-        -180,
+        -189,
         0
       ],
       "motion": {
@@ -316,9 +502,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        -90,
+        -88.89,
         0,
-        0
+        -14.08
       ],
       "width": 10,
       "height": 12,
@@ -348,12 +534,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene25-de-scene26",
-        "azimuth": 90,
+        "azimuth": 36,
         "reality": [
           {
-            "az0": -1.6,
+            "az0": -46.6,
             "el0": -0.51,
-            "az1": 1.6,
+            "az1": -43.4,
             "el1": 3.32
           }
         ]
@@ -365,7 +551,7 @@
       "arrivalFrom": "scene25",
       "rotation": [
         0,
-        -270,
+        -279,
         0
       ],
       "motion": {

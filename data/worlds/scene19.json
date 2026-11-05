@@ -76,6 +76,48 @@
         "pt": "Retrato do mundo scene20, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene20 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1Buy0uXcfsW-LNURIneQkicatTqdkjefh",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Sin Colgar"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1mv_FFUV62dUC6qIrTBV_UMMNytRJ9KpL",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Quiero dejar mi nombre, eterno en tus hogares"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1mx-i5Vkz9Aj1NhJawIbaLw7nsHIcKwlr",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Borrador para una horda de amazonas (Draft for a Horde of Amazons)"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/17lS1rchDbt80u6SreRYSVTM3OqU5yvuf",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra El Castillo"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1uH2O1cCTSbuHisAt4zt3Qkg0JNgj8BgM",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Heráldica para tiempos convulsos"
+      }
+    },
+    "capa-6": {
+      "path": "https://lh3.googleusercontent.com/d/1KmRGMHQCEqQy1SfApyBr5sAyt0t68-Ry",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Vá, Pensiero"
+      }
     }
   },
   "dimensions": [
@@ -99,15 +141,197 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        30,
+        1.5,
+        -51.96
+      ],
+      "rotation": [
+        0,
+        -30,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Sin Colgar"
+      },
+      "authors": "Esterbel",
+      "synopsis": {
+        "pt": "Sin Colgar é um autorretrato audiovisual sobre hiperconectividade e esgotamento mental. Imagens de tensão, chamadas, digitação e alarmes criam uma experiência de saturação. Aos 1 minuto e 16 segundos, o silêncio interrompe o ruído como gesto de pausa, alívio e resistência."
+      },
+      "site": "https://drive.google.com/file/d/1sSRAEqMJperU9UqEQcALJuHpbZ6QL15S/preview"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        60,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Quiero dejar mi nombre, eterno en tus hogares"
+      },
+      "authors": "Paula G. Robleño",
+      "synopsis": {
+        "pt": "A peça analisa América y sus mujeres (1890), da Baronesa Emilia Serrano de Wilson: dois registros da sua escrita que nunca coincidem – uma linguagem exclamativa que sublima a paisagem americana frente a um relato banalizado do espólio. O oscilograma vibrátil torna audível essa distância: um zumbido contido, ainda hoje, na violência colonial"
+      },
+      "site": "https://vimeo.com/1230703565"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        30,
+        1.5,
+        51.96
+      ],
+      "rotation": [
+        0,
+        -150,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Borrador para una horda de amazonas (Draft for a Horde of Amazons)"
+      },
+      "authors": "O.R.G.I.A (Carmen Muriana y Tatiana Sentamans)",
+      "coAuthors": "Laboratorio de prototipado, Fundación Universidad Miguel Hernández (Spain)",
+      "synopsis": {
+        "pt": "Este é um vídeo-ensaio sobre a raiva, a autodefesa transfeminista e as memórias perdidas. Ele articula a narrativa própria de um acervo lítico composto por pontas de lança e flecha com imagens inéditas das filmagens na Espanha do filme As Amazonas, de 1973 (Os Arquivos Secretos do NO-DO Rtve2025). É um rascunho para uma horda de amazonas."
+      },
+      "site": "https://vimeo.com/1231786379?share=copy&fl=sv&fe=ci"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        -30,
+        1.5,
+        51.96
+      ],
+      "rotation": [
+        0,
+        -210,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "El Castillo"
+      },
+      "authors": "/ javi moreno",
+      "synopsis": {
+        "pt": "."
+      },
+      "site": "https://youtu.be/GXIqVP9g6Jg?si=JBnO4JO6cD43Tj5D"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -60,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        -270,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Heráldica para tiempos convulsos"
+      },
+      "authors": "José Vicente Martín Martínez; Guillem Martín Llàcer",
+      "synopsis": {
+        "pt": "A obra mostra como o surgimento de partidos fascistas e nacional-socialistas foi um fenômeno abrangente. A intenção do projeto é estabelecer um paralelo implícito entre o período entre guerras e os tempos atuais, bem como o ressurgimento e a popularização de ideias que apresentam semelhanças inquietantes."
+      },
+      "site": "https://drive.google.com/file/d/125Y9sviz8n2rno6JCRJT4GTNhsPSP2aK/preview"
+    },
+    {
+      "id": 6,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-6",
+      "position": [
+        -30,
+        1.5,
+        -51.96
+      ],
+      "rotation": [
+        0,
+        -330,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Vá, Pensiero"
+      },
+      "authors": "Llinares",
+      "synopsis": {
+        "pt": "Uma pequena casa é destruída por uma bomba enquanto algumas crianças brincam ao seu redor. A obra representa a destruição do lar e o deslocamento do povo palestino em Gaza. Va, pensiero, o canto dos hebreus exilados em Nabucco, introduz um paradoxo histórico deliberado."
+      },
+      "site": "https://drive.google.com/file/d/10fDvZ4tu608MKl2-mT-EbYrSPWCe1tp4/preview"
+    }
+  ],
   "portals": [
     {
       "id": 0,
       "ownedBy": 0,
       "position": [
+        23.29,
         0,
-        0,
-        -90
+        -86.93
       ],
       "width": 10,
       "height": 12,
@@ -143,7 +367,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        0,
+        -15,
         0
       ],
       "motion": {
@@ -168,9 +392,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        90,
+        86.93,
         0,
-        0
+        23.29
       ],
       "width": 10,
       "height": 12,
@@ -200,12 +424,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene18-de-scene19",
-        "azimuth": 0,
+        "azimuth": -6,
         "reality": [
           {
-            "az0": 43.03,
+            "az0": 52.03,
             "el0": -0.74,
-            "az1": 46.25,
+            "az1": 55.25,
             "el1": 4.83
           }
         ]
@@ -217,7 +441,7 @@
       "arrivalFrom": "scene18",
       "rotation": [
         0,
-        -90,
+        -105,
         0
       ],
       "motion": {
@@ -242,9 +466,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
+        -23.29,
         0,
-        0,
-        90
+        86.93
       ],
       "width": 10,
       "height": 12,
@@ -274,7 +498,7 @@
         "radius": 120,
         "shaderId": "noite-aurora",
         "cutout": "recorte-scene4-de-scene19",
-        "azimuth": -72,
+        "azimuth": -87,
         "reality": [
           {
             "az0": 51.88,
@@ -291,7 +515,7 @@
       "arrivalFrom": "scene4",
       "rotation": [
         0,
-        -180,
+        -195,
         0
       ],
       "motion": {
@@ -316,9 +540,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        -90,
+        -86.93,
         0,
-        0
+        -23.29
       ],
       "width": 10,
       "height": 12,
@@ -348,12 +572,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene20-de-scene19",
-        "azimuth": 0,
+        "azimuth": -60,
         "reality": [
           {
-            "az0": -46.25,
+            "az0": -91.25,
             "el0": -0.74,
-            "az1": -43.03,
+            "az1": -88.03,
             "el1": 4.83
           }
         ]
@@ -365,7 +589,7 @@
       "arrivalFrom": "scene20",
       "rotation": [
         0,
-        -270,
+        -285,
         0
       ],
       "motion": {

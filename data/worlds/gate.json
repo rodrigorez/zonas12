@@ -1492,7 +1492,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene16-de-gate",
-        "azimuth": -73.3
+        "azimuth": -42.5
       },
       "action": {
         "kind": "navigate",
@@ -1624,7 +1624,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene18-de-gate",
-        "azimuth": -153.3
+        "azimuth": -144.3
       },
       "action": {
         "kind": "navigate",
@@ -1690,7 +1690,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene19-de-gate",
-        "azimuth": 153.3
+        "azimuth": 168.3
       },
       "action": {
         "kind": "navigate",
@@ -1756,7 +1756,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene20-de-gate",
-        "azimuth": 113.3
+        "azimuth": 68.3
       },
       "action": {
         "kind": "navigate",
@@ -1822,7 +1822,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene21-de-gate",
-        "azimuth": 73.3
+        "azimuth": 88.3
       },
       "action": {
         "kind": "navigate",
@@ -1888,7 +1888,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene22-de-gate",
-        "azimuth": 33.3
+        "azimuth": 42.3
       },
       "action": {
         "kind": "navigate",
@@ -1954,7 +1954,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene23-de-gate",
-        "azimuth": -6.7
+        "azimuth": 8.3
       },
       "action": {
         "kind": "navigate",
@@ -2086,7 +2086,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene25-de-gate",
-        "azimuth": -86.7
+        "azimuth": -131.7
       },
       "action": {
         "kind": "navigate",
@@ -2152,7 +2152,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene26-de-gate",
-        "azimuth": -126.7
+        "azimuth": -117.7
       },
       "action": {
         "kind": "navigate",
@@ -2218,7 +2218,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene27-de-gate",
-        "azimuth": -166.7
+        "azimuth": -157.7
       },
       "action": {
         "kind": "navigate",

@@ -76,6 +76,41 @@
         "pt": "Retrato do mundo scene26, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene26 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1UCGang8zspMzO-t8J7_Jwv4f357OUj7U",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Mientras miras"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1IO_jO2GjZK6lH20kQH7J1p9YpZIQPTO-",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Poéticas de un corazón roto"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1BbPgbhrRjyyv8nYF7VxRQlnlc1JCRcC9",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra EU"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/16Gx7n5DG80TjLWW-ioq2aYoVJnUKZMni",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Alma"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1fXANOepi3Bzj2wS2Rlvh3wFyX81ynCva",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra ¡Crea el cuerpo perfecto!"
+      }
     }
   },
   "dimensions": [
@@ -99,15 +134,167 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        35.27,
+        1.5,
+        -48.54
+      ],
+      "rotation": [
+        0,
+        -36,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Mientras miras"
+      },
+      "authors": "Alejandro Osuna Pacheco Claudia Sanchez Campos Carolina Bermejo Soria",
+      "coAuthors": "Claudia Sanchez Campos; Carolina Bermejo Soria; Alejandro Osuna Pacheco",
+      "synopsis": {
+        "pt": "A obra propõe um paradoxo: embora o participante saiba que as categorias são instáveis, procura somar pontos e superar os restantes. O jogo transforma a classificação em desejo e questiona a vigilância. As barras mostram como uma interface pode fazer com que algo arbitrário pareça objetivo."
+      },
+      "site": "https://editor.p5js.org/aleosupa/full/tg_S3e7E_"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        57.06,
+        1.5,
+        18.54
+      ],
+      "rotation": [
+        0,
+        -108,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Poéticas de un corazón roto"
+      },
+      "authors": "Nightingale",
+      "synopsis": {
+        "pt": "Esta obra interativa, estilo videogame, une arte e luto através do movimento das mãos sem tocar na tela. Cada usuário cria uma melodia e um rastro de palavras efémeras e irrepetíveis. É uma ode à memória que nos convida a curar a dor e a desfrutar do presente sendo humanos."
+      },
+      "site": "https://editor.p5js.org/daniidodraws/full/rBA-fgkvh"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        0,
+        1.5,
+        60
+      ],
+      "rotation": [
+        0,
+        -180,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "EU"
+      },
+      "authors": "Kokeshi; Raider",
+      "synopsis": {
+        "pt": "É a mesma"
+      },
+      "site": "https://editor.p5js.org/joseandres.lunabenito/full/p-qeSBOIi"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        -57.06,
+        1.5,
+        18.54
+      ],
+      "rotation": [
+        0,
+        -252,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Alma"
+      },
+      "authors": "bonaxrt; kikqueart",
+      "synopsis": {
+        "pt": "A poluição que mancha e transforma a natureza"
+      },
+      "site": "https://editor.p5js.org/ana.brodriguez868/full/cozZzPqB4"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -35.27,
+        1.5,
+        -48.54
+      ],
+      "rotation": [
+        0,
+        -324,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "¡Crea el cuerpo perfecto!"
+      },
+      "authors": "cherri",
+      "synopsis": {
+        "pt": "Com esta obra interativa, a autora faz uma crítica ao padrão de beleza imposto pela sociedade, no qual se exige de nós uma perfeição irreal e inalcançável. Por isso, podemos deformar de maneira aleatória e sutil — tal como na vida real — o boneco central, gerando uma certa dismorfia."
+      },
+      "site": "https://editor.p5js.org/cherriart/full/Jm3VhiuBi"
+    }
+  ],
   "portals": [
     {
       "id": 0,
       "ownedBy": 0,
       "position": [
+        14.08,
         0,
-        0,
-        -90
+        -88.89
       ],
       "width": 10,
       "height": 12,
@@ -143,7 +330,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        0,
+        -9,
         0
       ],
       "motion": {
@@ -168,9 +355,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        90,
+        88.89,
         0,
-        0
+        14.08
       ],
       "width": 10,
       "height": 12,
@@ -200,12 +387,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene16-de-scene27",
-        "azimuth": 18,
+        "azimuth": 39.9,
         "reality": [
           {
-            "az0": 51.88,
+            "az0": 82.73,
             "el0": -0.91,
-            "az1": 55.12,
+            "az1": 85.97,
             "el1": 5.87
           }
         ]
@@ -217,7 +404,7 @@
       "arrivalFrom": "scene16",
       "rotation": [
         0,
-        -90,
+        -99,
         0
       ],
       "motion": {
@@ -242,9 +429,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
+        -14.08,
         0,
-        0,
-        90
+        88.89
       ],
       "width": 10,
       "height": 12,
@@ -274,7 +461,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene17-de-scene27",
-        "azimuth": -72,
+        "azimuth": -81,
         "reality": [
           {
             "az0": 51.88,
@@ -291,7 +478,7 @@
       "arrivalFrom": "scene17",
       "rotation": [
         0,
-        -180,
+        -189,
         0
       ],
       "motion": {
@@ -316,9 +503,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        -90,
+        -88.89,
         0,
-        0
+        -14.08
       ],
       "width": 10,
       "height": 12,
@@ -351,9 +538,9 @@
         "azimuth": 90,
         "reality": [
           {
-            "az0": -1.6,
+            "az0": 7.4,
             "el0": -0.51,
-            "az1": 1.6,
+            "az1": 10.6,
             "el1": 3.32
           }
         ]
@@ -365,7 +552,7 @@
       "arrivalFrom": "scene26",
       "rotation": [
         0,
-        -270,
+        -279,
         0
       ],
       "motion": {

@@ -76,6 +76,62 @@
         "pt": "Retrato do mundo scene23, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene23 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/15UpWeu-k2BwknXy5RHnLngck9QiLXOZg",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Líneas de horizonte"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1VI63gq5HPIAHYMBalerjrMoOvMp5fY3A",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Un fluir cálido. 007-800-013"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/17cvfnqIoezu7dsjhshdG4cmJ3ZKJ5sfD",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra La arquitectura del murmullo / A arquitetura do murmúrio / The Architecture of Murmurs"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1HQroopyevvF0i0uCiNg8sdHoaEFt8cZ2",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra María y las noches"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1WQUoSS4ITdSm4nXmVBejJ84v6P4nRGbi",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra De aquellas migas naceresmos todas"
+      }
+    },
+    "capa-6": {
+      "path": "https://lh3.googleusercontent.com/d/1QFU3brq4a1Q2Psa2kxQ8ukhIqeewZPdD",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra NADIE PUEDE DIBUJAR SU PROPIA SOMBRA"
+      }
+    },
+    "capa-7": {
+      "path": "https://lh3.googleusercontent.com/d/1RXObPmxszhOja9gPb81Nn7-XSLaGmpds",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra 24h en una celda. Prisiones franquistas de València"
+      }
+    },
+    "capa-8": {
+      "path": "https://lh3.googleusercontent.com/d/1_nvobNyQboEGHnA1DX5-Hw94dk5ATfwN",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra GEMELAS ARBUS, 2023"
+      }
     }
   },
   "dimensions": [
@@ -99,7 +155,248 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        22.96,
+        1.5,
+        -55.43
+      ],
+      "rotation": [
+        0,
+        -22.5,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Líneas de horizonte"
+      },
+      "authors": "Alfredo Guillamón",
+      "synopsis": {
+        "pt": "Esta obra surge de uma haste metálica reta que, por meio de dobras e deslocamentos sucessivos, transforma-se em uma forma escultórica. O processo desenvolve-se a partir da improvisação: cada gesto condiciona o seguinte. O vídeo registra essa sequência de decisões e transformações em ação."
+      },
+      "site": "https://youtu.be/RpcjebbXmQ0"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        55.43,
+        1.5,
+        -22.96
+      ],
+      "rotation": [
+        0,
+        -67.5,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Un fluir cálido. 007-800-013"
+      },
+      "authors": "Laura Salguero",
+      "synopsis": {
+        "pt": "Cera, luz e transparência transformam a superfície em um limiar. Un fluir cálido propõe uma imagem em trânsito entre matéria e percepção, na qual o visível parece abrir-se para outro espaço possível."
+      },
+      "site": "https://drive.google.com/file/d/1VI63gq5HPIAHYMBalerjrMoOvMp5fY3A/preview"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        55.43,
+        1.5,
+        22.96
+      ],
+      "rotation": [
+        0,
+        -112.5,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "La arquitectura del murmullo / A arquitetura do murmúrio / The Architecture of Murmurs"
+      },
+      "authors": "Laura Silvestre García",
+      "synopsis": {
+        "pt": "Espiral logarítmica que opera como limiar entre matéria e memória. Esta fotografia explora a concha como uma estrutura que amplifica o murmúrio do tempo. A partir do enquadramento e do estudo da luz, a imagem propõe uma reflexão sobre a soberania do Sul Global a partir da própria geometria da natureza."
+      },
+      "site": "https://drive.google.com/file/d/17cvfnqIoezu7dsjhshdG4cmJ3ZKJ5sfD/preview"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        22.96,
+        1.5,
+        55.43
+      ],
+      "rotation": [
+        0,
+        -157.5,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "María y las noches"
+      },
+      "authors": "Josep Sanmartín",
+      "synopsis": {
+        "pt": "Este trabalho faz parte de uma série sobre María Lázaro, minha avó, que aos 100 anos vive tranquilamente na sua casa em Chulilla. A partir deste lugar, que dá sentido à sua existência, contempla o mundo, imersa nos seus pensamentos e nas memórias de uma vida à qual ainda regressa nas noites de verão."
+      },
+      "site": "https://drive.google.com/file/d/1HQroopyevvF0i0uCiNg8sdHoaEFt8cZ2/preview"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -22.96,
+        1.5,
+        55.43
+      ],
+      "rotation": [
+        0,
+        -202.5,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "De aquellas migas naceresmos todas"
+      },
+      "authors": "Lola Carbonell Payá",
+      "synopsis": {
+        "pt": "A obra evidencia a dimensão ritual do fazer, onde o material, reduzido ao mínimo, nos devolve à questão da origem. O monte de migalhas reúne restos, gestos, memória e herança. Aquilo que permanece pode também ser o início de algo mais, questionando o nosso próprio percurso: de onde viemos e para onde vamos?"
+      },
+      "site": "https://drive.google.com/file/d/1WQUoSS4ITdSm4nXmVBejJ84v6P4nRGbi/preview"
+    },
+    {
+      "id": 6,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-6",
+      "position": [
+        -55.43,
+        1.5,
+        22.96
+      ],
+      "rotation": [
+        0,
+        -247.5,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "NADIE PUEDE DIBUJAR SU PROPIA SOMBRA"
+      },
+      "authors": "Susana & Leo",
+      "synopsis": {
+        "pt": "Leo se filmou desenhando o contorno de sua sombra em uma parede. Então, percebeu que ninguém é capaz de desenhar a própria sombra por completo. Essa é uma boa explicação para o motivo de ele preferir trabalhar com Susana, em espaços experimentais compartilhados que melhoram com a presença do outro."
+      },
+      "site": "https://drive.google.com/file/d/140ugOUgclLr-5Fu3WGokrN9hoByLhoRW/preview"
+    },
+    {
+      "id": 7,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-7",
+      "position": [
+        -55.43,
+        1.5,
+        -22.96
+      ],
+      "rotation": [
+        0,
+        -292.5,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "24h en una celda. Prisiones franquistas de València"
+      },
+      "authors": "Mar Juan Tortosa",
+      "synopsis": {
+        "pt": "A violência foi um elemento estrutural e permanente do franquismo. Após a ocupação de Valência, milhares de republicanos e civis foram detidos e encarcerados. Esta peça sonora reconstrói a experiência de um dia de encarceramento nas prisões franquistas, a partir de investigação histórica e da memória material preservada nos objetos prisionais."
+      },
+      "site": "https://marjuantortosa.es/portfolio/dins-i-fora-paraules-preses-a-la-valencia-de-postguerra-col·leccio-rafael-solaz/"
+    },
+    {
+      "id": 8,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-8",
+      "position": [
+        -22.96,
+        1.5,
+        -55.43
+      ],
+      "rotation": [
+        0,
+        -337.5,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "GEMELAS ARBUS, 2023"
+      },
+      "authors": "MARIA ZARRAGA",
+      "synopsis": {
+        "pt": "Gêmeas Arbus, 2023, uma pequena alusão à obra da fotógrafa Diane Arbus, com a sua famosa fotografia das meninas gémeas e com essa aproximação ao mundo do grotesco, do sombrio e do sinistro. O fundo negro desta composição e uns corpos estranhos representam um autorretrato paródico do lado mais doloroso do nosso ser."
+      },
+      "site": "https://drive.google.com/file/d/1_nvobNyQboEGHnA1DX5-Hw94dk5ATfwN/preview"
+    }
+  ],
   "portals": [
     {
       "id": 0,
@@ -200,12 +497,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene25-de-scene24",
-        "azimuth": 0,
+        "azimuth": -45,
         "reality": [
           {
-            "az0": 43.03,
+            "az0": -1.97,
             "el0": -0.74,
-            "az1": 46.25,
+            "az1": 1.25,
             "el1": 4.83
           }
         ]
@@ -348,12 +645,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene23-de-scene24",
-        "azimuth": 90,
+        "azimuth": 105,
         "reality": [
           {
-            "az0": -1.6,
+            "az0": 13.4,
             "el0": -0.51,
-            "az1": 1.6,
+            "az1": 16.6,
             "el1": 3.32
           }
         ]

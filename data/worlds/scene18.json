@@ -76,6 +76,41 @@
         "pt": "Retrato do mundo scene19, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene19 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1fTA1j9O80IAUtmzu-xu9iTsSOb8zVnTt",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Cuerpo colectivo"
+      }
+    },
+    "capa-2": {
+      "path": "https://drive.google.com/drive/folders/1ImKm8RLT0sIDATymCmkMuMAsbHOwv2h2?usp=drive_link",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Aguja inversa"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/16xCWS6lhkjqVQkLyT5AGAftaq_ROPefS",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Transmut^re"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1alkz0-wJ0-b5hJZinnxSKOgiH9XiL1CY",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Bailando con el sol.... Dibujando poesía"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/10cfCmcabK--QlGT2RTckth3u_LGtlNag",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Cuerpo-Raíz"
+      }
     }
   },
   "dimensions": [
@@ -99,15 +134,166 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        35.27,
+        1.5,
+        -48.54
+      ],
+      "rotation": [
+        0,
+        -36,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Cuerpo colectivo"
+      },
+      "authors": "Colectivo Tránsito",
+      "synopsis": {
+        "pt": "Corpo Coletivo, do Coletivo TRÂNSITO, é uma videoinstalação nascida da experiência de caminhar sem ver. Som, respiração e presença partilhada criam vínculos invisíveis. Em vários ecrãs, os corpos deixam de ser trajetórias individuais para se tornarem uma presença comum."
+      },
+      "site": "https://drive.google.com/drive/folders/1Tp3dejS2awOgHr0s0n8JzJrZ6EKd9t55?usp=share_link"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        57.06,
+        1.5,
+        18.54
+      ],
+      "rotation": [
+        0,
+        -108,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Aguja inversa"
+      },
+      "authors": "Elia Torrecilla",
+      "synopsis": {
+        "pt": "Aguja inversa desloca a obra A Needle Woman, de Kimsooja, através de uma inversão do tempo e do movimento. Em Benidorm, um corpo imóvel observa os transeuntes caminharem para trás. O corpo-agulha cose e fissura o tecido urbano, interrompendo a aceleração e propondo a pausa como forma de resistência e possibilidade de transformação."
+      },
+      "site": "https://drive.google.com/file/d/14ed9wS0SID931ulihXmC3T-6Kni6ayrK/preview"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        0,
+        1.5,
+        60
+      ],
+      "rotation": [
+        0,
+        -180,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Transmut^re"
+      },
+      "authors": "Bibiana de la Soledad",
+      "synopsis": {
+        "pt": "“Transmut^re” parte do corpo como um lugar de intercâmbio: um organismo que recebe, transforma, afeta e é afetado. Cada gesto corporal estabelece vínculos com aquilo que o cerca. A ação se constrói por meio de redes humanas e não humanas afetivas, ambientais e simbólicas para ativar uma experiência ecossistêmica."
+      },
+      "site": "https://drive.google.com/file/d/1SPCF54XF5vCAyvnQp7A_hzcYzOvqBh3Q/preview"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        -57.06,
+        1.5,
+        18.54
+      ],
+      "rotation": [
+        0,
+        -252,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Bailando con el sol.... Dibujando poesía"
+      },
+      "authors": "Xusa Bou",
+      "synopsis": {
+        "pt": "Minha sombra caminha, brinca e se funde com a natureza, enquanto desperta o olhar da minha criança interior. Companheira fiel dos meus passeios, transforma-se em árvore, mão ou figura. Aqui, a sombra não representa escuridão, mas presença: aquilo que permanece ao nosso lado, íntimo e sem nos julgar."
+      },
+      "site": "https://drive.google.com/drive/folders/1z_1S9EJGRiMrab73fvUhENF7BtU5ECGL?usp=sharing"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -35.27,
+        1.5,
+        -48.54
+      ],
+      "rotation": [
+        0,
+        -324,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Cuerpo-Raíz"
+      },
+      "authors": "José Antonio Hinojos",
+      "synopsis": {
+        "pt": "Um corpo duplica-se até se tornar irreconhecível. No espelho, quatro pernas, braços, pescoço e costas criam uma anatomia impossível, sem cabeça, entregue ao gesto de cavar. A enxada penetra na terra e o músculo responde. Corpo e ferramenta fundem-se num único gesto, evocando a força e a memória ancestral do trabalho agrícola."
+      },
+      "site": "https://drive.google.com/file/d/1JTBxb6BWGdkqE0pIzk2ucBmCH7n1JHW6/preview"
+    }
+  ],
   "portals": [
     {
       "id": 0,
       "ownedBy": 0,
       "position": [
+        14.08,
         0,
-        0,
-        -90
+        -88.89
       ],
       "width": 10,
       "height": 12,
@@ -143,7 +329,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        0,
+        -9,
         0
       ],
       "motion": {
@@ -168,9 +354,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        90,
+        88.89,
         0,
-        0
+        14.08
       ],
       "width": 10,
       "height": 12,
@@ -200,7 +386,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene17-de-scene18",
-        "azimuth": -54,
+        "azimuth": -63,
         "reality": [
           {
             "az0": 16.28,
@@ -217,7 +403,7 @@
       "arrivalFrom": "scene17",
       "rotation": [
         0,
-        -90,
+        -99,
         0
       ],
       "motion": {
@@ -242,9 +428,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
+        -14.08,
         0,
-        0,
-        90
+        88.89
       ],
       "width": 10,
       "height": 12,
@@ -274,7 +460,7 @@
         "radius": 120,
         "shaderId": "nuvens",
         "cutout": "recorte-scene3-de-scene18",
-        "azimuth": -72,
+        "azimuth": -81,
         "reality": [
           {
             "az0": 51.88,
@@ -291,7 +477,7 @@
       "arrivalFrom": "scene3",
       "rotation": [
         0,
-        -180,
+        -189,
         0
       ],
       "motion": {
@@ -316,9 +502,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        -90,
+        -88.89,
         0,
-        0
+        -14.08
       ],
       "width": 10,
       "height": 12,
@@ -348,12 +534,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene19-de-scene18",
-        "azimuth": 0,
+        "azimuth": 6,
         "reality": [
           {
-            "az0": -46.25,
+            "az0": -31.25,
             "el0": -0.74,
-            "az1": -43.03,
+            "az1": -28.03,
             "el1": 4.83
           }
         ]
@@ -365,7 +551,7 @@
       "arrivalFrom": "scene19",
       "rotation": [
         0,
-        -270,
+        -279,
         0
       ],
       "motion": {

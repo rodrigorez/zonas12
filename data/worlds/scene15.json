@@ -92,6 +92,41 @@
         "pt": "Retrato do mundo scene26, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene26 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1HBJiKx7hLoGt0pRM54BcqedSgvbyVa_N",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra ecos del abismo"
+      }
+    },
+    "capa-2": {
+      "path": "https://f4.bcbits.com/img/a2859756919_16.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra SoundRide 3"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1Y25mNF6r0ykJ_UtL43tFM5_PdBqmVaQx",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Bajo (Y) Sobre el Mismo Cielo"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1ayOyW1o8YOq9u4kaK2HfCcmO0T_eLMBT",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Fuentes Brotantes"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1IKeBYtR7avK1B2PceQMAj-MFX0QwAiCQ",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Se dice que las cigarras anuncian las lluvias"
+      }
     }
   },
   "dimensions": [
@@ -115,7 +150,158 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        35.27,
+        1.5,
+        -48.54
+      ],
+      "rotation": [
+        0,
+        -36,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "ecos del abismo"
+      },
+      "authors": "Sufei Ke",
+      "synopsis": {
+        "pt": "Ao escutar o som de uma fenda doméstica, questiono a sua história. A crença no processo passo a passo levou-me a procurar respostas em passos humanos a quilómetros de distância. Uma peça audiovisual que transforma o tempo impercetível da fratura numa presença sonora."
+      },
+      "site": "https://youtu.be/xt3OPHzu9xM"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        57.06,
+        1.5,
+        18.54
+      ],
+      "rotation": [
+        0,
+        -108,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "SoundRide 3"
+      },
+      "authors": "Catalano Julio César",
+      "synopsis": {
+        "pt": "Esta é uma peça de música eletroacústica criada utilizando o software Moebius, programado pelo autor no ambiente Max MSP. Este software utiliza centenas de pequenas composições de Julio Catalano, organizadas em bancos de dados específicos, que são recombinadas, sem qualquer uso de memória, para gerar uma composição infinita."
+      },
+      "site": "https://juliocatalano.bandcamp.com/album/soundride"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        0,
+        1.5,
+        60
+      ],
+      "rotation": [
+        0,
+        -180,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Bajo (Y) Sobre el Mismo Cielo"
+      },
+      "authors": "COLECTIVO REFLUXUS; DONATELLA LIVIGNI",
+      "synopsis": {
+        "pt": "Queremos propor um reencantamento do mundo, se trata de um ato de voluntariado filosófico, um retorno a nós mismos através de uma escuta profunda de todos os seres que nos rodeiam. Hay que eleva a frequência do mundo!!!"
+      },
+      "site": "https://drive.google.com/file/d/1gexLs_YjOth6D_-YjETnsmObIRKEzyFN/preview"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        -57.06,
+        1.5,
+        18.54
+      ],
+      "rotation": [
+        0,
+        -252,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Fuentes Brotantes"
+      },
+      "authors": "Daniel Colorado",
+      "synopsis": {
+        "pt": "Esta obra é uma paisagem sonora eletroacústica composta a partir de gravações de campo. A peça convida a uma escuta situada na fronteira entre o orgânico, a memória do espaço e a percepção do nosso entorno."
+      },
+      "site": "https://drive.google.com/drive/folders/1-qcEKHk-7HHnGeFC6n5Y5vggtrAzbJDp?usp=share_link"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -35.27,
+        1.5,
+        -48.54
+      ],
+      "rotation": [
+        0,
+        -324,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Se dice que las cigarras anuncian las lluvias"
+      },
+      "authors": "Valeria Espinosa Galán",
+      "synopsis": {
+        "pt": "Esta proposta de paisagem sonora consiste em gravações de sons de insetos e aves de uma região de Veracruz, no México. A obra revela uma paisagem na qual é representada a associação entre as cigarras e a chuva, assim como o ritual dos Voladores de Papantla e sua flauta tradicional, utilizada para pedir a chuva."
+      },
+      "site": "https://drive.google.com/file/d/1DmOa4GYe-iqUkFGEUnlrOpAnd1-v0ENP/preview"
+    }
+  ],
   "portals": [
     {
       "id": 0,
@@ -364,12 +550,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene16-de-scene15",
-        "azimuth": 108,
+        "azimuth": 138.8,
         "reality": [
           {
-            "az0": -19.48,
+            "az0": 11.37,
             "el0": -0.54,
-            "az1": -16.28,
+            "az1": 14.57,
             "el1": 3.53
           }
         ]
@@ -438,12 +624,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene26-de-scene15",
-        "azimuth": -18,
+        "azimuth": -9,
         "reality": [
           {
-            "az0": -46.25,
+            "az0": -37.24,
             "el0": -0.74,
-            "az1": -43.03,
+            "az1": -34.02,
             "el1": 4.83
           }
         ]

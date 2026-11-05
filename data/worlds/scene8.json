@@ -624,12 +624,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene23-de-scene8",
-        "azimuth": 162,
+        "azimuth": 177,
         "reality": [
           {
-            "az0": 43.03,
+            "az0": 58.02,
             "el0": -0.74,
-            "az1": 46.25,
+            "az1": 61.24,
             "el1": 4.83
           }
         ]

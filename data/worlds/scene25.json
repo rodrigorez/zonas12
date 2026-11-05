@@ -76,6 +76,55 @@
         "pt": "Retrato do mundo scene24, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene24 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1tnMoQjt7AruZJPp3Oc-F7l6cq0IZ5mMP",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Pincéis de pedra"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1y6GnHoGnw5Zrus_-oyKzWFJPOXyFaMr1",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Rock Skulls"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/14GTZtE32lsOC36Vb9eA-ZEqcvvd6fkFz",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Next Station"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1uy6C7Iyn9MPgUt2ujpuY2cffsWTUp4Li",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Atrapa la luz"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1sw6gJAHVcVi2vIpZxgCpxQ01SqkGCBWZ",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra FEED/EAT THE RICH"
+      }
+    },
+    "capa-6": {
+      "path": "https://lh3.googleusercontent.com/d/1DHFB98VOiiNS9sBgelnWd-DC8fxxyDFL",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Sem Vontade"
+      }
+    },
+    "capa-7": {
+      "path": "https://lh3.googleusercontent.com/d/1NHE_Dt1jYf-8vm7lZMinGkbtRJgrezxv",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Sucker"
+      }
     }
   },
   "dimensions": [
@@ -99,15 +148,226 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        26.03,
+        1.5,
+        -54.06
+      ],
+      "rotation": [
+        0,
+        -25.71,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Pincéis de pedra"
+      },
+      "authors": "Miguel Pérez Escribano",
+      "synopsis": {
+        "pt": "Esta obra combina a arte com o jogo de tabuleiro Go. O movimento e a captura das pedras criam um registro visual. Após pouco tempo, surge uma pintura abstrata. O objetivo é, assim, transformar o tabuleiro em uma tela interativa, na qual se pinta e se joga simultaneamente."
+      },
+      "site": "https://editor.p5js.org/miguelperez/full/29oHg54NF"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        58.5,
+        1.5,
+        -13.35
+      ],
+      "rotation": [
+        0,
+        -77.14,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Rock Skulls"
+      },
+      "authors": "Soraya",
+      "synopsis": {
+        "pt": "O objetivo do jogo é estimular a memória, tanto visual quanto auditiva, de uma forma divertida e diferente, com uma estética punk fortemente influenciada pela música e pelo visual do gênero."
+      },
+      "site": "https://editor.p5js.org/sayax/full/aMgjgyJD3"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        46.91,
+        1.5,
+        37.41
+      ],
+      "rotation": [
+        0,
+        -128.57,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Next Station"
+      },
+      "authors": "Martina Rosario Rodríguez",
+      "synopsis": {
+        "pt": "Next Station reflete sobre a rotina e o cansaço do dia a dia, usando o transporte público como metáfora de uma vida automatizada, dominada por telas e pelo consumo."
+      },
+      "site": "https://editor.p5js.org/MartinaRR/full/P4gB4j0I1"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        0,
+        1.5,
+        60
+      ],
+      "rotation": [
+        0,
+        -180,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Atrapa la luz"
+      },
+      "authors": "Nerea",
+      "synopsis": {
+        "pt": "No centro, um boneco recolhe bolinhas luminosas e desvia-se das escuras. Jogo criado para momentos de stress e angústia. Convida-nos a escolher a luz, os pensamentos positivos e a deixar para trás a escuridão e o negativo. Uma distração suave que nos lembra que podemos sempre inclinar-nos para aquilo que ilumina."
+      },
+      "site": "https://editor.p5js.org/nereamborrego2701/full/VAVpnNKAA"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -46.91,
+        1.5,
+        37.41
+      ],
+      "rotation": [
+        0,
+        -231.43,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "FEED/EAT THE RICH"
+      },
+      "authors": "Sandra",
+      "synopsis": {
+        "pt": "Inspirada na música da AURORA “The Seed” e na frase “COMA OS RICOS”. Uma pequena obra interativa em que você pode tentar alimentar os ricos e depois comê-los."
+      },
+      "site": "https://editor.p5js.org/Un_bichito/full/jXdkWJtuO"
+    },
+    {
+      "id": 6,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-6",
+      "position": [
+        -58.5,
+        1.5,
+        -13.35
+      ],
+      "rotation": [
+        0,
+        -282.86,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Sem Vontade"
+      },
+      "authors": "Jose Roldán",
+      "synopsis": {
+        "pt": "Sintomas da revolução tecnológica na atitude humana. O sujeito de testes é completamente neutro e anônimo, nada mais do que um esqueleto. E as motivações que declara ter para existir são nulas. O ser humano saturado por estímulos e horários sente-se vazio quando não se lhe atribui algo para fazer, quando a sua única tarefa é existir. Nem sequer no descanso se permite a si mesmo simplesmente existir e ser consciente disso, a motivação fica morta."
+      },
+      "site": "https://editor.p5js.org/Josel3/full/rf27L7pXX"
+    },
+    {
+      "id": 7,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-7",
+      "position": [
+        -26.03,
+        1.5,
+        -54.06
+      ],
+      "rotation": [
+        0,
+        -334.29,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Sucker"
+      },
+      "authors": "Cristina Albin",
+      "synopsis": {
+        "pt": "Sucker é um jogo de pegar objetos no qual você move Mark Suckerberg horizontalmente para capturar coisas que caem, como dinheiro e outros elementos dos quais ele se alimenta. À medida que você coleta esses itens, o ícone da Terra vai mudando; conforme a quantidade de dinheiro que ele possui cresce, o resto do mundo se deteriora."
+      },
+      "site": "https://editor.p5js.org/cristinagedealbin/sketches/_cOq4WeFn"
+    }
+  ],
   "portals": [
     {
       "id": 0,
       "ownedBy": 0,
       "position": [
+        -63.64,
         0,
-        0,
-        -90
+        -63.64
       ],
       "width": 10,
       "height": 12,
@@ -143,7 +403,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        0,
+        -315,
         0
       ],
       "motion": {
@@ -168,9 +428,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        90,
+        63.64,
         0,
-        0
+        -63.64
       ],
       "width": 10,
       "height": 12,
@@ -200,7 +460,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene14-de-scene25",
-        "azimuth": 18,
+        "azimuth": 63,
         "reality": [
           {
             "az0": 51.88,
@@ -217,7 +477,7 @@
       "arrivalFrom": "scene14",
       "rotation": [
         0,
-        -90,
+        -45,
         0
       ],
       "motion": {
@@ -242,9 +502,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
+        63.64,
         0,
-        0,
-        90
+        63.64
       ],
       "width": 10,
       "height": 12,
@@ -274,12 +534,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene26-de-scene25",
-        "azimuth": -90,
+        "azimuth": -36,
         "reality": [
           {
-            "az0": 43.03,
+            "az0": 52.03,
             "el0": -0.74,
-            "az1": 46.25,
+            "az1": 55.25,
             "el1": 4.83
           }
         ]
@@ -291,7 +551,7 @@
       "arrivalFrom": "scene26",
       "rotation": [
         0,
-        -180,
+        -135,
         0
       ],
       "motion": {
@@ -316,9 +576,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        -90,
+        -63.64,
         0,
-        0
+        63.64
       ],
       "width": 10,
       "height": 12,
@@ -348,7 +608,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene24-de-scene25",
-        "azimuth": 0,
+        "azimuth": 45,
         "reality": [
           {
             "az0": -46.25,
@@ -365,7 +625,7 @@
       "arrivalFrom": "scene24",
       "rotation": [
         0,
-        -270,
+        -225,
         0
       ],
       "motion": {

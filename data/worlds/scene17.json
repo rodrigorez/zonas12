@@ -92,6 +92,48 @@
         "pt": "Retrato do mundo scene27, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene27 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/18a8QxhU0hgyJpTg87PwKhGbiuVaevc6h",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Circuiti"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1RGSZ-6c43mD6GJsW939Qm-mmRBgnr0qz",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra “Lo que nos estamos comiendo”"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1wAviA3eC_A-I2W4zVTQsedH3j_eOJ_Qp",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra ENSAYOS DE UN CUERPO EXPANDIDO"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1R3HAhzsm42e_uXN6oXKfmoLqW2Fulb1_",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Recuerdos del futuro"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1Ixy0EBjaZsM-lm-RJ1gLje-MdPWyFVMi",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra culebra [pasaje cromático #2]"
+      }
+    },
+    "capa-6": {
+      "path": "https://lh3.googleusercontent.com/d/1gPazTx4qne_FhroshCyHuiXE7JYeS4j9",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra (re)activar los fluidos"
+      }
     }
   },
   "dimensions": [
@@ -115,7 +157,189 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        30,
+        1.5,
+        -51.96
+      ],
+      "rotation": [
+        0,
+        -30,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Circuiti"
+      },
+      "authors": "Diana",
+      "synopsis": {
+        "pt": "A obra busca circuitos e conexões por meio de imagens que se relacionam entre si. Apresenta uma narrativa abstrata que explora a dimensão da vida através de um olhar íntimo e colorido, ao ritmo da música."
+      },
+      "site": "https://drive.google.com/file/d/1cRQJvNryLZeJpL-1JgpzWxdAoWSiwO7H/preview"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        60,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "“Lo que nos estamos comiendo”"
+      },
+      "authors": "Andrea Olit",
+      "synopsis": {
+        "pt": "Esta videoperformance explora a contradição entre o saudável e o acessível. Através da ingestão de alimentos, medicamentos e documentos legais, o corpo transforma-se num espaço de consumo extremo onde se misturam o biológico, o económico e o burocrático. Comer torna-se uma forma de absorver normas, precariedade e controlo."
+      },
+      "site": "https://drive.google.com/drive/folders/12wsK8DX6Zi49ZUfsjzBIjVvskfgx1M4A"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        30,
+        1.5,
+        51.96
+      ],
+      "rotation": [
+        0,
+        -150,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "ENSAYOS DE UN CUERPO EXPANDIDO"
+      },
+      "authors": "Antonio Faus",
+      "coAuthors": "Julián Miralles; Dani Monllor",
+      "synopsis": {
+        "pt": "Ensaios de um corpo expandido é uma videoperformance que entende o vestir como um ato performativo, escultórico e político. O corpo torna-se suporte vivo e matéria moldável entre têxteis, luz e movimento. Através de uma presença andrógina, a obra questiona os códigos de género e propõe o corpo como território de expressão."
+      },
+      "site": "https://drive.google.com/drive/u/1/folders/1a0V0nBqBx6_EyAjytNNCzCFlr8F9onZT"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        -30,
+        1.5,
+        51.96
+      ],
+      "rotation": [
+        0,
+        -210,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Recuerdos del futuro"
+      },
+      "authors": "Sergio Luna",
+      "synopsis": {
+        "pt": "Lembranças do Futuro é um filme em loop nascido de um dispositivo artesanal: uma câmera estenopeica de 20 estenopos que impressiona um filme de 35 mm inteiro. Projetada por um projetor motorizado, a obra registra o trânsito pausado de uma figura misteriosa, criando imagens vaporosas e tons saturados da poética lo-fi."
+      },
+      "site": "https://youtu.be/DkeLy1l4sZg?si=k3CwQNajB59Pe1Kq"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -60,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        -270,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "culebra [pasaje cromático #2]"
+      },
+      "authors": "Beatriz Higón; Brenda Boyer",
+      "synopsis": {
+        "pt": "culebra [pasaje cromático #2] é um exercício de contemplação da floresta, no qual os corpos que observam também fazem parte da paisagem. Um lugar de memórias em torno de uma casa abandonada, de um rio onde a cobra desliza entre as fissuras das rochas e os reflexos da água."
+      },
+      "site": "https://vimeo.com/925370538"
+    },
+    {
+      "id": 6,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-6",
+      "position": [
+        -30,
+        1.5,
+        -51.96
+      ],
+      "rotation": [
+        0,
+        -330,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "(re)activar los fluidos"
+      },
+      "authors": "Llar Algueró",
+      "synopsis": {
+        "pt": "(Re)activar os fluidos é um projeto audiovisual experimental sobre a mutabilidade dos fluidos corporais após o contato. Imagens em primeiros planos extremos e sons captados através de piezoelétricos constroem uma experiência imersiva onde o pós-corpo se transforma, se expande e transborda os seus próprios limites."
+      },
+      "site": "https://vimeo.com/1231276725?share=copy&fl=sv&fe=ci"
+    }
+  ],
   "portals": [
     {
       "id": 0,
@@ -216,12 +440,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene16-de-scene17",
-        "azimuth": -36,
+        "azimuth": -5.2,
         "reality": [
           {
-            "az0": 16.28,
+            "az0": 47.13,
             "el0": -0.54,
-            "az1": 19.48,
+            "az1": 50.33,
             "el1": 3.53
           }
         ]
@@ -364,12 +588,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene18-de-scene17",
-        "azimuth": 54,
+        "azimuth": 63,
         "reality": [
           {
-            "az0": -46.25,
+            "az0": -37.24,
             "el0": -0.74,
-            "az1": -43.03,
+            "az1": -34.02,
             "el1": 4.83
           }
         ]
@@ -438,12 +662,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene27-de-scene17",
-        "azimuth": 72,
+        "azimuth": 81,
         "reality": [
           {
-            "az0": -1.6,
+            "az0": 7.4,
             "el0": -0.51,
-            "az1": 1.6,
+            "az1": 10.6,
             "el1": 3.32
           }
         ]

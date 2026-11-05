@@ -76,6 +76,48 @@
         "pt": "Retrato do mundo Imersões 360º, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the Immersions 360º world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1LvY7c4kX5rIvseUNiPZIrBSAXOm-VAzT",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra PERFILADORA DE EXCLUSIÓN"
+      }
+    },
+    "capa-2": {
+      "path": "https://imgur.com/a/CYQ8tFk",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Stoned"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/11kRl755zKbfdKK3MHHFS5Vm4hfIuQanY",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Un dato cualquiera"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1c6zFi5Z2LeOmkj9jMN-_bIDJl_I8AjhV",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Alientos"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1Ny5ZSBA_J2Gx77gN4kxv5WL06d9AW7dc",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Nacer, 2025"
+      }
+    },
+    "capa-6": {
+      "path": "https://lh3.googleusercontent.com/d/1UlK7rc69_zCy6ztdBgFkOguRwBnv-Icz",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Despiezar al depredante, 2018"
+      }
     }
   },
   "dimensions": [
@@ -99,15 +141,197 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        30,
+        1.5,
+        -51.96
+      ],
+      "rotation": [
+        0,
+        -30,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "PERFILADORA DE EXCLUSIÓN"
+      },
+      "authors": "ALFREDO LLORENS",
+      "synopsis": {
+        "pt": "Perfiladora de exclusão reflete sobre as sociedades de controle de Deleuze e a superação da disciplina de Foucault. A violência já não corrige com base en orientaçoes, mas exclui por meio de senhas. Este material humano descartado, invisível e sem direitos, evoca o Homo sacer de Agamben."
+      },
+      "site": "https://drive.google.com/file/d/1GTwFGyu799ljiFKy9T1ucwU0qQKwMXxq/preview"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        60,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Stoned"
+      },
+      "authors": "Guillermo Ros",
+      "synopsis": {
+        "pt": "Stoned confronta pedra e espelho para explorar as tensões entre natural e artificial, real e virtual, matéria e imagem. A pedra se desdobra em seu reflexo, diluindo o limite entre objeto físico e imagem e construindo um espaço de continuidade entre ambas as realidades."
+      },
+      "site": "https://imgur.com/a/CYQ8tFk"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        30,
+        1.5,
+        51.96
+      ],
+      "rotation": [
+        0,
+        -150,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Un dato cualquiera"
+      },
+      "authors": "Equipo VAL·LAB; La Cosecha Comunicación",
+      "coAuthors": "Equipo VAL·LAB; La Cosecha Comunicación",
+      "synopsis": {
+        "pt": "“Um dado qualquer” é uma videoperformance do coletivo VAL·LAB, realizada a partir das enchentes ocorridas em Valência em 2024. Nela, abordamos um território marcado pelo caos climático e pelas políticas de expansão da cidade, que tornam a vida cada vez mais difícil, além do sentimento de medo do calor do verão e de suas consequências."
+      },
+      "site": "https://u.pcloud.link/publink/show?code=XZJ6z95Zzzfkt0S5sPSMU2krEJrjfhGTD96V"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        -30,
+        1.5,
+        51.96
+      ],
+      "rotation": [
+        0,
+        -210,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Alientos"
+      },
+      "authors": "Elías Pérez",
+      "synopsis": {
+        "pt": "No procede"
+      },
+      "site": "https://drive.google.com/file/d/17BmwQ8unfUEiBnDhugrU6VgvbCnKWUjq/preview"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -60,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        -270,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Nacer, 2025"
+      },
+      "authors": "Teresa García-del Blanco",
+      "synopsis": {
+        "pt": "Nacer, faz parte de um projeto sobre a maternidade financiado pela Universitat Politècnica de València — programa de auxílios da Pró-Reitoria de Pesquisa, Subprograma 1 (PAID-01-25) — no âmbito da pesquisa de doutorado \"Autobiografia, maternidade e produção artística: estudo de casos na arte e na literatura a partir do século XX\""
+      },
+      "site": "https://drive.google.com/file/d/1Ny5ZSBA_J2Gx77gN4kxv5WL06d9AW7dc/preview"
+    },
+    {
+      "id": 6,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-6",
+      "position": [
+        -30,
+        1.5,
+        -51.96
+      ],
+      "rotation": [
+        0,
+        -330,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Despiezar al depredante, 2018"
+      },
+      "authors": "Joaquín (Ximo) Ortega Garrido",
+      "synopsis": {
+        "pt": "Despiezar al depredante (2018) documenta a metabolização de El depredante (2013), escultura de madeira urbana recolhida, em diálogo com a territorialização de Deleuze e o Manifiesto Territoriante de Francesc Muñoz. A reincorporação de seus materiais confronta a prática escultórica com a irrelevância daquilo que se produz."
+      },
+      "site": "https://drive.google.com/open?id=1r5LWKir5qNXZo_ETAIj-olN0Dy7SbwQw&usp=drive_fs"
+    }
+  ],
   "portals": [
     {
       "id": 0,
       "ownedBy": 0,
       "position": [
+        23.29,
         0,
-        0,
-        -90
+        -86.93
       ],
       "width": 10,
       "height": 12,
@@ -143,7 +367,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        0,
+        -15,
         0
       ],
       "motion": {
@@ -168,9 +392,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        90,
+        86.93,
         0,
-        0
+        23.29
       ],
       "width": 10,
       "height": 12,
@@ -200,12 +424,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene22-de-scene23",
-        "azimuth": 0,
+        "azimuth": -6,
         "reality": [
           {
-            "az0": 43.03,
+            "az0": 52.03,
             "el0": -0.74,
-            "az1": 46.25,
+            "az1": 55.25,
             "el1": 4.83
           }
         ]
@@ -217,7 +441,7 @@
       "arrivalFrom": "scene22",
       "rotation": [
         0,
-        -90,
+        -105,
         0
       ],
       "motion": {
@@ -242,9 +466,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
+        -23.29,
         0,
-        0,
-        90
+        86.93
       ],
       "width": 10,
       "height": 12,
@@ -274,7 +498,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene24-de-scene23",
-        "azimuth": -90,
+        "azimuth": -105,
         "reality": [
           {
             "az0": 43.03,
@@ -291,7 +515,7 @@
       "arrivalFrom": "scene24",
       "rotation": [
         0,
-        -180,
+        -195,
         0
       ],
       "motion": {
@@ -316,9 +540,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        -90,
+        -86.93,
         0,
-        0
+        -23.29
       ],
       "width": 10,
       "height": 12,
@@ -348,7 +572,7 @@
         "radius": 120,
         "shaderId": "holograma",
         "cutout": "recorte-scene8-de-scene23",
-        "azimuth": -162,
+        "azimuth": -177,
         "reality": [
           {
             "az0": 51.88,
@@ -365,7 +589,7 @@
       "arrivalFrom": "scene8",
       "rotation": [
         0,
-        -270,
+        -285,
         0
       ],
       "motion": {

@@ -92,6 +92,55 @@
         "pt": "Retrato do mundo scene27, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene27 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1NULh7nyycbPZyxiJ3Qs3Py0Nr174AgqT",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Keep Scrolling"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/14NrdKpYGeru_MFO0dMZMYGyfu-RVlKm5",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra HEY JELLY"
+      }
+    },
+    "capa-3": {
+      "path": "https://2084futurosimaginados.org/wp-content/uploads/2024/04/80-omaromar-argentina-1024x1024.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Retro Hoy"
+      }
+    },
+    "capa-4": {
+      "path": "https://2084futurosimaginados.org/wp-content/uploads/2024/05/82-ana-suarez-argentina.jpg",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Futuros"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1eWQSpkeE9RN35EBoecil9cLTyjf26lpn",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Compatibilidad Telepática"
+      }
+    },
+    "capa-6": {
+      "path": "https://lh3.googleusercontent.com/d/19-55w7vbVN4tGU0Q8TNBxx9pDuBZnMIn",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Varado"
+      }
+    },
+    "capa-7": {
+      "path": "https://lh3.googleusercontent.com/d/1XdeWL9hagupxWO8-DitllAaPtpSjjLWU",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Borderline Disorder, or IMAGINE"
+      }
     }
   },
   "dimensions": [
@@ -115,15 +164,226 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        26.03,
+        1.5,
+        -54.06
+      ],
+      "rotation": [
+        0,
+        -25.71,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Keep Scrolling"
+      },
+      "authors": "Irma Marco",
+      "synopsis": {
+        "pt": "Keep Scrolling aborda a navegação na internet a partir do fenómeno do scrolling infinito. Este gesto revela como o excesso de informação e os designs concebidos para fomentar hábitos aditivos nos mantêm online, gerando a ilusão de novidade constante enquanto, paradoxalmente, acabamos por orbitar em torno dos mesmos conteúdos."
+      },
+      "site": "https://www.youtube.com/watch?v=iS5AADCuXE8"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        58.5,
+        1.5,
+        -13.35
+      ],
+      "rotation": [
+        0,
+        -77.14,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "HEY JELLY"
+      },
+      "authors": "Núria Nia",
+      "synopsis": {
+        "pt": "Em \"Hey Jelly\" (2026, 20'32''), de Núria Nia, uma voz humana dirige-se à matéria, seguindo a forma de uma epístola endereçada a uma entidade não humana que resiste a ser fixada. Essa voz propõe uma forma de conhecimento baseada no contato e na adaptabilidade, em correspondência direta com as teses dos novos materialismos. (Texto de Cultural Rizoma)"
+      },
+      "site": "https://drive.google.com/file/d/1luNpNvhY5ILJn21bWMUtqSe4tDmvkvoW/preview"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        46.91,
+        1.5,
+        37.41
+      ],
+      "rotation": [
+        0,
+        -128.57,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Retro Hoy"
+      },
+      "authors": "OmarOmar",
+      "synopsis": {
+        "pt": "Imersos em uma paisagem liminar onde a estrutura linguística e o ambiente urbano colidem. Por meio de um tratamento estritamente monocromático, a peça explora a tensão visual e conceitual entre a abstração do design gráfico e a materialidade da metrópole moderna."
+      },
+      "site": "https://drive.google.com/file/d/1rdmKzyOnFUWqJZzI-ENOId6KCSspAu53/preview"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        0,
+        1.5,
+        60
+      ],
+      "rotation": [
+        0,
+        -180,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Futuros"
+      },
+      "authors": "Ana Suárez",
+      "synopsis": {
+        "pt": "Futuros, da série #alfageometry, de Ana Suárez, entrelaça geometria, tecnologia e linguagem. Circuitos, formas orgânicas e estruturas arquitetônicas constroem uma cartografia poética de futuros possíveis, onde o racional se transforma em um sistema aberto e dinâmico."
+      },
+      "site": "https://drive.google.com/file/d/1bQUJaNpo8cVNoTDyJMl_2YOWWdFIyZyG/preview"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -46.91,
+        1.5,
+        37.41
+      ],
+      "rotation": [
+        0,
+        -231.43,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Compatibilidad Telepática"
+      },
+      "authors": "Xiomara Zapata Ariza",
+      "synopsis": {
+        "pt": "Em 2084, a comunicação torna-se telepática, libertando o corpo dos dispositivos eletrônicos. Diante de uma mente expandida, o mundo entra em um silêncio permanente onde as palavras ressoam apenas para emitir canções e sussurros de amor."
+      },
+      "site": "https://youtu.be/EKPby-rGQVQ"
+    },
+    {
+      "id": 6,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-6",
+      "position": [
+        -58.5,
+        1.5,
+        -13.35
+      ],
+      "rotation": [
+        0,
+        -282.86,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Varado"
+      },
+      "authors": "Calvin Klon",
+      "synopsis": {
+        "pt": "O ano de 2084 nos chama a despertar hoje."
+      },
+      "site": "https://youtu.be/b5EbKSwNkVomega"
+    },
+    {
+      "id": 7,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-7",
+      "position": [
+        -26.03,
+        1.5,
+        -54.06
+      ],
+      "rotation": [
+        0,
+        -334.29,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Borderline Disorder, or IMAGINE"
+      },
+      "authors": "Belen Roncoroni",
+      "synopsis": {
+        "pt": "«Borderline» é a linha fronteiriça de divisão política entre um país e outro. «Borderline» também é um transtorno psiquiátrico que gera padrões prolongados de emoções turbulentas ou instáveis. A resultante: «Borderline Borderline», um mundo dividido por fronteiras políticas turbulentas e instáveis. Belen Roncoroni, 2026"
+      },
+      "site": "https://2084futurosimaginados.org/borderline-disorder-or-imagine/"
+    }
+  ],
   "portals": [
     {
       "id": 0,
       "ownedBy": 0,
       "position": [
+        46.15,
         0,
-        0,
-        -90
+        -77.27
       ],
       "width": 10,
       "height": 12,
@@ -159,7 +419,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        0,
+        -30.85,
         0
       ],
       "motion": {
@@ -184,9 +444,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        85.6,
+        87.75,
         0,
-        -27.81
+        20.02
       ],
       "width": 10,
       "height": 12,
@@ -216,7 +476,7 @@
         "radius": 120,
         "shaderId": "projecao",
         "cutout": "recorte-scene13-de-scene16",
-        "azimuth": 36,
+        "azimuth": 5.1,
         "reality": [
           {
             "az0": 51.88,
@@ -233,7 +493,7 @@
       "arrivalFrom": "scene13",
       "rotation": [
         0,
-        -72,
+        -102.85,
         0
       ],
       "motion": {
@@ -258,9 +518,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
-        52.9,
+        8.08,
         0,
-        72.81
+        89.64
       ],
       "width": 10,
       "height": 12,
@@ -290,7 +550,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene15-de-scene16",
-        "azimuth": -108,
+        "azimuth": -138.8,
         "reality": [
           {
             "az0": 16.28,
@@ -307,7 +567,7 @@
       "arrivalFrom": "scene15",
       "rotation": [
         0,
-        -144,
+        -174.85,
         0
       ],
       "motion": {
@@ -332,9 +592,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        -52.9,
+        -82.75,
         0,
-        72.81
+        35.38
       ],
       "width": 10,
       "height": 12,
@@ -364,7 +624,7 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene17-de-scene16",
-        "azimuth": 36,
+        "azimuth": 5.2,
         "reality": [
           {
             "az0": -55.12,
@@ -381,7 +641,7 @@
       "arrivalFrom": "scene17",
       "rotation": [
         0,
-        -216,
+        -246.85,
         0
       ],
       "motion": {
@@ -406,9 +666,9 @@
       "id": 4,
       "ownedBy": 0,
       "position": [
-        -85.6,
+        -59.22,
         0,
-        -27.81
+        -67.77
       ],
       "width": 10,
       "height": 12,
@@ -438,12 +698,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene27-de-scene16",
-        "azimuth": -18,
+        "azimuth": -39.9,
         "reality": [
           {
-            "az0": -46.25,
+            "az0": -37.24,
             "el0": -0.74,
-            "az1": -43.03,
+            "az1": -34.02,
             "el1": 4.83
           }
         ]
@@ -455,7 +715,7 @@
       "arrivalFrom": "scene27",
       "rotation": [
         0,
-        -288,
+        -318.85,
         0
       ],
       "motion": {

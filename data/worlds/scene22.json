@@ -76,6 +76,41 @@
         "pt": "Retrato do mundo scene23, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene23 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1_LynZUXWB8toNVuB8F9m6KA9t81Q3XQb",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Artemisa"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/17wa7CVTTgRJkoDC82tCkLSlpjFY4kbMT",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Ábaco de mariposas"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1GCyn2sUhD-b6uOoVUm1GwIGSkPkMl3lI",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Nuevo día"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1OUstghd_W68ygpP330HHcXa_AV2t42ae",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Cortina"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/15AFUFHopxu7qum0T6XE-av3Mjqa0Adzh",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Espina"
+      }
     }
   },
   "dimensions": [
@@ -99,15 +134,166 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        35.27,
+        1.5,
+        -48.54
+      ],
+      "rotation": [
+        0,
+        -36,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Artemisa"
+      },
+      "authors": "Mireia Hervás Pallarés",
+      "synopsis": {
+        "pt": "Artemisa é uma escultura cerâmica que materializa o “segundo nascimento” da identidade feminina na puberdade. Criada em 2026, liga a missão lunar Artemis II ao mapeamento do clitóris e relaciona ovo–vulva e Terra–Lua sobre um ninho de esparto e cabelo."
+      },
+      "site": "https://drive.google.com/file/d/1FbxekUaNgX4bDOu5pLal2HQf2GjqZinX/preview"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        57.06,
+        1.5,
+        18.54
+      ],
+      "rotation": [
+        0,
+        -108,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Ábaco de mariposas"
+      },
+      "authors": "Sara Reyes",
+      "synopsis": {
+        "pt": "Mordi uma concha E ela voou para longe Contei borboletas com um ábaco Que primeiro capturei com um favo de mel"
+      },
+      "site": "https://drive.google.com/file/d/17wa7CVTTgRJkoDC82tCkLSlpjFY4kbMT/preview"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        0,
+        1.5,
+        60
+      ],
+      "rotation": [
+        0,
+        -180,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Nuevo día"
+      },
+      "authors": "Celia Marco",
+      "synopsis": {
+        "pt": "Nuevo día reflete sobre o ciclo da Natureza Vida-Morte-Vida por meio da agência dos materiais. Na obra, os materiais reagem entre si, gerando o resultado final do trabalho, propondo um deslocamento do antropocentrismo e tornando mais difusos os limites entre o vivo e o morto."
+      },
+      "site": "https://drive.google.com/file/d/10F97VYQkgTMrOBlraFsAO2JPEubppLpc/preview"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        -57.06,
+        1.5,
+        18.54
+      ],
+      "rotation": [
+        0,
+        -252,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Cortina"
+      },
+      "authors": "Carmen Andreu",
+      "synopsis": {
+        "pt": "A cortina apenas vela. Pequenos módulos de madeira tingida constroem a imagem pixelada de um rosto que parece olhar do outro lado. Um limite entre o interior e o exterior, onde o material e o digital se encontram."
+      },
+      "site": "https://www.instagram.com/p/DO8PeaMDZ07/?hl=es&img_index=1"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -35.27,
+        1.5,
+        -48.54
+      ],
+      "rotation": [
+        0,
+        -324,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Espina"
+      },
+      "authors": "Magdalena Lorca Mena",
+      "synopsis": {
+        "pt": "Espina nasce de uma oficina ministrada para mulheres migrantes do Sul Global, na qual foram produzidos vasos de cerâmica que, após a queima, foram enterrados no território valenciano. A partir daí, cria-se uma criatura migrante que deixa vasos de cerâmica como rastro em sua trajetória, questionando as lógicas coloniais de pertencimento."
+      },
+      "site": "https://drive.google.com/file/d/1BM-Um5VjBt09VT9Cqlic8w8--b30a0pn/preview"
+    }
+  ],
   "portals": [
     {
       "id": 0,
       "ownedBy": 0,
       "position": [
+        14.08,
         0,
-        0,
-        -90
+        -88.89
       ],
       "width": 10,
       "height": 12,
@@ -143,7 +329,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        0,
+        -9,
         0
       ],
       "motion": {
@@ -168,9 +354,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        90,
+        88.89,
         0,
-        0
+        14.08
       ],
       "width": 10,
       "height": 12,
@@ -200,12 +386,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene21-de-scene22",
-        "azimuth": 0,
+        "azimuth": 6,
         "reality": [
           {
-            "az0": 43.03,
+            "az0": 58.02,
             "el0": -0.74,
-            "az1": 46.25,
+            "az1": 61.24,
             "el1": 4.83
           }
         ]
@@ -217,7 +403,7 @@
       "arrivalFrom": "scene21",
       "rotation": [
         0,
-        -90,
+        -99,
         0
       ],
       "motion": {
@@ -242,9 +428,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
+        -14.08,
         0,
-        0,
-        90
+        88.89
       ],
       "width": 10,
       "height": 12,
@@ -274,7 +460,7 @@
         "radius": 120,
         "shaderId": "aguas",
         "cutout": "recorte-scene7-de-scene22",
-        "azimuth": -72,
+        "azimuth": -81,
         "reality": [
           {
             "az0": 51.88,
@@ -291,7 +477,7 @@
       "arrivalFrom": "scene7",
       "rotation": [
         0,
-        -180,
+        -189,
         0
       ],
       "motion": {
@@ -316,9 +502,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        -90,
+        -88.89,
         0,
-        0
+        -14.08
       ],
       "width": 10,
       "height": 12,
@@ -348,12 +534,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene23-de-scene22",
-        "azimuth": 0,
+        "azimuth": 6,
         "reality": [
           {
-            "az0": -46.25,
+            "az0": -31.25,
             "el0": -0.74,
-            "az1": -43.03,
+            "az1": -28.03,
             "el1": 4.83
           }
         ]
@@ -365,7 +551,7 @@
       "arrivalFrom": "scene23",
       "rotation": [
         0,
-        -270,
+        -279,
         0
       ],
       "motion": {

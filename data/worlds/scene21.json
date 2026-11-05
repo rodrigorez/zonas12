@@ -76,6 +76,48 @@
         "pt": "Retrato do mundo scene22, visto da porta (recorte, para a janela ao vivo)",
         "en": "Portrait of the scene22 world, seen from the door (cutout, for the live window)"
       }
+    },
+    "capa-1": {
+      "path": "https://lh3.googleusercontent.com/d/1BuJnbiAzWJQYMakIJU3zrqEWV-5Xvek1",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra encarne, encarnada"
+      }
+    },
+    "capa-2": {
+      "path": "https://lh3.googleusercontent.com/d/1wywwnNNL-eSrcEpaG-VK4rzMOLS3Z8Lh",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra El cielo llora y yo bebo"
+      }
+    },
+    "capa-3": {
+      "path": "https://lh3.googleusercontent.com/d/1NCSaAkQ_Uc_FGRCBs_XIW_oTyOGuW1yl",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Los caminos del agua"
+      }
+    },
+    "capa-4": {
+      "path": "https://lh3.googleusercontent.com/d/1-za9XIK_03XpLp6jWy8_fV1wUiiDp2iJ",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Recuerdos de supervivencia"
+      }
+    },
+    "capa-5": {
+      "path": "https://lh3.googleusercontent.com/d/1uSQU_dZEToQEY8Ft2XCeFfzkegzbzPvb",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Desconchados de pared"
+      }
+    },
+    "capa-6": {
+      "path": "https://lh3.googleusercontent.com/d/1LrvkhagAD-dvCd4xufphUbCf2dOibKBP",
+      "type": "image",
+      "alt": {
+        "pt": "Capa da obra Casi puedo tocarlo"
+      }
     }
   },
   "dimensions": [
@@ -99,15 +141,196 @@
       }
     }
   ],
-  "artworks": [],
+  "artworks": [
+    {
+      "id": 1,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-1",
+      "position": [
+        30,
+        1.5,
+        -51.96
+      ],
+      "rotation": [
+        0,
+        -30,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "encarne, encarnada"
+      },
+      "authors": "Marcos Boluda",
+      "synopsis": {
+        "pt": "“encarne, encarnada” propõe uma experiência sensorial em torno da flor. Por meio de uma imagem onírica e envolvente, a obra explora a imagem em movimento como se fosse matéria plástica para despertar emoções, transformando a fragilidade da flor em um espelho da condição humana."
+      },
+      "site": "https://drive.google.com/file/d/1Jksb2OUwDpJI_M_lxiAiBNp_KFF0iR1P/preview"
+    },
+    {
+      "id": 2,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-2",
+      "position": [
+        60,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "El cielo llora y yo bebo"
+      },
+      "authors": "Lucía Mallol",
+      "synopsis": {
+        "pt": "Em “O Céu Chora e Eu Bebo”, o mundo terreno desaparece, e as formas permanecem suspensas no espaço. A água atravessa as figuras, criando um fio condutor que evoca os saberes herdados: aquilo que recebemos, transformamos e transmitimos, como uma memória que nos nutre e nos faz crescer."
+      },
+      "site": "https://drive.google.com/file/d/1TJf5gvus-u51SAkYcS-_siGVahTRmwJB/preview"
+    },
+    {
+      "id": 3,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-3",
+      "position": [
+        30,
+        1.5,
+        51.96
+      ],
+      "rotation": [
+        0,
+        -150,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Los caminos del agua"
+      },
+      "authors": "Paula Alcayde Peydro",
+      "synopsis": {
+        "pt": "Os caminhos da água reinterpreta a rede de canais de irrigação da Horta de Valência, uma paisagem agrícola e cultural historicamente estruturada em torno da água. Por meio de módulos cerâmicos conectados, a água percorre a instalação como uma metáfora dos vínculos de cooperação e apoio mútuo que sustentam esse território."
+      },
+      "site": "https://drive.google.com/file/d/10r-tcMIMe-VdUGqK2r6xr2Yhiuu0OD4k/preview"
+    },
+    {
+      "id": 4,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-4",
+      "position": [
+        -30,
+        1.5,
+        51.96
+      ],
+      "rotation": [
+        0,
+        -210,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Recuerdos de supervivencia"
+      },
+      "authors": "Alba Guillem",
+      "synopsis": {
+        "pt": "“Memórias da Sobrevivência” é uma obra audiovisual que explora como a memória atua como um mecanismo de resistência, articulada por meio da história e das ações de Dolores."
+      },
+      "site": "https://youtu.be/oaqYJ7obTUg"
+    },
+    {
+      "id": 5,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-5",
+      "position": [
+        -60,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        -270,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Desconchados de pared"
+      },
+      "authors": "Elvira Cremades Roca",
+      "synopsis": {
+        "pt": "Desconchados de Pared resgata as formas efêmeras das superfícies urbanas e as transforma em objetos de contemplação. A partir de seus contornos, quinze peças de porcelana reproduzem os traços da deterioração. A fragilidade do material faz parte do processo, tornando cada peça um registro do acidental, do quebrado e do erro."
+      },
+      "site": "https://drive.google.com/file/d/1_FYS0-StyDEexOLhaf58I47PcMTxG3UN/preview"
+    },
+    {
+      "id": 6,
+      "dimension": 0,
+      "kind": "site",
+      "asset": "capa-6",
+      "position": [
+        -30,
+        1.5,
+        -51.96
+      ],
+      "rotation": [
+        0,
+        -330,
+        0
+      ],
+      "size": [
+        4,
+        3,
+        0.1
+      ],
+      "interaction": "page",
+      "title": {
+        "pt": "Casi puedo tocarlo"
+      },
+      "authors": "Natalia Hernández Coronel",
+      "synopsis": {
+        "pt": "Casi puedo tocarlo parte do desenho e de um processo baseado na pausa e na repetição para explorar a sua expansão para o escultórico e o instalativo. A relação entre papel e cerâmica questiona os limites entre imagem e matéria, convidando a parar, olhar e permanecer na incerteza."
+      },
+      "site": "https://drive.google.com/file/d/16HMPbv9F_7r286BH4Sep5H-TrpG-QS5J/preview"
+    }
+  ],
   "portals": [
     {
       "id": 0,
       "ownedBy": 0,
       "position": [
+        23.29,
         0,
-        0,
-        -90
+        -86.93
       ],
       "width": 10,
       "height": 12,
@@ -143,7 +366,7 @@
       "arrivalFrom": "gate",
       "rotation": [
         0,
-        0,
+        -15,
         0
       ],
       "motion": {
@@ -168,9 +391,9 @@
       "id": 1,
       "ownedBy": 0,
       "position": [
-        90,
+        86.93,
         0,
-        0
+        23.29
       ],
       "width": 10,
       "height": 12,
@@ -200,12 +423,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene20-de-scene21",
-        "azimuth": 0,
+        "azimuth": -60,
         "reality": [
           {
-            "az0": 43.03,
+            "az0": -1.97,
             "el0": -0.74,
-            "az1": 46.25,
+            "az1": 1.25,
             "el1": 4.83
           }
         ]
@@ -217,7 +440,7 @@
       "arrivalFrom": "scene20",
       "rotation": [
         0,
-        -90,
+        -105,
         0
       ],
       "motion": {
@@ -242,9 +465,9 @@
       "id": 2,
       "ownedBy": 0,
       "position": [
+        -23.29,
         0,
-        0,
-        90
+        86.93
       ],
       "width": 10,
       "height": 12,
@@ -274,7 +497,7 @@
         "radius": 120,
         "shaderId": "becos",
         "cutout": "recorte-scene6-de-scene21",
-        "azimuth": -72,
+        "azimuth": -87,
         "reality": [
           {
             "az0": 51.88,
@@ -291,7 +514,7 @@
       "arrivalFrom": "scene6",
       "rotation": [
         0,
-        -180,
+        -195,
         0
       ],
       "motion": {
@@ -316,9 +539,9 @@
       "id": 3,
       "ownedBy": 0,
       "position": [
-        -90,
+        -86.93,
         0,
-        0
+        -23.29
       ],
       "width": 10,
       "height": 12,
@@ -348,12 +571,12 @@
         "radius": 120,
         "shaderId": "grade-neon",
         "cutout": "recorte-scene22-de-scene21",
-        "azimuth": 0,
+        "azimuth": -6,
         "reality": [
           {
-            "az0": -46.25,
+            "az0": -37.24,
             "el0": -0.74,
-            "az1": -43.03,
+            "az1": -34.02,
             "el1": 4.83
           }
         ]
@@ -365,7 +588,7 @@
       "arrivalFrom": "scene22",
       "rotation": [
         0,
-        -270,
+        -285,
         0
       ],
       "motion": {
