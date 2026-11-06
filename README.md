@@ -707,6 +707,8 @@ reduz a 1200 px com um só Chrome e reescreve o caminho. Medido: **150 → 141 g
 15,3 MB**, e a sala 24 passou de 3 para **8 de 8**. Fecha as quatro causas de uma vez, e as capas
 deixam de depender de um servidor alheio — que este README já dizia ser um objetivo.
 
+O **que falta e o que está mal** vive numa lista à parte, para se ir riscando: [`docs/PENDENCIAS.md`](docs/PENDENCIAS.md). É o resultado de um pente fino em três camadas — o dado, os links e o browser —, e só lá está o que está por fazer.
+
 **O que não se apaga, e porquê.** Nove capas não vieram, e oito não são ficheiros inválidos: são
 ficheiros do Drive **não partilhados**. O Google devolve a página `Sign in - Google Accounts`,
 900 kB de HTML. Distinguir isso de «imagem partida» é o que impede a ferramenta de apagar uma capa
@@ -2659,7 +2661,7 @@ juntas somam minutos, por isso não são o `default`. Com `--full` são **28** b
 Os instrumentos de linha de comando que **não** entram no `all.mjs` são os que escrevem no
 repositório: `node tools/artwork/from-csv.mjs` lê `data/obras.tsv` e escreve nos mundos o dado das
 obras (nome, créditos, descritivo, imagem e site) — com `--file` corre outra folha, e é assim que se vê
-o exemplo (`data/obras.exemplo.tsv`) sem tocar na definitiva —, `node tools/artwork/capas-locais.mjs` guarda as capas remotas dentro do projeto (D107: reduz a 1200 px e reescreve o caminho; uma capa que não venha fica no dado, reportada), `node tools/scene/new-world.mjs
+o exemplo (`data/obras.exemplo.tsv`) sem tocar na definitiva —, `node tools/artwork/capas-locais.mjs` guarda as capas remotas dentro do projeto (D107: reduz a 1200 px e reescreve o caminho; uma capa que não venha fica no dado, reportada), `node tools/artwork/links.mjs` diz o que cada site e cada capa remota fazem de verdade — se respondem **e** se deixam ser embutidos no iframe da ficha (D108; só reporta o que está mal), `node tools/scene/new-world.mjs
 <slug>` cria a pasta e o arranque de um mundo, `node tools/scene/new-room.mjs <slug> --destinos …`
 escreve o esqueleto de uma sala nova, as portas que ela pede **e o movimento sorteado de cada porta**
 (ver [`docs/SPEC-NOVA-SALA.md`](docs/SPEC-NOVA-SALA.md)), `node tools/scene/ring.mjs --aplicar` põe as obras
