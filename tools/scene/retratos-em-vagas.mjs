@@ -6,19 +6,26 @@
 // volta da escrita, e cada par escreve ficheiros diferentes - o paralelismo e so no render, que nao
 // disputa nada.
 //
-// Uso: node tools/scene/retratos-em-vagas.mjs <pares.json> [--vagas 4] [--passagem 2]
+// Uso: node tools/scene/retratos-em-vagas.mjs --do-dado [--vagas 4] [--passagem 2]
+//      node tools/scene/retratos-em-vagas.mjs <pares.json> [--vagas 4] [--passagem 2]
 //
-// `pares.json` e uma lista de `{ destino, origem }`. As vagas sao reutilizadas: quando um processo
-// acaba, entra o proximo. Uma falha nao para a vaga — e contada no fim, para se poder repetir so ela.
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+// `--do-dado` lê os pares do próprio dado (`portas-com-retrato.mjs`, a mesma leitura que o
+// `portrait.mjs` usa) — é o caminho normal, porque uma lista à mão envelhece a cada porta nova.
+// `pares.json` é uma lista de `{ destino, origem }`, para repetir só um subconjunto. As vagas são
+// reutilizadas: quando um processo acaba, entra o próximo. Uma falha não para a vaga — é contada no
+// fim, para se poder repetir só ela.
+import { readFileSync, writeFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { join } from 'node:path';
 import { ROOT } from '../regression/harness.mjs';
+import { portasDoDado } from './portas-com-retrato.mjs';
 
 const argumentos = process.argv.slice(2);
+const doDado = argumentos.includes('--do-dado');
 const ficheiro = argumentos.find((arg) => !arg.startsWith('--') && arg.endsWith('.json'));
-if (!ficheiro) {
-  console.error('uso: node tools/scene/retratos-em-vagas.mjs <pares.json> [--vagas 4]');
+if (!doDado && !ficheiro) {
+  console.error('uso: node tools/scene/retratos-em-vagas.mjs --do-dado [--vagas 4]');
+  console.error('     node tools/scene/retratos-em-vagas.mjs <pares.json> [--vagas 4]');
   process.exit(1);
 }
 const vagas = (() => {
@@ -30,7 +37,14 @@ const passagem = (() => {
   return indice > 0 ? Number(argumentos[indice + 1]) || 1 : 1;
 })();
 
-const pares = JSON.parse(readFileSync(ficheiro, 'utf8'));
+const pares = doDado
+  ? portasDoDado(join(ROOT, 'data', 'worlds')).map((porta) => ({
+    destino: porta.destino,
+    origem: porta.origem,
+    nome: porta.destino + '-de-' + porta.origem,
+    direto: porta.direto
+  }))
+  : JSON.parse(readFileSync(ficheiro, 'utf8'));
 if (!Array.isArray(pares) || pares.length === 0) {
   console.error('a lista está vazia');
   process.exit(1);
@@ -46,7 +60,9 @@ console.log('passagem ' + passagem + ' · ' + pares.length + ' par(es) · ' + va
 console.log('');
 
 const correr = (par) => new Promise((resolve) => {
-  const processo = spawn(process.execPath, [join(ROOT, 'tools/scene/portrait.mjs'), par.destino, par.origem],
+  const pedido = [join(ROOT, 'tools/scene/portrait.mjs'), par.destino, par.origem];
+  if (par.direto) pedido.push('--direto');
+  const processo = spawn(process.execPath, pedido,
     { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] });
   let saida = '';
   processo.stdout.on('data', (pedaco) => { saida += pedaco; });

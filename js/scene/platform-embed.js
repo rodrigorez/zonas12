@@ -3,8 +3,12 @@
 // As Zonas 11 traziam esta tabela no `platform-detector.js`, a correr no browser à carga da página.
 // Aqui é um módulo: a ficha (D62) usa-o ao desenhar, e os instrumentos usam-no fora do browser para
 // provar a tabela sem abrir nada. A lista é a mesma — YouTube, o editor do p5.js, Vimeo,
-// OpenProcessing e Shadertoy —, e o que não for nenhuma delas é embutido tal e qual, que é o que a
-// referência faz no fim: nunca se inventa um embed que o site não serve.
+// OpenProcessing e Shadertoy —, mais duas que o autor trouxe e que **servem** um embed: o Instagram
+// (`/p/<código>/embed` responde 200 e não manda `X-Frame-Options`) e o álbum do Imgur
+// (`/a/<código>/embed` responde 200 e o CSP não traz `frame-ancestors`); as páginas normais de ambos
+// mandam `DENY`, e é por isso que sem estas duas entradas a ficha abria uma caixa vazia. O que não for
+// nenhuma delas é embutido tal e qual, que é o que a referência faz no fim: nunca se inventa um embed
+// que o site não serve.
 //
 // `mute=1` no YouTube em vez do `autoplay=1` sozinho da referência: um vídeo com som não arranca
 // sozinho em nenhum browser moderno, e o resultado seria um retângulo preto à espera de um clique.
@@ -35,6 +39,16 @@ export const PLATFORMS = [
     id: 'shadertoy',
     patterns: [/shadertoy\.com\/view\/([a-zA-Z0-9]+)/],
     embed: (id) => 'https://shadertoy.com/embed/' + id + '?gui=false&paused=false'
+  },
+  {
+    id: 'instagram',
+    patterns: [/instagram\.com\/(?:p|reel|tv)\/([^?&/]+)/],
+    embed: (id) => 'https://www.instagram.com/p/' + id + '/embed'
+  },
+  {
+    id: 'imgur',
+    patterns: [/imgur\.com\/a\/([^?&/]+)/, /imgur\.com\/gallery\/([^?&/]+)/],
+    embed: (id) => 'https://imgur.com/a/' + id + '/embed'
   }
 ];
 

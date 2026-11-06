@@ -101,6 +101,21 @@ function main() {
   check.check('a folha de produção está em dia: `--check` não muda nada e sai com 0',
     atual.code === 0 && /a folha não muda nada/.test(atual.output), JSON.stringify(atual).slice(0, 200));
 
+  // ---- 1b. as folhas das salas dizem o mesmo que o dado ----
+  // A folha é a fonte da verdade das capas (D62): uma capa que o `capas-locais` guardou no projecto e
+  // que a folha ainda diz remota volta a ser remota no `from-csv` seguinte, sem erro nenhum e sem
+  // ninguém dar por isso. Foi assim que 75 células das salas 15 a 27 ficaram para trás — e nenhuma
+  // bateria se queixou, porque a única folha vigiada era a de produção.
+  const folhas = readdirSync(join(ROOT, 'data'))
+    .filter((nome) => /^folha-.+\.tsv$/.test(nome))
+    .sort();
+  const atrasadas = folhas.filter((nome) => {
+    const mundo = nome.replace(/^folha-/, '').replace(/\.tsv$/, '');
+    return run(['--file', join(ROOT, 'data', nome), '--mundo', mundo, '--check']).code !== 0;
+  });
+  check.check('as ' + folhas.length + ' folhas das salas dizem o mesmo que o dado (`--check` em cada uma)',
+    folhas.length > 0 && atrasadas.length === 0, atrasadas.join(', '));
+
   // ---- 2 e 3. os três créditos, e o que uma célula vazia faz ----
   const creditos = sheet('creditos.tsv', [[
     'scene1', '1', 'Um título novo', 'Fulano, Beltrana', 'Sicrana', 'Beltrano, Ciclano',

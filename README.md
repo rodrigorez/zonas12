@@ -1753,7 +1753,10 @@ página de obras será com esta» e deu o `galerias/obra7.html`: o `css/obra.css
 `clamp()`, uma coluna de `clamp(320px, 90vw, 800px)` e uma linha por assunto) e o gerador ganhou a
 **tabela das plataformas** do `platform-detector.js` — um endereço de YouTube, p5.js, Vimeo,
 OpenProcessing ou Shadertoy é embutido no `embed` que a plataforma serve; um endereço desconhecido
-passa tal e qual, sem se inventar um embed que o site não dá. Três desvios conscientes: o YouTube leva
+passa tal e qual, sem se inventar um embed que o site não dá. Duas entraram depois das obras: o
+**Instagram** (`/p/<código>/embed`) e o **álbum do Imgur** (`/a/<código>/embed`) — as páginas normais
+de ambos mandam `X-Frame-Options: DENY` e a ficha abria uma caixa vazia, mas as formas de embutir
+respondem 200 e não recusam o iframe (medido, D109). Três desvios conscientes: o YouTube leva
 **`mute=1`** (com som, o `autoplay` é bloqueado e a Zonas 11 ficavam com o cartão parado); o
 **`?from=`** das Zonas 11 **não** se copiou, porque na zonas12 esse parâmetro é a **porta de chegada**
 do mundo e voltar com ele faria a ficha anunciar uma chegada que não houve — o «voltar» é `../`, a

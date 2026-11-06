@@ -28,11 +28,12 @@
 // porta de chegada. É o que uma porta da sala de ensaio mostra (D84), porque lá o `?from` não viaja.
 // Os pares vêm do dado (`preview` que navega, com o retrato na convenção `<destino>-de-<origem>`).
 import { join } from 'node:path';
-import { mkdirSync, readdirSync, readFileSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { writeAtomic } from '../coordination/atomic.mjs';
 import { oficina } from '../coordination/locks.mjs';
 import { serveProject, openBrowser, ROOT, sleep } from '../regression/harness.mjs';
 import { DERIVED_DIMENSION_BASE } from '../../js/core/index.js';
+import { portasDoDado } from './portas-com-retrato.mjs';
 
 // O tamanho da imagem. Enquanto o fundo era um panorama, quem mandava era a resolução: medido na
 // porta mais difícil (praia 4 �  cidade), 2560x1280 deixava a costura em **0,58** (falhava a meta de
@@ -45,41 +46,9 @@ import { DERIVED_DIMENSION_BASE } from '../../js/core/index.js';
 // resolução.
 const TAMANHO = { largura: 2048, altura: 1024, face: 1536, qualidade: 0.85 };
 
-// As portas com retrato, lidas do **dado** (D84): uma entrada por porta `preview` que navega, com o
-// mundo de destino, o mundo de origem e se essa origem leva o `?from` (as salas levam; a sala de
-// ensaio não — `world.carryOrigin: false`).
-//
-// A lista esteve escrita à mão (39 pares) e teria de crescer à mão com cada porta nova — a mesma
-// lição que a P1 da spec (D83) deixou nas baterias. O que continua a ser uma regra está aqui: só se
-// desenha o que segue a convenção `<destino>-de-<origem>.jpg`, porque é essa a porta que a janela
-// mostra; um fixture que aponte para um panorama antigo (o `example` aponta para `praia.jpg`) fica de
-// fora em vez de ser substituído por um retrato.
-const CONVENCAO = /(^|\/)previews\/[a-z0-9-]+-de-[a-z0-9-]+\.jpg$/;
-
-function portasDoDado() {
-  const pasta = join(ROOT, 'data', 'worlds');
-  const portas = [];
-  const vistas = new Set();
-  for (const nome of readdirSync(pasta).filter((entrada) => entrada.endsWith('.json'))) {
-    const cena = JSON.parse(readFileSync(join(pasta, nome), 'utf8'));
-    const origem = (cena.world && cena.world.slug) || nome.replace(/\.json$/, '');
-    const direto = Boolean(cena.world && cena.world.carryOrigin === false);
-    for (const portal of cena.portals || []) {
-      const janela = portal.window || {};
-      const acao = portal.action || {};
-      if (janela.kind !== 'preview' || acao.kind !== 'navigate') continue;
-      const retrato = (cena.assets && cena.assets[janela.asset] && cena.assets[janela.asset].path) || null;
-      if (!retrato || !CONVENCAO.test(retrato)) continue;
-      const chave = origem + '>' + acao.target;
-      if (vistas.has(chave)) continue;
-      vistas.add(chave);
-      portas.push({ destino: acao.target, origem, direto, retrato });
-    }
-  }
-  return portas.sort((a, b) => a.destino.localeCompare(b.destino) || a.origem.localeCompare(b.origem));
-}
-
-const PORTAS = portasDoDado();
+// As portas com retrato vivem em `portas-com-retrato.mjs`, porque o `retratos-em-vagas.mjs` também
+// precisa delas para repartir o trabalho.
+const PORTAS = portasDoDado(join(ROOT, 'data', 'worlds'));
 
 const todos = process.argv[2] === '--todos';
 const mundo = todos ? null : process.argv[2];
