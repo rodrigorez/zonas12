@@ -11,7 +11,9 @@
 //      no dado);
 //   2. com o YouTube bloqueado, cai na **capa do CSV**;
 //   3. com o YouTube e a capa do CSV bloqueados, cai na **imagem padrão** de aviso;
-//   4. a imagem padrão está no projeto e carrega (é ela que se vê quando nada funciona).
+//   4. a imagem padrão está no projeto e carrega (é ela que se vê quando nada funciona);
+//   5. na **sala**, a capa resolvida chega à malha da obra: nenhum id de `<a-assets>` se repete, as
+//      obras desenham uma imagem descodificada e a obra sem capa desenha a imagem padrão.
 //
 // Uso, da raiz do projeto:
 //
@@ -63,6 +65,38 @@ async function comBloqueio(site, caminho, bloqueados) {
         carregada: img ? (img.complete && img.naturalWidth > 0) : null,
         tamanho: img ? [img.naturalWidth, img.naturalHeight] : null
       };
+    })()`);
+  } finally {
+    await browser.close();
+  }
+}
+
+// O que a **sala** faz com as capas que a cadeia resolveu. Não basta a ficha mostrar a capa certa: a
+// obra na sala desenha-a por um `#selector` de `<a-assets>`, e um id repetido faz o A-Frame escolher o
+// primeiro do documento. Medido em 2026-11-06: 8 obras pretas, com a cadeia a resolver bem ao lado
+// (achado §8.5-a do PENDENCIAS).
+async function capasDaSala(site, slug) {
+  const browser = await openBrowser({ width: 1280, height: 720 });
+  try {
+    const construida = await browser.goto(site.base + '/' + slug + '/?from=gate', 120000);
+    if (!construida) throw new Error(slug + ' não ficou construída em 120 s');
+    await sleep(1200);
+    return await browser.evaluate(`(() => {
+      const imagens = Array.from(document.querySelectorAll('a-assets [id]'));
+      const contagem = {};
+      for (const el of imagens) contagem[el.id] = (contagem[el.id] || 0) + 1;
+      const duplicados = Object.entries(contagem).filter((par) => par[1] > 1).map((par) => par[0]);
+      const obras = Array.from(document.querySelectorAll('[data-artwork-id]')).map((el) => {
+        const malha = el.getObject3D('mesh');
+        const mapa = malha && malha.material && malha.material.map;
+        const imagem = mapa && mapa.image;
+        return {
+          id: el.getAttribute('data-artwork-id'),
+          largura: imagem ? imagem.naturalWidth : 0,
+          ficheiro: imagem ? String(imagem.currentSrc || imagem.src || '') : ''
+        };
+      });
+      return { duplicados: duplicados, obras: obras };
     })()`);
   } finally {
     await browser.close();
@@ -121,6 +155,25 @@ async function main() {
       JSON.stringify(padrao));
     result.check('a imagem padrão diz que a capa tem um problema',
       /sem-capa\.svg$/.test(DEFAULT_COVER), DEFAULT_COVER);
+
+    // 4. A sala: a capa resolvida tem de chegar à **malha** da obra, e não só ao `<a-assets>`. O
+    // `scene16` é o caso difícil — sete obras de sítio, três com capa no projeto e quatro com a capa no
+    // YouTube por cima de uma do catálogo que falha; é onde os ids colidiam.
+    const sala = await capasDaSala(site, 'scene16');
+    result.check('scene16 · nenhum id de <a-assets> se repete',
+      sala.duplicados.length === 0, sala.duplicados.length ? 'repetidos: ' + sala.duplicados.join(', ') : '0 repetido(s)');
+    const pretas = sala.obras.filter((obra) => !(obra.largura > 0));
+    result.check('scene16 · as 7 obras desenham uma imagem descodificada',
+      sala.obras.length === 7 && pretas.length === 0,
+      sala.obras.length + ' obra(s), pretas: ' + (pretas.length ? pretas.map((o) => o.id).join(',') : 'nenhuma'));
+
+    // A `scene23`·2 não tem capa nenhuma no dado: é a única obra que **tem** de desenhar a imagem padrão,
+    // e é a prova de que a cadeia corre até ao fim quando não há nada a tentar.
+    const semCapa = await capasDaSala(site, 'scene23');
+    const stoned = semCapa.obras.find((obra) => obra.id === '2');
+    result.check('scene23 · a obra sem capa desenha a imagem padrão, e não um painel preto',
+      Boolean(stoned) && stoned.largura > 0 && /sem-capa\.svg$/.test(stoned.ficheiro),
+      stoned ? stoned.largura + ' px · ' + stoned.ficheiro.replace(/^.*\//, '') : 'obra 2 não encontrada');
   } finally {
     await site.close();
   }

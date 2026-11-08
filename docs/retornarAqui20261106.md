@@ -1,7 +1,14 @@
 # Retomar aqui — a prova no browser das 28 páginas (zonas12)
 
-Passagem interrompida a pedido em **2026-11-06 ~16h**. Nada foi commitado; nada do projecto foi alterado
-excepto `docs/PENDENCIAS.md` (a §8, que é o que a tarefa pede).
+Passagem interrompida a pedido em **2026-11-06 ~16h**; retomada e continuada em **2026-11-08**.
+
+> **Actualização de 2026-11-08 — leia primeiro.** A correção `[M]` dos 8 painéis pretos (§8.5-a) **está
+> feita**, na branch **`v0.0.50`** (saída da `bkp20261106`): uma linha em `js/scene/scene-builder.js` e
+> três guardas novas no `tools/regression/capa.mjs`. Medido depois: **150/150** malhas com imagem (era
+> 142/150), 152/152 janelas, 0 erros; `capa.mjs` **12/12** e `twelve-tests` **211/211**. A causa do
+> vermelho da `--full` também ficou apurada — **é a §6**, não código partido (ver §8.5-h do PENDENCIAS).
+> O que continua por fazer está em baixo, actualizado.
+
 
 ## O que já está feito (e onde está escrito)
 
@@ -33,23 +40,20 @@ excepto `docs/PENDENCIAS.md` (a §8, que é o que a tarefa pede).
 
 1. **Acabar o `--full`** — faltam 9 baterias: `ordem-da-janela` (D80, estava a começar), `emenda` (D82),
    `orientation`, `camera-arrival`, `image-bridge`, `labels-artworks`, `labels-doors`, `start-button`,
-   `transition`. Registar o número de cada uma no §8.1.
-2. **Fechar a §8.5-h** (três medições em isolamento + o teste do `git stash`):
-
-   ```powershell
-   node tools/regression/seam.mjs gate 0        # 1,48 na varredura — repete sozinho?
-   node tools/regression/seam.mjs scene15 3     # 2,79 na varredura — repete sozinho?
-   node tools/regression/motion.mjs             # o controlo «sala de ensaio»: 0 navegações?
-   git stash push -- assets/previews ; node tools/regression/seam.mjs gate 0 ; git stash pop
-   ```
-
-   (a árvore de trabalho tem 51 pares de retratos refeitos e **não commitados**; a hipótese é que o
-   `seam` esteja a medir esses retratos novos, ou a falta deles)
-
-3. **Decidir com o autor** o YouTube (b) e o Vimeo (c), e aplicar a correção `[M]` do `links.mjs`.
-4. **Aplicar a correção de uma linha (a)** + guarda no `capa.mjs` (nenhum id repetido em `<a-assets>`; a
-   malha de cada obra com `naturalWidth > 0`).
+   `transition`. Registar o número de cada uma no §8.1. (Não é preciso repetir o núcleo: as 9 do núcleo
+   correm-se pelo `all.mjs` sem `--full` e já deram 9/9.)
+2. ~~**Fechar a §8.5-h**~~ — **a causa está apurada em 2026-11-08**: das 17 portas, **0** têm retrato do
+   lote refeito e **17** têm retrato antigo → é a §6 (retratos por refazer), não regressão. A 18.ª falha
+   («fotograma escuro») é o `seam` a julgar o portão, que é `kind: "camera"` — correção `[M]` no
+   `seam.mjs`. **Falta só o `motion`**, o único vermelho sem causa (o controlo «a atravessar o plano, a
+   porta leva-o» dá 0 navegações, o que torna as duas verificações vizinhas vacuamente verdes).
+3. **Decidir com o autor** o YouTube (b) e o Vimeo (c), e aplicar a correção `[M]` do `links.mjs`
+   (verificar `platformEmbed(site).src`, não o endereço da obra).
+4. ~~**Aplicar a correção de uma linha (a)**~~ — **feito na `v0.0.50`** (2026-11-08), com as três guardas
+   no `capa.mjs` e provada a falhar com o defeito de volta (10/12).
 5. (Opcional) repetir a ficha do Imgur com sessão/cookies de terceiros.
+6. **Os 75 pares de retratos da §6** — duas passagens de `retratos-em-vagas.mjs`. É o que faz cair as 17
+   portas da `seam`.
 
 ## Os instrumentos (fora do repositório)
 
@@ -75,10 +79,19 @@ Fora do repositório, no estado desta sessão:
 ## O que ficou medido, para não se repetir
 
 - `cobertura(paginasDaExposicao()).ok` = **true** (28 salas, 0 fora, 0 ignorados).
-- 150 obras: **142** malhas com imagem (141 capas + 1 imagem padrão em `scene23`·2), **8** pretas —
-  exactamente as 8 da §3.
+- 150 obras: **142** malhas com imagem em 2026-11-06 e **150** depois da correção da `v0.0.50`
+  (2026-11-08); as **8** que estavam pretas eram exatamente as 8 da §3.
 - **152/152** janelas, todas em modo `shader`, todas com retrato e recorte.
 - **0** erros e **0** avisos de consola nas 28 páginas.
 - Fichas: 11/11 falham como previsto (Canva 200+`ERR_BLOCKED_BY_RESPONSE` / 403; Drive 403; `open?id=` →
   `/view` 403; 401 / 404 / 401). Amostras: p5.js e Instagram funcionam; YouTube (1 de 2) e Vimeo não;
   Imgur carrega o iframe e não desenha a imagem.
+- `seam` 384/402 e `motion` 43/44 — a `seam` é a §6, o `motion` está por explicar.
+
+## Estado do git
+
+| | |
+|---|---|
+| `bkp20261106` | instantâneo de 2026-11-06 (`c782b89`), igual ao `origin`. **Não commitar mais nela** |
+| `v0.0.50` | a correção dos 8 painéis + esta documentação. Saiu da `bkp20261106` |
+| `v0.0.49` | a versão anterior a tudo isto (`85b97ec`) |

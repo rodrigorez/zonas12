@@ -306,7 +306,11 @@ async function resolveCovers(scene, language, parent) {
     const resolved = candidates.length === 0
       ? { src: DEFAULT_COVER, from: 'padrao' }
       : await resolveCover(candidates);
-    const id = 'capa-' + artwork.id;
+    // O id **não** pode ser `capa-<id>`: esse é o do asset do catálogo (`from-csv.mjs`), que já está em
+    // `<a-assets>`. Com o mesmo id, o `#selector` do A-Frame resolve para o primeiro do documento — o do
+    // catálogo, que falha — e a obra ficava preta apesar de a cadeia ter resolvido. Medido em 2026-11-06:
+    // 8 obras pretas, e a `scene23`·2 (a única sem asset com esse id) a mostrar a imagem padrão.
+    const id = 'capa-resolvida-' + artwork.id;
     const el = document.createElement('img');
     el.setAttribute('id', id);
     el.setAttribute('src', resolved.src);

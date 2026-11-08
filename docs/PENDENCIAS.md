@@ -613,6 +613,13 @@ numa obra) e três passam a mostrar o thumbnail do YouTube.
 `<a-assets>`; (2) a malha de cada obra tem `material.map.image.naturalWidth > 0`, salvo a obra declarada
 sem capa.
 
+> **CORRIGIDO em 2026-11-08, na branch `v0.0.50`** — a linha foi mudada e as três guardas entraram no
+> `capa.mjs`. Medido depois, com o mesmo instrumento: **150/150** malhas com imagem, **152/152** janelas,
+> **0** erros (antes: 142/150, com as 8 pretas). Das oito, **5** passaram a mostrar a imagem padrão e
+> **3** o thumbnail do YouTube — os números que esta alínea previa. A guarda foi provada a falhar: com o
+> id antigo de volta, o `capa.mjs` dá **10 de 12**, nomeando os 7 ids repetidos e as obras **1 e 5** da
+> `scene16` como pretas. Detalhe e provas na **§8.8**.
+
 #### b) **[A] `scene1`·1 «Golens Transgênicos» — o vídeo recusa ser embutido**
 
 O documento manda provar «uma do YouTube». Esta é a que calhou na amostra, e falha: a ficha devolve
@@ -705,9 +712,29 @@ a varredura completa — a que o `--full` corre, uma entrada por porta do dado, 
 
 **A causa mais provável é a §6**, e é para confirmar antes de se tratar como regressão: o `seam.mjs`
 compara exatamente o retrato que a janela mostra com a sala ao vivo, e há **125 pares de retratos
-desactualizados** no disco (dos quais 51 foram refeitos nesta árvore de trabalho e ainda **não estão
-commitados**). Duas portas reprovadas — `scene15` 3 → `scene16` (**2,79**) e `scene4` 13 → `scene5`
-(**1,24**) — são de salas com retratos no lote que falta.
+desactualizados** no disco (dos quais 51 foram refeitos e ficaram no commit `c782b89`, branch
+`bkp20261106`, a 2026-11-06). Duas portas reprovadas — `scene15` 3 → `scene16` (**2,79**) e
+`scene4` 13 → `scene5` (**1,24**) — são de salas com retratos no lote que falta.
+
+**CONFIRMADO em 2026-11-08** — as três medições em isolamento reproduzem os valores da varredura
+(`gate 0` = **1,48**, `scene15 3` = **2,79**, `motion` = **43/44**), e a pertença ao lote resolve a
+hipótese sem ambiguidade: das 17 portas, **0** têm o retrato entre os 51 refeitos e **17** têm retrato
+do lote antigo (`scene8-de-gate.jpg` e `scene5-de-scene13.jpg` de 04/11 21:38, `scene16-de-scene15.jpg`
+de 05/11 18:20, …). A `seam` vermelha **é a §6 a aparecer numa medição**, não código partido — e o
+«0,10 a 0,32 em cinco portas» das passagens anteriores continua verdadeiro: aquelas cinco eram do lote
+fresco. A previsão fica escrita para se poder cobrar: quando os 75 pares da §6 forem refeitos, estas 17
+caem abaixo de 0,50.
+
+**A 18.ª falha não é da exposição, é da bateria.** `scene3 47 → gate` chega ao portão, cuja única
+dimensão é `kind: "camera"` — a chegada mostra o mundo real, e os «5 escuros em 78 amostras» são o
+arranque do dispositivo de câmara do Chrome. O `seam.mjs` já sabe que a porta «leva à câmara» e por isso
+não julga o **salto**; tem de aplicar a mesma excepção ao **fotograma escuro**. Correção `[M]`, uma
+condição a mais, e nada muda para o visitante.
+
+**O `motion.mjs` continua por explicar** e é o único vermelho sem causa: o controlo «com a porta assente e
+a câmara a atravessar o plano» devia navegar e dá **0 navegações** — o que torna vacuamente verdes as duas
+verificações vizinhas («parado não leva» / «ao lado não leva»). É defeito real na travessia (D91) ou no
+próprio controlo; exige a sua passagem.
 
 *Como confirmar, na próxima passagem* (não feito aqui, e é o primeiro item de quem retomar):
 
@@ -735,8 +762,10 @@ commitados**). Duas portas reprovadas — `scene15` 3 → `scene16` (**2,79**) e
 
 | Achado | Correção | Marca | Quem |
 |---|---|---|---|
-| §8.5-h · `--full` vermelho (`seam` 17 portas, `motion` 1 controlo) | medir em isolamento, depois refazer o retrato da porta ou o recorte da janela | **[T]**/**[M]** | máquina |
-| §8.5-a · 8 painéis pretos | 1 linha em `js/scene/scene-builder.js:309` + guarda no `capa.mjs` | **[M]** | mecânico |
+| §8.5-h · `seam` 17 portas | nenhuma — é a §6; refazer os 75 pares | **[T]** | máquina |
+| §8.5-h · `seam` 18.ª (fotograma escuro no portão) | não julgar os escuros quando o destino é `kind: "camera"` | **[M]** | mecânico |
+| §8.5-h · `motion` 1 controlo | apurar se é a travessia (D91) ou o controlo | **[T]** | máquina |
+| ~~§8.5-a · 8 painéis pretos~~ | **feito** na `v0.0.50` (2026-11-08) — 1 linha + 3 guardas no `capa.mjs` | **[M]** | — |
 | §8.5-b · YouTube `scene1`·1 | activar «Permitir incorporação» (`63faPpyHonk`) | **[A]** | autor |
 | §8.5-c · Vimeo `scene4`·0 | tornar o vídeo incorporável | **[A]** | autor |
 | §8.5-c · `links.mjs` cego ao embed | verificar `platformEmbed(site).src` | **[M]** | mecânico |
@@ -773,6 +802,60 @@ A passagem foi **interrompida a pedido**, a meio do `all.mjs --full`. O que falt
 Os instrumentos desta passagem — `medir-paginas.mjs`, `medir-fichas.mjs`, `fichas-lista.json`,
 `capturar.mjs`, `capturar-recorte.mjs`, `capturar-ficha.mjs`, `sondar-obras.mjs` — vivem fora do
 repositório (`%TEMP%\zonas-medicao\`), como o pedido manda, e é de lá que se volta a correr.
+
+---
+
+### 8.8 · Segunda passagem, 2026-11-08 — a correção da §8.5-a, e o que ela mudou
+
+Branch **`v0.0.50`**, saída da `bkp20261106`. É a única coisa reparada até hoje nesta matéria; tudo o
+resto da §8 continua como estava medido.
+
+### 8.8.1 · O que foi mudado
+
+| Ficheiro | Mudança |
+|---|---|
+| `js/scene/scene-builder.js` | o `<img>` da capa resolvida passa a ter id **`capa-resolvida-<id>`** (era `capa-<id>`, o mesmo do asset do catálogo), com o porquê escrito ao lado |
+| `tools/regression/capa.mjs` | três verificações novas, medidas **na sala** e não na ficha: nenhum id repetido em `<a-assets>` · as 7 obras da `scene16` desenham imagem descodificada · a `scene23`·2 desenha a imagem padrão |
+
+Não foi preciso mexer no dado, nas folhas nem em `assets/`: a chave `capa-<id>` continua a ser a do
+catálogo (`from-csv.mjs`), e a malha passa a apontar para a `<img>` resolvida pela cadeia do D65.
+
+### 8.8.2 · Antes e depois, com o mesmo instrumento
+
+| Medida (28 páginas, `medir-paginas.mjs`) | 2026-11-06, antes | 2026-11-08, depois |
+|---|---|---|
+| malhas da obra com imagem descodificada | **142/150** | **150/150** |
+| obras a desenhar a imagem padrão | 1 (`scene23`·2) | **6** — as 5 sem capa válida e sem thumbnail, mais a `scene23`·2 |
+| obras a desenhar o thumbnail do YouTube | 0 das que falhavam | **3** (`scene16`·1, `scene16`·5, `scene19`·4) |
+| janelas com retrato e recorte | 152/152 | **152/152** |
+| erros de consola da exposição | 0 | **0** |
+
+As 8 obras que estavam pretas — `scene5`·1, `scene16`·1, `scene16`·5, `scene18`·2, `scene19`·1,
+`scene19`·4, `scene20`·2, `scene25`·2 — passaram todas a mostrar **o que o D65 promete**: 5 a imagem
+«Capa indisponível · avisar o administrador da galeria» e 3 o thumbnail do vídeo. Os painéis continuam a
+denunciar a falta da capa (§3) — o que acabou foi o painel **preto**, que não dizia nada.
+
+### 8.8.3 · As baterias, corridas depois da mudança
+
+| Comando | Resultado |
+|---|---|
+| `node tools/scene/validate.mjs` | exit **0**, 28 mundos com arranque, L28 e D53 sem erro |
+| `node tools/regression/capa.mjs` | **12 de 12** (9 antigas + 3 novas), exit **0** |
+| `node tools/regression/capa.mjs` **com o id antigo de volta** | **10 de 12**, exit **1** — «repetidos: capa-1 … capa-7» e «pretas: 1,5». A guarda vê o defeito |
+| `node tools/regression/twelve-tests.mjs` | **211 de 211**, exit **0** |
+| `node tools/regression/obra.mjs` | **82 de 82**, exit **0** |
+| `medir-paginas.mjs` (28 páginas) | **150/150** · **152/152** · **0** erros |
+
+A prova visual: o painel da `scene16` que era um retângulo preto mostra agora o thumbnail do vídeo, e a
+ficha da `scene5`·1 mostra a imagem padrão com «Capa indisponível · Avisar o administrador da galeria».
+As imagens ficam fora do repositório, com as da §8.
+
+### 8.8.4 · O que continua aberto
+
+Nada disto foi tocado: a `seam` (17 portas da §6 + a 18.ª da câmara), o `motion`, as 9 baterias
+arquivadas que nunca correram, as decisões do autor (§8.5-b YouTube, §8.5-c Vimeo) e as pendências das
+§3, §4 e §5. A lista viva é a §8.6.
+
 
 
 
