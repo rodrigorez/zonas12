@@ -42,7 +42,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Cidade 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the City 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the City 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "recorte-scene2-de-gate": {
@@ -50,7 +50,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Praia, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Beach world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Beach world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-noite": {
@@ -66,7 +66,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Noite 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Night 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Night 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-ondas": {
@@ -82,7 +82,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Ondas 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Waves 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Waves 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-becos": {
@@ -98,7 +98,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Becos 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Alleys 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Alleys 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-presencas": {
@@ -114,7 +114,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Presenças 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Presences 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Presences 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-imersoes": {
@@ -130,7 +130,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Imersões 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Immersions 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Immersions 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-mangue": {
@@ -146,7 +146,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Mangue 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Mangrove 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Mangrove 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-distopia": {
@@ -162,7 +162,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Distopia 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Dystopia 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Dystopia 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-memoria": {
@@ -178,7 +178,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Memória 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Memory 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Memory 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-ceu": {
@@ -194,23 +194,23 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Céu 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Sky 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Sky 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene12": {
       "path": "assets/previews/scene12-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene12, visto da porta",
-        "en": "Portrait of the scene12 world, seen from the door"
+        "pt": "Retrato do mundo Tesouros 360º, visto da porta",
+        "en": "Portrait of the Treasures 360º world, seen from the door"
       }
     },
     "recorte-scene12-de-gate": {
       "path": "assets/previews/recorte-scene12-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene12, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene12 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Tesouros 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Treasures 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene13": {
@@ -233,224 +233,224 @@
       "path": "assets/previews/scene14-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene14, visto da porta",
-        "en": "Portrait of the scene14 world, seen from the door"
+        "pt": "Retrato do mundo Sinais Invisíveis, visto da porta",
+        "en": "Portrait of the Invisible Signals world, seen from the door"
       }
     },
     "recorte-scene14-de-gate": {
       "path": "assets/previews/recorte-scene14-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene14, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene14 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Sinais Invisíveis, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Invisible Signals world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene15": {
       "path": "assets/previews/scene15-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene15, visto da porta",
-        "en": "Portrait of the scene15 world, seen from the door"
+        "pt": "Retrato do mundo Paisagens Sonoras, visto da porta",
+        "en": "Portrait of the Soundscapes world, seen from the door"
       }
     },
     "recorte-scene15-de-gate": {
       "path": "assets/previews/recorte-scene15-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene15, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene15 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Paisagens Sonoras, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Soundscapes world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene16": {
       "path": "assets/previews/scene16-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene16, visto da porta",
-        "en": "Portrait of the scene16 world, seen from the door"
+        "pt": "Retrato do mundo Depois do Ecrã, visto da porta",
+        "en": "Portrait of the After the Screen world, seen from the door"
       }
     },
     "recorte-scene16-de-gate": {
       "path": "assets/previews/recorte-scene16-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene16, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene16 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Depois do Ecrã, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the After the Screen world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene17": {
       "path": "assets/previews/scene17-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene17, visto da porta",
-        "en": "Portrait of the scene17 world, seen from the door"
+        "pt": "Retrato do mundo Corpo como Território, visto da porta",
+        "en": "Portrait of the Body as Territory world, seen from the door"
       }
     },
     "recorte-scene17-de-gate": {
       "path": "assets/previews/recorte-scene17-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene17, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene17 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Corpo como Território, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Body as Territory world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene18": {
       "path": "assets/previews/scene18-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene18, visto da porta",
-        "en": "Portrait of the scene18 world, seen from the door"
+        "pt": "Retrato do mundo Sombras e Raízes, visto da porta",
+        "en": "Portrait of the Shadows and Roots world, seen from the door"
       }
     },
     "recorte-scene18-de-gate": {
       "path": "assets/previews/recorte-scene18-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene18, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene18 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Sombras e Raízes, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Shadows and Roots world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene19": {
       "path": "assets/previews/scene19-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene19, visto da porta",
-        "en": "Portrait of the scene19 world, seen from the door"
+        "pt": "Retrato do mundo Memória sob Ataque, visto da porta",
+        "en": "Portrait of the Memory Under Attack world, seen from the door"
       }
     },
     "recorte-scene19-de-gate": {
       "path": "assets/previews/recorte-scene19-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene19, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene19 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Memória sob Ataque, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Memory Under Attack world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene20": {
       "path": "assets/previews/scene20-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene20, visto da porta",
-        "en": "Portrait of the scene20 world, seen from the door"
+        "pt": "Retrato do mundo Habitar, visto da porta",
+        "en": "Portrait of the Dwelling world, seen from the door"
       }
     },
     "recorte-scene20-de-gate": {
       "path": "assets/previews/recorte-scene20-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene20, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene20 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Habitar, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Dwelling world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene21": {
       "path": "assets/previews/scene21-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene21, visto da porta",
-        "en": "Portrait of the scene21 world, seen from the door"
+        "pt": "Retrato do mundo Matéria Frágil, visto da porta",
+        "en": "Portrait of the Fragile Matter world, seen from the door"
       }
     },
     "recorte-scene21-de-gate": {
       "path": "assets/previews/recorte-scene21-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene21, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene21 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Matéria Frágil, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Fragile Matter world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene22": {
       "path": "assets/previews/scene22-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene22, visto da porta",
-        "en": "Portrait of the scene22 world, seen from the door"
+        "pt": "Retrato do mundo Ciclos, visto da porta",
+        "en": "Portrait of the Cycles world, seen from the door"
       }
     },
     "recorte-scene22-de-gate": {
       "path": "assets/previews/recorte-scene22-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene22, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene22 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Ciclos, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Cycles world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene23": {
       "path": "assets/previews/scene23-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene23, visto da porta",
-        "en": "Portrait of the scene23 world, seen from the door"
+        "pt": "Retrato do mundo Sociedades de Controlo, visto da porta",
+        "en": "Portrait of the Control Societies world, seen from the door"
       }
     },
     "recorte-scene23-de-gate": {
       "path": "assets/previews/recorte-scene23-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene23, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene23 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Sociedades de Controlo, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Control Societies world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene24": {
       "path": "assets/previews/scene24-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene24, visto da porta",
-        "en": "Portrait of the scene24 world, seen from the door"
+        "pt": "Retrato do mundo Murmúrio e Matéria, visto da porta",
+        "en": "Portrait of the Murmur and Matter world, seen from the door"
       }
     },
     "recorte-scene24-de-gate": {
       "path": "assets/previews/recorte-scene24-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene24, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene24 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Murmúrio e Matéria, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Murmur and Matter world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene25": {
       "path": "assets/previews/scene25-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene25, visto da porta",
-        "en": "Portrait of the scene25 world, seen from the door"
+        "pt": "Retrato do mundo Arcade Crítico, visto da porta",
+        "en": "Portrait of the Critical Arcade world, seen from the door"
       }
     },
     "recorte-scene25-de-gate": {
       "path": "assets/previews/recorte-scene25-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene25, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene25 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Arcade Crítico, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Critical Arcade world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene26": {
       "path": "assets/previews/scene26-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene26, visto da porta",
-        "en": "Portrait of the scene26 world, seen from the door"
+        "pt": "Retrato do mundo Solidão em Rede, visto da porta",
+        "en": "Portrait of the Networked Loneliness world, seen from the door"
       }
     },
     "recorte-scene26-de-gate": {
       "path": "assets/previews/recorte-scene26-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene26, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene26 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Solidão em Rede, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Networked Loneliness world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene27": {
       "path": "assets/previews/scene27-de-gate.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene27, visto da porta",
-        "en": "Portrait of the scene27 world, seen from the door"
+        "pt": "Retrato do mundo Quem Nos Olha, visto da porta",
+        "en": "Portrait of the Who Watches Us world, seen from the door"
       }
     },
     "recorte-scene27-de-gate": {
       "path": "assets/previews/recorte-scene27-de-gate.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene27, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene27 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Quem Nos Olha, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Who Watches Us world, seen from the door (cutout, for the live window)"
       }
     }
   },

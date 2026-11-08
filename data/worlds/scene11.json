@@ -77,7 +77,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Noite 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Night 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Night 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-praia": {
@@ -93,7 +93,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Praia, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Beach world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Beach world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-distopia": {
@@ -109,23 +109,23 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Distopia 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Dystopia 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Dystopia 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene14": {
       "path": "assets/previews/scene14-de-scene11.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene14, visto da porta",
-        "en": "Portrait of the scene14 world, seen from the door"
+        "pt": "Retrato do mundo Sinais Invisíveis, visto da porta",
+        "en": "Portrait of the Invisible Signals world, seen from the door"
       }
     },
     "recorte-scene14-de-scene11": {
       "path": "assets/previews/recorte-scene14-de-scene11.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene14, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene14 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Sinais Invisíveis, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Invisible Signals world, seen from the door (cutout, for the live window)"
       }
     }
   },

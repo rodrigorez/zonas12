@@ -3,8 +3,8 @@
   "world": {
     "slug": "scene20",
     "name": {
-      "pt": "scene20",
-      "en": "scene20"
+      "pt": "Habitar",
+      "en": "Dwelling"
     }
   },
   "cameras": {
@@ -33,16 +33,16 @@
       "path": "assets/previews/scene19-de-scene20.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene19, visto da porta",
-        "en": "Portrait of the scene19 world, seen from the door"
+        "pt": "Retrato do mundo Memória sob Ataque, visto da porta",
+        "en": "Portrait of the Memory Under Attack world, seen from the door"
       }
     },
     "recorte-scene19-de-scene20": {
       "path": "assets/previews/recorte-scene19-de-scene20.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene19, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene19 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Memória sob Ataque, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Memory Under Attack world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene5": {
@@ -65,16 +65,16 @@
       "path": "assets/previews/scene21-de-scene20.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene21, visto da porta",
-        "en": "Portrait of the scene21 world, seen from the door"
+        "pt": "Retrato do mundo Matéria Frágil, visto da porta",
+        "en": "Portrait of the Fragile Matter world, seen from the door"
       }
     },
     "recorte-scene21-de-scene20": {
       "path": "assets/previews/recorte-scene21-de-scene20.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene21, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene21 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Matéria Frágil, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Fragile Matter world, seen from the door (cutout, for the live window)"
       }
     },
     "capa-1": {

@@ -70,7 +70,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Mangue 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Mangrove 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Mangrove 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-memoria": {
@@ -86,39 +86,39 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Memória 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Memory 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Memory 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene12": {
       "path": "assets/previews/scene12-de-scene10.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene12, visto da porta",
-        "en": "Portrait of the scene12 world, seen from the door"
+        "pt": "Retrato do mundo Tesouros 360º, visto da porta",
+        "en": "Portrait of the Treasures 360º world, seen from the door"
       }
     },
     "recorte-scene12-de-scene10": {
       "path": "assets/previews/recorte-scene12-de-scene10.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene12, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene12 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Tesouros 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Treasures 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene14": {
       "path": "assets/previews/scene14-de-scene10.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene14, visto da porta",
-        "en": "Portrait of the scene14 world, seen from the door"
+        "pt": "Retrato do mundo Sinais Invisíveis, visto da porta",
+        "en": "Portrait of the Invisible Signals world, seen from the door"
       }
     },
     "recorte-scene14-de-scene10": {
       "path": "assets/previews/recorte-scene14-de-scene10.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene14, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene14 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Sinais Invisíveis, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Invisible Signals world, seen from the door (cutout, for the live window)"
       }
     }
   },

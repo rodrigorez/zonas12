@@ -3,8 +3,8 @@
   "world": {
     "slug": "scene14",
     "name": {
-      "pt": "scene14",
-      "en": "scene14"
+      "pt": "Sinais Invisíveis",
+      "en": "Invisible Signals"
     }
   },
   "cameras": {
@@ -65,32 +65,32 @@
       "path": "assets/previews/scene15-de-scene14.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene15, visto da porta",
-        "en": "Portrait of the scene15 world, seen from the door"
+        "pt": "Retrato do mundo Paisagens Sonoras, visto da porta",
+        "en": "Portrait of the Soundscapes world, seen from the door"
       }
     },
     "recorte-scene15-de-scene14": {
       "path": "assets/previews/recorte-scene15-de-scene14.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene15, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene15 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Paisagens Sonoras, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Soundscapes world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene25": {
       "path": "assets/previews/scene25-de-scene14.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene25, visto da porta",
-        "en": "Portrait of the scene25 world, seen from the door"
+        "pt": "Retrato do mundo Arcade Crítico, visto da porta",
+        "en": "Portrait of the Critical Arcade world, seen from the door"
       }
     },
     "recorte-scene25-de-scene14": {
       "path": "assets/previews/recorte-scene25-de-scene14.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene25, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene25 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Arcade Crítico, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Critical Arcade world, seen from the door (cutout, for the live window)"
       }
     },
     "capa-1": {

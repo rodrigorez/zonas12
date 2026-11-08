@@ -3,8 +3,8 @@
   "world": {
     "slug": "scene18",
     "name": {
-      "pt": "scene18",
-      "en": "scene18"
+      "pt": "Sombras e Raízes",
+      "en": "Shadows and Roots"
     }
   },
   "cameras": {
@@ -33,16 +33,16 @@
       "path": "assets/previews/scene17-de-scene18.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene17, visto da porta",
-        "en": "Portrait of the scene17 world, seen from the door"
+        "pt": "Retrato do mundo Corpo como Território, visto da porta",
+        "en": "Portrait of the Body as Territory world, seen from the door"
       }
     },
     "recorte-scene17-de-scene18": {
       "path": "assets/previews/recorte-scene17-de-scene18.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene17, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene17 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Corpo como Território, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Body as Territory world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene3": {
@@ -65,16 +65,16 @@
       "path": "assets/previews/scene19-de-scene18.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene19, visto da porta",
-        "en": "Portrait of the scene19 world, seen from the door"
+        "pt": "Retrato do mundo Memória sob Ataque, visto da porta",
+        "en": "Portrait of the Memory Under Attack world, seen from the door"
       }
     },
     "recorte-scene19-de-scene18": {
       "path": "assets/previews/recorte-scene19-de-scene18.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene19, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene19 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Memória sob Ataque, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Memory Under Attack world, seen from the door (cutout, for the live window)"
       }
     },
     "capa-1": {

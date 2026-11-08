@@ -77,7 +77,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Noite 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Night 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Night 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-becos": {
@@ -93,7 +93,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Becos 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Alleys 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Alleys 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene13": {
@@ -116,16 +116,16 @@
       "path": "assets/previews/scene20-de-scene5.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene20, visto da porta",
-        "en": "Portrait of the scene20 world, seen from the door"
+        "pt": "Retrato do mundo Habitar, visto da porta",
+        "en": "Portrait of the Dwelling world, seen from the door"
       }
     },
     "recorte-scene20-de-scene5": {
       "path": "assets/previews/recorte-scene20-de-scene5.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene20, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene20 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Habitar, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Dwelling world, seen from the door (cutout, for the live window)"
       }
     }
   },

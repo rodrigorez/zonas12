@@ -109,16 +109,16 @@
       "path": "assets/previews/scene15-de-scene12.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene15, visto da porta",
-        "en": "Portrait of the scene15 world, seen from the door"
+        "pt": "Retrato do mundo Paisagens Sonoras, visto da porta",
+        "en": "Portrait of the Soundscapes world, seen from the door"
       }
     },
     "recorte-scene15-de-scene12": {
       "path": "assets/previews/recorte-scene15-de-scene12.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene15, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene15 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Paisagens Sonoras, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Soundscapes world, seen from the door (cutout, for the live window)"
       }
     }
   },

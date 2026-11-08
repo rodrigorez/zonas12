@@ -84,7 +84,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Céu 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Sky 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Sky 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-ondas": {
@@ -100,7 +100,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Ondas 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Waves 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Waves 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-memoria": {
@@ -116,23 +116,23 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Memória 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Memory 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Memory 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene19": {
       "path": "assets/previews/scene19-de-scene4.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene19, visto da porta",
-        "en": "Portrait of the scene19 world, seen from the door"
+        "pt": "Retrato do mundo Memória sob Ataque, visto da porta",
+        "en": "Portrait of the Memory Under Attack world, seen from the door"
       }
     },
     "recorte-scene19-de-scene4": {
       "path": "assets/previews/recorte-scene19-de-scene4.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene19, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene19 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Memória sob Ataque, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Memory Under Attack world, seen from the door (cutout, for the live window)"
       }
     }
   },

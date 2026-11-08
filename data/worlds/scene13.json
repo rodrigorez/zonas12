@@ -123,16 +123,16 @@
       "path": "assets/previews/scene16-de-scene13.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene16, visto da porta",
-        "en": "Portrait of the scene16 world, seen from the door"
+        "pt": "Retrato do mundo Depois do Ecrã, visto da porta",
+        "en": "Portrait of the After the Screen world, seen from the door"
       }
     },
     "recorte-scene16-de-scene13": {
       "path": "assets/previews/recorte-scene16-de-scene13.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene16, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene16 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Depois do Ecrã, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the After the Screen world, seen from the door (cutout, for the live window)"
       }
     }
   },

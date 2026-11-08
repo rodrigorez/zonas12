@@ -77,7 +77,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Cidade 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the City 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the City 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-ondas": {
@@ -93,39 +93,39 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Ondas 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Waves 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Waves 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene12": {
       "path": "assets/previews/scene12-de-scene6.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene12, visto da porta",
-        "en": "Portrait of the scene12 world, seen from the door"
+        "pt": "Retrato do mundo Tesouros 360º, visto da porta",
+        "en": "Portrait of the Treasures 360º world, seen from the door"
       }
     },
     "recorte-scene12-de-scene6": {
       "path": "assets/previews/recorte-scene12-de-scene6.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene12, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene12 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Tesouros 360º, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Treasures 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene21": {
       "path": "assets/previews/scene21-de-scene6.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene21, visto da porta",
-        "en": "Portrait of the scene21 world, seen from the door"
+        "pt": "Retrato do mundo Matéria Frágil, visto da porta",
+        "en": "Portrait of the Fragile Matter world, seen from the door"
       }
     },
     "recorte-scene21-de-scene6": {
       "path": "assets/previews/recorte-scene21-de-scene6.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene21, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene21 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Matéria Frágil, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Fragile Matter world, seen from the door (cutout, for the live window)"
       }
     }
   },

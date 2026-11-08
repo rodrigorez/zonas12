@@ -3,8 +3,8 @@
   "world": {
     "slug": "scene15",
     "name": {
-      "pt": "scene15",
-      "en": "scene15"
+      "pt": "Paisagens Sonoras",
+      "en": "Soundscapes"
     }
   },
   "cameras": {
@@ -49,48 +49,48 @@
       "path": "assets/previews/scene14-de-scene15.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene14, visto da porta",
-        "en": "Portrait of the scene14 world, seen from the door"
+        "pt": "Retrato do mundo Sinais Invisíveis, visto da porta",
+        "en": "Portrait of the Invisible Signals world, seen from the door"
       }
     },
     "recorte-scene14-de-scene15": {
       "path": "assets/previews/recorte-scene14-de-scene15.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene14, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene14 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Sinais Invisíveis, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Invisible Signals world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene16": {
       "path": "assets/previews/scene16-de-scene15.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene16, visto da porta",
-        "en": "Portrait of the scene16 world, seen from the door"
+        "pt": "Retrato do mundo Depois do Ecrã, visto da porta",
+        "en": "Portrait of the After the Screen world, seen from the door"
       }
     },
     "recorte-scene16-de-scene15": {
       "path": "assets/previews/recorte-scene16-de-scene15.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene16, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene16 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Depois do Ecrã, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the After the Screen world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene26": {
       "path": "assets/previews/scene26-de-scene15.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene26, visto da porta",
-        "en": "Portrait of the scene26 world, seen from the door"
+        "pt": "Retrato do mundo Solidão em Rede, visto da porta",
+        "en": "Portrait of the Networked Loneliness world, seen from the door"
       }
     },
     "recorte-scene26-de-scene15": {
       "path": "assets/previews/recorte-scene26-de-scene15.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene26, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene26 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Solidão em Rede, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Networked Loneliness world, seen from the door (cutout, for the live window)"
       }
     },
     "capa-1": {

@@ -82,7 +82,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Praia, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Beach world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Beach world, seen from the door (cutout, for the live window)"
       }
     },
     "capa-0": {
@@ -147,7 +147,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Becos 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Alleys 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Alleys 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-imersoes": {
@@ -163,7 +163,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Imersões 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Immersions 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Immersions 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-mangue": {
@@ -179,7 +179,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Mangue 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Mangrove 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Mangrove 360º world, seen from the door (cutout, for the live window)"
       }
     }
   },

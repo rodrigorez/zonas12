@@ -3,8 +3,8 @@
   "world": {
     "slug": "scene23",
     "name": {
-      "pt": "scene23",
-      "en": "scene23"
+      "pt": "Sociedades de Controlo",
+      "en": "Control Societies"
     }
   },
   "cameras": {
@@ -33,32 +33,32 @@
       "path": "assets/previews/scene22-de-scene23.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene22, visto da porta",
-        "en": "Portrait of the scene22 world, seen from the door"
+        "pt": "Retrato do mundo Ciclos, visto da porta",
+        "en": "Portrait of the Cycles world, seen from the door"
       }
     },
     "recorte-scene22-de-scene23": {
       "path": "assets/previews/recorte-scene22-de-scene23.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene22, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene22 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Ciclos, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Cycles world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene24": {
       "path": "assets/previews/scene24-de-scene23.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene24, visto da porta",
-        "en": "Portrait of the scene24 world, seen from the door"
+        "pt": "Retrato do mundo Murmúrio e Matéria, visto da porta",
+        "en": "Portrait of the Murmur and Matter world, seen from the door"
       }
     },
     "recorte-scene24-de-scene23": {
       "path": "assets/previews/recorte-scene24-de-scene23.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene24, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene24 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Murmúrio e Matéria, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Murmur and Matter world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene8": {

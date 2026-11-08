@@ -3,8 +3,8 @@
   "world": {
     "slug": "scene17",
     "name": {
-      "pt": "scene17",
-      "en": "scene17"
+      "pt": "Corpo como Território",
+      "en": "Body as Territory"
     }
   },
   "cameras": {
@@ -33,16 +33,16 @@
       "path": "assets/previews/scene16-de-scene17.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene16, visto da porta",
-        "en": "Portrait of the scene16 world, seen from the door"
+        "pt": "Retrato do mundo Depois do Ecrã, visto da porta",
+        "en": "Portrait of the After the Screen world, seen from the door"
       }
     },
     "recorte-scene16-de-scene17": {
       "path": "assets/previews/recorte-scene16-de-scene17.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene16, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene16 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Depois do Ecrã, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the After the Screen world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene2": {
@@ -65,32 +65,32 @@
       "path": "assets/previews/scene18-de-scene17.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene18, visto da porta",
-        "en": "Portrait of the scene18 world, seen from the door"
+        "pt": "Retrato do mundo Sombras e Raízes, visto da porta",
+        "en": "Portrait of the Shadows and Roots world, seen from the door"
       }
     },
     "recorte-scene18-de-scene17": {
       "path": "assets/previews/recorte-scene18-de-scene17.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene18, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene18 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Sombras e Raízes, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Shadows and Roots world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene27": {
       "path": "assets/previews/scene27-de-scene17.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene27, visto da porta",
-        "en": "Portrait of the scene27 world, seen from the door"
+        "pt": "Retrato do mundo Quem Nos Olha, visto da porta",
+        "en": "Portrait of the Who Watches Us world, seen from the door"
       }
     },
     "recorte-scene27-de-scene17": {
       "path": "assets/previews/recorte-scene27-de-scene17.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene27, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene27 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Quem Nos Olha, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Who Watches Us world, seen from the door (cutout, for the live window)"
       }
     },
     "capa-1": {

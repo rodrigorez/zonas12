@@ -150,30 +150,47 @@ Os shaders foram medidos e as ferramentas lidas, sem instalar nada e sem escreve
 
 ---
 
-## 1 · Salas sem nome — 14 **[A]**
+## 1 · Salas sem nome — 14 **[A]** ✅ **feito a 2026-11-08**
 
-O visitante vê o slug. Falta o nome nas duas línguas.
+O visitante via o slug. **Escolhidos os 14 nomes pelo autor**, escritos nas duas línguas e medidos — o
+rótulo da ficha e o `<title>` da página já dizem o nome (`Corpo como Território`, `Solidão em Rede`, …).
 
-**Feito nesta passagem (2026-11-06), sem escrever no dado** — o nome é do autor, e os nomes não vieram:
+| Sala | Nome PT | Nome EN | O que a sala mostra (o critério) |
+|---|---|---|---|
+| `scene14` | Sinais Invisíveis | Invisible Signals | som electromagnético, pulsos, o que se ouve e não se vê |
+| `scene15` | Paisagens Sonoras | Soundscapes | gravações de campo, cigarras e chuva, reencantamento |
+| `scene16` | Depois do Ecrã | After the Screen | scroll infinito, telepatia em 2084, fronteiras |
+| `scene17` | Corpo como Território | Body as Territory | videoperformances: comer normas, vestir, fluidos |
+| `scene18` | Sombras e Raízes | Shadows and Roots | corpo colectivo, sombra e infância, corpo-raiz |
+| `scene19` | Memória sob Ataque | Memory Under Attack | esgotamento, nome colonial, heráldica, Gaza |
+| `scene20` | Habitar | Dwelling | vidro e vulnerabilidade, a casa e a rua, o vazio |
+| `scene21` | Matéria Frágil | Fragile Matter | flor, porcelana, canais da Horta, desenho |
+| `scene22` | Ciclos | Cycles | Artemis e a Lua, vida-morte-vida, vasos migrantes |
+| `scene23` | Sociedades de Controlo | Control Societies | senhas e exclusão, pedra e espelho, despiezar |
+| `scene24` | Murmúrio e Matéria | Murmur and Matter | cera e luz, a avó María, migalhas, prisões |
+| `scene25` | Arcade Crítico | Critical Arcade | o jogo como crítica (Go, comer os ricos, *Sucker*) |
+| `scene26` | Solidão em Rede | Networked Loneliness | conexão perdida, boate, anestesia do scroll |
+| `scene27` | Quem Nos Olha | Who Watches Us | classificação, padrão de beleza, o corpo imposto |
 
-- [x] **Estado medido, ficheiro a ficheiro.** `world.name.pt` = `world.name.en` = slug em todas as 14
-      (`scene14`…`scene27`). Árvore de trabalho limpa antes de começar (`v0.0.49`, `git status` vazio).
-- [x] **Pauta das 14 salas preparada e entregue ao autor**, uma linha por sala, com as obras que cada
-      uma tem montadas (o contexto com que se nomeia), mais duas colunas vazias — `Nome PT`, `Nome EN`.
-- [ ] **Nada foi escrito.** Sem os 14 pares pt/en: nenhum `world.name` foi tocado, o `integrar.mjs` não
-      foi corrido, e a bateria de provas (`validate`, `integrar --seco`, `mapa --check`, `i18n`, `csv`)
-      não foi executada porque o dado não mudou. O trabalho retoma no primeiro item abaixo, quando a
-      pauta voltar preenchida. Respostas parciais servem: aplicam-se as salas que vierem e as outras
-      ficam como estão (o passo é idempotente).
+O que ficou feito, e a prova de cada passo:
 
-- [ ] `scene14` … `scene27` (as 14 salas novas)
-- [ ] Correção: em `data/worlds/scene<N>.json`, o bloco `world.name`:
+- [x] **Os 14 pares pt/en escritos** em `data/worlds/scene<N>.json` (bloco `world.name`) — duas linhas
+      por ficheiro, sem reformatar o resto (o diff são 28 linhas em 14 ficheiros).
+- [x] **A ficha e o título da página dizem o nome**: `obra.html?mundo=scene17&id=1` → `.exposicao` =
+      «Corpo como Território» e `<title>` = «Circuiti — Corpo como Território»; `scene26` → «Solidão em
+      Rede». Medido no browser a 2026-11-08.
+- [x] **`integrar.mjs` ganhou o passo que faltava** — e foi preciso: o `--seco` dizia `nada a fazer`
+      porque o nome **não** vive no ficheiro do vizinho, excepto numa cópia, o `alt` do retrato que a
+      porta mostra. Sem esse passo, 252 descrições continuavam a dizer «Retrato do mundo scene14». O
+      passo acerta-as a partir de `portas.mjs` (a mesma frase, uma só casa) e é idempotente; de caminho
+      corrigiu 13 mundos antigos cujo **inglês** dizia «(recorte, para a janela ao vivo)».
+- [x] **Provas, todas exit 0**: `validate` 0/0 · `mapa --check` OK · `i18n` 9/9 · `from-csv --check` 0 ·
+      `csv` 22/22 · `assets` 10/10 · `integrar --seco` «nada a fazer» · `labels-doors` 23/23.
 
-      "name": { "pt": "<o nome em português>", "en": "<the name in English>" }
+> Nota para a §6: o nome mudou, por isso os retratos das 14 salas nomeadas têm de ser refeitos — é a
+> regra que a §6 já escreve («um nome, um shader, uma capa ou um sítio mudam o retrato»). Nada a fazer
+> agora: eles vão com o lote final, depois da §2–§5.
 
-- [ ] Depois: `node tools/scene/integrar.mjs` — o nome de uma sala entra na descrição que as salas
-      **vizinhas** dão à janela que a mostra (`portas.mjs`, D46); sem isto os vizinhos ficam a dizer o
-      nome antigo. Não mexe em geometria e é idempotente.
 
 ## 2 · Shader repetido — 1 shader em 15 salas **[A]** + **[T]** + **[M]**
 

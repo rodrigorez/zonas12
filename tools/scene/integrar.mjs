@@ -156,6 +156,37 @@ for (const [origem, mundo] of mundos) {
   }
 }
 
+// ---- o nome de cada sala, nas descrições das janelas que a mostram (D46) ----
+//
+// O `alt` de um retrato é escrito uma vez, quando a porta nasce (`portas.mjs`), com o nome que o destino
+// tinha **nesse dia** — e até esta passagem esse nome era o slug. Nomear uma sala depois deixava o
+// vizinho a dizer «Retrato do mundo scene14» a quem ouve a página: é a única cópia do nome de uma sala
+// que vive no ficheiro de outra, e por isso é a única que o fecho tem de acertar. O resto (o rótulo da
+// porta, a ficha, o editor) lê `world.name` do destino na hora e já não guarda nada.
+//
+// A frase vem de `retrato()` e não é reescrita aqui: duas cópias do mesmo texto seriam duas verdades, e
+// a origem tira-se do próprio caminho (`<destino>-de-<origem>.jpg`), que é a convenção do D46.
+const nomeadas = new Set();
+for (const mundo of mundos.values()) {
+  for (const [id, asset] of Object.entries(mundo.cena.assets || {})) {
+    if (!asset || typeof asset !== 'object' || !asset.alt) continue;
+    const achado = /^retrato-([a-z0-9-]+)$/.exec(id) || /^recorte-([a-z0-9-]+)-de-[a-z0-9-]+$/.exec(id);
+    if (!achado) continue;
+    const sala = mundos.get(achado[1]);
+    const caminho = /([a-z0-9-]+)-de-([a-z0-9-]+)\.(?:jpg|png)$/i.exec(asset.path || '');
+    if (!sala || !caminho) continue;
+    const canonico = retrato(achado[1], caminho[2], sala.cena)[id];
+    if (!canonico || !canonico.alt) continue;
+    if (asset.alt.pt === canonico.alt.pt && asset.alt.en === canonico.alt.en) continue;
+    Object.assign(asset.alt, canonico.alt);
+    mudou(mundo);
+    nomeadas.add(mundo.slug);
+  }
+}
+if (nomeadas.size) {
+  notas.push('nomes: as descrições das janelas acertadas em ' + nomeadas.size + ' mundo(s)');
+}
+
 // ---- escrever ----
 
 if (opcoes.seco) {

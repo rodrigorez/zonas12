@@ -3,8 +3,8 @@
   "world": {
     "slug": "scene26",
     "name": {
-      "pt": "scene26",
-      "en": "scene26"
+      "pt": "Solidão em Rede",
+      "en": "Networked Loneliness"
     }
   },
   "cameras": {
@@ -33,48 +33,48 @@
       "path": "assets/previews/scene15-de-scene26.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene15, visto da porta",
-        "en": "Portrait of the scene15 world, seen from the door"
+        "pt": "Retrato do mundo Paisagens Sonoras, visto da porta",
+        "en": "Portrait of the Soundscapes world, seen from the door"
       }
     },
     "recorte-scene15-de-scene26": {
       "path": "assets/previews/recorte-scene15-de-scene26.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene15, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene15 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Paisagens Sonoras, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Soundscapes world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene27": {
       "path": "assets/previews/scene27-de-scene26.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene27, visto da porta",
-        "en": "Portrait of the scene27 world, seen from the door"
+        "pt": "Retrato do mundo Quem Nos Olha, visto da porta",
+        "en": "Portrait of the Who Watches Us world, seen from the door"
       }
     },
     "recorte-scene27-de-scene26": {
       "path": "assets/previews/recorte-scene27-de-scene26.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene27, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene27 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Quem Nos Olha, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Who Watches Us world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene25": {
       "path": "assets/previews/scene25-de-scene26.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene25, visto da porta",
-        "en": "Portrait of the scene25 world, seen from the door"
+        "pt": "Retrato do mundo Arcade Crítico, visto da porta",
+        "en": "Portrait of the Critical Arcade world, seen from the door"
       }
     },
     "recorte-scene25-de-scene26": {
       "path": "assets/previews/recorte-scene25-de-scene26.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene25, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene25 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Arcade Crítico, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Critical Arcade world, seen from the door (cutout, for the live window)"
       }
     },
     "capa-1": {

@@ -58,7 +58,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Praia, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Beach world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Beach world, seen from the door (cutout, for the live window)"
       }
     },
     "capa-0": {
@@ -95,7 +95,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Noite 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Night 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Night 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-presencas": {
@@ -111,23 +111,23 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Presenças 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Presences 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Presences 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene18": {
       "path": "assets/previews/scene18-de-scene3.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene18, visto da porta",
-        "en": "Portrait of the scene18 world, seen from the door"
+        "pt": "Retrato do mundo Sombras e Raízes, visto da porta",
+        "en": "Portrait of the Shadows and Roots world, seen from the door"
       }
     },
     "recorte-scene18-de-scene3": {
       "path": "assets/previews/recorte-scene18-de-scene3.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene18, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene18 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Sombras e Raízes, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Shadows and Roots world, seen from the door (cutout, for the live window)"
       }
     }
   },

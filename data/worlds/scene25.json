@@ -3,8 +3,8 @@
   "world": {
     "slug": "scene25",
     "name": {
-      "pt": "scene25",
-      "en": "scene25"
+      "pt": "Arcade Crítico",
+      "en": "Critical Arcade"
     }
   },
   "cameras": {
@@ -33,48 +33,48 @@
       "path": "assets/previews/scene14-de-scene25.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene14, visto da porta",
-        "en": "Portrait of the scene14 world, seen from the door"
+        "pt": "Retrato do mundo Sinais Invisíveis, visto da porta",
+        "en": "Portrait of the Invisible Signals world, seen from the door"
       }
     },
     "recorte-scene14-de-scene25": {
       "path": "assets/previews/recorte-scene14-de-scene25.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene14, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene14 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Sinais Invisíveis, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Invisible Signals world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene26": {
       "path": "assets/previews/scene26-de-scene25.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene26, visto da porta",
-        "en": "Portrait of the scene26 world, seen from the door"
+        "pt": "Retrato do mundo Solidão em Rede, visto da porta",
+        "en": "Portrait of the Networked Loneliness world, seen from the door"
       }
     },
     "recorte-scene26-de-scene25": {
       "path": "assets/previews/recorte-scene26-de-scene25.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene26, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene26 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Solidão em Rede, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Networked Loneliness world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene24": {
       "path": "assets/previews/scene24-de-scene25.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene24, visto da porta",
-        "en": "Portrait of the scene24 world, seen from the door"
+        "pt": "Retrato do mundo Murmúrio e Matéria, visto da porta",
+        "en": "Portrait of the Murmur and Matter world, seen from the door"
       }
     },
     "recorte-scene24-de-scene25": {
       "path": "assets/previews/recorte-scene24-de-scene25.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene24, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene24 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Murmúrio e Matéria, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Murmur and Matter world, seen from the door (cutout, for the live window)"
       }
     },
     "capa-1": {

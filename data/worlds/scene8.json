@@ -77,7 +77,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Cidade 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the City 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the City 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-presencas": {
@@ -93,7 +93,7 @@
       "type": "image",
       "alt": {
         "pt": "Retrato do mundo Presenças 360º, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the Presences 360º world, seen from the door (recorte, para a janela ao vivo)"
+        "en": "Portrait of the Presences 360º world, seen from the door (cutout, for the live window)"
       }
     },
     "retrato-scene13": {
@@ -116,16 +116,16 @@
       "path": "assets/previews/scene23-de-scene8.jpg",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene23, visto da porta",
-        "en": "Portrait of the scene23 world, seen from the door"
+        "pt": "Retrato do mundo Sociedades de Controlo, visto da porta",
+        "en": "Portrait of the Control Societies world, seen from the door"
       }
     },
     "recorte-scene23-de-scene8": {
       "path": "assets/previews/recorte-scene23-de-scene8.png",
       "type": "image",
       "alt": {
-        "pt": "Retrato do mundo scene23, visto da porta (recorte, para a janela ao vivo)",
-        "en": "Portrait of the scene23 world, seen from the door (cutout, for the live window)"
+        "pt": "Retrato do mundo Sociedades de Controlo, visto da porta (recorte, para a janela ao vivo)",
+        "en": "Portrait of the Control Societies world, seen from the door (cutout, for the live window)"
       }
     }
   },

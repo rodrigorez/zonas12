@@ -6,7 +6,11 @@
 >
 > **Estado a 2026-11-08, fim do dia: a Fase 0 está feita** (§3) — seis correcções mecânicas, todas
 > provadas com o instrumento que as julga, mais um achado novo (§4.4, o Instagram da `scene22`·4).
-> O registo com os números está na §9 da `docs/PENDENCIAS.md`. O que resta é a Fase 1, que é do autor.
+> O registo com os números está na §9 da `docs/PENDENCIAS.md`.
+>
+> **E a §1 também: as 14 salas têm nome** (§4.1) — escolhidos sobre a análise das 80 obras, escritos nas
+> duas línguas, com o `integrar.mjs` a acertar as 252 descrições das janelas. O que resta da Fase 1 são
+> os shaders, as capas e os sítios.
 
 ## Como se lê
 
@@ -22,7 +26,7 @@
 
 | § | Pendência | Estado | Prova (comando e número) |
 |---|---|---|---|
-| 1 | 14 nomes de sala | ⬜ aberto | `world.name.pt = world.name.en = "scene<N>"` nas 14 (`scene14`…`scene27`) |
+| 1 | 14 nomes de sala | ✅ **feito (Fase 1)** | escolhidos pelo autor e escritos; a ficha e o `<title>` dizem «Corpo como Território», «Solidão em Rede»… |
 | 2 | shader repetido | ⬜ aberto | 13 shaders; `grade-neon` em **15** salas; a dimensão diz «Cidade 360º» nas 14 novas |
 | 3 | capas que não carregam | ⬜ aberto | `capas-locais.mjs --check` → **8 remotas em 6 mundos, 0 guardadas** |
 | 3.1 | obra sem capa | ⬜ aberto | `scene23`·2 «Stoned» não tem a chave de capa no dado |
@@ -98,29 +102,32 @@ O registo com os números completos está na **§9 da `docs/PENDENCIAS.md`**.
 
 ## 4 · Fase 1 — o autor (caminho crítico de tudo o resto)
 
-### 4.1 · Nomes das 14 salas **[A]**
+### 4.1 · Nomes das 14 salas **[A]** ✅ **feito a 2026-11-08**
 
-Pauta pronta — o contexto de cada sala são as obras que ela tem montadas. Respostas parciais
-servem: aplica-se o que vier, o passo é idempotente.
+A pauta das 14 salas foi analisada obra a obra, com **três propostas por sala** (o «porquê» de cada uma),
+e o autor escolheu. Escritos, provados e registados na **§1 da `docs/PENDENCIAS.md`**, que traz a tabela
+completa:
 
-| Sala | Obras | Primeiras obras (contexto para nomear) |
+| Sala | Nome PT | Nome EN |
 |---|---|---|
-| `scene14` | 5 | What Reaches the Listener · Cançó de nodrir i destrossa a 4 veus · dissonância/solitud |
-| `scene15` | 5 | ecos del abismo · SoundRide 3 · Bajo (Y) Sobre el Mismo Cielo |
-| `scene16` | 7 | Keep Scrolling · HEY JELLY · Retro Hoy |
-| `scene17` | 6 | Circuiti · “Lo que nos estamos comiendo” · ENSAYOS DE UN CUERPO EXPANDIDO |
-| `scene18` | 5 | Cuerpo colectivo · Aguja inversa · Transmut^re |
-| `scene19` | 6 | Sin Colgar · Quiero dejar mi nombre… · Borrador para una horda de amazonas |
-| `scene20` | 7 | Vulnerables · Paseo la Pechina · Silena |
-| `scene21` | 6 | encarne, encarnada · El cielo llora y yo bebo · Los caminos del agua |
-| `scene22` | 5 | Artemisa · Ábaco de mariposas · Nuevo día |
-| `scene23` | 6 | PERFILADORA DE EXCLUSIÓN · Stoned · Un dato cualquiera |
-| `scene24` | 8 | Líneas de horizonte · Un fluir cálido · La arquitectura del murmullo |
-| `scene25` | 7 | Pincéis de pedra · Rock Skulls · Next Station |
-| `scene26` | 5 | Conexión Perdida · ¿Quieres? · Vivienda a la fuga |
-| `scene27` | 5 | Mientras miras · Poéticas de un corazón roto · EU |
+| `scene14` | Sinais Invisíveis | Invisible Signals |
+| `scene15` | Paisagens Sonoras | Soundscapes |
+| `scene16` | Depois do Ecrã | After the Screen |
+| `scene17` | Corpo como Território | Body as Territory |
+| `scene18` | Sombras e Raízes | Shadows and Roots |
+| `scene19` | Memória sob Ataque | Memory Under Attack |
+| `scene20` | Habitar | Dwelling |
+| `scene21` | Matéria Frágil | Fragile Matter |
+| `scene22` | Ciclos | Cycles |
+| `scene23` | Sociedades de Controlo | Control Societies |
+| `scene24` | Murmúrio e Matéria | Murmur and Matter |
+| `scene25` | Arcade Crítico | Critical Arcade |
+| `scene26` | Solidão em Rede | Networked Loneliness |
+| `scene27` | Quem Nos Olha | Who Watches Us |
 
-Depois: `integrar.mjs` (o nome entra na descrição que as vizinhas dão à janela, D46).
+O `integrar.mjs` ganhou o passo que faltava: acertar o `alt` do retrato que cada vizinha mostra (a única
+cópia do nome fora do ficheiro da própria sala) — 252 descrições, mais o inglês de 13 mundos antigos.
+E, pela §6, **os retratos destas 14 salas passam a ter de ser refeitos** no lote final.
 
 ### 4.2 · Shaders **[A]** — 14 salas
 
@@ -238,10 +245,10 @@ separam-se em silêncio — foi o que aconteceu entre 2026-11-04 e 2026-11-08.
 | Fase | Marca | Quem | Tempo | Fecha |
 |---|---|---|---|---|
 | 0 | **[M]** | nós | ✅ **feita** | §6.1, §8.5-c, §8.5-d, §8.5-h (2), §8.9 |
-| 1 | **[A]** | autor | a decisão é dele | §1, §2, §3, §3.1, §4, §5, §8.5-b, §8.5-f, §8.5-d bis |
+| 1 | **[A]** | autor | em curso — **1.1 (nomes) feito** | §2, §3, §3.1, §4, §5, §8.5-b, §8.5-f, §8.5-d bis |
 | 2 | **[M]** | nós | ~1 h | aplica a Fase 1 |
 | 3 | **[T]** | máquina | ~1 h 15 | §6 |
 | 4 | **[T]** | máquina | ~4 h | as provas e a publicação |
 
-A ordem é obrigatória: ~~0~~ → **1** → 2 → 3 → 4. A Fase 0 está fechada; a Fase 1 é a única coisa que
-não se resolve aqui.
+A ordem é obrigatória: ~~0~~ → **1** → 2 → 3 → 4. A Fase 0 está fechada e a §1 também; o que resta da
+Fase 1 são os shaders, as capas e os sítios.
