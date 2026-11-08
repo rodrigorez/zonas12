@@ -8,6 +8,11 @@ Passagem interrompida a pedido em **2026-11-06 ~16h**; retomada e continuada em 
 > 142/150), 152/152 janelas, 0 erros; `capa.mjs` **12/12** e `twelve-tests` **211/211**. A causa do
 > vermelho da `--full` também ficou apurada — **é a §6**, não código partido (ver §8.5-h do PENDENCIAS).
 > O que continua por fazer está em baixo, actualizado.
+>
+> **Publicado.** O `main` estava parado em **2026-11-04** — o site só tinha 13 salas (`scene14`…`scene27`
+> davam 404). Foi avançado em **fast-forward** para a `v0.0.50` (`23d8279`) e o Pages reconstruiu. Medido
+> no ar: **150/150** obras com imagem, **152/152** janelas, **0** erros (PENDENCIAS §8.9).
+
 
 
 ## O que já está feito (e onde está escrito)
@@ -92,6 +97,7 @@ Fora do repositório, no estado desta sessão:
 
 | | |
 |---|---|
-| `bkp20261106` | instantâneo de 2026-11-06 (`c782b89`), igual ao `origin`. **Não commitar mais nela** |
-| `v0.0.50` | a correção dos 8 painéis + esta documentação. Saiu da `bkp20261106` |
+| `bkp20261106` | instantâneo de 2026-11-06 (`c782b89`). **Não commitar mais nela** |
+| `v0.0.50` | a correção dos 8 painéis + esta documentação (`23d8279`), no `origin` |
+| `main` | avançado em fast-forward até à `v0.0.50` — **é o que o GitHub Pages publica** |
 | `v0.0.49` | a versão anterior a tudo isto (`85b97ec`) |

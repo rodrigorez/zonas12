@@ -856,6 +856,48 @@ Nada disto foi tocado: a `seam` (17 portas da §6 + a 18.ª da câmara), o `moti
 arquivadas que nunca correram, as decisões do autor (§8.5-b YouTube, §8.5-c Vimeo) e as pendências das
 §3, §4 e §5. A lista viva é a §8.6.
 
+---
+
+## 8.9 · A versão publicada — medida no ar a 2026-11-08
+
+O `README` (linha 1678) diz que «a versão publicada é o `main` servido pelo GitHub Pages». E o `main`
+estava **parado em `808d0b8`, de 2026-11-04**: o site em
+<https://rodrigorez.github.io/zonas12/> respondia **404 em `scene14`, `scene20` e `scene27`** e não tinha
+`docs/PENDENCIAS.md` — publicava uma exposição de 13 salas, não de 28. Isto é anterior a esta passagem e
+não tinha sido notado por nenhuma bateria, porque todas medem o disco.
+
+A `bkp20261106` e a `v0.0.50` continham o `main` inteiro (verificado: `origin/main..v0.0.50` = **26**
+commits, `v0.0.50..origin/main` = **0**), por isso a publicação foi um **fast-forward**, sem reescrever
+história e sem perder um commit: `main` passou de `808d0b8` a **`23d8279`** (a `v0.0.50`), empurrado às
+20:07 GMT; o Pages reconstruiu e o `Last-Modified` da raiz passou a **Sun, 08 Nov 2026 20:07:12 GMT**.
+
+Medido **no ar**, com o mesmo critério da §8.2 (`medir-publicado.mjs`, `BASE =
+https://rodrigorez.github.io/zonas12`), as 28 páginas uma a uma:
+
+| Medida no site publicado | Resultado |
+|---|---|
+| obras com imagem descodificada na malha | **150/150** |
+| janelas com retrato e recorte | **152/152** |
+| erros de consola da exposição | **0** |
+| páginas que ficaram com o `loading-overlay` | **0** |
+| salas 14–27 | **200** (antes: 404) |
+
+É o mesmo número que o local dá depois da correção da §8.8 — o publicado e o repositório concordam, obra
+a obra.
+
+**Duas coisas que esta publicação deixa ditas**, e que valem mais do que o número:
+
+1. **O `main` é o que se publica, e ninguém o estava a actualizar.** O trabalho de 2026-11-05 e 06 vivia
+   em branches de versão; publicar exige o avanço do `main`. Fica a correção sugerida `[M]`: uma linha no
+   `README` (ou um `npm run publicar`) que diga «publicar = avançar o `main` para a versão e `git push
+   origin main`», e — melhor — uma verificação no fim das baterias que pergunte ao site publicado se
+   `scene<N>.json` de cada sala responde 200. Sem isso, a distância entre o repositório e o site cresce em
+   silêncio, que é exactamente a falha que a P1 da spec matou do lado do dado.
+2. **O que o visitante vê agora é a exposição completa, com os oito painéis já com a imagem padrão ou o
+   thumbnail** — e as 8 capas da §3, as 11 fichas da §4/§5 e o `seam` da §6 continuam por resolver, como
+   a §8.6 lista.
+
+
 
 
 
