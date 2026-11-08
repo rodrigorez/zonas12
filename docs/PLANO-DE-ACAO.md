@@ -2,8 +2,11 @@
 
 > Medição de **2026-11-08**, sobre `main` = `8e7a568` (árvore limpa, em sincronia com o `origin`).
 > Este documento não substitui a `docs/PENDENCIAS.md`: lê-a, confirma-a com números de hoje e ordena
-> o que falta por **quem** consegue fechar cada coisa. Nada de código foi alterado nesta passagem — o
-> único ficheiro escrito é este.
+> o que falta por **quem** consegue fechar cada coisa.
+>
+> **Estado a 2026-11-08, fim do dia: a Fase 0 está feita** (§3) — seis correcções mecânicas, todas
+> provadas com o instrumento que as julga, mais um achado novo (§4.4, o Instagram da `scene22`·4).
+> O registo com os números está na §9 da `docs/PENDENCIAS.md`. O que resta é a Fase 1, que é do autor.
 
 ## Como se lê
 
@@ -23,18 +26,18 @@
 | 2 | shader repetido | ⬜ aberto | 13 shaders; `grade-neon` em **15** salas; a dimensão diz «Cidade 360º» nas 14 novas |
 | 3 | capas que não carregam | ⬜ aberto | `capas-locais.mjs --check` → **8 remotas em 6 mundos, 0 guardadas** |
 | 3.1 | obra sem capa | ⬜ aberto | `scene23`·2 «Stoned» não tem a chave de capa no dado |
-| 4 | sites não embutíveis | ⬜ aberto | `links.mjs` → **7** (6 pastas do Drive + a Canva da `scene1`·0) |
+| 4 | sites não embutíveis | ⬜ aberto | `links.mjs` → **8** (6 pastas do Drive, a Canva da `scene1`·0 e o Instagram da `scene22`·4) |
 | 5 | sites com erro HTTP | ⬜ **cresceu: 4 → 9** | `links.mjs` → 5 Vimeo novos (**403** na página, **401** no player) + Canva + 3 Drive |
 | 6 | retratos desactualizados | ⬜ aberto | 126 pares, **0** ficheiros em falta; a idade não é medível num checkout (mtime de todos = 17:06) |
-| 6.1 | órfãos em `assets/previews/` | ⬜ aberto | os 13 existem; a lista segura continua a ser **10** (guardar `ceu`, `cidade`, `praia`) |
+| 6.1 | órfãos em `assets/previews/` | ✅ **feito (Fase 0)** | 265 → **255** ficheiros, 616 kB; `validate` 0/0, `mapa` OK, `assets.mjs` 10/10 |
 | 7 | portais | ✅ **sem problemas** | `validate` 0/0 · `mapa --check` OK (27 salas · 49 arestas · 152 portas · 304 retratos) · `integrar --seco` «nada a fazer» |
 | 8.5-a | 8 painéis pretos | ✅ **feito** | `js/scene/scene-builder.js:313` (`capa-resolvida-<id>`) + 3 guardas no `capa.mjs` |
-| 8.5-c | `links.mjs` cego ao embed | 🟡 **meio** | o `platformEmbed` já é importado, mas só o **YouTube** é espiado no endereço do embed |
-| 8.5-d | a ficha esconde a capa | ⬜ aberto | não existe `frameable` em `js/scene/platform-embed.js` nem em `js/obra.js` |
-| 8.5-h | a 18.ª falha da `seam` | ⬜ aberto | o check dos escuros (`seam.mjs:358`) corre **antes** da excepção da câmara (`seam.mjs:361`) |
-| 8.5-h | `motion` 43/44 | 🟢 **causa provada** | ver §2-a |
-| 8.7 | 9 baterias arquivadas | ✅ **medidas hoje, todas verdes** | ver §2-c |
-| 8.9 | publicação | ✅ em sincronia | `main` = `origin/main` = `8e7a568`; o site responde **200** em `/scene14/`, `/scene27/`, `/docs/PENDENCIAS.md` |
+| 8.5-c | `links.mjs` cego ao embed | ✅ **feito (Fase 0)** | espia `platformEmbed(site).src` em todas as plataformas; diz para onde o pedido seguiu |
+| 8.5-d | a ficha esconde a capa | ✅ **feito (Fase 0)** | `frameable: false` (Canva, pastas do Drive, `open?id=`) + a caixa nasce `falhou` |
+| 8.5-h | a 18.ª falha da `seam` | ✅ **feito (Fase 0)** | `scene3 47 → gate` **1/1**; os escuros da câmara ficam ditos, não julgados |
+| 8.5-h | `motion` 43/44 | ✅ **feito (Fase 0)** | era o passo da bateria (1 cm = a guarda do D91) → **44/44** |
+| 8.7 | 9 baterias arquivadas | ✅ **medidas, todas verdes** | ver §2-c |
+| 8.9 | publicação | ✅ **em sincronia, e agora com guarda** | `publicado.mjs`: **28 salas + 33 ficheiros** de acordo; provada a falhar com 1 byte a mais |
 
 **Núcleo, hoje:** `validate` 0/0 · `from-csv --check` 0 · `csv` 22/22 · `mapa --check` OK ·
 `integrar --seco` «nada a fazer». O único vermelho é o `links.mjs` — **24 problemas em 21 obras**,
@@ -78,20 +81,18 @@ suspeitar do `reality.js`/`dimension.js` para as explicar.
 
 ---
 
-## 3 · Fase 0 — o que não depende de ninguém (≈meio dia, fecha 6 pendências)
+## 3 · Fase 0 — o que não depende de ninguém ✅ **feita a 2026-11-08**
 
-| # | Correção | Ficheiro |
-|---|---|---|
-| 0.1 | passo de **2 cm** nos controlos (b) e (c), com o porquê da guarda escrito ao lado | `tools/regression/motion.mjs` (linhas 454–472) |
-| 0.2 | não julgar o **fotograma escuro** quando o destino é `kind: "camera"` — a excepção passa para antes do check | `tools/regression/seam.mjs:358` |
-| 0.3 | `frameable: false` nas entradas que recusam (Canva, pastas do Drive, `open?id=`) e a ficha marca `falhou` de imediato | `js/scene/platform-embed.js`, `js/obra.js` (`drawMedium`) |
-| 0.4 | `links.mjs` passa a espiar `platformEmbed(site).src` em **todas** as plataformas — é o que torna o Vimeo 401 visível | `tools/artwork/links.mjs` |
-| 0.5 | apagar os **10** órfãos seguros (manter `ceu.jpg`, `cidade.jpg`, `praia.jpg`) | `assets/previews/` |
-| 0.6 | guarda da publicação: um `publicado.mjs` que pergunta ao site, sala a sala (200), e uma linha no README | `tools/regression/publicado.mjs`, `README.md` |
+| # | Correção | Ficheiro | Prova |
+|---|---|---|---|
+| 0.1 | passo de **2 cm** nos controlos (b) e (c), com o porquê da guarda escrito ao lado | `tools/regression/motion.mjs` | `motion` **44/44**, exit 0 (era 43/44) |
+| 0.2 | não julgar o **fotograma escuro** quando a chegada é a câmara | `tools/regression/seam.mjs` | `seam scene3 47` **1/1**, exit 0 |
+| 0.3 | `frameable: false` (Canva, pastas do Drive, `open?id=`) e a caixa `falhou` de imediato | `js/scene/platform-embed.js`, `js/obra.js` | `obra` **82/82** · `ficha-falhas` **3/3** · `capa` **12/12** |
+| 0.4 | `links.mjs` espia `platformEmbed(site).src` em todas as plataformas | `tools/artwork/links.mjs` | apanha o Vimeo (5 obras) e o Instagram da `scene22`·4 |
+| 0.5 | apagar os **10** órfãos seguros (mantidos `ceu`, `cidade`, `praia`) | `assets/previews/` | 265 → 255 · `validate` 0/0 · `mapa` OK · `assets` 10/10 |
+| 0.6 | guarda da publicação, sala a sala, página **e** dado | `tools/regression/publicado.mjs`, `README.md` | **28 salas + 33 ficheiros** de acordo; provada a falhar |
 
-Provas de cada uma: `motion` **44/44** · `seam` sem o falso escuro · `obra.mjs` e `ficha-falhas.mjs`
-a continuarem verdes com `frameable` · `validate` + `mapa --check` + `regression/assets.mjs` 10/10
-depois dos órfãos · `publicado.mjs` a dar 28/28 no site actual.
+O registo com os números completos está na **§9 da `docs/PENDENCIAS.md`**.
 
 ---
 
@@ -166,8 +167,9 @@ Partilhar cada ficheiro («qualquer pessoa com o link») e depois `node tools/ar
 | `scene19`·1 | Drive `/preview` — **404**: o ficheiro **já não existe** | endereço novo da peça, ou tirar o sítio e deixar a obra como imagem |
 | `scene1`·1 «Golens Transgênicos» | YouTube `63faPpyHonk` recusa a incorporação | activar «Permitir incorporação» no YouTube Studio (a célula não muda) |
 | `scene23`·2 «Stoned» | álbum do Imgur desenha o iframe e não a imagem | decidir: sessão/cookies de terceiros ou tratar como avaria |
+| **`scene22`·4 «Cortina»** | o embed do Instagram responde 200 + `DENY` e manda para o **login**; a ficha mostra a página de erro do Chrome | imagem em vez de site, ou um endereço que sirva o embed sem sessão |
 
-**São 21 obras distintas em 11 salas.** As que se fecham com uma só partilha estão assinaladas.
+**São 22 obras distintas em 12 salas.** As que se fecham com uma só partilha estão assinaladas.
 
 ---
 
@@ -218,13 +220,13 @@ passagem extra sobre eles os assenta.
 
 | Comando | O que tem de dar |
 |---|---|
-| `node tools/regression/seam.mjs` | **402/402** (hoje 384/402: 17 portas são a §6, a 18.ª é a §3-0.2) |
-| `node tools/regression/motion.mjs` | **44/44** (hoje 43/44: a §2-a) |
+| `node tools/regression/seam.mjs` | **402/402** (hoje 384/402: as 17 portas são a §6; a 18.ª, a da câmara, já está fechada) |
+| `node tools/regression/motion.mjs` | **44/44** ✅ (fechada na Fase 0) |
 | `node tools/regression/all.mjs --full` | **31/31**, exit 0 |
 | `medir-paginas.mjs` (28 páginas) | **150/150** malhas · **152/152** janelas · **0** erros |
-| `node tools/artwork/links.mjs` | **0** |
-| `node tools/artwork/capas-locais.mjs --check` | **0** remotas |
-| `node tools/regression/publicado.mjs` | **28/28** no site, depois de avançar o `main` |
+| `node tools/artwork/links.mjs` | **0** (hoje 25 problemas em 22 obras) |
+| `node tools/artwork/capas-locais.mjs --check` | **0** remotas (hoje 8) |
+| `node tools/regression/publicado.mjs` | **28 salas + 33 ficheiros** de acordo, depois de avançar o `main` |
 
 Publicar = avançar o `main` para a versão e `git push origin main`. Sem isso, o repositório e o site
 separam-se em silêncio — foi o que aconteceu entre 2026-11-04 e 2026-11-08.
@@ -235,11 +237,11 @@ separam-se em silêncio — foi o que aconteceu entre 2026-11-04 e 2026-11-08.
 
 | Fase | Marca | Quem | Tempo | Fecha |
 |---|---|---|---|---|
-| 0 | **[M]** | nós | ~meio dia | §6.1, §8.5-c, §8.5-d, §8.5-h (2), §8.9 |
-| 1 | **[A]** | autor | a decisão é dele | §1, §2, §3, §3.1, §4, §5, §8.5-b, §8.5-f |
+| 0 | **[M]** | nós | ✅ **feita** | §6.1, §8.5-c, §8.5-d, §8.5-h (2), §8.9 |
+| 1 | **[A]** | autor | a decisão é dele | §1, §2, §3, §3.1, §4, §5, §8.5-b, §8.5-f, §8.5-d bis |
 | 2 | **[M]** | nós | ~1 h | aplica a Fase 1 |
 | 3 | **[T]** | máquina | ~1 h 15 | §6 |
 | 4 | **[T]** | máquina | ~4 h | as provas e a publicação |
 
-A ordem é obrigatória: **0 → 1 → 2 → 3 → 4**. A Fase 0 pode começar hoje; a Fase 1 é a única coisa
-que não se resolve aqui.
+A ordem é obrigatória: ~~0~~ → **1** → 2 → 3 → 4. A Fase 0 está fechada; a Fase 1 é a única coisa que
+não se resolve aqui.

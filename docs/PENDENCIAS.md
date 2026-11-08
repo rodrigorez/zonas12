@@ -763,16 +763,17 @@ próprio controlo; exige a sua passagem.
 | Achado | Correção | Marca | Quem |
 |---|---|---|---|
 | §8.5-h · `seam` 17 portas | nenhuma — é a §6; refazer os 75 pares | **[T]** | máquina |
-| §8.5-h · `seam` 18.ª (fotograma escuro no portão) | não julgar os escuros quando o destino é `kind: "camera"` | **[M]** | mecânico |
-| §8.5-h · `motion` 1 controlo | apurar se é a travessia (D91) ou o controlo | **[T]** | máquina |
+| ~~§8.5-h · `seam` 18.ª (fotograma escuro no portão)~~ | **feito** na Fase 0 (§9) — quando a chegada é a câmara, a `seam` já não julga a imagem | **[M]** | — |
+| ~~§8.5-h · `motion` 1 controlo~~ | **feito** na Fase 0 (§9) — não era a travessia: era o passo da bateria (1 cm = a guarda do D91) | **[M]** | — |
 | ~~§8.5-a · 8 painéis pretos~~ | **feito** na `v0.0.50` (2026-11-08) — 1 linha + 3 guardas no `capa.mjs` | **[M]** | — |
 | §8.5-b · YouTube `scene1`·1 | activar «Permitir incorporação» (`63faPpyHonk`) | **[A]** | autor |
 | §8.5-c · Vimeo `scene4`·0 | tornar o vídeo incorporável | **[A]** | autor |
-| §8.5-c · `links.mjs` cego ao embed | verificar `platformEmbed(site).src` | **[M]** | mecânico |
-| §8.5-d · a ficha esconde a capa | `frameable: false` na tabela das plataformas | **[M]** | mecânico |
+| ~~§8.5-c · `links.mjs` cego ao embed~~ | **feito** na Fase 0 (§9) — espia `platformEmbed(site).src` em todas as plataformas | **[M]** | — |
+| ~~§8.5-d · a ficha esconde a capa~~ | **feito** na Fase 0 (§9) — `frameable: false` + a caixa nasce `falhou` | **[M]** | — |
+| **§8.5-d bis · `scene22`·4 «Cortina»** — o embed do Instagram passou a redireccionar para o login | imagem em vez de site, ou um endereço que sirva o embed sem sessão | **[A]** | autor |
 | §3 · as 8 capas | partilhar os ficheiros e `capas-locais.mjs` | **[A]** | autor |
 | §4 · as 7 não embutíveis | ficheiro em vez de pasta / imagem em vez de site | **[A]** | autor |
-| §5 · as 4 com erro HTTP | partilhar ou trocar o endereço | **[A]** | autor |
+| §5 · as **9** com erro HTTP | partilhar ou trocar o endereço (5 são Vimeo novos) | **[A]** | autor |
 | §6 · os 75 retratos | duas passagens de `retratos-em-vagas.mjs` | **[T]** | máquina |
 
 As provas visuais desta passagem — **14 imagens de página** (as 7 salas com problema, a ampliação do
@@ -896,6 +897,43 @@ a obra.
 2. **O que o visitante vê agora é a exposição completa, com os oito painéis já com a imagem padrão ou o
    thumbnail** — e as 8 capas da §3, as 11 fichas da §4/§5 e o `seam` da §6 continuam por resolver, como
    a §8.6 lista.
+
+---
+
+## 9 · A Fase 0 do plano de acção — o que fechou (2026-11-08)
+
+Sobre a `main` em `8e7a568`. As seis correcções mecânicas de `docs/PLANO-DE-ACAO.md`, cada uma provada
+com o instrumento que a julga, mais **um achado novo** que o instrumento passou a ver.
+
+| O que | Ficheiro | Antes → depois |
+|---|---|---|
+| §8.5-h · `motion` **43/44** | `tools/regression/motion.mjs` | o passo do controlo era **1 cm**, exactamente a guarda do D91 (o `detectTraversal` só conta **mais** de 1 cm): `andou` = 0 em 200 passos. A 2 cm → **44/44**, exit 0 |
+| §8.5-h · a 18.ª falha da `seam` | `tools/regression/seam.mjs` | o check dos escuros corria **antes** da excepção da câmara; `scene3 47 → gate` passa a **1/1**, e os 2 escuros ficam ditos como o arranque do dispositivo |
+| §8.5-d · a ficha escondia a capa | `js/scene/platform-embed.js`, `js/obra.js` | `frameable: false` para a Canva, as pastas do Drive e o `open?id=` (com o porquê medido em `motivo`), e a caixa nasce `falhou` — o `load` de um site que recusa já não a passa a `carregado` |
+| §8.5-c · `links.mjs` cego ao embed | `tools/artwork/links.mjs` | passa a espiar `platformEmbed(site).src` em **todas** as plataformas, e diz para onde o pedido seguiu |
+| §6.1 · os órfãos | `assets/previews/` | 265 → **255** ficheiros, **616 kB**; `validate` 0/0, `mapa --check` OK, `regression/assets.mjs` **10/10** |
+| §8.9 · a publicação sem guarda | `tools/regression/publicado.mjs`, `README.md` | pergunta ao site, sala a sala, a página (200) e o `data/worlds/<slug>.json` (igual ao do repositório): **28 salas + 33 ficheiros** de acordo. Provada a falhar com 1 byte a mais numa sala |
+
+As baterias das fichas, corridas depois da mudança da tabela: `obra.mjs` **82/82**, `ficha-falhas.mjs`
+**3/3**, `capa.mjs` **12/12**, todas exit **0**.
+
+### O achado novo — e é a §8.5-d outra vez, num endereço que a tabela não conhece
+
+`scene22` · obra **4** «Cortina»: o endereço que a ficha desenha,
+`instagram.com/p/DO8PeaMDZ07/embed`, responde **200** com `X-Frame-Options: DENY`, e o pedido segue
+para `instagram.com/accounts/login/`. No browser a moldura mostra a **página de erro do Chrome** (o
+rectângulo cinzento com a folha partida, medido em screenshot a 2026-11-08) e a caixa fica com a classe
+`carregado` — o `INSTANT_LOAD_MS` não a apanha porque o `load` não é instantâneo.
+
+A §8.4 tinha medido esta amostra a **funcionar** a 2026-11-06. O que mudou foi o site, não o projecto —
+e é a razão por que a tabela não deve fechar a porta ao Instagram: um embed que depende de sessão não se
+resolve com uma linha de código. **Fica na §8.6 como pendência do autor**: uma imagem em vez do site, ou
+um endereço que sirva o embed a quem não tem sessão.
+
+O `links.mjs` passou de **19** (medido a 2026-11-06) a **25** problemas — 9 com erro HTTP, 8 que não se
+deixam embutir e 8 capas remotas que não são imagem, em **22 obras distintas**: é o retrato de agora, e
+agora que ele vê o endereço do embed também vê o Vimeo (5 obras) e esta.
+
 
 
 

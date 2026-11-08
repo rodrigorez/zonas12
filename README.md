@@ -2624,6 +2624,13 @@ experimenta o que ainda não entra no caminho do visitante.
 - As imagens têm de ser **2:1** e ficam melhor com 2048 de largura (lei L14); a ferramenta
   `tools/assets/normalize.mjs` corta e reduz sem ampliar
 - Valide antes de publicar: `node tools/scene/validate.mjs` (confere todos os mundos e o grafo)
+- **Publicar é avançar o `main`** — o GitHub Pages serve o `main`, e nenhuma bateria vê o *site*: todas
+  medem o disco, e entre **2026-11-04** e **2026-11-08** o `main` ficou parado e o site publicou **13**
+  salas em vez de 28 (`scene14`, `scene20` e `scene27` respondiam 404) com a bateria verde
+  (`docs/PENDENCIAS.md` §8.9). O caminho é: `node tools/regression/all.mjs --full`, `git push origin
+  main`, esperar a reconstrução do Pages e `node tools/regression/publicado.mjs` — que pergunta, sala a
+  sala, se a página responde 200 **e** se o `data/worlds/<slug>.json` que o site serve é o do
+  repositório (dá `0` quando o site concorda, `1` e o nome da sala quando não)
 
 ### 3. Correr a verificação (um comando)
 

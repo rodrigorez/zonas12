@@ -12,8 +12,10 @@
 // responder sem rede.
 //
 // As plataformas que o projecto converte para um endereço de embed próprio (`js/scene/platform-embed.js`
-// — YouTube, p5.js, Vimeo, OpenProcessing, Shadertoy) são embutíveis por construção: para essas
-// verifica-se o endereço do embed, não o original.
+// — YouTube, p5.js, Vimeo, OpenProcessing, Shadertoy, Instagram, Imgur) são perguntadas **duas** vezes:
+// ao endereço da obra e ao endereço que a ficha desenha. A segunda pergunta é a que apanha o caso que
+// este instrumento era cego a ver (§8.5-c): um domínio que responde bem na página e mal no embed.
+// A tabela também diz, sem rede, quais os endereços que recusam por natureza (`frameable`).
 //
 // Uso, da raiz do projeto:
 //   node tools/artwork/links.mjs               todas as salas
@@ -47,7 +49,11 @@ function espiar(url) {
   const temporizador = setTimeout(() => controlo.abort(), 20000);
   return fetch(url, { redirect: 'follow', signal: controlo.signal })
     .then((resposta) => ({
+      pedido: url,
       estado: resposta.status,
+      // Onde o pedido acabou: um embed que manda para o login é uma recusa que não vem do site, vem
+      // da falta de sessão — e quem lê a lista precisa de saber qual dos dois é.
+      final: resposta.url,
       tipo: (resposta.headers.get('content-type') || '').toLowerCase(),
       xfo: resposta.headers.get('x-frame-options') || '',
       csp: resposta.headers.get('content-security-policy') || ''
@@ -55,6 +61,11 @@ function espiar(url) {
     .catch((erro) => ({ erro: erro.name === 'AbortError' ? 'tempo esgotado (20 s)' : erro.message }))
     .finally(() => clearTimeout(temporizador));
 }
+
+// O que o pedido seguiu, quando seguiu: ` — o pedido seguiu para <endereço>`.
+const seguiu = (info) => (info.final && info.final !== info.pedido
+  ? ' — o pedido seguiu para ' + info.final.split('?')[0]
+  : '');
 
 // Recusa explícita de iframe. `DENY` e `SAMEORIGIN` recusam sempre — a ficha vive noutro endereço.
 function recusaDeEmbed(info) {
@@ -109,15 +120,37 @@ await Promise.all(Array.from({ length: 6 }, async () => {
 
     if (alvo.site) {
       const info = await espiar(alvo.site);
+      let paginaOk = false;
       if (info.erro) add('site não responde', onde, alvo.site + ' — ' + info.erro);
-      else if (info.estado >= 400) add('site com erro HTTP', onde, alvo.site + ' — HTTP ' + info.estado);
-      else if (alvo.embed.platform === 'site') {
+      else if (info.estado >= 400) add('site com erro HTTP', onde, alvo.site + ' — HTTP ' + info.estado + seguiu(info));
+      else if (alvo.embed.frameable === false) {
+        // A tabela das plataformas já sabe os endereços que recusam (Canva, pastas do Drive,
+        // `open?id=`): a resposta é 200 e o iframe fica na mesma vazio (§8.5-d).
+        add('site não pode ser embutido', onde, alvo.site + ' — ' + alvo.embed.motivo);
+      } else if (alvo.embed.platform === 'site') {
         const recusa = recusaDeEmbed(info);
-        if (recusa) add('site não pode ser embutido', onde, alvo.site + ' — ' + recusa);
-      } else if (alvo.embed.platform === 'youtube') {
-        const video = await espiar(alvo.embed.src);
-        if (video.erro || video.estado >= 400) {
-          add('vídeo do YouTube não abre', onde, alvo.embed.src + ' — ' + (video.erro || 'HTTP ' + video.estado));
+        if (recusa) add('site não pode ser embutido', onde, alvo.site + ' — ' + recusa + seguiu(info));
+        else paginaOk = true;
+      } else {
+        paginaOk = true;
+      }
+
+      // O endereço que a ficha **desenha** não é sempre o da obra (D61/D62): o YouTube, o Vimeo, o
+      // Instagram e o Imgur passam por um embed próprio, e um domínio que responde bem na página e mal
+      // no embed ficava invisível para o único instrumento que olha para links (§8.5-c: o
+      // `player.vimeo.com` respondia 401 com a página a responder 200). Pergunta-se ao embed a mesma
+      // coisa que se pergunta à página — status, `X-Frame-Options` e `frame-ancestors`. Só quando a
+      // página passou: duas linhas para a mesma obra seriam o mesmo problema contado duas vezes.
+      if (paginaOk && alvo.embed.src && alvo.embed.src !== alvo.site) {
+        const embed = await espiar(alvo.embed.src);
+        if (embed.erro) add('site não responde', onde, alvo.embed.src + ' (embed) — ' + embed.erro);
+        else if (embed.estado >= 400) {
+          add('site com erro HTTP', onde, alvo.embed.src + ' (embed) — HTTP ' + embed.estado + seguiu(embed));
+        } else {
+          const recusa = recusaDeEmbed(embed);
+          if (recusa) {
+            add('site não pode ser embutido', onde, alvo.embed.src + ' (embed) — ' + recusa + seguiu(embed));
+          }
         }
       }
     }

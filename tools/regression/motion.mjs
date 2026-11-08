@@ -418,9 +418,9 @@ async function main() {
     // A caixa de colisão roda com a porta e varre até 12 m para dentro da sala. Três provas, com a
     // porta rodada **à mão** e a câmara no ponto de chegada:
     //   (a) parado, a porta varre uma volta inteira -> 0 navegações;
-    //   (b) a andar **ao lado** do plano (20 cm, mais que os 1 cm da guarda) enquanto a porta varre ->
-    //       0 navegações. É esta que a D91 fecha: o sinal do plano trocava porque a porta andava, não
-    //       porque alguém tivesse cruzado;
+    //   (b) a andar **ao lado** do plano (48 cm ao todo, mais que os 1 cm da guarda) enquanto a porta
+    //       varre -> 0 navegações. É esta que a D91 fecha: o sinal do plano trocava porque a porta
+    //       andava, não porque alguém tivesse cruzado;
     //   (c) a andar **através** do plano, com a porta parada -> pelo menos uma. Sem este controlo, (a) e
     //       (b) também passavam numa cena onde a travessia não existe.
     const parado = await browser.evaluate(`(async () => {
@@ -428,6 +428,11 @@ async function main() {
       const portal = d.state.portals.find((cada) => cada.data.id === 1);
       d.freezeMotion(true);
       d.settleMotion();
+      // O passo do visitante nestas três provas, e o número que **faz a prova existir**: o
+      // detectTraversal só conta um passo maior que 1 cm (js/modules/portal.js, a guarda que o D91
+      // escreveu). Com 1 cm exacto o movimento não conta como movimento — medido: andou = 0 em 200
+      // passos, zero navegações em (c) e (a)/(b) verdes por vacuidade. A 2 cm as três passam a medir.
+      const PASSO = 0.02;
       const conta = { navegacoes: 0 };
       const original = portal.navigate.bind(portal);
       portal.navigate = function () { conta.navegacoes++; };
@@ -451,23 +456,23 @@ async function main() {
         await espera();
       }
       const semAndar = conta.navegacoes;
-      // (b) A mesma varredura, com a câmara a andar 1 cm por passo **ao lado** do plano.
+      // (b) A mesma varredura, com a câmara a andar 2 cm por passo **ao lado** do plano.
       conta.navegacoes = 0;
       camara.position.copy(chegada);
       for (let i = 0; i < 24; i++) {
         const angulo = (i / 24) * Math.PI * 2;
         portal.el.object3D.rotation.set(base.x + angulo, base.y, base.z);
-        camara.position.addScaledVector(lado, 0.01);
+        camara.position.addScaledVector(lado, PASSO);
         await espera();
       }
       const aoLado = conta.navegacoes;
-      // (c) A porta assente e a câmara a atravessar o plano: 1 cm por passo, para dentro.
+      // (c) A porta assente e a câmara a atravessar o plano: 2 cm por passo, para dentro.
       conta.navegacoes = 0;
       portal.el.object3D.rotation.copy(base);
       camara.position.copy(chegada);
       await espera();
       for (let i = 0; i < 200; i++) {
-        camara.position.addScaledVector(frente, -0.01);
+        camara.position.addScaledVector(frente, -PASSO);
         await espera();
       }
       portal.navigate = original;
@@ -479,7 +484,7 @@ async function main() {
         ' navegação(ões)');
     result.check('sala de ensaio · a andar ao lado do plano, a porta também não o leva (D91)',
       parado.aoLado === 0,
-      'com a câmara a andar 24 cm ao lado do plano e a porta a varrer uma volta inteira: ' +
+      'com a câmara a andar 48 cm ao lado do plano e a porta a varrer uma volta inteira: ' +
         parado.aoLado + ' navegação(ões) — antes da D91 o sinal do plano trocava por a porta andar');
     result.check('sala de ensaio · e o controlo: a atravessar o plano, a porta leva-o',
       parado.atraves > 0,

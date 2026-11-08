@@ -138,6 +138,14 @@ async function drawMedium(world, artwork, language) {
     box.setAttribute('data-meio', 'site');
     box.setAttribute('data-site', artwork.site);
     box.setAttribute('data-platform', embed.platform);
+    // Um site que **recusa** ser embutido não tem como avisar: o `load` dispara na mesma e a moldura
+    // ficaria por cima da capa com a página de erro do browser (medido, §8.5-d do PENDENCIAS — 7 das
+    // 11 fichas reprovadas ficavam com a classe `carregado`). A tabela das plataformas já sabe quais
+    // são, por isso a caixa nasce falhada: a capa fica à vista e o botão «Abrir o site» é a saída.
+    if (embed.frameable === false) {
+      box.classList.add('falhou');
+      box.setAttribute('data-recusa', embed.motivo || '');
+    }
     // O `<img>` da capa resolvida: a cadeia do D65 já correu aqui, por isso ele é a capa.
     box.appendChild(coverImage(world, artwork, language));
     const frame = document.createElement('iframe');
@@ -158,6 +166,9 @@ async function drawMedium(world, artwork, language) {
     // o `load` quase instantaneamente (ver `INSTANT_LOAD_MS`), por isso o tempo é o que o distingue.
     const startedAt = performance.now();
     frame.addEventListener('load', () => {
+      // Um endereço que a tabela já deu por recusado não passa a «carregado»: o que ele carrega é a
+      // página de erro, e a capa tem de continuar à vista.
+      if (embed.frameable === false) return;
       if (performance.now() - startedAt < INSTANT_LOAD_MS) box.classList.add('falhou');
       else box.classList.add('carregado');
     });
