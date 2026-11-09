@@ -209,7 +209,7 @@ na `scene1`.
 | `scene17` | `sala17` Corpo como Território | membrana de perto: veias, poros e uma pulsação lenta |
 | `scene18` | `sala18` Sombras e Raízes | chão de cultivo com sulcos e pedras de bordo nítido, raízes finas a abanar e uma lua com crateras que não ilumina |
 | `scene19` | `sala19` Memória sob Ataque | fatias de imagem a apagar-se, brasas por baixo e estática por cima |
-| `scene20` | `sala20` Habitar | interior sem nada pendurado na parede: tábuas em perspectiva a convergir, uma faixa de luz de porta a andar e poeira a subir nela |
+| `scene20` | `sala20` Habitar | interior sem nada pendurado na parede: soalho de tábuas contado no **plano do mundo** (a convergir para o horizonte, sem costura na emenda), uma faixa de luz de porta a andar e poeira a subir nela |
 | `scene21` | `sala21` Matéria Frágil | o esmalte da porcelana, os cabelos de crack e uma luz que dá a volta à parede em ~22 s — com a poeira do vidrado a subir na luz |
 | `scene22` | `sala22` Ciclos | a lua a passar por todas as fases em ~22 s, com a luz da terra no lado escuro — a sala nunca fica sem o seu foco |
 | `scene23` | `sala23` Sociedades de Controlo | a grelha de células que vigiam, o feixe que varre, o código de barras e o retículo |
