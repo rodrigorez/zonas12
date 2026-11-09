@@ -31,6 +31,12 @@
 //   node tools/regression/teste-final.mjs --fase=portas   só as portas, juntando ao CSV que existe
 //   node tools/regression/teste-final.mjs --sem-rede      não pergunta nada aos sites das obras
 //
+// A costura pixel a pixel de cada porta é da `seam.mjs` (44 s por porta) e entra no CSV pelas colunas
+// `costura` e `costura_nota`, a partir do que ela imprime:
+//
+//   node tools/regression/seam.mjs > seam.log             as 152 portas (~1 h 50)
+//   node tools/regression/teste-final.mjs --fase=costura --costura=seam.log
+//
 // Sai com 0 quando não há nenhuma linha `FALHA`, 1 quando há — é o que o torna utilizável numa
 // bateria. As `ATENÇÃO` não fazem falhar: são o que funciona e merece olho.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -58,6 +64,9 @@ const BASE = opcao('base', 'https://rodrigorez.github.io/zonas12');
 // `--fase=portas` refaz só a passagem das portas e junta o resultado ao CSV que já existe: uma
 // correção de instrumento não obriga a medir as 150 fichas outra vez.
 const FASE = opcao('fase', 'todas');
+// As linhas que a `seam.mjs` imprime (`node tools/regression/seam.mjs > seam.log`), para a coluna
+// `costura` deixar de estar vazia — a costura mede-se à parte porque custa 44 s por porta.
+const LOG_COSTURA = opcao('costura', null);
 
 // ---------------------------------------------------------------- o dado
 
@@ -86,8 +95,8 @@ PARES.sort((a, b) => (ORDEM.get(a.origem) - ORDEM.get(b.origem)) || (a.ida.id - 
 // ---------------------------------------------------------------- o CSV
 
 const COLUNAS = ['ordem', 'nivel', 'sala', 'sala_nome', 'item', 'item_nome', 'ligacao',
-  'ida', 'volta', 'shader', 'capa', 'clique', 'ficha', 'texto', 'site', 'estado', 'observacao',
-  'gravidade', 'url', 'evidencia', 'medido_em'];
+  'ida', 'volta', 'shader', 'costura', 'costura_nota', 'capa', 'clique', 'ficha', 'texto', 'site',
+  'estado', 'observacao', 'gravidade', 'url', 'evidencia', 'medido_em'];
 
 const campo = (valor) => {
   const texto = valor === null || valor === undefined ? '' : String(valor);
@@ -154,7 +163,7 @@ function lerCsv(ficheiro) {
   const registos = { salas: [], portas: [], obras: [] };
   let texto;
   try {
-    texto = readFileSync(ficheiro, 'utf8');
+    texto = lerTexto(ficheiro);
   } catch (error) {
     return registos;
   }
@@ -165,7 +174,9 @@ function lerCsv(ficheiro) {
     const registo = {};
     cabecalho.forEach((coluna, indice) => { registo[coluna] = campos[indice]; });
     if (registo.nivel === 'Portal') {
-      registo.porta = Number(registo.porta);
+      // O número da porta não é coluna do CSV (vive no `item`): lê-se daí, para a costura encontrar a
+      // sua linha.
+      registo.porta = Number(((/(\d+)\s*$/.exec(registo.item) || [])[1]) || NaN);
       registos.portas.push(registo);
       continue;
     }
@@ -781,6 +792,86 @@ async function passagemObras(browser, site) {
   }
 }
 
+// Um log escrito com `>` no PowerShell 5.1 sai em UTF-16, e um CSV aberto no Excel também pode voltar
+// assim. Lê-se o que estiver lá, pelo BOM.
+function lerTexto(ficheiro) {
+  const bytes = readFileSync(ficheiro);
+  if (bytes[0] === 0xFF && bytes[1] === 0xFE) return bytes.toString('utf16le').replace(/^\uFEFF/, '');
+  if (bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) return bytes.subarray(3).toString('utf8');
+  return bytes.toString('utf8');
+}
+
+// As linhas da `seam.mjs`, por porta: `ok   scene5 0 → scene13: o salto no corte é ≤ 0,50 — 0.17 (…)`.
+// A rotina não corre a costura dentro da passagem — são 44 s por porta —, mas sabe ler o que ela mediu.
+function lerCostura(ficheiro) {
+  const mapa = new Map();
+  let texto;
+  try {
+    texto = lerTexto(ficheiro);
+  } catch (error) {
+    return mapa;
+  }
+  const LINHA = /^(ok|FAIL)\s+(scene\d+|gate)\s+(\d+)\s+→\s+(\S+):\s+(.+?)(?:\s+—\s+(.*))?$/;
+  for (const linha of texto.split(/\r?\n/)) {
+    const achado = LINHA.exec(linha.replace(/^\s+/, ''));
+    if (!achado) continue;
+    const chave = achado[2] + '#' + achado[3];
+    const registo = mapa.get(chave)
+      || { destino: achado[4], ok: true, salto: null, instanteMs: null, escuros: null, camera: false };
+    if (achado[1] === 'FAIL') registo.ok = false;
+    const aspeto = achado[5];
+    const detalhe = achado[6] || '';
+    if (/fotograma escuro/.test(aspeto)) {
+      const numero = /(\d+)\s+escuro/.exec(detalhe);
+      if (numero) registo.escuros = Number(numero[1]);
+    } else if (/salto no corte/.test(aspeto)) {
+      const numero = /^([\d.]+)/.exec(detalhe);
+      if (numero) registo.salto = Number(numero[1]);
+    } else if (/instante do corte/.test(aspeto)) {
+      const numero = /(-?[\d.]+)\s*ms/.exec(detalhe);
+      if (numero) registo.instanteMs = Number(numero[1]);
+    } else if (/a chegada é a câmara/.test(aspeto)) {
+      registo.camera = true;
+    }
+    mapa.set(chave, registo);
+  }
+  return mapa;
+}
+
+async function passagemCostura() {
+  if (!LOG_COSTURA) {
+    console.log('  (sem --costura=<ficheiro do seam.mjs>: as colunas costura ficam vazias)');
+    return;
+  }
+  const mapa = lerCostura(LOG_COSTURA);
+  console.log('  costuras lidas do log: ' + mapa.size);
+  let medidas = 0;
+  for (const linha of registos.portas) {
+    const medida = mapa.get(linha.sala + '#' + linha.porta);
+    if (!medida) continue;
+    medidas++;
+    if (medida.camera) {
+      linha.costura = 'n/j';
+      linha.costura_nota = 'a chegada e a camara ao vivo: nao se julga a imagem';
+      continue;
+    }
+    linha.costura = medida.salto === null ? '' : medida.salto.toFixed(2);
+    const partes = [];
+    if (medida.salto !== null) {
+      partes.push('salto ' + medida.salto.toFixed(2) + (medida.salto <= 0.5 ? ' (dentro de 0,50)' : ' (ACIMA de 0,50)'));
+    }
+    if (medida.instanteMs !== null) partes.push('instante ' + medida.instanteMs + ' ms (meta <= 50)');
+    if (medida.escuros !== null) partes.push(medida.escuros + ' escuro(s)');
+    linha.costura_nota = partes.join(' · ');
+    if (!medida.ok) {
+      linha.observacao = (linha.observacao ? linha.observacao + ' · ' : '')
+        + 'a costura da travessia nao fecha: ' + linha.costura_nota;
+      if (linha.estado === 'OK') { linha.estado = 'ATENÇÃO'; linha.gravidade = 'incomoda'; }
+    }
+  }
+  console.log('  portas com costura no CSV: ' + medidas + '/' + registos.portas.length);
+}
+
 // ---------------------------------------------------------------- a corrida
 
 async function main() {
@@ -789,6 +880,21 @@ async function main() {
     + PAGINAS.reduce((soma, pagina) => soma + DADOS.get(pagina.slug).artworks.length, 0) + ' obra(s)'
     + (SO ? ' · so ' + SO : '') + (SEM_REDE ? ' · sem rede' : ''));
   console.log('  o CSV: ' + CSV);
+  // `--fase=costura` não abre browser nenhum: só lê o log do `seam.mjs` e escreve as colunas.
+  if (FASE === 'costura') {
+    const anteriores = lerCsv(CSV);
+    registos.salas = anteriores.salas;
+    registos.portas = anteriores.portas;
+    registos.obras = anteriores.obras;
+    console.log('  so a fase costura · ' + registos.portas.length + ' porta(s) no CSV');
+    await passagemCostura();
+    const linhas = escreverCsv(registos);
+    const comCostura = linhas.filter((linha) => linha.nivel === 'Portal' && linha.costura).length;
+    console.log('');
+    console.log('linhas: ' + linhas.length + ' · com costura: ' + comCostura);
+    console.log('o CSV ficou em ' + CSV);
+    return;
+  }
   const site = await serveProject();
   const browser = await openBrowser({ camera: false, width: 1280, height: 800 });
   try {
@@ -812,6 +918,7 @@ async function main() {
       console.log('3/3 · as fichas das obras');
       await passagemObras(browser, site);
     }
+    if (LOG_COSTURA) await passagemCostura();
   } finally {
     await browser.close();
     site.close();

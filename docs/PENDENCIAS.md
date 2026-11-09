@@ -410,6 +410,28 @@ baixo. Decisão tomada explicitamente com quem pediu: **51 pares**, não 126.
 > final precisa de **uma passagem extra sobre estes 51** para assentar: três passagens, não duas, e
 > ~**1 h 15** no total. Disse-se aqui em vez de o esconder.
 
+### Medido a 2026-11-09: **52 das 152 portas** têm a costura acima de 0,50
+
+A `seam.mjs` correu as **152** portas de uma vez (`node tools/regression/seam.mjs`, 30 min) e deu
+**350 de 402** provas. As 52 que falham são todas a mesma prova — «o salto no corte é ≤ 0,50» —, e
+nenhuma falha o instante do corte (0 ms em todas) nem os fotogramas escuros (0 em todas). Ou seja: a
+ponte chega ao sítio certo e no instante certo; **o que está errado é a imagem que ela mostra**, que é
+o retrato do destino. É exactamente a §6, medida porta a porta pela primeira vez.
+
+| Onde | Portas que falham | Medidas |
+|---|---|---|
+| `scene3`, `scene5`, `scene6`, `scene8`, `scene9` | **4 de 4 cada** | 20 |
+| `scene24`, `scene25`, `scene26`, `scene27` (as salas novas) | **3 de 3 cada** | 12 |
+| `scene4`, `scene7` | 3 de 4 | 6 |
+| `gate` | 3 de 27 | 3 |
+| `scene1`, `scene2`, `scene11`, `scene13`, `scene14`, `scene15`, `scene16`, `scene18`, `scene20`, `scene21`, `scene23` | 1 cada | 11 |
+
+Distribuição das 125 portas julgadas (as 27 que chegam ao portão não se julgam: a imagem é a câmara):
+**mínimo 0,11 · p25 0,24 · mediana 0,40 · p75 1,51 · máximo 12,78**. Uma porta boa anda nos 0,11–0,30;
+as três piores (`scene3`·20 → 12,78, `scene8`·43 → 12,23, `scene6`·41 → 9,44) mostram uma imagem que não
+é deste estado das salas. A lista completa, porta a porta, está nas colunas `costura` e `costura_nota`
+do `docs/TESTE-FINAL.csv` — é a essa lista que as passagens dos retratos têm de responder.
+
 ### 6.1 · Ficheiros órfãos em `assets/previews/` — 13 **[M]**
 
 Nenhuma porta os pede: sobraram de salas que mudaram de sítio ou de topologia. Ocupam ~1,1 MB em jpg

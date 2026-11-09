@@ -2896,10 +2896,21 @@ pela porta inversa; na **ficha** a capa, o meio do tipo, o título, o autor, a s
 o botão do site e o que o site responde — pela ordem de perguntas do `links.mjs`, para os dois não
 dizerem coisas diferentes.
 
+A **costura pixel a pixel** de cada porta não se mede aqui (são 44 s por porta) mas entra no CSV pelas
+colunas `costura` e `costura_nota`, lidas do que a `seam.mjs` imprime:
+
+```powershell
+node tools/regression/seam.mjs > seam.log                                    # as 152 portas (~1 h 50)
+node tools/regression/teste-final.mjs --fase=costura --costura=seam.log      # enche as duas colunas
+```
+
+`costura` é o salto no corte (a meta do D46 é **≤ 0,50**) e `costura_nota` diz o instante e os
+fotogramas escuros; as portas que chegam ao **portão** ficam `n/j`, porque a imagem que se compara é a
+câmara ao vivo e uma fotografia nunca é igual a uma câmara a andar.
+
 Duas notas de leitura: a cadência `/s` é a **entregue** a 1280×800 num Chrome sem cabeça, que é mais
 lenta do que a máquina do autor — o número que julga o shader continua a ser o da bateria do fundo
-(`tools/regression/shader.mjs`, 20,0/s a 800×600); e a costura pixel a pixel das portas **não** está
-aqui (é a `seam.mjs`, 44 s por porta).
+(`tools/regression/shader.mjs`, 20,0/s a 800×600).
 
 ## Melhorias Planejadas
 

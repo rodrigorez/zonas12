@@ -14,7 +14,8 @@
 >
 > **A 2026-11-09 ficou pronta a rotina de teste final** (§7.2): um comando, ~20 min, e um CSV com as
 > 330 linhas da exposição — portão, as 152 portas nas duas direções, as 27 salas e as 150 obras —
-> em `docs/TESTE-FINAL.csv`.
+> em `docs/TESTE-FINAL.csv`. A **costura das 152 portas** também já está medida e dentro do CSV
+> (§7.2.1): **350/402**, com 52 portas acima da meta de 0,50 — todas a apontar para os retratos da §6.
 
 ## Como se lê
 
@@ -261,7 +262,7 @@ passagem extra sobre eles os assenta.
 
 | Comando | O que tem de dar |
 |---|---|
-| `node tools/regression/seam.mjs` | **402/402** (hoje 384/402: as 17 portas são a §6; a 18.ª, a da câmara, já está fechada) |
+| `node tools/regression/seam.mjs` | **402/402** (medido a 2026-11-09: **350/402** — 52 portas com o salto acima de 0,50 e todas a apontar para os retratos da §6; o instante e os escuros passam nas 152) |
 | `node tools/regression/motion.mjs` | **44/44** ✅ (fechada na Fase 0) |
 | `node tools/regression/all.mjs --full` | **31/31**, exit 0 |
 | `medir-paginas.mjs` (28 páginas) | **150/150** malhas · **152/152** janelas · **0** erros |
@@ -300,7 +301,9 @@ portão → portal → sala → obra, sala a sala.
 
 **Resultado da primeira corrida completa** (2026-11-09, `v0.0.60`): **310 OK · 20 ATENÇÃO · 0
 FALHA**; **152/152 portas** com ida e volta a OK; **150/150 obras** abrem a ficha pelo clique, com
-capa, meio e texto. As 20 `ATENÇÃO` são todas pendências conhecidas menos uma:
+capa, meio e texto. Depois de a costura das portas entrar no CSV (`v0.0.61`) as contas são **258 OK ·
+72 ATENÇÃO · 0 FALHA** — as 20 de sempre mais as 52 portas com o salto acima de 0,50 (§7.2.1). As 20
+`ATENÇÃO` de obra são todas pendências conhecidas menos uma:
 
 | Quantas | O que é | Onde está escrito |
 |---|---|---|
@@ -312,12 +315,39 @@ capa, meio e texto. As 20 `ATENÇÃO` são todas pendências conhecidas menos um
 Regras de leitura, para não se repetir a discussão: a cadência `/s` é a **entregue a 1280×800** num
 Chrome sem cabeça (mais lento do que a máquina do autor) e a coluna diz o tamanho; o shader julga-se
 pela bateria do fundo (`shader.mjs`, 20,0/s a 800×600, **23/23** a 2026-11-09); e a costura pixel a
-pixel das portas **não** está nesta rotina — é a `seam.mjs` (44 s por porta).
+pixel das portas vem à parte, nas colunas `costura` e `costura_nota`.
 
 ```powershell
 node tools/regression/teste-final.mjs                  # a exposição inteira (~20 min)
 node tools/regression/teste-final.mjs --fase=portas    # só as portas, juntando ao CSV que existe
 ```
+
+### 7.2.1 · A costura das 152 portas (2026-11-09)
+
+`node tools/regression/seam.mjs` sobre as 152 portas de uma vez — 30 min — deu **350 de 402** provas.
+As 52 que falham são todas «o salto no corte é ≤ 0,50»; **o instante do corte passou nas 152** (0 ms) e
+os **fotogramas escuros também** (0 em todas). A ponte chega ao sítio certo e no instante certo; o que
+está errado é a **imagem** que ela mostra — o retrato do destino —, que é a §6 medida porta a porta
+pela primeira vez.
+
+| | |
+|---|---|
+| portas julgadas | **125** (as 27 que chegam ao portão ficam `n/j`: a imagem é a câmara ao vivo) |
+| dentro da meta (≤ 0,50) | **73** |
+| acima da meta | **52** — `scene3`, `scene5`, `scene6`, `scene8`, `scene9` falham 4 de 4; `scene24`–`scene27` falham 3 de 3; `scene4` e `scene7` 3 de 4; `gate` 3 de 27; onze salas 1 cada |
+| distribuição | mínimo **0,11** · p25 **0,24** · mediana **0,40** · p75 **1,51** · máximo **12,78** |
+| as três piores | `scene3`·20 → 12,78 · `scene8`·43 → 12,23 · `scene6`·41 → 9,44 |
+
+A lista porta a porta fica no CSV (`costura` = o salto, `costura_nota` = instante · escuros · veredicto):
+
+```powershell
+node tools/regression/seam.mjs > seam.log                                    # ~30 min
+node tools/regression/teste-final.mjs --fase=costura --costura=seam.log      # enche as duas colunas
+```
+
+É esta lista que as passagens dos retratos da Fase 3 têm de levar a zero — e a mediana de 0,40 diz que
+**metade das portas já está bem**: o problema não é o mecanismo da ponte, são os retratos que ela
+pinta.
 
 ---
 
@@ -328,7 +358,7 @@ node tools/regression/teste-final.mjs --fase=portas    # só as portas, juntando
 | 0 | **[M]** | nós | ✅ **feita** | §6.1, §8.5-c, §8.5-d, §8.5-h (2), §8.9 |
 | 1 | **[A]** | autor | em curso — **1.1 (nomes) e 1.2 (shaders) feitos** | §3, §3.1, §4, §5, §8.5-b, §8.5-f, §8.5-d bis |
 | 2 | **[M]** | nós | ~1 h | aplica a Fase 1 |
-| 3 | **[T]** | máquina | ~1 h 15 | §6 |
+| 3 | **[T]** | máquina | ~1 h 15 | §6 — e agora com lista: as **52 portas** com a costura acima de 0,50 (§7.2.1) |
 | 4 | **[T]** | máquina | ~4 h | as provas e a publicação — **a rotina da §7.2 é a que mede objeto a objeto** |
 
 A ordem é obrigatória: ~~0~~ → **1** → 2 → 3 → 4. A Fase 0, a §1 e a §2 estão fechadas; o que resta da
