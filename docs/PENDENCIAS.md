@@ -210,12 +210,12 @@ na `scene1`.
 | `scene18` | `sala18` Sombras e Raízes | húmus, raízes a subir e uma lua baixa e fria |
 | `scene19` | `sala19` Memória sob Ataque | fatias de imagem a apagar-se, brasas por baixo e estática por cima |
 | `scene20` | `sala20` Habitar | a parede quente, uma janela de quatro vidros e a luz caída no chão |
-| `scene21` | `sala21` Matéria Frágil | o esmalte da porcelana, poucos cabelos de crack e o brilho rasante |
+| `scene21` | `sala21` Matéria Frágil | o esmalte da porcelana, os cabelos de crack e uma luz que dá a volta à parede em ~22 s — com a poeira do vidrado a subir na luz |
 | `scene22` | `sala22` Ciclos | a lua a passar por todas as fases em ~22 s, com a luz da terra no lado escuro — a sala nunca fica sem o seu foco |
 | `scene23` | `sala23` Sociedades de Controlo | a grelha de células que vigiam, o feixe que varre, o código de barras e o retículo |
 | `scene24` | `sala24` Murmúrio e Matéria | a espiral da concha e a poeira na luz do fim da tarde |
 | `scene25` | `sala25` Arcade Crítico | blocos de três cores, as linhas do tubo e a vinheta |
-| `scene26` | `sala26` Solidão em Rede | nós de luz, fios quase invisíveis e um nó que nunca se apaga |
+| `scene26` | `sala26` Solidão em Rede | nós de luz **a subir** em duas camadas (a de trás mais lenta e apagada), fios quase invisíveis e um nó âmbar parado que nunca se apaga |
 | `scene27` | `sala27` Quem Nos Olha | um olho grande com a íris em anéis, a pupila que segue o visitante e outros pontos a olhar |
 
 Os quatro passos do documento foram cumpridos, e o 4.º **não existia** — ver abaixo.

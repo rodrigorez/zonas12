@@ -144,12 +144,12 @@ coisa), instalados e medidos um a um — todos a **20,0/s** com `p95` de 6,2–6
 | `scene18` | `sala18` Sombras e Raízes | húmus, raízes a subir, lua fria |
 | `scene19` | `sala19` Memória sob Ataque | fatias a apagar, brasas, estática |
 | `scene20` | `sala20` Habitar | parede quente, janela de quatro vidros, luz no chão |
-| `scene21` | `sala21` Matéria Frágil | esmalte de porcelana com cabelos de crack |
+| `scene21` | `sala21` Matéria Frágil | esmalte de porcelana e uma luz que percorre a parede, com a poeira do vidrado a subir |
 | `scene22` | `sala22` Ciclos | a lua a passar por todas as fases |
 | `scene23` | `sala23` Sociedades de Controlo | células que vigiam, feixe, código de barras, retículo |
 | `scene24` | `sala24` Murmúrio e Matéria | a espiral da concha e a poeira |
 | `scene25` | `sala25` Arcade Crítico | blocos de três cores, linhas de tubo, vinheta |
-| `scene26` | `sala26` Solidão em Rede | nós de luz e um nó que nunca se apaga |
+| `scene26` | `sala26` Solidão em Rede | nós de luz a subir em duas camadas e um nó que nunca se apaga |
 | `scene27` | `sala27` Quem Nos Olha | um olho com íris em anéis e pupila que segue |
 
 Três coisas que esta passagem teve de resolver, e que o documento não previa:
