@@ -11,6 +11,10 @@
 > **E a §1 e a §2 também: as 14 salas têm nome e fundo próprio** (§4.1, §4.2) — os nomes escolhidos
 > sobre a análise das 80 obras e os catorze shaders escritos a partir deles, instalados a 20,0/s e
 > provados na cena. O que resta da Fase 1 são as capas e os sítios.
+>
+> **A 2026-11-09 ficou pronta a rotina de teste final** (§7.2): um comando, ~20 min, e um CSV com as
+> 330 linhas da exposição — portão, as 152 portas nas duas direções, as 27 salas e as 150 obras —
+> em `docs/TESTE-FINAL.csv`.
 
 ## Como se lê
 
@@ -280,6 +284,41 @@ números diferentes. Resolvido a 2026-11-09 com a **`v0.0.59`**, um passo à fre
 como marco de onde os shaders entraram; a `v0.0.58` não existe como branch porque **0.59 já a
 contém** (o intervalo `v0.0.51..v0.0.59` são os retratos das portas do Habitar e esta nota).
 
+### 7.2 · A rotina de teste final — o CSV da exposição (2026-11-09)
+
+As baterias dizem «passou»; esta diz **por objeto**: `tools/regression/teste-final.mjs` percorre as
+**28 páginas**, as **152 portas nas duas direções** e as **150 fichas** no browser, com servidor
+local (o `harness.mjs` de sempre), e escreve `docs/TESTE-FINAL.csv` — **330 linhas**, na ordem
+portão → portal → sala → obra, sala a sala.
+
+| Nível | Linhas | O que a linha diz |
+|---|---|---|
+| Portão | 1 | o fundo é a câmara, as 27 portas que saem dele |
+| Portal | 152 | `ida` e `volta` (cada porta medida nos dois sentidos), a chegada (ponto, olhar, 0 travessias a entrar / 1 a voltar), a janela nomeia o shader do destino |
+| Sala | 27 | o fundo (id, cadência, atrasos), a consola, as malhas com capa, as vizinhas e o portão |
+| Obra | 150 | `capa`, `clique` (a obra abre a ficha), `ficha` (o meio do tipo), `texto` (título, autor, sinopse), `site` |
+
+**Resultado da primeira corrida completa** (2026-11-09, `v0.0.60`): **310 OK · 20 ATENÇÃO · 0
+FALHA**; **152/152 portas** com ida e volta a OK; **150/150 obras** abrem a ficha pelo clique, com
+capa, meio e texto. As 20 `ATENÇÃO` são todas pendências conhecidas menos uma:
+
+| Quantas | O que é | Onde está escrito |
+|---|---|---|
+| 9 | site com erro HTTP (403 do Vimeo, 401/404 do Drive) | §5 |
+| 8 | o embed recusa ser embutido (Canva, 6 pastas do Drive, `open?id=`, Instagram da `scene22`·4) | §4, §8.5-d bis |
+| 2 | a capa é a de reserva (o endereço remoto não é imagem) | §3 |
+| 1 | a capa é a de reserva **e o dado não tem chave de capa** — `scene23`·2 «Stoned» | §3.1 |
+
+Regras de leitura, para não se repetir a discussão: a cadência `/s` é a **entregue a 1280×800** num
+Chrome sem cabeça (mais lento do que a máquina do autor) e a coluna diz o tamanho; o shader julga-se
+pela bateria do fundo (`shader.mjs`, 20,0/s a 800×600, **23/23** a 2026-11-09); e a costura pixel a
+pixel das portas **não** está nesta rotina — é a `seam.mjs` (44 s por porta).
+
+```powershell
+node tools/regression/teste-final.mjs                  # a exposição inteira (~20 min)
+node tools/regression/teste-final.mjs --fase=portas    # só as portas, juntando ao CSV que existe
+```
+
 ---
 
 ## 8 · Resumo, por quem fecha
@@ -290,7 +329,8 @@ contém** (o intervalo `v0.0.51..v0.0.59` são os retratos das portas do Habitar
 | 1 | **[A]** | autor | em curso — **1.1 (nomes) e 1.2 (shaders) feitos** | §3, §3.1, §4, §5, §8.5-b, §8.5-f, §8.5-d bis |
 | 2 | **[M]** | nós | ~1 h | aplica a Fase 1 |
 | 3 | **[T]** | máquina | ~1 h 15 | §6 |
-| 4 | **[T]** | máquina | ~4 h | as provas e a publicação |
+| 4 | **[T]** | máquina | ~4 h | as provas e a publicação — **a rotina da §7.2 é a que mede objeto a objeto** |
 
 A ordem é obrigatória: ~~0~~ → **1** → 2 → 3 → 4. A Fase 0, a §1 e a §2 estão fechadas; o que resta da
-Fase 1 são as capas (9 obras) e os sítios (17 obras).
+Fase 1 são as capas (9 obras) e os sítios (17 obras) — e são exactamente as 20 linhas `ATENÇÃO` do
+`docs/TESTE-FINAL.csv`.

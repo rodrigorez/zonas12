@@ -2868,6 +2868,39 @@ O que se lê no painel da sonda, na linha `giroscópio`: `ligado · tremor 0.04`
 `desligado · tremor 45.4` num ruidoso. O limite é **0,5** (graus por amostra²) e está em
 `ORIENTATION.jitterLimit`.
 
+### 10. A rotina de teste final (o CSV da exposição)
+
+As baterias respondem «passou»; esta responde **por objeto**. Uma passagem pelo browser, com servidor
+local (o mesmo `harness.mjs` das outras), que mede as **28 páginas**, as **152 portas nas duas
+direções** e as **150 fichas**, e escreve uma linha por objeto em `docs/TESTE-FINAL.csv` — para
+importar para uma folha e ler-se de cima para baixo.
+
+```powershell
+node tools/regression/teste-final.mjs                     # a exposição inteira (~20 min)
+node tools/regression/teste-final.mjs --so=scene20        # uma sala (para ver o formato)
+node tools/regression/teste-final.mjs --desde=170         # retoma na linha 170
+node tools/regression/teste-final.mjs --fase=portas       # só as portas, juntando ao CSV que existe
+node tools/regression/teste-final.mjs --capturas=<pasta>  # uma imagem de cada linha que falhou
+```
+
+A ordem das linhas é a do pedido: **portão → portal → sala → obra**, sala a sala. As colunas que
+interessam para ler são `nivel`, `estado` (`OK` · `ATENÇÃO` · `FALHA`), `observacao`, `gravidade` e
+`url` (o endereço publicado, para abrir e confirmar). `ATENÇÃO` é o que funciona e merece olho — a capa
+de reserva, um embed que recusa ser embutido, um site que responde 403; `FALHA` é o que não cumpre o
+que promete. Sai com **1** quando há alguma `FALHA`.
+
+O que ela mede, por nível: na **sala** o fundo (id, cadência, atrasos), a consola, as malhas das obras
+com a capa carregada e o clique de cada obra (T6); na **porta** a ida (chega ao destino com `?from=`),
+a chegada (ponto e olhar do dado, nada dispara ao entrar, uma travessia ao voltar — T7/T11) e a volta
+pela porta inversa; na **ficha** a capa, o meio do tipo, o título, o autor, a sinopse, o nome da sala,
+o botão do site e o que o site responde — pela ordem de perguntas do `links.mjs`, para os dois não
+dizerem coisas diferentes.
+
+Duas notas de leitura: a cadência `/s` é a **entregue** a 1280×800 num Chrome sem cabeça, que é mais
+lenta do que a máquina do autor — o número que julga o shader continua a ser o da bateria do fundo
+(`tools/regression/shader.mjs`, 20,0/s a 800×600); e a costura pixel a pixel das portas **não** está
+aqui (é a `seam.mjs`, 44 s por porta).
+
 ## Melhorias Planejadas
 
 A **Fase 7** (§9 de [docs/ROADMAP.md](docs/ROADMAP.md)) fechou em **2026-10-25**: os dez blocos estão
