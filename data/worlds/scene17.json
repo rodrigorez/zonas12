@@ -140,11 +140,11 @@
     {
       "id": 0,
       "kind": "shader",
-      "shaderId": "grade-neon",
+      "shaderId": "sala17",
       "fallbackAsset": "cidade-360",
       "name": {
-        "pt": "Cidade 360º",
-        "en": "City 360º"
+        "pt": "Corpo como Território",
+        "en": "Body as Territory"
       },
       "radius": 500
     },
@@ -438,7 +438,7 @@
         "kind": "preview",
         "asset": "retrato-scene16",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala16",
         "cutout": "recorte-scene16-de-scene17",
         "azimuth": -5.2,
         "reality": [
@@ -586,7 +586,7 @@
         "kind": "preview",
         "asset": "retrato-scene18",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala18",
         "cutout": "recorte-scene18-de-scene17",
         "azimuth": 63,
         "reality": [
@@ -660,7 +660,7 @@
         "kind": "preview",
         "asset": "retrato-scene27",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala27",
         "cutout": "recorte-scene27-de-scene17",
         "azimuth": 81,
         "reality": [

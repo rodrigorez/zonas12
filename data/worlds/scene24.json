@@ -138,11 +138,11 @@
     {
       "id": 0,
       "kind": "shader",
-      "shaderId": "grade-neon",
+      "shaderId": "sala24",
       "fallbackAsset": "cidade-360",
       "name": {
-        "pt": "Cidade 360º",
-        "en": "City 360º"
+        "pt": "Murmúrio e Matéria",
+        "en": "Murmur and Matter"
       },
       "radius": 500
     },
@@ -495,7 +495,7 @@
         "kind": "preview",
         "asset": "retrato-scene25",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala25",
         "cutout": "recorte-scene25-de-scene24",
         "azimuth": -45,
         "reality": [
@@ -643,7 +643,7 @@
         "kind": "preview",
         "asset": "retrato-scene23",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala23",
         "cutout": "recorte-scene23-de-scene24",
         "azimuth": 105,
         "reality": [

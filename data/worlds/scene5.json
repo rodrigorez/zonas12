@@ -619,7 +619,7 @@
         "kind": "preview",
         "asset": "retrato-scene20",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala20",
         "cutout": "recorte-scene20-de-scene5",
         "azimuth": 27,
         "reality": [

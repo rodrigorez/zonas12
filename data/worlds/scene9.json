@@ -585,7 +585,7 @@
         "kind": "preview",
         "asset": "retrato-scene24",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala24",
         "cutout": "recorte-scene24-de-scene9",
         "azimuth": 72,
         "reality": [

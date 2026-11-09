@@ -131,11 +131,11 @@
     {
       "id": 0,
       "kind": "shader",
-      "shaderId": "grade-neon",
+      "shaderId": "sala20",
       "fallbackAsset": "cidade-360",
       "name": {
-        "pt": "Cidade 360º",
-        "en": "City 360º"
+        "pt": "Habitar",
+        "en": "Dwelling"
       },
       "radius": 500
     },
@@ -458,7 +458,7 @@
         "kind": "preview",
         "asset": "retrato-scene19",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala19",
         "cutout": "recorte-scene19-de-scene20",
         "azimuth": 60,
         "reality": [
@@ -606,7 +606,7 @@
         "kind": "preview",
         "asset": "retrato-scene21",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala21",
         "cutout": "recorte-scene21-de-scene20",
         "azimuth": 60,
         "reality": [

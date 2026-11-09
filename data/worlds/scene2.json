@@ -718,7 +718,7 @@
         "kind": "preview",
         "asset": "retrato-scene17",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala17",
         "cutout": "recorte-scene17-de-scene2",
         "azimuth": 5.1,
         "reality": [

@@ -133,11 +133,11 @@
     {
       "id": 0,
       "kind": "shader",
-      "shaderId": "grade-neon",
+      "shaderId": "sala14",
       "fallbackAsset": "cidade-360",
       "name": {
-        "pt": "Cidade 360º",
-        "en": "City 360º"
+        "pt": "Sinais Invisíveis",
+        "en": "Invisible Signals"
       },
       "radius": 500
     },
@@ -549,7 +549,7 @@
         "kind": "preview",
         "asset": "retrato-scene15",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala15",
         "cutout": "recorte-scene15-de-scene14",
         "azimuth": 108,
         "reality": [
@@ -623,7 +623,7 @@
         "kind": "preview",
         "asset": "retrato-scene25",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala25",
         "cutout": "recorte-scene25-de-scene14",
         "azimuth": -63,
         "reality": [

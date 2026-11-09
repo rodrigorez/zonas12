@@ -28,6 +28,20 @@ import { shader as nucleo } from '../shaders/nucleo.js';
 import { shader as fichario } from '../shaders/fichario.js';
 import { shader as deposito } from '../shaders/deposito.js';
 import { shader as projecao } from '../shaders/projecao.js';
+import { shader as sala14 } from '../shaders/sala14.js';
+import { shader as sala15 } from '../shaders/sala15.js';
+import { shader as sala16 } from '../shaders/sala16.js';
+import { shader as sala17 } from '../shaders/sala17.js';
+import { shader as sala18 } from '../shaders/sala18.js';
+import { shader as sala19 } from '../shaders/sala19.js';
+import { shader as sala20 } from '../shaders/sala20.js';
+import { shader as sala21 } from '../shaders/sala21.js';
+import { shader as sala22 } from '../shaders/sala22.js';
+import { shader as sala23 } from '../shaders/sala23.js';
+import { shader as sala24 } from '../shaders/sala24.js';
+import { shader as sala25 } from '../shaders/sala25.js';
+import { shader as sala26 } from '../shaders/sala26.js';
+import { shader as sala27 } from '../shaders/sala27.js';
 // shaders:imports end
 
 export const VERTEX = `
@@ -113,7 +127,21 @@ const INSTALLED = [
   nucleo,
   fichario,
   deposito,
-  projecao
+  projecao,
+  sala14,
+  sala15,
+  sala16,
+  sala17,
+  sala18,
+  sala19,
+  sala20,
+  sala21,
+  sala22,
+  sala23,
+  sala24,
+  sala25,
+  sala26,
+  sala27
   // shaders:list end
 ];
 

@@ -27,7 +27,7 @@ import { spawnSync } from 'node:child_process';
 import { ROOT } from '../regression/harness.mjs';
 import { FIXTURES } from '../../js/scene/fixtures.js';
 import { ENTRY_WORLD } from '../../js/modules/portal-kinds.js';
-import { portaDeChegada, portaNoPortao, proximoId, retrato } from './portas.mjs';
+import { portaDeChegada, portaNoPortao, proximoId, retrato, shaderDoFundo } from './portas.mjs';
 
 const MUNDOS = join(ROOT, 'data', 'worlds');
 
@@ -185,6 +185,37 @@ for (const mundo of mundos.values()) {
 }
 if (nomeadas.size) {
   notas.push('nomes: as descrições das janelas acertadas em ' + nomeadas.size + ' mundo(s)');
+}
+
+// ---- o shader que cada janela ao vivo nomeia (D53) ----
+//
+// Uma janela de retrato desenha o fundo do destino **ao vivo**, e por isso tem de nomear o shader que o
+// destino desenha: é a única coisa que a porta promete. Trocar o fundo de uma sala — como esta passagem
+// fez nas catorze — deixava as vizinhas a nomear o shader antigo, e a porta passaria a mentir sobre a
+// sala do outro lado (o `validate` recusa-o). A leitura é a mesma do `new-room` (`shaderDoFundo`), e o
+// passo fecha: quando a sala não tem shader na dimensão 0, a janela também não nomeia nenhum.
+let janelas = 0;
+for (const mundo of mundos.values()) {
+  for (const portal of mundo.cena.portals || []) {
+    const janela = portal.window || {};
+    const destino = (portal.action || {}).target;
+    if (janela.kind !== 'preview' || typeof destino !== 'string') continue;
+    const sala = mundos.get(destino);
+    if (!sala) continue;
+    const shader = shaderDoFundo(sala.cena);
+    if (shader) {
+      if (janela.shaderId === shader) continue;
+      janela.shaderId = shader;
+    } else {
+      if (!('shaderId' in janela)) continue;
+      delete janela.shaderId;
+    }
+    mudou(mundo);
+    janelas++;
+  }
+}
+if (janelas) {
+  notas.push('shaders: ' + janelas + ' janela(s) passam a nomear o fundo que o destino desenha (D53)');
 }
 
 // ---- escrever ----

@@ -8,9 +8,9 @@
 > provadas com o instrumento que as julga, mais um achado novo (§4.4, o Instagram da `scene22`·4).
 > O registo com os números está na §9 da `docs/PENDENCIAS.md`.
 >
-> **E a §1 também: as 14 salas têm nome** (§4.1) — escolhidos sobre a análise das 80 obras, escritos nas
-> duas línguas, com o `integrar.mjs` a acertar as 252 descrições das janelas. O que resta da Fase 1 são
-> os shaders, as capas e os sítios.
+> **E a §1 e a §2 também: as 14 salas têm nome e fundo próprio** (§4.1, §4.2) — os nomes escolhidos
+> sobre a análise das 80 obras e os catorze shaders escritos a partir deles, instalados a 20,0/s e
+> provados na cena. O que resta da Fase 1 são as capas e os sítios.
 
 ## Como se lê
 
@@ -27,7 +27,7 @@
 | § | Pendência | Estado | Prova (comando e número) |
 |---|---|---|---|
 | 1 | 14 nomes de sala | ✅ **feito (Fase 1)** | escolhidos pelo autor e escritos; a ficha e o `<title>` dizem «Corpo como Território», «Solidão em Rede»… |
-| 2 | shader repetido | ⬜ aberto | 13 shaders; `grade-neon` em **15** salas; a dimensão diz «Cidade 360º» nas 14 novas |
+| 2 | shader repetido | ✅ **feito (Fase 1)** | 14 corpos novos (`sala14`…`sala27`), 27 shaders, `grade-neon` só na `scene1`; `shader/validate --all` 27/27 a 20,0/s |
 | 3 | capas que não carregam | ⬜ aberto | `capas-locais.mjs --check` → **8 remotas em 6 mundos, 0 guardadas** |
 | 3.1 | obra sem capa | ⬜ aberto | `scene23`·2 «Stoned» não tem a chave de capa no dado |
 | 4 | sites não embutíveis | ⬜ aberto | `links.mjs` → **8** (6 pastas do Drive, a Canva da `scene1`·0 e o Instagram da `scene22`·4) |
@@ -129,12 +129,42 @@ O `integrar.mjs` ganhou o passo que faltava: acertar o `alt` do retrato que cada
 cópia do nome fora do ficheiro da própria sala) — 252 descrições, mais o inglês de 13 mundos antigos.
 E, pela §6, **os retratos destas 14 salas passam a ter de ser refeitos** no lote final.
 
-### 4.2 · Shaders **[A]** — 14 salas
+### 4.2 · Shaders **[A]** — 14 salas ✅ **feito a 2026-11-08**
 
-Uma de duas decisões, por sala: (a) um corpo `.glsl` novo → `install.mjs <ficheiro> --id sala<N>
---name "…"` e `dimensions[0].shaderId` passa a `sala<N>`; ou (b) `dimensions[0]` com `kind: "image"`
-e `asset: "cidade-360"`. **Em qualquer dos casos, o nome da dimensão** (hoje «Cidade 360º» nas 15)
-**tem de acompanhar** — o editor agrupa as obras por esse nome.
+Os catorze corpos foram escritos **a partir do nome de cada sala** (a sala e o seu fundo dizem a mesma
+coisa), instalados e medidos um a um — todos a **20,0/s** com `p95` de 6,2–6,3 ms — e ligados ao dado
+(`shaderId` + nome da dimensão). O `grade-neon` ficou só na `scene1`: 13 → **27** shaders.
+
+| Sala | Shader | O que desenha |
+|---|---|---|
+| `scene14` | `sala14` Sinais Invisíveis | frentes de onda de um ponto à frente da chegada, interferência, antenas no chão |
+| `scene15` | `sala15` Paisagens Sonoras | barras de espectro no céu, marulho no chão |
+| `scene16` | `sala16` Depois do Ecrã | varrimento, vazio e um retângulo de pixels acesos |
+| `scene17` | `sala17` Corpo como Território | membrana com veias, poros e pulsação |
+| `scene18` | `sala18` Sombras e Raízes | húmus, raízes a subir, lua fria |
+| `scene19` | `sala19` Memória sob Ataque | fatias a apagar, brasas, estática |
+| `scene20` | `sala20` Habitar | parede quente, janela de quatro vidros, luz no chão |
+| `scene21` | `sala21` Matéria Frágil | esmalte de porcelana com cabelos de crack |
+| `scene22` | `sala22` Ciclos | a lua a passar por todas as fases |
+| `scene23` | `sala23` Sociedades de Controlo | células que vigiam, feixe, código de barras, retículo |
+| `scene24` | `sala24` Murmúrio e Matéria | a espiral da concha e a poeira |
+| `scene25` | `sala25` Arcade Crítico | blocos de três cores, linhas de tubo, vinheta |
+| `scene26` | `sala26` Solidão em Rede | nós de luz e um nó que nunca se apaga |
+| `scene27` | `sala27` Quem Nos Olha | um olho com íris em anéis e pupila que segue |
+
+Três coisas que esta passagem teve de resolver, e que o documento não previa:
+
+1. **O elemento focal de cada fundo foi medido, não adivinhado.** A orientação em que a câmara chega a
+   olhar varia por sala (180°, 171°, 165°, 149°, −135°) e um olho ou uma lua postos a −Z ficavam atrás
+   do visitante. Lida no browser, sala a sala, e escrita no corpo.
+2. **O `integrar.mjs` não fazia o 4.º passo** (o `window.shaderId` das 60 janelas, D53) — respondia
+   `nada a fazer` com o `validate` a recusar. Passou a acertá-lo, com a leitura do `new-room`.
+3. **O T4 da aceitação compara dois pixels**: uma paleta quantizada pode dar-lhes a mesma cor e reprovar
+   sem haver defeito (aconteceu na `scene25`, e passou ao segundo pixel noutra corrida). O fundo dela
+   ganhou um gradiente lento em azimute — que é também a luz desigual do tubo — e a bateria ficou
+   211/211.
+
+Pela §6, **os retratos destas 14 salas têm agora duas razões para serem refeitos** (o nome e o fundo).
 
 ### 4.3 · Capas a partilhar **[A]** — coluna «endereço da imagem»
 
@@ -245,10 +275,10 @@ separam-se em silêncio — foi o que aconteceu entre 2026-11-04 e 2026-11-08.
 | Fase | Marca | Quem | Tempo | Fecha |
 |---|---|---|---|---|
 | 0 | **[M]** | nós | ✅ **feita** | §6.1, §8.5-c, §8.5-d, §8.5-h (2), §8.9 |
-| 1 | **[A]** | autor | em curso — **1.1 (nomes) feito** | §2, §3, §3.1, §4, §5, §8.5-b, §8.5-f, §8.5-d bis |
+| 1 | **[A]** | autor | em curso — **1.1 (nomes) e 1.2 (shaders) feitos** | §3, §3.1, §4, §5, §8.5-b, §8.5-f, §8.5-d bis |
 | 2 | **[M]** | nós | ~1 h | aplica a Fase 1 |
 | 3 | **[T]** | máquina | ~1 h 15 | §6 |
 | 4 | **[T]** | máquina | ~4 h | as provas e a publicação |
 
-A ordem é obrigatória: ~~0~~ → **1** → 2 → 3 → 4. A Fase 0 está fechada e a §1 também; o que resta da
-Fase 1 são os shaders, as capas e os sítios.
+A ordem é obrigatória: ~~0~~ → **1** → 2 → 3 → 4. A Fase 0, a §1 e a §2 estão fechadas; o que resta da
+Fase 1 são as capas (9 obras) e os sítios (17 obras).

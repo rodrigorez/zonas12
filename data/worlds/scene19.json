@@ -124,11 +124,11 @@
     {
       "id": 0,
       "kind": "shader",
-      "shaderId": "grade-neon",
+      "shaderId": "sala19",
       "fallbackAsset": "cidade-360",
       "name": {
-        "pt": "Cidade 360º",
-        "en": "City 360º"
+        "pt": "Memória sob Ataque",
+        "en": "Memory Under Attack"
       },
       "radius": 500
     },
@@ -422,7 +422,7 @@
         "kind": "preview",
         "asset": "retrato-scene18",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala18",
         "cutout": "recorte-scene18-de-scene19",
         "azimuth": -6,
         "reality": [
@@ -570,7 +570,7 @@
         "kind": "preview",
         "asset": "retrato-scene20",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala20",
         "cutout": "recorte-scene20-de-scene19",
         "azimuth": -60,
         "reality": [

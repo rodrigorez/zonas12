@@ -192,26 +192,59 @@ O que ficou feito, e a prova de cada passo:
 > agora: eles vão com o lote final, depois da §2–§5.
 
 
-## 2 · Shader repetido — 1 shader em 15 salas **[A]** + **[T]** + **[M]**
+## 2 · Shader repetido — 1 shader em 15 salas ✅ **feito a 2026-11-08**
 
-O projecto tem **13 shaders** para 27 salas: doze estão em uso único e o `grade-neon` está em quinze
-(`scene1` **e** as 14 salas novas, que herdaram o fundo da `scene1` — é o `--fundo` por omissão do
-`new-room`). Não há shader livre: repetir é a única forma de ficar como está.
+O projecto tinha **13 shaders** para 27 salas: doze em uso único e o `grade-neon` em quinze (`scene1`
+**e** as 14 salas novas, que herdaram o fundo da `scene1` — o `--fundo` por omissão do `new-room`).
 
-- [ ] Correção, por sala — quatro passos, dos quais só o primeiro é do autor:
-      1. escrever o corpo do shader num `.glsl` (**sem** preâmbulo: `uTime`, `vDir`, `az`, `el` e
-         `vec3 col` vêm do `js/modules/shaders.js`);
-      2. `node tools/shader/install.mjs sala14.glsl --id sala14 --name "…"` — grava `js/shaders/sala14.js`
-         e regista-o entre os marcadores `// shaders:list` do registo. **Mede** o corpo: recusa o que não
-         compila, o que não pinta nada, e o que não sustenta 19 atualizações por segundo no teto de 20
-         (`--force` só vence a cadência, e fica com o número medido escrito ao lado);
-      3. em `data/worlds/scene14.json`, `dimensions[0].shaderId` passa a `"sala14"` (o `kind` fica
-         `shader`, o `fallbackAsset` fica);
-      4. `node tools/scene/integrar.mjs` — a janela ao vivo de quem aponta para a sala nomeia o shader
-         que o destino desenha (D53). E depois §6, porque o fundo mudou.
-- [ ] Alternativa legal e imediata, se o shader não vier: `dimensions[0]` com `kind: "image"` e
-      `asset: "cidade-360"` — mas então as quinze salas partilham o mesmo **panorama**, que é o mesmo
-      problema com outra roupa.
+**Feito:** catorze corpos novos, um por sala, escritos **a partir do nome de cada uma** — a sala e o
+seu fundo passam a dizer a mesma coisa. O projecto tem agora **27 shaders** e o `grade-neon` ficou só
+na `scene1`.
+
+| Sala | Shader (id) | O que o corpo desenha |
+|---|---|---|
+| `scene14` | `sala14` Sinais Invisíveis | um ponto à frente da chegada a emitir frentes de onda, interferência por cima e o campo de antenas no chão |
+| `scene15` | `sala15` Paisagens Sonoras | o céu em barras de espectro (36 por volta) e o chão a devolver o marulho |
+| `scene16` | `sala16` Depois do Ecrã | o varrimento do tubo, o vazio e um retângulo de pixels ainda acesos à frente de quem entra |
+| `scene17` | `sala17` Corpo como Território | membrana de perto: veias, poros e uma pulsação lenta |
+| `scene18` | `sala18` Sombras e Raízes | húmus, raízes a subir e uma lua baixa e fria |
+| `scene19` | `sala19` Memória sob Ataque | fatias de imagem a apagar-se, brasas por baixo e estática por cima |
+| `scene20` | `sala20` Habitar | a parede quente, uma janela de quatro vidros e a luz caída no chão |
+| `scene21` | `sala21` Matéria Frágil | o esmalte da porcelana, poucos cabelos de crack e o brilho rasante |
+| `scene22` | `sala22` Ciclos | a lua a passar por todas as fases, com as órbitas atrás |
+| `scene23` | `sala23` Sociedades de Controlo | a grelha de células que vigiam, o feixe que varre, o código de barras e o retículo |
+| `scene24` | `sala24` Murmúrio e Matéria | a espiral da concha e a poeira na luz do fim da tarde |
+| `scene25` | `sala25` Arcade Crítico | blocos de três cores, as linhas do tubo e a vinheta |
+| `scene26` | `sala26` Solidão em Rede | nós de luz, fios quase invisíveis e um nó que nunca se apaga |
+| `scene27` | `sala27` Quem Nos Olha | um olho grande com a íris em anéis, a pupila que segue o visitante e outros pontos a olhar |
+
+Os quatro passos do documento foram cumpridos, e o 4.º **não existia** — ver abaixo.
+
+- [x] **O corpo escrito** para cada sala, com o preâmbulo do `js/modules/shaders.js` (nenhum corpo tem
+      `#`, textura, `uniform`, `discard` ou `while`), e a emenda da esfera tratada à cabeça (D82):
+      tudo o que conta em `volta` usa frequências inteiras, e o que é orgânico vive em `d`/`azim`.
+- [x] **Instalados e medidos**, um a um, pelo `install.mjs`: **20,0/s** (o mínimo é 19, o teto 20) em
+      todos, `p95` de **6,2–6,3 ms**, e nenhum recusado. `node tools/shader/validate.mjs --all` →
+      **27 de 27** shader(s) passam.
+- [x] **O `shaderId` e o nome da dimensão** trocados nas 14 salas (3 linhas por ficheiro), com o nome da
+      dimensão a acompanhar o da sala — o editor agrupa as obras por ele.
+- [x] **A orientação de cada fundo foi medida, não adivinhada**: o elemento focal (a fonte, a janela, a
+      lua, o retículo, o olho) está no azimute em que a câmara chega a olhar — lido no browser, sala a
+      sala (180° em seis delas, 171°, 165°, 149°, −135° nas outras).
+- [x] **`integrar.mjs` ganhou o 4.º passo, que faltava.** O documento mandava-o correr «para a janela ao
+      vivo de quem aponta para a sala nomear o shader que o destino desenha (D53)», e ele respondia
+      `nada a fazer` enquanto o `validate` recusava **60 janelas**. Agora o fecho acerta `window.shaderId`
+      de todas as janelas de retrato a partir do destino (e apaga-o quando a sala não tem shader), com a
+      mesma leitura do `new-room` (`shaderDoFundo`). Idempotente.
+- [x] **Provado na cena, não só no validador**: as 14 salas capturadas no browser depois de instaladas
+      (a folha de contacto está fora do repositório), a luminância média das novas a **0,29** contra
+      **0,39** das antigas — as salas novas ficam no registo nocturno da exposição, sem nenhuma lavada.
+- [x] **As baterias**: `validate` 0/0 · `shader/validate --all` 27/27 · `regression/shader.mjs` 23/23 ·
+      `twelve-tests` 211/211.
+
+> **Para a §6:** o fundo mudou nas 14 salas, por isso os retratos delas têm de ser refeitos — a regra é
+> a mesma que o nome já tinha accionado. Vão no lote final, com os nomes.
+
 
 ## 3 · Capas que não carregam — 8 obras **[A]** → **[M]**
 

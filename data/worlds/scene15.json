@@ -133,11 +133,11 @@
     {
       "id": 0,
       "kind": "shader",
-      "shaderId": "grade-neon",
+      "shaderId": "sala15",
       "fallbackAsset": "cidade-360",
       "name": {
-        "pt": "Cidade 360º",
-        "en": "City 360º"
+        "pt": "Paisagens Sonoras",
+        "en": "Soundscapes"
       },
       "radius": 500
     },
@@ -474,7 +474,7 @@
         "kind": "preview",
         "asset": "retrato-scene14",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala14",
         "cutout": "recorte-scene14-de-scene15",
         "azimuth": -108,
         "reality": [
@@ -548,7 +548,7 @@
         "kind": "preview",
         "asset": "retrato-scene16",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala16",
         "cutout": "recorte-scene16-de-scene15",
         "azimuth": 138.8,
         "reality": [
@@ -622,7 +622,7 @@
         "kind": "preview",
         "asset": "retrato-scene26",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala26",
         "cutout": "recorte-scene26-de-scene15",
         "azimuth": -9,
         "reality": [

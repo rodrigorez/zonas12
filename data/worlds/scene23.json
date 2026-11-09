@@ -117,11 +117,11 @@
     {
       "id": 0,
       "kind": "shader",
-      "shaderId": "grade-neon",
+      "shaderId": "sala23",
       "fallbackAsset": "cidade-360",
       "name": {
-        "pt": "Cidade 360º",
-        "en": "City 360º"
+        "pt": "Sociedades de Controlo",
+        "en": "Control Societies"
       },
       "radius": 500
     },
@@ -414,7 +414,7 @@
         "kind": "preview",
         "asset": "retrato-scene22",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala22",
         "cutout": "recorte-scene22-de-scene23",
         "azimuth": -6,
         "reality": [
@@ -488,7 +488,7 @@
         "kind": "preview",
         "asset": "retrato-scene24",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala24",
         "cutout": "recorte-scene24-de-scene23",
         "azimuth": -105,
         "reality": [

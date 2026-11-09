@@ -117,11 +117,11 @@
     {
       "id": 0,
       "kind": "shader",
-      "shaderId": "grade-neon",
+      "shaderId": "sala18",
       "fallbackAsset": "cidade-360",
       "name": {
-        "pt": "Cidade 360º",
-        "en": "City 360º"
+        "pt": "Sombras e Raízes",
+        "en": "Shadows and Roots"
       },
       "radius": 500
     },
@@ -384,7 +384,7 @@
         "kind": "preview",
         "asset": "retrato-scene17",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala17",
         "cutout": "recorte-scene17-de-scene18",
         "azimuth": -63,
         "reality": [
@@ -532,7 +532,7 @@
         "kind": "preview",
         "asset": "retrato-scene19",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala19",
         "cutout": "recorte-scene19-de-scene18",
         "azimuth": 6,
         "reality": [

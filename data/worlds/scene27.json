@@ -117,11 +117,11 @@
     {
       "id": 0,
       "kind": "shader",
-      "shaderId": "grade-neon",
+      "shaderId": "sala27",
       "fallbackAsset": "cidade-360",
       "name": {
-        "pt": "Cidade 360º",
-        "en": "City 360º"
+        "pt": "Quem Nos Olha",
+        "en": "Who Watches Us"
       },
       "radius": 500
     },
@@ -385,7 +385,7 @@
         "kind": "preview",
         "asset": "retrato-scene16",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala16",
         "cutout": "recorte-scene16-de-scene27",
         "azimuth": 39.9,
         "reality": [
@@ -459,7 +459,7 @@
         "kind": "preview",
         "asset": "retrato-scene17",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala17",
         "cutout": "recorte-scene17-de-scene27",
         "azimuth": -81,
         "reality": [
@@ -533,7 +533,7 @@
         "kind": "preview",
         "asset": "retrato-scene26",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala26",
         "cutout": "recorte-scene26-de-scene27",
         "azimuth": 90,
         "reality": [

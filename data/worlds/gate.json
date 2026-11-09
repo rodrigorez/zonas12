@@ -1358,7 +1358,7 @@
         "kind": "preview",
         "asset": "retrato-scene14",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala14",
         "cutout": "recorte-scene14-de-gate",
         "azimuth": 6.7
       },
@@ -1424,7 +1424,7 @@
         "kind": "preview",
         "asset": "retrato-scene15",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala15",
         "cutout": "recorte-scene15-de-gate",
         "azimuth": -33.3
       },
@@ -1490,7 +1490,7 @@
         "kind": "preview",
         "asset": "retrato-scene16",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala16",
         "cutout": "recorte-scene16-de-gate",
         "azimuth": -42.5
       },
@@ -1556,7 +1556,7 @@
         "kind": "preview",
         "asset": "retrato-scene17",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala17",
         "cutout": "recorte-scene17-de-gate",
         "azimuth": -113.3
       },
@@ -1622,7 +1622,7 @@
         "kind": "preview",
         "asset": "retrato-scene18",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala18",
         "cutout": "recorte-scene18-de-gate",
         "azimuth": -144.3
       },
@@ -1688,7 +1688,7 @@
         "kind": "preview",
         "asset": "retrato-scene19",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala19",
         "cutout": "recorte-scene19-de-gate",
         "azimuth": 168.3
       },
@@ -1754,7 +1754,7 @@
         "kind": "preview",
         "asset": "retrato-scene20",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala20",
         "cutout": "recorte-scene20-de-gate",
         "azimuth": 68.3
       },
@@ -1820,7 +1820,7 @@
         "kind": "preview",
         "asset": "retrato-scene21",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala21",
         "cutout": "recorte-scene21-de-gate",
         "azimuth": 88.3
       },
@@ -1886,7 +1886,7 @@
         "kind": "preview",
         "asset": "retrato-scene22",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala22",
         "cutout": "recorte-scene22-de-gate",
         "azimuth": 42.3
       },
@@ -1952,7 +1952,7 @@
         "kind": "preview",
         "asset": "retrato-scene23",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala23",
         "cutout": "recorte-scene23-de-gate",
         "azimuth": 8.3
       },
@@ -2018,7 +2018,7 @@
         "kind": "preview",
         "asset": "retrato-scene24",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala24",
         "cutout": "recorte-scene24-de-gate",
         "azimuth": -46.7
       },
@@ -2084,7 +2084,7 @@
         "kind": "preview",
         "asset": "retrato-scene25",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala25",
         "cutout": "recorte-scene25-de-gate",
         "azimuth": -131.7
       },
@@ -2150,7 +2150,7 @@
         "kind": "preview",
         "asset": "retrato-scene26",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala26",
         "cutout": "recorte-scene26-de-gate",
         "azimuth": -117.7
       },
@@ -2216,7 +2216,7 @@
         "kind": "preview",
         "asset": "retrato-scene27",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala27",
         "cutout": "recorte-scene27-de-gate",
         "azimuth": -157.7
       },

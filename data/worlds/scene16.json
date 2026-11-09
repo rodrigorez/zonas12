@@ -147,11 +147,11 @@
     {
       "id": 0,
       "kind": "shader",
-      "shaderId": "grade-neon",
+      "shaderId": "sala16",
       "fallbackAsset": "cidade-360",
       "name": {
-        "pt": "Cidade 360º",
-        "en": "City 360º"
+        "pt": "Depois do Ecrã",
+        "en": "After the Screen"
       },
       "radius": 500
     },
@@ -548,7 +548,7 @@
         "kind": "preview",
         "asset": "retrato-scene15",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala15",
         "cutout": "recorte-scene15-de-scene16",
         "azimuth": -138.8,
         "reality": [
@@ -622,7 +622,7 @@
         "kind": "preview",
         "asset": "retrato-scene17",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala17",
         "cutout": "recorte-scene17-de-scene16",
         "azimuth": 5.2,
         "reality": [
@@ -696,7 +696,7 @@
         "kind": "preview",
         "asset": "retrato-scene27",
         "radius": 120,
-        "shaderId": "grade-neon",
+        "shaderId": "sala27",
         "cutout": "recorte-scene27-de-scene16",
         "azimuth": -39.9,
         "reality": [
