@@ -139,11 +139,11 @@ coisa), instalados e medidos um a um — todos a **20,0/s** com `p95` de 6,2–6
 |---|---|---|
 | `scene14` | `sala14` Sinais Invisíveis | frentes de onda de um ponto à frente da chegada, interferência, antenas no chão |
 | `scene15` | `sala15` Paisagens Sonoras | barras de espectro no céu, marulho no chão |
-| `scene16` | `sala16` Depois do Ecrã | varrimento, vazio e um retângulo de pixels acesos |
+| `scene16` | `sala16` Depois do Ecrã | varrimento, tremor de pixels e um feixe a descer o vidro — nada em quadro |
 | `scene17` | `sala17` Corpo como Território | membrana com veias, poros e pulsação |
-| `scene18` | `sala18` Sombras e Raízes | húmus, raízes a subir, lua fria |
+| `scene18` | `sala18` Sombras e Raízes | chão de cultivo nítido, raízes a abanar, lua com crateras |
 | `scene19` | `sala19` Memória sob Ataque | fatias a apagar, brasas, estática |
-| `scene20` | `sala20` Habitar | parede quente, janela de quatro vidros, luz no chão |
+| `scene20` | `sala20` Habitar | tábuas em perspectiva, faixa de luz de porta a andar, poeira |
 | `scene21` | `sala21` Matéria Frágil | esmalte de porcelana e uma luz que percorre a parede, com a poeira do vidrado a subir |
 | `scene22` | `sala22` Ciclos | a lua a passar por todas as fases |
 | `scene23` | `sala23` Sociedades de Controlo | células que vigiam, feixe, código de barras, retículo |

@@ -205,11 +205,11 @@ na `scene1`.
 |---|---|---|
 | `scene14` | `sala14` Sinais Invisíveis | um ponto à frente da chegada a emitir frentes de onda, interferência por cima e o campo de antenas no chão |
 | `scene15` | `sala15` Paisagens Sonoras | o céu em barras de espectro (36 por volta) e o chão a devolver o marulho |
-| `scene16` | `sala16` Depois do Ecrã | o varrimento do tubo, o vazio e um retângulo de pixels ainda acesos à frente de quem entra |
+| `scene16` | `sala16` Depois do Ecrã | o varrimento do tubo, o tremor dos pixels e o último feixe a descer o vidro — **sem nada em quadro**, porque a imagem já não está |
 | `scene17` | `sala17` Corpo como Território | membrana de perto: veias, poros e uma pulsação lenta |
-| `scene18` | `sala18` Sombras e Raízes | húmus, raízes a subir e uma lua baixa e fria |
+| `scene18` | `sala18` Sombras e Raízes | chão de cultivo com sulcos e pedras de bordo nítido, raízes finas a abanar e uma lua com crateras que não ilumina |
 | `scene19` | `sala19` Memória sob Ataque | fatias de imagem a apagar-se, brasas por baixo e estática por cima |
-| `scene20` | `sala20` Habitar | a parede quente, uma janela de quatro vidros e a luz caída no chão |
+| `scene20` | `sala20` Habitar | interior sem nada pendurado na parede: tábuas em perspectiva a convergir, uma faixa de luz de porta a andar e poeira a subir nela |
 | `scene21` | `sala21` Matéria Frágil | o esmalte da porcelana, os cabelos de crack e uma luz que dá a volta à parede em ~22 s — com a poeira do vidrado a subir na luz |
 | `scene22` | `sala22` Ciclos | a lua a passar por todas as fases em ~22 s, com a luz da terra no lado escuro — a sala nunca fica sem o seu foco |
 | `scene23` | `sala23` Sociedades de Controlo | a grelha de células que vigiam, o feixe que varre, o código de barras e o retículo |
