@@ -2631,6 +2631,11 @@ experimenta o que ainda não entra no caminho do visitante.
   main`, esperar a reconstrução do Pages e `node tools/regression/publicado.mjs` — que pergunta, sala a
   sala, se a página responde 200 **e** se o `data/worlds/<slug>.json` que o site serve é o do
   repositório (dá `0` quando o site concorda, `1` e o nome da sala quando não)
+- **A versão é uma branch `v0.0.NN`** — criada no **mesmo commit** da `main` e empurrada com ela
+  (`git branch v0.0.NN; git push origin main v0.0.NN`), e a mensagem desse commit diz «A v0.0.NN: …»,
+  para o nome da branch e o topo da história contarem **o mesmo número**. A branch é o marcador (foi
+  assim desde a `v0.0.1`); um commit numerado a mais do que a branch deixa o repositório a dizer duas
+  versões, e é isso que a `v0.0.59` corrige. A versão publicada hoje é a **`v0.0.59`**
 
 ### 3. Correr a verificação (um comando)
 

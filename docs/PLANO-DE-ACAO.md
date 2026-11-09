@@ -268,6 +268,18 @@ passagem extra sobre eles os assenta.
 Publicar = avançar o `main` para a versão e `git push origin main`. Sem isso, o repositório e o site
 separam-se em silêncio — foi o que aconteceu entre 2026-11-04 e 2026-11-08.
 
+### 7.1 · Uma versão, um número
+
+A versão é a **branch** `v0.0.NN`, criada no mesmo commit da `main` e empurrada com ela; a mensagem
+desse commit diz «A v0.0.NN: …». Foi assim desde a `v0.0.1`, e é a branch que conta.
+
+Nesta ronda, os oito commits da Fase 0 e da Fase 1 (`55f48f7` … `027ca9b`) levaram números
+sequenciais **0.51 → 0.58** e a branch criada no fim chamou-se `v0.0.51` — o nome e o topo diziam
+números diferentes. Resolvido a 2026-11-09 com a **`v0.0.59`**, um passo à frente do **0.58** que o
+`git log` mostra: branch e `main` estão no mesmo commit, e o topo diz «A v0.0.59». A `v0.0.51` fica
+como marco de onde os shaders entraram; a `v0.0.58` não existe como branch porque **0.59 já a
+contém** (o intervalo `v0.0.51..v0.0.59` são os retratos das portas do Habitar e esta nota).
+
 ---
 
 ## 8 · Resumo, por quem fecha
