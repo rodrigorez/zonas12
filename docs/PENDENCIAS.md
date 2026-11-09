@@ -211,7 +211,7 @@ na `scene1`.
 | `scene19` | `sala19` Memória sob Ataque | fatias de imagem a apagar-se, brasas por baixo e estática por cima |
 | `scene20` | `sala20` Habitar | a parede quente, uma janela de quatro vidros e a luz caída no chão |
 | `scene21` | `sala21` Matéria Frágil | o esmalte da porcelana, poucos cabelos de crack e o brilho rasante |
-| `scene22` | `sala22` Ciclos | a lua a passar por todas as fases, com as órbitas atrás |
+| `scene22` | `sala22` Ciclos | a lua a passar por todas as fases em ~22 s, com a luz da terra no lado escuro — a sala nunca fica sem o seu foco |
 | `scene23` | `sala23` Sociedades de Controlo | a grelha de células que vigiam, o feixe que varre, o código de barras e o retículo |
 | `scene24` | `sala24` Murmúrio e Matéria | a espiral da concha e a poeira na luz do fim da tarde |
 | `scene25` | `sala25` Arcade Crítico | blocos de três cores, as linhas do tubo e a vinheta |
